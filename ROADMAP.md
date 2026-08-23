@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.1
+# K-Trader Roadmap v1.2
 
-Status: APPROVED baseline with runtime-coordinator correction, 2026-08-23.
+Status: APPROVED baseline with runtime coordinator implemented, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -71,117 +71,81 @@ Status: IMPLEMENTATION COMPLETE.
 
 Status: IMPLEMENTATION COMPLETE.
 
-Mandatory evaluation order implemented:
+- approved 14-component evaluation flow;
+- canonical setup types and evidence gates;
+- Entry/Luft/SL/structural TP;
+- RR >=3 and ATR-used hard gates;
+- deterministic Setup Score and A+/A/B/C;
+- explicit optional RiskContext;
+- LONG/SHORT/NO_TRADE TradingDecision;
+- Phase 7 isolated harness: 17 passed.
 
-1. Market regime
-2. Liquidity
-3. Session
-4. Trap
-5. MTF levels
-6. Strength
-7. Setup Score
-8. ATR
-9. Setup type
-10. Stop
-11. Entry + luft
-12. Position size
-13. Risk
-14. Rating
-
-Implemented:
-
-- setup candidate discovery from confirmed evidence;
-- `TRAP_VSA_CONFIRMATION`, `VSA_LEVEL_CONFIRMATION`, `TRAP_LEVEL_CONFIRMATION`;
-- evidence identity and setup-type consistency gates;
-- STRONG confirmed/mirror primary-level hard gate;
-- canonical luft `max(1 tick, 0.02*ATR14)`;
-- confirmation-trigger Entry;
-- structural SL;
-- nearest confirmed opposing structural TP;
-- no synthetic 3R target;
-- RR >=3 hard gate;
-- ATR-used origin from UTC-day directional extreme to proposed Entry;
-- 100-point deterministic score;
-- A+ >=90, A >=80, B >=70, C <70;
-- hard rejects force C and public score <=69;
-- optional explicit RiskContext sizing;
-- final LONG/SHORT/NO_TRADE TradingDecision;
-- deterministic Phase 7 exact-module harness: 17 passed.
-
-Exit: PASSED for implementation. Repository-wide CI remains Phase 9.
+Repository-wide CI remains Phase 9.
 
 ## Phase 8 - Read-only K-Trader API
 
 Status: IMPLEMENTATION COMPLETE.
 
-- FastAPI read-only application boundary;
-- `/health`, scanner-status, universe, market, candles, analysis, candidates and signals endpoints;
-- internal `ApiReadModel` populated by scanner runtime;
-- Decimal-as-string exact serialization;
-- UTC ISO-8601 timestamps;
-- provider ambiguity -> HTTP 409, never silent provider substitution;
-- provider/aggregate candle provenance;
-- A/A+ LONG/SHORT-only `/v1/signals`;
-- single-process rate-limit baseline with HTTP 429;
-- FastAPI/Uvicorn runtime dependencies;
-- `custom_gpt/openapi.yaml` with stable operation IDs;
-- Custom GPT Action guide;
+- FastAPI read-only boundary;
+- health/status/universe/market/candles/analysis/candidates/signals;
+- Decimal-as-string and UTC serialization;
+- provider ambiguity fail-closed behavior;
+- API rate limiting;
+- Custom GPT OpenAPI/Action guide;
 - isolated API harness: 7 passed.
-
-Exit: API implementation PASSED.
 
 ## Phase 8.5 - Runtime Scanner Coordinator
 
-Status: REQUIRED / NEXT.
+Status: IMPLEMENTATION COMPLETE / REPOSITORY-WIDE CI EXECUTION PENDING PHASE 9.
 
-This phase was added after Phase 8 repository audit identified a missing application-level orchestration layer.
+Implemented:
 
-Purpose: turn the already implemented Phase 1-7 modules into one autonomous scanner process and publish its state to the Phase 8 API read model.
+- provider priority/fallback refresh per scanner cycle;
+- current liquidity-ranked universe publication;
+- configurable top-N analysis shortlist;
+- bounded MTF bootstrap/analysis concurrency;
+- retained Phase 3 live WebSocket task for the selected provider/shortlist;
+- MTF readiness and freshness validation before every analysis;
+- indicators -> structure -> Trap/VSA -> Phase 7 Trading Engine orchestration;
+- per-symbol failure isolation;
+- explicit `NO_SETUP` -> `NO_TRADE` sentinel only for valid/fresh data;
+- no fabricated decision when mandatory market data is invalid/stale;
+- atomic replacement of status/universe/candles/decisions in `ApiReadModel`;
+- provider/aggregate/mixed candle-series provenance;
+- expanded runtime status and clean shutdown;
+- production entrypoint `uvicorn ktrader.runtime.app:app`;
+- orchestration tests committed.
 
-Required flow:
+Exit condition for implementation: satisfied.
 
-provider selection
--> universe/liquidity shortlist
--> REST bootstrap and live state readiness
--> indicators
--> market structure/levels/session
--> Trap/VSA
--> Setup/Rating Engine
--> ranked decisions/signals
--> `ApiReadModel`
-
-Requirements:
-
-- provider-independent orchestration;
-- read-only only;
-- no cross-provider OHLCV mixing;
-- fail closed on stale/gapped/incomplete data;
-- no TradingDecision until all mandatory inputs are confirmed;
-- repeatable scanner cycle;
-- per-symbol exception isolation;
-- scanner runtime status/error reporting;
-- deterministic orchestration tests;
-- clean shutdown/restart boundaries for Phase 9 Docker service.
-
-Exit: one process can autonomously produce current universe/candidates/signals and continuously update the API read model without manual calls.
+Validation gate: Phase 9 must execute repository-wide pytest before deployment. No Phase 8.5 PASS count is claimed before that CI run.
 
 ## Phase 9 - VPS / Docker / CI-CD
 
-- Ubuntu VPS;
-- Docker + Docker Compose;
-- persistent `/opt/k-trader` data/config/logs;
+NEXT.
+
+Mandatory first gate:
+
+- run complete repository pytest suite;
+- fix any regression before container/deployment work.
+
+Then:
+
+- Dockerfile + Docker Compose;
+- Ubuntu VPS persistent `/opt/k-trader` layout;
+- scanner coordinator + API runtime service;
 - private-repo self-hosted GitHub Runner;
-- repository-wide pytest/build/deploy/health workflow;
-- run scanner coordinator + API as production services;
-- execute pending live provider acceptance from Phases 1-3.
+- push-to-main test/build/deploy/health workflow;
+- target-VPS public REST/bootstrap/WebSocket acceptance for Phases 1-3;
+- HTTPS exposure for read-only API.
 
 ## Phase 10 - Custom GPT Update
 
 - deploy canonical SYSTEM instructions;
-- replace `.invalid` server in OpenAPI with deployed HTTPS host;
+- replace `.invalid` OpenAPI server with deployed HTTPS host;
 - connect read-only Action/OpenAPI schema;
 - validate source/freshness/NO_TRADE output;
-- add valid Privacy Policy URL if GPT distribution mode requires it.
+- add Privacy Policy URL if distribution mode requires it.
 
 ## Phase 11 - Hardening
 
@@ -192,7 +156,7 @@ Exit: one process can autonomously produce current universe/candidates/signals a
 
 ## Phase 12 - Multi-provider expansion
 
-- add OKX/KuCoin/other public adapters through same provider contract;
+- add OKX/KuCoin/other public adapters through the same provider contract;
 - keep Trading Engine provider-independent.
 
 ## Deferred beyond v1
