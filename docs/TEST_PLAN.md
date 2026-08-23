@@ -1,4 +1,4 @@
-# Test Plan v2.2
+# Test Plan v2.3
 
 ## Test layers
 
@@ -106,12 +106,30 @@
 - per-series and bundle SHA-256 integrity
 - bundle roundtrip and tamper detection
 
-13. Integration tests
+13. Full-engine historical replay / outcome studies - Phase 11D
+- live `EngineSymbolAnalyzer` and historical replay share `analyze_candle_snapshot()`
+- replay context JSON roundtrip with confirmed instrument and timestamped liquidity points
+- replay-context provider/symbol/provider-symbol identity enforcement
+- historical liquidity rank/universe-size validation
+- context point selected only when timestamp <= replay cutoff
+- missing/stale liquidity context causes cutoff skip, never fabricated rank
+- chronological MTF slicing before shared engine invocation
+- unchanged setup geometry deduplicated by stable signal key
+- exact decision fingerprint remains time-specific audit identity
+- only unique tradable setups are evaluated for outcomes
+- NO_TRADE decisions do not produce calibration outcomes
+- Phase 11B future-candle evaluator/persistence integration
+- explicit optional study horizon
+- replay study JSONL artifact always keeps `estimated_probability=null`
+- deterministic study identity inputs
+
+14. Integration tests
 - provider -> validation -> storage -> indicators -> structure -> Trap/VSA -> Trading Engine -> runtime coordinator -> API
+- provider-recorded MTF bundle + timestamped liquidity context -> shared analysis engine -> TradingDecision -> outcome evaluator -> OutcomeRepository
 - source/freshness propagation
 - fail-closed NO_TRADE behavior
 
-14. Deployment and architecture tests
+15. Deployment and architecture tests
 - container build/start
 - persistence across restart
 - scanner coordinator + API health
@@ -160,7 +178,7 @@
 - Historical outcome bars must start after the decision's last closed bar.
 - Outcome evaluation must never guess OHLC intrabar ordering.
 - `NO_TRADE`, `AMBIGUOUS`, pending and expired outcomes must not enter the WIN/LOSS binary sample set.
-- Phase 11B/11C must not populate `estimated_probability` or reinterpret Setup Score as probability.
+- Phase 11B/11C/11D must not populate `estimated_probability` or reinterpret Setup Score as probability.
 - Deep historical collection must never splice another provider to fill a missing page.
 - Deep historical collection must fail if the exact requested closed-bar depth cannot be produced.
 - Historical page cursors must make strict backward progress.
@@ -168,6 +186,12 @@
 - Any candle closing after the bundle `as_of` cutoff must be rejected.
 - Replay slicing must exclude all bars not closed by the selected cutoff.
 - Bundle/series digest mismatches must be detected on load.
+- Historical full-engine replay must use the same canonical snapshot analyzer as live runtime.
+- Historical liquidity score/rank/universe size must come from a timestamped replay-context observation, never a guessed default.
+- A replay context observation with timestamp after the cutoff must never be used.
+- A stale or missing replay context observation must skip the cutoff fail-closed.
+- Repeated unchanged setup geometry must not be counted as independent signals on every 5m cutoff.
+- Exact decision fingerprint and stable signal key must remain separate concepts: audit identity vs setup-study identity.
 
 ## Current deterministic verification
 
@@ -184,6 +208,9 @@
 - Phase 10 preparation + Phase 11A final CI run `32647828382`: **106 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - Phase 11B CI run `32650220382`: **121 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - Phase 11C CI run `32652044967`: **134 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- Phase 11D final CI run `32653087172`: **140 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+
+The initial Phase 11D PR gate `32653028353` had 135 passed / 5 failed because one newly added synthetic fixture violated existing OHLC validation (`low > open`). Only the fixture was corrected; production validation was not weakened.
 
 Real provider/Oracle-host acceptance remains a separate Phase 9 live gate. Phase 10 live Action acceptance remains blocked until a real HTTPS endpoint exists.
 
@@ -192,3 +219,5 @@ Real provider/Oracle-host acceptance remains a separate Phase 9 live gate. Phase
 Synthetic fixtures are allowed only inside tests and must be explicitly test data. Production/live outputs may never substitute synthetic data for missing exchange data.
 
 Provider-recorded historical fixtures must preserve provider/symbol/timeframe provenance and the `ktrader.history.v1` content digest. Long real-provider MTF bundles are operator-generated artifacts; normal PR CI uses deterministic mocked provider pages and must not fabricate live exchange captures when network collection is unavailable.
+
+Historical liquidity/universe context must likewise be captured as explicit timestamped study input. A synthetic context may be used only in tests and may never be presented as recorded exchange history.
