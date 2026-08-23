@@ -88,12 +88,22 @@ Exit: deterministic provider-independent market structure/session/level context 
 
 ## Phase 6 - Trap + VSA
 
-- Trap/liquidity-sweep engine.
-- VSA events: ND, NS, T, UT, BC, SC, SV.
-- Context/location/confirmation hard rules.
-- Replay tests against deterministic sequences.
+Status: IMPLEMENTATION COMPLETE.
 
-Exit: VSA/trap events are rule-backed evidence and cannot independently create a trade outside approved structure/location context.
+- Provider-independent trap evidence contract. DONE.
+- Confirmed/mirror support/resistance eligibility. DONE.
+- Failed-break LONG/SHORT sequence with ATR-scaled break threshold. DONE.
+- Return and directional confirmation windows. DONE.
+- Trap states `RETURNED / CONFIRMED / EXPIRED`. DONE.
+- Raw VSA events ND, NS, T, UT, BC, SC, SV. DONE.
+- Previous-20-bar relative volume/spread baseline. DONE.
+- Strict HTF regime and confirmed-level location filters. DONE.
+- ATR-scaled level proximity and next-bar confirmation. DONE.
+- Same-level confirmed trap confluence. DONE.
+- VSA states `RAW / IGNORED / VALID_CONTEXT / CONFIRMED`. DONE.
+- Deterministic Phase 6 harness. DONE: 14 passed; compile validation PASS.
+
+Exit: VSA/trap events are rule-backed evidence and cannot independently create a trade outside approved structure/location/context. No Setup Score or rating is assigned in Phase 6.
 
 ## Phase 7 - Setup / Rating Engine
 
