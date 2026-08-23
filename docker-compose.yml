@@ -18,6 +18,16 @@ services:
       KTRADER_SCAN_INTERVAL_SECONDS: ${KTRADER_SCAN_INTERVAL_SECONDS:-60}
       KTRADER_BOOTSTRAP_CONCURRENCY: ${KTRADER_BOOTSTRAP_CONCURRENCY:-2}
       KTRADER_ACTION_API_KEY: ${KTRADER_ACTION_API_KEY:-}
+      KTRADER_RESEARCH_CAPTURE_ENABLED: ${KTRADER_RESEARCH_CAPTURE_ENABLED:-true}
+      KTRADER_RESEARCH_CAPTURE_INTERVAL_SECONDS: ${KTRADER_RESEARCH_CAPTURE_INTERVAL_SECONDS:-300}
+      KTRADER_RESEARCH_ROOT: /data/research/universe
+      KTRADER_BACKUP_ENABLED: ${KTRADER_BACKUP_ENABLED:-true}
+      KTRADER_BACKUP_INTERVAL_SECONDS: ${KTRADER_BACKUP_INTERVAL_SECONDS:-21600}
+      KTRADER_BACKUP_ROOT: /data/backups
+      KTRADER_BACKUP_RETENTION: ${KTRADER_BACKUP_RETENTION:-7}
+      KTRADER_DISK_MIN_FREE_BYTES: ${KTRADER_DISK_MIN_FREE_BYTES:-2147483648}
+      KTRADER_DISK_MIN_FREE_PERCENT: ${KTRADER_DISK_MIN_FREE_PERCENT:-5}
+      KTRADER_HEALTH_MAX_SCAN_AGE_SECONDS: ${KTRADER_HEALTH_MAX_SCAN_AGE_SECONDS:-180}
     volumes:
       - ${KTRADER_ROOT:-/opt/k-trader}/data:/data
     ports:
@@ -35,6 +45,11 @@ services:
       timeout: 5s
       start_period: 30s
       retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   caddy:
     image: caddy:2-alpine
@@ -59,3 +74,8 @@ services:
       - NET_BIND_SERVICE
     security_opt:
       - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
