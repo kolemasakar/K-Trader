@@ -129,6 +129,19 @@ Repository-side implementation is **VERIFIED**:
 - unique tradable signals feed the conservative Phase 11B future-candle outcome evaluator and optional SQLite outcome store;
 - explicit optional outcome horizon; no universal holding period is invented.
 
+### Phase 11E - Historical Universe / Liquidity Capture + Study Cohorts
+
+Repository-side implementation is **VERIFIED**:
+
+- `ktrader.universe_snapshot.v1` captures one provider-native ranked universe at an explicit UTC timestamp;
+- snapshots preserve the ticker inputs used by liquidity scoring and the live-compatible rank/universe size;
+- `ktrader.universe_archive.v1` stores strictly chronological same-provider/same-config snapshots with per-snapshot and archive SHA-256 integrity;
+- current ticker data is never used to fabricate a historical rank retroactively;
+- `ktrader.study_cohort.v1` selects an explicit time window and optional symbol subset;
+- per-symbol `ktrader.replay_context.v1` files are generated automatically from captured snapshots;
+- provider/config mixing, future ticker timestamps, missing cohort symbols, changed analysis-critical instrument metadata and stale context fail closed;
+- operator utilities capture universe snapshots and build replay cohorts.
+
 Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 
 ## CI evidence
@@ -139,6 +152,7 @@ Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 - CI run `32650220382`: Phase 11B, **121 tests PASS**, amd64/arm64 PASS.
 - CI run `32652044967`: Phase 11C, **134 tests PASS**, amd64/arm64 PASS.
 - CI run `32653087172`: Phase 11D, **140 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- CI run `32654162474`: Phase 11E, **147 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 ## Runtime entrypoint
 
@@ -159,6 +173,8 @@ API-only entrypoint:
 - `scripts/export_provider_history.py`
 - `scripts/export_mtf_history.py`
 - `scripts/run_replay_study.py`
+- `scripts/capture_universe_snapshot.py`
+- `scripts/build_study_cohort.py`
 - `scripts/provision_vps.sh`
 - `scripts/register_runner.sh`
 - `scripts/deploy.sh`
@@ -182,6 +198,7 @@ No exchange credentials are used.
 - `docs/PHASE_11B_CHECKPOINT.md`
 - `docs/PHASE_11C_CHECKPOINT.md`
 - `docs/PHASE_11D_CHECKPOINT.md`
+- `docs/PHASE_11E_CHECKPOINT.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
@@ -193,8 +210,8 @@ No exchange credentials are used.
 
 ## Current phase
 
-Repository-side Phase 10 preparation and Phase 11A/11B/11C/11D hardening are **VERIFIED** with the current **140-test** CI baseline.
+Repository-side Phase 10 preparation and Phase 11A/11B/11C/11D/11E hardening are **VERIFIED** with the current **147-test** CI baseline.
 
-Historical full-engine outcome studies now require two coherent inputs: a provider-recorded MTF bundle and matching timestamped historical liquidity/universe context. Missing context is not fabricated.
+Historical full-engine outcome studies require coherent provider-recorded MTF bundles plus timestamped universe/liquidity context captured prospectively. Missing historical ranks are never fabricated from current ticker data.
 
 External critical path remains: obtain Oracle A1 capacity, provision the ARM64 host, run Phase 9 live acceptance, configure public HTTPS, then activate and validate the Custom GPT Action.
