@@ -199,3 +199,7 @@ api:
   https_required: true
   auth_mode: none_initial
   rate_limit_required: true
+  rate_limit_requests: 120
+  rate_limit_window_seconds: 60
+  trust_x_forwarded_for: false
+  decimal_json_mode: string
