@@ -74,7 +74,9 @@ indicators:
     baseline_window: 20
     exclude_current_from_baseline: true
   atr_used:
-    origin: phase7_setup_rule
+    origin: utc_day_directional_extreme_to_entry
+    source_interval: 5m
+    require_utc_day_start: true
 
 market_structure:
   pivots:
@@ -144,6 +146,36 @@ vsa:
     confirmation_bars: 2
     require_htf_direction: true
     require_confirmed_level: true
+
+trading_engine:
+  setup_types:
+    - TRAP_VSA_CONFIRMATION
+    - VSA_LEVEL_CONFIRMATION
+    - TRAP_LEVEL_CONFIRMATION
+  require_strong_primary_level: true
+  geometry:
+    luft_atr_fraction: 0.02
+    min_luft_ticks: 1
+    target_mode: nearest_confirmed_opposing_level
+    allow_synthetic_rr_target: false
+  scoring:
+    weights:
+      market_regime: 20
+      liquidity: 10
+      session: 5
+      trap: 15
+      mtf_level: 15
+      strength: 10
+      vsa: 15
+      atr: 5
+      rr: 5
+    grades:
+      a_plus_min: 90
+      a_min: 80
+      b_min: 70
+      c_max: 69
+    hard_reject_score_cap: 69
+    score_is_probability: false
 
 risk_rules:
   min_rr: 3.0
