@@ -22,92 +22,50 @@ Collect confirmed public derivatives market data, normalize and validate it, mai
 
 Public Exchange API -> REST/WS Provider -> Normalized Data -> Validation/SQLite -> Universe/Liquidity -> ATR/MA -> Structure/Levels -> Trap -> VSA -> Setup Geometry -> Setup Score -> TradingDecision -> Runtime Coordinator -> Read-only API -> Custom GPT
 
-## Implemented phases
+## Implemented
 
-### Phase 1 - Provider foundation
+### Phase 1-3 - Market data
 
 - exchange-agnostic provider contract;
-- Binance USD-M + Bybit Linear public adapters;
-- public REST history, symbols/tickers, price/liquidity filtering and fallback.
+- Binance USD-M + Bybit Linear public REST/WS adapters;
+- universe/liquidity filtering and provider fallback;
+- MTF bootstrap `1d/4h/1h/15m/5m`;
+- SQLite WAL, UTC/gap/freshness validation;
+- live 5m state, MTF aggregation, reconnect and REST reconciliation.
 
-### Phase 2 - Market-data core
-
-- `1d/4h/1h/15m/5m` bootstrap;
-- SQLite WAL;
-- UTC/gap/freshness validation;
-- atomic MTF persistence.
-
-### Phase 3 - Live market data
-
-- Binance/Bybit public WebSocket;
-- 5m base stream;
-- local 15m/1h/4h/1d aggregation;
-- stale/reconnect/REST reconciliation/gap recovery.
-
-### Phase 4 - Indicators
+### Phase 4-7 - Analysis engine
 
 - Wilder ATR14 and canonical ATR5D;
-- SMA/EMA MA50/200;
-- relative volume/spread;
-- ATR-used helper.
-
-### Phase 5 - Market structure
-
-- swing structure and MTF regime;
-- directional strength;
-- DST-aware sessions;
-- confirmed MTF levels and lifecycle.
-
-### Phase 6 - Trap + VSA
-
-- failed-break/return/confirmation trap engine;
-- ND/NS/T/UT/BC/SC/SV;
-- HTF/location/confirmation hard filters.
-
-### Phase 7 - Setup / Rating Engine
-
-- canonical setup types;
-- STRONG confirmed/mirror primary-level hard gate;
-- confirmation-based Entry + luft;
-- structural Stop and nearest confirmed opposing Target;
-- no synthetic 3R target;
-- RR >=3 hard gate;
-- UTC-day ATR-used rule;
-- deterministic 100-point Setup Score;
-- A+/A/B/C and hard-reject override;
-- optional explicit risk sizing;
+- MA50/200 and relative volume/spread;
+- MTF regime/strength/sessions/levels;
+- Trap + ND/NS/T/UT/BC/SC/SV;
+- canonical setup geometry, RR/ATR hard gates, Setup Score and A+/A/B/C;
 - final `TradingDecision`.
 
 ### Phase 8 - Read-only API
 
-- FastAPI read-only service;
-- `GET /health`;
-- `GET /v1/scanner/status`;
-- `GET /v1/universe`;
-- `GET /v1/market/{symbol}`;
-- `GET /v1/candles/{symbol}`;
-- `GET /v1/analysis/{symbol}`;
-- `GET /v1/candidates`;
-- `GET /v1/signals`;
-- internal thread-safe `ApiReadModel`;
-- Decimal values serialized as exact strings;
-- UTC ISO-8601 timestamps;
-- provider ambiguity returns HTTP 409;
-- candle provenance `provider|aggregate`;
-- rate-limit baseline;
-- `custom_gpt/openapi.yaml` and `ACTION_GUIDE.md`.
+- FastAPI endpoints for health/status/universe/market/candles/analysis/candidates/signals;
+- thread-safe `ApiReadModel`;
+- exact Decimal strings and UTC timestamps;
+- provider ambiguity fail-closed behavior;
+- rate limiting;
+- Custom GPT OpenAPI/Action guide.
 
-## Runtime correction
+### Phase 8.5 - Runtime Scanner Coordinator
 
-Repository audit after Phase 8 found that the original roadmap omitted the application-level coordinator required to continuously compose Phases 1-7 and publish results into the API.
+- autonomous provider -> universe -> data readiness -> indicators -> structure -> Trap/VSA -> Trading Engine flow;
+- configurable top-N liquidity shortlist;
+- bounded bootstrap/analysis concurrency;
+- retained live WebSocket task unless provider/shortlist changes;
+- per-symbol failure isolation;
+- explicit `NO_SETUP` -> `NO_TRADE` sentinel for valid/fresh symbols without setup;
+- no fabricated decision for stale/incomplete data;
+- atomic read-model publication;
+- `provider|aggregate|mixed` series provenance;
+- expanded runtime health/status;
+- production entrypoint `ktrader.runtime.app:app`.
 
-Therefore **Phase 8.5 - Runtime Scanner Coordinator** is required before Docker/VPS deployment.
-
-It will connect:
-
-provider -> universe -> data readiness -> indicators -> structure -> Trap/VSA -> Trading Engine -> ranked decisions -> `ApiReadModel`.
-
-## Verification
+## Verification status
 
 - Phase 1: 7 deterministic tests.
 - Phase 2: 9 deterministic tests.
@@ -117,16 +75,17 @@ provider -> universe -> data readiness -> indicators -> structure -> Trap/VSA ->
 - Phase 6: 14 deterministic tests.
 - Phase 7: 17 isolated exact-module checks.
 - Phase 8: 7 isolated API tests.
+- Phase 8.5 orchestration tests are committed but are not yet claimed as executed.
 
-Repository-wide pytest/CI and real target-VPS REST/WS acceptance remain Phase 9 gates.
+Repository-wide pytest/CI is the first mandatory Phase 9 gate. Real target-VPS REST/WS acceptance also remains Phase 9.
 
-## Development API
+## Runtime entrypoint
 
-After dependencies are installed:
+`PYTHONPATH=src uvicorn ktrader.runtime.app:app --host 127.0.0.1 --port 8000`
+
+The legacy API-only entrypoint remains available for isolated API development:
 
 `PYTHONPATH=src uvicorn ktrader.api.app:app --host 127.0.0.1 --port 8000`
-
-The default process starts with an empty/degraded read model until the runtime coordinator publishes scanner state.
 
 ## Smoke utilities
 
@@ -154,6 +113,6 @@ No exchange credentials are used.
 
 ## Current phase
 
-Phase 8 implementation complete.
+Phase 8.5 implementation complete.
 
-Next required checkpoint: Phase 8.5 - Runtime Scanner Coordinator.
+Next: Phase 9 - repository-wide CI, Docker/VPS deployment and live acceptance.
