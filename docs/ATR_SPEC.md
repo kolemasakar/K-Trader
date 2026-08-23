@@ -1,59 +1,61 @@
-# ATR Specification v1.1
+# ATR Specification v1.2
 
 ## ATR14
 
 ATR14 uses standard True Range over confirmed closed contiguous candles.
 
-True Range for candle `t`:
+`TR_t = max(high_t-low_t, abs(high_t-close_(t-1)), abs(low_t-close_(t-1)))`
 
-`TR_t = max(high_t - low_t, abs(high_t - close_(t-1)), abs(low_t - close_(t-1)))`
+For the first available candle without previous close, `TR = high-low`.
 
-For the first available candle without a previous close, `TR = high - low`.
+Canonical smoothing is Wilder:
 
-Smoothing is canonical Wilder smoothing:
-
-1. seed ATR = arithmetic mean of the first 14 True Range values;
-2. each next ATR = `((previous_ATR * 13) + current_TR) / 14`.
-
-No provider-specific ATR formula is allowed.
+1. seed ATR = arithmetic mean of first 14 True Range values;
+2. next ATR = `((previous_ATR * 13) + current_TR) / 14`.
 
 ## ATR5D
 
-Purpose: estimate recent normal daily movement while excluding abnormal D1 ranges.
+1. Use confirmed closed contiguous canonical `1d` bars.
+2. Calculate Wilder ATR14 series on D1.
+3. Walk backward from latest closed D1 bar.
+4. Candidate range = `high-low`.
+5. Compare with ATR14 ending on that same historical bar.
+6. Reject range `>= 2.0 * ATR14_at_bar`.
+7. Reject range `<= 1/3 * ATR14_at_bar`.
+8. Never replace, duplicate or interpolate rejected bars.
+9. Continue until five valid D1 ranges are collected.
+10. `ATR5D = mean(five valid ranges)`.
 
-Algorithm:
+Same-bar ATR14 reference avoids look-ahead during replay/backtest.
 
-1. Use confirmed closed contiguous canonical `1d` bars only.
-2. Calculate the Wilder ATR14 series on D1.
-3. Walk backward through D1 bars from the latest closed bar.
-4. For each candidate bar calculate `range = high - low`.
-5. Use the ATR14 value ending at that same bar as the abnormal-range reference.
-6. Reject if `range >= 2.0 * ATR14_at_bar`.
-7. Reject if `range <= (1/3) * ATR14_at_bar`.
-8. Do not replace, duplicate or interpolate rejected bars.
-9. Continue backward until 5 valid observations are collected.
-10. `ATR5D = arithmetic mean(valid 5 high-low ranges)`.
+If five valid ranges cannot be confirmed, ATR5D is unavailable and setup fails closed.
 
-Using the ATR14 value from the same historical bar avoids look-ahead when ATR5D is replayed/backtested.
+## ATR used - canonical Phase 7 origin
 
-If 5 valid bars cannot be confirmed after ATR14 becomes available, ATR5D is unavailable and the setup cannot pass ATR validation.
+Phase 7 now defines the previously deferred `move_distance` origin.
 
-The implementation exposes the selected valid ranges/timestamps and rejection counts for deterministic testing/audit.
+Daily range context is reconstructed from confirmed closed 5m candles from exactly `00:00 UTC` through the last closed 5m bar of the current UTC day.
 
-## ATR used
+LONG proposed Entry:
 
-Phase 4 defines only the mathematical metric:
+`move_distance = Entry - observed_UTC_day_low`
+
+SHORT proposed Entry:
+
+`move_distance = observed_UTC_day_high - Entry`
+
+Then:
 
 `ATR_used_pct = abs(move_distance) / ATR5D * 100`
 
 Classification:
 
-- `< 40%` -> `STRONG`
+- `<40%` -> `STRONG`
 - `40% <= value <= 80%` -> `ACCEPTABLE`
-- `> 80%` -> `LATE_REJECT`
+- `>80%` -> `LATE_REJECT`
 
-The canonical `move_distance` origin is deliberately not chosen in the indicator module.
+The metric is calculated against the proposed Entry trigger, not the latest close, so luft is included in the exhaustion test.
 
-It SHALL be defined by the Phase 7 Trading Engine setup rule and must be identical in engine output, API output, tests and Custom GPT interpretation.
+A partial UTC-day range that does not begin at 00:00 UTC cannot be used for this metric.
 
-No GPT-side recalculation may override the engine value.
+GPT-side recalculation must not override the Trading Engine value.
