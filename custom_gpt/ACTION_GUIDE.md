@@ -1,16 +1,23 @@
-# K-Trader Custom GPT Action Guide v1.0
+# K-Trader Custom GPT Action Guide v1.1
 
 ## Role
 
-The Action is a read-only bridge from K_Trader Custom GPT to the K-Trader scanner API.
+The Action is a read-only bridge from K_Trader Custom GPT to the K-Trader scanner API. It cannot place, modify or cancel orders.
 
-It is not a trading/execution API and cannot place, modify or cancel orders.
+## Authentication
+
+Production uses a server-side Bearer API key.
+
+- Server secret: environment/GitHub Environment secret `KTRADER_ACTION_API_KEY`.
+- GPT editor: Authentication -> API key -> Bearer.
+- The secret is never committed to the repository.
+- `/health` and `/privacy` remain public; `/v1/*` is protected when the server secret is configured.
 
 ## Preferred operations
 
-For requests such as "find the best setups now":
+For "find the best setups now":
 
-1. `getHealth` or `getScannerStatus` when data readiness is unknown.
+1. `getHealth` or `getScannerStatus` when readiness is unknown.
 2. `listSignals` for current A/A+ LONG/SHORT signals.
 3. `listCandidates` when the user asks why assets were rejected or wants lower grades.
 
@@ -18,34 +25,44 @@ For one symbol:
 
 1. `getAnalysis` for the canonical TradingDecision.
 2. `getMarketSnapshot` for latest normalized ticker/liquidity metadata.
-3. `getCandles` only when raw confirmed bars are needed, for example to show the latest VSA sequence.
+3. `getCandles` only when confirmed raw bars are needed, such as a VSA sequence.
 
 ## Provider ambiguity
 
-A canonical symbol may exist on more than one provider.
-
-If an operation returns HTTP 409, repeat it with the explicit `provider_id` supplied by the API response/context.
-
-Never silently substitute another provider.
+If an operation returns HTTP 409, repeat it with explicit `provider_id`. Never silently substitute another provider.
 
 ## Data rules
 
-- API market data has priority over Web Search for current OHLCV/VSA analysis.
+- Action API data has priority over Web Search for current OHLCV/VSA analysis.
 - Never mix candle series from different providers.
-- Respect `freshness_status`, `data_time`, `last_closed_bar` and `data_age_seconds`.
+- Respect freshness/data timestamps.
 - Stale/insufficient data cannot be promoted to a trade.
-- Decimal market values are serialized as strings to preserve exact exchange precision.
-- `Setup Score` is not a statistical probability.
-- `estimated_probability` remains null until a calibrated historical model exists.
+- Decimal market values are strings to preserve exact exchange precision.
+- Setup Score is not statistical probability.
+- `estimated_probability` remains null until calibrated historical evidence exists.
+- Preserve canonical TradingDecision Entry/SL/TP/RR/ATR/grade; do not recalculate them in GPT.
 
-## Output rule
+## Deployment rendering
 
-Use the canonical TradingDecision returned by `getAnalysis`/`listSignals`; do not reconstruct Entry, SL, TP, RR, ATR-used or grade independently.
+Canonical `custom_gpt/openapi.yaml` intentionally contains `https://api.k-trader.invalid`.
 
-If the API returns `NO_TRADE`, preserve it and explain `reason_codes` rather than overriding the engine.
+After the real HTTPS origin exists:
 
-## Deployment placeholder
+```sh
+python scripts/render_custom_gpt_openapi.py \
+  --server https://REAL_HOST \
+  --output /tmp/k-trader-openapi.yaml
+```
 
-`custom_gpt/openapi.yaml` currently points to `https://api.k-trader.invalid` intentionally.
+Then run:
 
-Phase 10 must replace it with the real HTTPS host before the Action is enabled in the GPT editor.
+```sh
+python scripts/phase10_action_acceptance.py \
+  --base-url https://REAL_HOST
+```
+
+Use the rendered schema in the existing K_Trader GPT editor. Do not commit a production API key.
+
+## Current OpenAI product constraints to verify at activation
+
+The Action uses the GPT editor's external API Action feature with an OpenAPI schema and API-key authentication. An existing GPT can be edited subject to account/workspace permissions. GPTs use Apps or Actions, not both simultaneously. Public/shared GPT distribution with Actions requires a valid Privacy Policy URL. Re-check these product rules immediately before activation because they can change.

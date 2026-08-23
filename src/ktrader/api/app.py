@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import hmac
 
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 
 from ktrader.api.rate_limit import FixedWindowRateLimitMiddleware
 from ktrader.api.serialization import (
@@ -22,6 +23,16 @@ from ktrader.api.state import (
 API_VERSION = "phase8-v1"
 ALLOWED_INTERVALS = {"5m", "15m", "1h", "4h", "1d"}
 ALLOWED_GRADES = {"A+", "A", "B", "C"}
+PRIVACY_POLICY_TEXT = """K-Trader Action Privacy Policy
+
+K-Trader exposes read-only public derivatives market data and deterministic scanner results to the K_Trader Custom GPT. It does not accept exchange credentials, does not access exchange accounts, and cannot place, modify, or cancel orders.
+
+The API is designed not to store ChatGPT prompts or conversation content. Normal infrastructure and application logs may contain technical request metadata such as timestamp, client/network address, HTTP path, status code, and diagnostic information needed to operate and secure the service.
+
+Market-data requests may be forwarded to configured public exchange market-data endpoints. No ChatGPT account credentials or exchange account credentials are sent to those providers.
+
+Contact and policy-owner details should be added before public GPT distribution if required by the selected publishing mode.
+"""
 
 
 def create_app(
@@ -30,8 +41,10 @@ def create_app(
     rate_limit_requests: int = 120,
     rate_limit_window_seconds: int = 60,
     lifespan=None,
+    action_api_key: str | None = None,
 ) -> FastAPI:
     state = read_model or ApiReadModel()
+    secret = action_api_key.strip() if action_api_key and action_api_key.strip() else None
     app = FastAPI(
         title="K-Trader Read-only API",
         version=API_VERSION,
@@ -42,11 +55,26 @@ def create_app(
         lifespan=lifespan,
     )
     app.state.read_model = state
+    app.state.action_auth_enabled = secret is not None
     app.add_middleware(
         FixedWindowRateLimitMiddleware,
         max_requests=rate_limit_requests,
         window_seconds=rate_limit_window_seconds,
     )
+
+    @app.middleware("http")
+    async def action_auth(request: Request, call_next):
+        if secret is not None and request.url.path.startswith("/v1/"):
+            authorization = request.headers.get("authorization", "")
+            prefix = "Bearer "
+            supplied = authorization[len(prefix):] if authorization.startswith(prefix) else ""
+            if not supplied or not hmac.compare_digest(supplied, secret):
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": "unauthorized"},
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+        return await call_next(request)
 
     @app.exception_handler(SymbolNotFoundError)
     async def not_found_handler(_request: Request, exc: SymbolNotFoundError):
@@ -73,8 +101,13 @@ def create_app(
             "data_ready": status.data_ready,
             "scanner_status": status.status,
             "provider_id": status.provider_id,
+            "action_auth_enabled": secret is not None,
             "generated_at": now.isoformat().replace("+00:00", "Z"),
         }
+
+    @app.get("/privacy", include_in_schema=False)
+    def privacy_policy():
+        return PlainTextResponse(PRIVACY_POLICY_TEXT)
 
     @app.get("/v1/scanner/status", operation_id="getScannerStatus")
     def scanner_status() -> dict:

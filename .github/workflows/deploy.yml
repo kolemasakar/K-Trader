@@ -18,6 +18,7 @@ jobs:
     timeout-minutes: 30
     env:
       KTRADER_DOMAIN: ${{ vars.KTRADER_DOMAIN }}
+      KTRADER_ACTION_API_KEY: ${{ secrets.KTRADER_ACTION_API_KEY }}
     steps:
       - name: Checkout approved main
         uses: actions/checkout@v6

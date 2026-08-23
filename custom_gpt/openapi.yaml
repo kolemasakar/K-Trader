@@ -1,27 +1,29 @@
 openapi: 3.1.0
 info:
   title: K-Trader Read-only API
-  version: phase8-v1
+  version: phase10-prep-v1
   description: >-
     Read-only market scanner API for K_Trader. It exposes confirmed public
-    market data and Trading Engine results. It cannot place, modify or cancel
-    orders and exposes no exchange-account endpoints.
+    market data and canonical Trading Engine results. It cannot place, modify,
+    or cancel orders and exposes no exchange-account endpoints.
 servers:
   - url: https://api.k-trader.invalid
-    description: Replace with the deployed HTTPS API host before enabling the Action.
+    description: Replace with the deployed HTTPS origin before enabling the Action.
+security:
+  - BearerAuth: []
 paths:
   /health:
     get:
       operationId: getHealth
       summary: Check K-Trader API and scanner readiness
+      security: []
       responses:
         '200':
           description: API/scanner health state
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/Health'
   /v1/scanner/status:
     get:
       operationId: getScannerStatus
@@ -32,8 +34,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/ScannerStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /v1/universe:
     get:
       operationId: listUniverse
@@ -47,8 +50,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/UniverseList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /v1/market/{symbol}:
     get:
       operationId: getMarketSnapshot
@@ -62,12 +66,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/UniverseCandidate'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Symbol not found
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Symbol exists on multiple providers; repeat with provider_id
+          $ref: '#/components/responses/Ambiguous'
   /v1/candles/{symbol}:
     get:
       operationId: getCandles
@@ -93,16 +98,17 @@ paths:
             default: 100
       responses:
         '200':
-          description: Candle series including provider/aggregate provenance
+          description: Confirmed candle series including provider/aggregate provenance
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/CandleSeries'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Symbol/timeframe not found
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Symbol exists on multiple providers; repeat with provider_id
+          $ref: '#/components/responses/Ambiguous'
   /v1/analysis/{symbol}:
     get:
       operationId: getAnalysis
@@ -110,7 +116,7 @@ paths:
       description: >-
         Returns LONG, SHORT or NO_TRADE plus Grade, Setup Score, Entry/SL/TP,
         RR, ATR, evidence, reason codes and freshness. Setup Score is not a
-        statistical probability.
+        statistical probability. Preserve the returned TradingDecision fields.
       parameters:
         - $ref: '#/components/parameters/Symbol'
         - $ref: '#/components/parameters/ProviderId'
@@ -120,12 +126,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/TradingDecision'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: No analysis available
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Symbol exists on multiple providers; repeat with provider_id
+          $ref: '#/components/responses/Ambiguous'
   /v1/candidates:
     get:
       operationId: listCandidates
@@ -145,8 +152,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/DecisionList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /v1/signals:
     get:
       operationId: listSignals
@@ -160,9 +168,15 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/DecisionList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Configure the GPT Action with the same API key stored as KTRADER_ACTION_API_KEY on the server.
   parameters:
     Symbol:
       name: symbol
@@ -189,3 +203,156 @@ components:
         minimum: 1
         maximum: 200
         default: 50
+  responses:
+    Unauthorized:
+      description: Missing or invalid Bearer API key
+    NotFound:
+      description: Requested symbol or analysis is not available
+    Ambiguous:
+      description: Symbol exists on multiple providers; repeat with provider_id
+  schemas:
+    Health:
+      type: object
+      required: [status, mode, api_version, data_ready, scanner_status, action_auth_enabled, generated_at]
+      properties:
+        status: {type: string, enum: [ok, degraded]}
+        mode: {type: string, enum: [read_only]}
+        api_version: {type: string}
+        data_ready: {type: boolean}
+        scanner_status: {type: string}
+        provider_id: {type: [string, 'null']}
+        action_auth_enabled: {type: boolean}
+        generated_at: {type: string, format: date-time}
+    ScannerStatus:
+      type: object
+      required: [status, universe_size, data_ready, cycle_id, symbols_ready, symbols_failed, live_streaming, started_at]
+      properties:
+        status: {type: string}
+        provider_id: {type: [string, 'null']}
+        universe_size: {type: integer}
+        data_ready: {type: boolean}
+        last_scan_at: {type: [string, 'null'], format: date-time}
+        last_error: {type: [string, 'null']}
+        cycle_id: {type: integer}
+        symbols_ready: {type: integer}
+        symbols_failed: {type: integer}
+        live_streaming: {type: boolean}
+        last_cycle_duration_seconds: {type: [number, 'null']}
+        started_at: {type: string, format: date-time}
+    UniverseList:
+      type: object
+      required: [count, items]
+      properties:
+        count: {type: integer}
+        provider_id: {type: [string, 'null']}
+        items:
+          type: array
+          items: {$ref: '#/components/schemas/UniverseCandidate'}
+    UniverseCandidate:
+      type: object
+      required: [provider_id, canonical_symbol, provider_symbol, market_type, contract_type, status, base_asset, quote_asset, last_price, liquidity_score, data_time, data_age_seconds]
+      properties:
+        provider_id: {type: string}
+        canonical_symbol: {type: string}
+        provider_symbol: {type: string}
+        market_type: {type: string}
+        contract_type: {type: string}
+        status: {type: string}
+        base_asset: {type: string}
+        quote_asset: {type: string}
+        price_tick: {type: [string, 'null']}
+        quantity_step: {type: [string, 'null']}
+        last_price: {type: string}
+        quote_volume_24h: {type: [string, 'null']}
+        base_volume_24h: {type: [string, 'null']}
+        trade_count_24h: {type: [integer, 'null']}
+        bid_price: {type: [string, 'null']}
+        ask_price: {type: [string, 'null']}
+        spread_bps: {type: [string, 'null']}
+        open_interest: {type: [string, 'null']}
+        liquidity_score: {type: string}
+        data_time: {type: string, format: date-time}
+        data_age_seconds: {type: number}
+    CandleSeries:
+      type: object
+      required: [provider_id, canonical_symbol, interval, source_kind, count, candles]
+      properties:
+        provider_id: {type: string}
+        canonical_symbol: {type: string}
+        interval: {type: string, enum: [5m, 15m, 1h, 4h, 1d]}
+        source_kind: {type: string, enum: [provider, aggregate, mixed]}
+        count: {type: integer}
+        candles:
+          type: array
+          items: {$ref: '#/components/schemas/Candle'}
+    Candle:
+      type: object
+      required: [provider_id, canonical_symbol, interval, open_time, close_time, open, high, low, close, volume, closed]
+      properties:
+        provider_id: {type: string}
+        canonical_symbol: {type: string}
+        interval: {type: string}
+        open_time: {type: string, format: date-time}
+        close_time: {type: string, format: date-time}
+        open: {type: string}
+        high: {type: string}
+        low: {type: string}
+        close: {type: string}
+        volume: {type: string}
+        quote_volume: {type: [string, 'null']}
+        trade_count: {type: [integer, 'null']}
+        taker_buy_volume: {type: [string, 'null']}
+        taker_buy_quote_volume: {type: [string, 'null']}
+        closed: {type: boolean}
+    DecisionList:
+      type: object
+      required: [count, items]
+      properties:
+        count: {type: integer}
+        items:
+          type: array
+          items: {$ref: '#/components/schemas/TradingDecision'}
+    TradingDecision:
+      type: object
+      required: [provider_id, exchange, canonical_symbol, provider_symbol, market_type, side, grade, setup_score, raw_score, setup_type, market_regime, trend_context, liquidity_rank, sessions, session_overlap, strength, reason_codes, data_time, last_closed_bar, data_age_seconds, freshness_status, generated_at, engine_version, estimated_probability]
+      properties:
+        provider_id: {type: string}
+        exchange: {type: string}
+        canonical_symbol: {type: string}
+        provider_symbol: {type: string}
+        market_type: {type: string}
+        side: {type: string, enum: [LONG, SHORT, NO_TRADE]}
+        grade: {type: string, enum: [A+, A, B, C]}
+        setup_score: {type: integer, minimum: 0, maximum: 100}
+        raw_score: {type: integer}
+        setup_type: {type: string}
+        market_regime: {type: string}
+        trend_context: {type: string}
+        liquidity_rank: {type: integer}
+        liquidity_score: {type: [string, 'null']}
+        sessions: {type: array, items: {type: string}}
+        session_overlap: {type: boolean}
+        strength: {type: string}
+        primary_level_id: {type: [string, 'null']}
+        primary_level_strength: {type: [string, 'null']}
+        trap_state: {type: [string, 'null']}
+        vsa_events: {type: array, items: {type: string}}
+        entry: {type: [string, 'null']}
+        luft: {type: [string, 'null']}
+        stop: {type: [string, 'null']}
+        target: {type: [string, 'null']}
+        rr: {type: [string, 'null']}
+        atr5d: {type: [string, 'null']}
+        atr_used_pct: {type: [string, 'null']}
+        atr_state: {type: [string, 'null']}
+        position_size: {type: [string, 'null']}
+        risk_amount: {type: [string, 'null']}
+        risk_percent: {type: [string, 'null']}
+        reason_codes: {type: array, items: {type: string}}
+        data_time: {type: string, format: date-time}
+        last_closed_bar: {type: string, format: date-time}
+        data_age_seconds: {type: number}
+        freshness_status: {type: string, enum: [FRESH, STALE]}
+        generated_at: {type: string, format: date-time}
+        engine_version: {type: string}
+        estimated_probability: {type: [number, 'null']}
