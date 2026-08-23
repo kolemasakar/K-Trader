@@ -57,6 +57,25 @@ live:
   persist_open_candles: false
   fail_on_stale_data: true
 
+indicators:
+  atr:
+    period: 14
+    smoothing: wilder
+  atr5d:
+    valid_days: 5
+    abnormal_high_multiplier: 2.0
+    abnormal_low_multiplier: 0.3333333333333333
+    reference_mode: same_bar_atr14
+  moving_average:
+    method: sma
+    fast_period: 50
+    slow_period: 200
+  volume:
+    baseline_window: 20
+    exclude_current_from_baseline: true
+  atr_used:
+    origin: phase7_setup_rule
+
 risk_rules:
   min_rr: 3.0
   atr_used_strong_max_pct: 40
