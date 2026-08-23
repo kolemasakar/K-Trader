@@ -1,4 +1,4 @@
-# Test Plan v2.1
+# Test Plan v2.2
 
 ## Test layers
 
@@ -90,12 +90,28 @@
 - SQLite outcome pending-to-resolved upsert
 - binary sample query contains WIN/LOSS only
 
-12. Integration tests
+12. Deep provider history / MTF replay - Phase 11C
+- Binance historical `endTime` and Bybit historical `end` cursor translation
+- strict backward page-cursor progress
+- page deduplication by candle open time
+- exact requested closed-bar depth
+- unsupported pagination and insufficient-depth fail-closed behavior
+- cross-provider page identity rejection
+- final merged-history gap rejection
+- canonical `1d/4h/1h/15m/5m` bundle membership
+- one provider/canonical symbol/provider symbol across the full bundle
+- shared UTC `as_of` cutoff across all timeframes
+- future candle beyond `as_of` rejection
+- no-lookahead slicing to explicit replay cutoff
+- per-series and bundle SHA-256 integrity
+- bundle roundtrip and tamper detection
+
+13. Integration tests
 - provider -> validation -> storage -> indicators -> structure -> Trap/VSA -> Trading Engine -> runtime coordinator -> API
 - source/freshness propagation
 - fail-closed NO_TRADE behavior
 
-13. Deployment and architecture tests
+14. Deployment and architecture tests
 - container build/start
 - persistence across restart
 - scanner coordinator + API health
@@ -144,7 +160,14 @@
 - Historical outcome bars must start after the decision's last closed bar.
 - Outcome evaluation must never guess OHLC intrabar ordering.
 - `NO_TRADE`, `AMBIGUOUS`, pending and expired outcomes must not enter the WIN/LOSS binary sample set.
-- Phase 11B must not populate `estimated_probability` or reinterpret Setup Score as probability.
+- Phase 11B/11C must not populate `estimated_probability` or reinterpret Setup Score as probability.
+- Deep historical collection must never splice another provider to fill a missing page.
+- Deep historical collection must fail if the exact requested closed-bar depth cannot be produced.
+- Historical page cursors must make strict backward progress.
+- An MTF replay bundle must contain exactly `1d/4h/1h/15m/5m` for one provider and one symbol identity.
+- Any candle closing after the bundle `as_of` cutoff must be rejected.
+- Replay slicing must exclude all bars not closed by the selected cutoff.
+- Bundle/series digest mismatches must be detected on load.
 
 ## Current deterministic verification
 
@@ -160,6 +183,7 @@
 - Phase 9.1 CI run `32646869264`: **92 passed**, amd64/arm64 Docker/runtime PASS.
 - Phase 10 preparation + Phase 11A final CI run `32647828382`: **106 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - Phase 11B CI run `32650220382`: **121 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- Phase 11C CI run `32652044967`: **134 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 Real provider/Oracle-host acceptance remains a separate Phase 9 live gate. Phase 10 live Action acceptance remains blocked until a real HTTPS endpoint exists.
 
@@ -167,4 +191,4 @@ Real provider/Oracle-host acceptance remains a separate Phase 9 live gate. Phase
 
 Synthetic fixtures are allowed only inside tests and must be explicitly test data. Production/live outputs may never substitute synthetic data for missing exchange data.
 
-Provider-recorded historical fixtures added later must preserve provider/symbol/timeframe provenance and the `ktrader.history.v1` content digest.
+Provider-recorded historical fixtures must preserve provider/symbol/timeframe provenance and the `ktrader.history.v1` content digest. Long real-provider MTF bundles are operator-generated artifacts; normal PR CI uses deterministic mocked provider pages and must not fabricate live exchange captures when network collection is unavailable.
