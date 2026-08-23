@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-08-23 - Phase 7 setup / rating engine
+
+- Added provider-independent Trading Engine package.
+- Added setup candidate discovery from confirmed trap/VSA evidence.
+- Added canonical setup types: TRAP_VSA_CONFIRMATION, VSA_LEVEL_CONFIRMATION, TRAP_LEVEL_CONFIRMATION.
+- Added evidence identity/setup-type consistency hard gates.
+- Added STRONG confirmed/mirror primary-level hard gate.
+- Added canonical Entry trigger and luft `max(1 tick, 0.02 * ATR14)`.
+- Added structural Stop using level boundary / trap sweep extreme.
+- Added nearest confirmed/mirror opposing structural Target.
+- Prohibited synthetic 3R targets when no structural target exists.
+- Added RR >=3 hard gate.
+- Defined canonical ATR-used origin from UTC-day directional extreme to proposed Entry.
+- Added 100-point deterministic scoring weights and A+/A/B/C thresholds.
+- Added hard-reject public score cap <=69 and forced C grade.
+- Added optional explicit RiskContext position sizing without inferring account state.
+- Added final TradingDecision and best-decision selector.
+- Added SETUP_SPEC v1.0, SCORING_SPEC v1.1, ATR_SPEC v1.2, SIGNAL_SPEC v1.1 and TRADING_ENGINE_SPEC v1.2.
+- Added Phase 7 config/test/checkpoint documentation.
+- Verification: exact Phase 7 module logic 17/17 isolated checks PASS; syntax compilation PASS.
+- Repository-wide pytest/CI remains a Phase 9 gate.
+
 ## 2026-08-23 - Phase 6 trap + VSA
 
 - Added provider-independent TrapEvent evidence model.
@@ -13,106 +35,54 @@
 - Added ATR-scaled level proximity and next-two-bar confirmation logic.
 - Added same-level confirmed trap confluence without allowing trap evidence to create a signal independently.
 - Added RAW / IGNORED / VALID_CONTEXT / CONFIRMED VSA states.
-- Added TRAP_SPEC v1.1, VSA_SPEC v1.1, Phase 6 config/test/checkpoint documentation.
-- Verification: local isolated Phase 6 harness 14 tests passed; compile validation PASS.
-- Repository-wide CI remains a Phase 9 gate.
+- Verification: isolated Phase 6 harness 14 tests passed; compile validation PASS.
 
 ## 2026-08-23 - Phase 5 market structure
 
-- Added strict swing-high/swing-low detection on validated closed contiguous candles.
-- Added per-timeframe regime from swing structure plus MA50/200 alignment.
-- Added MTF regime precedence for 1d/4h/1h.
-- Added deterministic strength evidence from structure, MA alignment and relative-volume participation.
-- Added DST-aware Tokyo/London/New York session context using IANA timezones.
-- Added historical swing-level clustering with ATR-scaled zones.
-- Added touch-based FLOATING/CONFIRMED level state and WEAK/MODERATE/STRONG strength.
-- Added BROKEN/MIRROR/INVALIDATED lifecycle.
-- Excluded BROKEN levels from active validation until mirror retest confirmation.
-- Added MTF priority and nearest active support/resistance lookup.
-- Added consolidation-zone detector.
-- Added explicit LIMIT/PARANORMAL_BAR evidence types without fabricated automatic geometry.
-- Added integrated MarketStructureSnapshot contract.
-- Added MARKET_STRUCTURE_SPEC v1.0, LEVELS_SPEC v1.1 and TRADING_ENGINE_SPEC v1.1.
-- Added Phase 5 config/test/checkpoint documentation.
-- Verification: local isolated Phase 5 harness 12 tests passed; syntax/compile validation PASS.
-- Repository-wide CI remains a Phase 9 gate.
-- One intermediate `noop` commit temporarily truncated README; the following fast-forward corrective commit restored it and no history rewrite/force-push was used.
+- Added strict swing-high/swing-low detection.
+- Added per-timeframe regime and MTF precedence.
+- Added directional strength evidence and DST-aware session context.
+- Added historical level clustering, lifecycle, MTF priority and consolidation detection.
+- Added LIMIT/PARANORMAL_BAR explicit evidence support without fabricated automatic geometry.
+- Verification: isolated Phase 5 harness 12 tests passed; compile validation PASS.
 
 ## 2026-08-23 - Phase 4 indicators
 
-- Added provider-independent indicator package.
-- Added standard True Range and Wilder ATR14.
-- Added D1 ATR5D filtering against same-bar ATR14, avoiding look-ahead in replay.
-- Preserved the approved no-replacement/no-duplication abnormal-bar rule.
-- Added SMA and EMA calculations with canonical MA50/200 baseline `sma`.
-- Added previous-20-bar volume baseline and relative volume.
-- Added VSA candle-spread baseline and relative spread.
-- Added optional relative quote volume only when all required quote-volume data is confirmed.
-- Added generic ATR-used calculation and exact STRONG/ACCEPTABLE/LATE_REJECT boundaries.
-- Kept ATR-used move origin explicitly deferred to Phase 7.
-- Added normalized indicator snapshot.
-- Verification: Phase 4 deterministic harness 12 tests passed; compileall PASS.
+- Added True Range and Wilder ATR14.
+- Added D1 ATR5D same-bar abnormal filter without rejected-bar replacement.
+- Added SMA/EMA MA50/200.
+- Added relative volume/quote volume/candle spread.
+- Added generic ATR-used helper.
+- Verification: isolated Phase 4 harness 12 tests passed; compileall PASS.
 
 ## 2026-08-23 - Phase 3 live market data
 
-- Added provider-independent `LiveCandleEvent` contract.
-- Added generic public JSON WebSocket transport.
-- Added Binance USD-M public kline WebSocket streaming.
-- Added Bybit Linear public kline WebSocket streaming and application heartbeat.
-- Added normalized Binance/Bybit live candle parsers.
-- Added provisional open-candle handling: open 5m bars stay in memory and are not canonical closed history.
-- Added provider-confirmed closed 5m persistence.
-- Added complete UTC local aggregation from 5m to 15m/1h/4h/1d.
-- Added provider-versus-aggregate candle provenance.
-- Migrated SQLite schema from v1 to v2 without deleting historical data.
-- Added periodic REST reconciliation and gap-triggered recovery.
-- Added stale-state detection and exponential reconnect baseline.
-- Added duplicate closed-event idempotency.
-- Added target-VPS public WebSocket smoke utility.
-- Verification: Phase 3 deterministic harness 10 tests passed; compileall PASS.
-- Target-VPS continuous REST/WS acceptance remains pending by design.
+- Added Binance USD-M and Bybit Linear public WebSocket streaming.
+- Added provisional open-candle handling, closed 5m persistence and local MTF aggregation.
+- Added provider/aggregate provenance, stale detection, reconnect and REST reconciliation/gap recovery.
+- Verification: isolated Phase 3 harness 10 tests passed; compileall PASS.
+- Target-VPS continuous REST/WS acceptance remains pending.
 
 ## 2026-08-23 - Phase 2 market-data core
 
-- Added canonical UTC timeframe utilities for 1d/4h/1h/15m/5m.
-- Added normalized candle integrity validation and missing-bar detection.
-- Added interval-relative configurable freshness policy.
-- Added fail-closed historical MTF bootstrap service.
-- Added target+1 request behavior to preserve required closed-history depth when a current bar is open.
-- Added SQLite WAL candle repository.
-- Added Decimal-as-TEXT precision-preserving persistence.
-- Added idempotent candle upsert and bootstrap audit records.
-- Added atomic MTF snapshot persistence only after all timeframes pass validation.
-- Verification: Phase 2 isolated harness 9 tests passed; compileall PASS.
-- Target-VPS live bootstrap acceptance remains pending by design.
+- Added UTC timeframe validation, missing-bar/freshness rules and fail-closed MTF bootstrap.
+- Added SQLite WAL Decimal-preserving persistence and atomic MTF writes.
+- Verification: isolated Phase 2 harness 9 tests passed; compileall PASS.
+- Target-VPS live bootstrap acceptance remains pending.
 
 ## 2026-08-23 - Phase 1 market-data foundation
 
-- Added Python package baseline and dependency metadata.
-- Added exchange-agnostic `MarketDataProvider` contract.
-- Added provider capability declarations.
-- Added normalized instrument, ticker and candle models.
-- Separated canonical symbol from native `provider_symbol` for future OKX/other naming schemes.
-- Added Binance USD-M public REST adapter.
-- Added Bybit Linear public REST adapter with instrument pagination.
-- Added quote-turnover liquidity ranking with confirmed spread penalty where bid/ask is available.
-- Added configurable price filtering and all-price mode.
-- Added priority-provider fallback without cross-provider market-series mixing.
-- Added VPS provider smoke utility.
-- Added provider contract, Bybit pagination, universe and fallback tests.
+- Added exchange-agnostic MarketDataProvider contract and capability declarations.
+- Added normalized instrument/ticker/candle models.
+- Added Binance USD-M and Bybit Linear public REST adapters.
+- Added configurable universe/liquidity filtering, provider fallback and smoke utility.
 - Verification: 7 tests passed; compileall PASS.
-- Live target-VPS provider acceptance remains pending by design.
+- Target-VPS provider acceptance remains pending.
 
 ## 2026-08-23 - Phase 0 foundation
 
 - Approved K-Trader Roadmap v1.0.
-- Established read-only v1 boundary.
-- Reworked architecture from Binance-centric to exchange-agnostic provider model.
-- Added provider fallback without cross-exchange OHLCV mixing.
-- Added canonical normalized market-data contract.
-- Approved SYSTEM K_Trader v1.1 and recorded owner-applied status.
+- Established read-only v1 boundary and exchange-agnostic provider architecture.
+- Approved SYSTEM K_Trader v1.1.
 - Replaced uncalibrated Probability with Setup Score for v1.
-- Defined ATR5D valid-bar collection algorithm.
-- Defined VSA/levels/trap/scoring/signal/API contracts.
-- Defined VPS/Docker/self-hosted-runner deployment baseline.
-- Defined test, operations and security baselines.
+- Defined canonical data, ATR, VSA, levels, trap, scoring, signal, API, deployment, test and security contracts.
