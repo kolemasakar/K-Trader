@@ -1,0 +1,191 @@
+openapi: 3.1.0
+info:
+  title: K-Trader Read-only API
+  version: phase8-v1
+  description: >-
+    Read-only market scanner API for K_Trader. It exposes confirmed public
+    market data and Trading Engine results. It cannot place, modify or cancel
+    orders and exposes no exchange-account endpoints.
+servers:
+  - url: https://api.k-trader.invalid
+    description: Replace with the deployed HTTPS API host before enabling the Action.
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Check K-Trader API and scanner readiness
+      responses:
+        '200':
+          description: API/scanner health state
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /v1/scanner/status:
+    get:
+      operationId: getScannerStatus
+      summary: Get scanner runtime status and data readiness
+      responses:
+        '200':
+          description: Scanner runtime state
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /v1/universe:
+    get:
+      operationId: listUniverse
+      summary: List the current ranked tradable universe
+      parameters:
+        - $ref: '#/components/parameters/ProviderId'
+        - $ref: '#/components/parameters/ListLimit'
+      responses:
+        '200':
+          description: Ranked universe with market metadata and freshness
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /v1/market/{symbol}:
+    get:
+      operationId: getMarketSnapshot
+      summary: Get the latest normalized market snapshot for a symbol
+      parameters:
+        - $ref: '#/components/parameters/Symbol'
+        - $ref: '#/components/parameters/ProviderId'
+      responses:
+        '200':
+          description: Latest market snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Symbol not found
+        '409':
+          description: Symbol exists on multiple providers; repeat with provider_id
+  /v1/candles/{symbol}:
+    get:
+      operationId: getCandles
+      summary: Get confirmed normalized candles for a symbol and timeframe
+      parameters:
+        - $ref: '#/components/parameters/Symbol'
+        - $ref: '#/components/parameters/ProviderId'
+        - name: interval
+          in: query
+          required: false
+          description: Canonical timeframe.
+          schema:
+            type: string
+            enum: [5m, 15m, 1h, 4h, 1d]
+            default: 5m
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+      responses:
+        '200':
+          description: Candle series including provider/aggregate provenance
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Symbol/timeframe not found
+        '409':
+          description: Symbol exists on multiple providers; repeat with provider_id
+  /v1/analysis/{symbol}:
+    get:
+      operationId: getAnalysis
+      summary: Get the best current Trading Engine decision for a symbol
+      description: >-
+        Returns LONG, SHORT or NO_TRADE plus Grade, Setup Score, Entry/SL/TP,
+        RR, ATR, evidence, reason codes and freshness. Setup Score is not a
+        statistical probability.
+      parameters:
+        - $ref: '#/components/parameters/Symbol'
+        - $ref: '#/components/parameters/ProviderId'
+      responses:
+        '200':
+          description: Canonical TradingDecision
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: No analysis available
+        '409':
+          description: Symbol exists on multiple providers; repeat with provider_id
+  /v1/candidates:
+    get:
+      operationId: listCandidates
+      summary: List ranked current setup candidates, including NO_TRADE results
+      parameters:
+        - $ref: '#/components/parameters/ProviderId'
+        - name: grade
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [A+, A, B, C]
+        - $ref: '#/components/parameters/ListLimit'
+      responses:
+        '200':
+          description: Ranked candidate decisions
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /v1/signals:
+    get:
+      operationId: listSignals
+      summary: List only currently tradable A or A+ LONG/SHORT signals
+      parameters:
+        - $ref: '#/components/parameters/ProviderId'
+        - $ref: '#/components/parameters/ListLimit'
+      responses:
+        '200':
+          description: Current tradable signals only
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+components:
+  parameters:
+    Symbol:
+      name: symbol
+      in: path
+      required: true
+      description: Canonical K-Trader symbol, for example SUIUSDT.
+      schema:
+        type: string
+    ProviderId:
+      name: provider_id
+      in: query
+      required: false
+      description: >-
+        Provider identifier such as binance_usdm or bybit_linear. Required when
+        the same canonical symbol is available from more than one provider.
+      schema:
+        type: string
+    ListLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
