@@ -1,4 +1,4 @@
-# Trading Engine Specification v1.1
+# Trading Engine Specification v1.2
 
 ## Mandatory evaluation sequence
 
@@ -19,96 +19,156 @@ Every complete setup evaluation covers:
 13. Risk
 14. Rating
 
+The engine is read-only and never places orders.
+
 ## 1. Market regime
 
-Consume Phase 5 `MarketStructureSnapshot`.
+Consume Phase 5 MTF regime.
 
-Canonical per-timeframe regime:
+Directional setup requires canonical HTF regime equal to setup direction.
 
-- HH + HL structure plus `close > MA50 > MA200` -> BULLISH;
-- LH + LL structure plus `close < MA50 < MA200` -> BEARISH;
-- range/transition structure plus neutral MA -> RANGE;
-- otherwise MIXED.
+MA50/200 remain supporting confirmation, never standalone signals.
 
-Canonical HTF precedence:
-
-1. agreeing directional `1d + 4h` wins;
-2. if D1 is non-directional, agreeing directional `4h + 1h` may define direction;
-3. all RANGE -> RANGE;
-4. otherwise MIXED.
-
-MA50/MA200 confirm structure; they are not independent signals.
+Mismatch -> hard reject.
 
 ## 2. Liquidity
 
-Consume normalized liquidity rank/score and hard spread/liquidity filters from `LIQUIDITY_SPEC.md`.
+Consume ranked `UniverseCandidate` context.
+
+Liquidity must be positive and rank/universe size valid.
+
+Rank percentile contributes to Setup Score; invalid liquidity context is a hard reject.
 
 ## 3. Session
 
-Consume DST-aware session context from `MARKET_STRUCTURE_SPEC.md`.
+Consume DST-aware Tokyo/London/New York context.
 
-Crypto is 24/7: session is context, not a market-open permission. Phase 5 provides active session labels/overlap only. Any future scoring weight must be explicitly versioned in Phase 7.
+Crypto is 24/7. Session contributes context points only and can neither independently approve nor reject a trade.
 
 ## 4. Trap
 
-Consume deterministic trap state from `TRAP_SPEC.md`.
+Consume confirmed Phase 6 TrapEvent.
+
+If trap evidence is declared by the setup it must match provider, symbol, direction and primary level.
 
 ## 5. MTF levels
 
-Consume active confirmed levels/zones from `LEVELS_SPEC.md`.
+Tradable primary level must be:
 
-FLOATING, BROKEN and INVALIDATED levels cannot independently validate a trade. MIRROR becomes active only after the defined retest/confirmation transition.
+- active `CONFIRMED` or `MIRROR`;
+- `STRONG`;
+- provider/symbol consistent.
 
-Canonical HTF level priority:
-
-`1d > 4h > 1h > 15m > 5m`
+HTF priority remains `1d > 4h > 1h > 15m > 5m` for level-map organization.
 
 ## 6. Strength
 
-Phase 5 directional strength is evidence count, not probability and not Setup Score:
+Use the weaker evidence count of the HTF pair that establishes direction:
 
-- structure agreement;
-- MA agreement;
-- relative-volume participation >= configured threshold.
+- agreeing directional 1d + 4h; or
+- when D1 is non-directional, agreeing directional 4h + 1h.
 
-3 -> STRONG, 2 -> MODERATE, <=1 -> WEAK. RANGE -> NEUTRAL.
+3 -> STRONG, 2 -> MODERATE, otherwise WEAK.
 
-Phase 7 will define how strength affects Setup Score; no implicit weight is allowed before then.
+Strength affects score but does not replace HTF regime hard validation.
 
 ## 7. Setup Score
 
-Use `SCORING_SPEC.md`. Score is not probability.
+Use `SCORING_SPEC.md` v1.1.
+
+Canonical weights sum to 100.
+
+A+ >=90, A >=80, B >=70, C <70.
+
+Score is not probability.
+
+Any hard reject forces grade C and public score <=69 while retaining raw_score for audit.
 
 ## 8. ATR
 
-Use ATR14/ATR5D/ATR-used from `ATR_SPEC.md`. ATR used > 80% is a hard reject.
+Use ATR14, ATR5D and canonical Phase 7 ATR-used origin from `ATR_SPEC.md` v1.2.
 
-The setup-specific origin for ATR-used `move_distance` must be defined in Phase 7 before tradable output.
+Daily excursion is measured from current UTC-day directional extreme to proposed Entry using confirmed closed 5m bars from 00:00 UTC.
+
+ATR used >80% -> hard reject.
 
 ## 9. Setup type
 
-Setup type must be explicit and rule-backed, not free-form narrative.
+Canonical Phase 7 setup types:
+
+- TRAP_VSA_CONFIRMATION
+- VSA_LEVEL_CONFIRMATION
+- TRAP_LEVEL_CONFIRMATION
+
+Evidence identity and declared setup type must be consistent.
 
 ## 10. Stop
 
-Stop must be structurally justified by the validated setup and instrument tick rules. No arbitrary stop may be fabricated.
+Stop is structural.
+
+For LONG use primary support lower boundary or lower confirmed trap sweep extreme, then subtract luft.
+
+For SHORT use primary resistance upper boundary or higher confirmed trap sweep extreme, then add luft.
+
+Round outward to tick.
 
 ## 11. Entry + luft
 
-Entry and optional luft/buffer are engine outputs tied to setup structure. Exact luft algorithm is deferred until setup rules are specified and tested.
+Canonical luft:
+
+`max(1 price tick, 0.02 * ATR14)`.
+
+LONG Entry = confirmation-bar high + luft, rounded upward.
+
+SHORT Entry = confirmation-bar low - luft, rounded downward.
+
+Target is nearest active confirmed/mirror opposing structural level beyond Entry, with luft applied before the zone.
+
+No structural target -> hard reject.
+
+Synthetic 3R target is prohibited in v1.
 
 ## 12. Position size
 
-Calculate only with confirmed account balance, risk-per-trade and instrument specifications. Otherwise N/A.
+Calculate only from explicit confirmed RiskContext:
+
+- balance;
+- risk-per-trade percent;
+- quantity value per one price unit;
+- quantity step.
+
+Without those fields -> N/A.
 
 ## 13. Risk
 
-Expose RR and, when prerequisites exist, monetary/percent risk. RR < 3 is a hard reject.
+RR uses structural Entry/SL/TP.
+
+RR <3 -> hard reject.
+
+If explicit risk context exists, quantity is rounded down to quantity step so planned risk is not exceeded.
 
 ## 14. Rating
 
-A+/A/B/C. Only A+/A may produce LONG/SHORT signal; B/C returns NO TRADE.
+Only A+/A with no hard rejects emit LONG/SHORT.
+
+B/C or any hard reject emit NO_TRADE.
+
+## Final decision contract
+
+Phase 7 emits `TradingDecision` with:
+
+- source/instrument identity;
+- 14-stage context;
+- score/grade;
+- setup type;
+- structural geometry;
+- ATR diagnostics;
+- optional position/risk;
+- reason codes;
+- freshness/source timestamps.
+
+Use `SIGNAL_SPEC.md` v1.1 for public field contract.
 
 ## Fail-closed rule
 
-Missing confirmed inputs, stale data, unresolved provider integrity, insufficient structural history, conflicting HTF context or failed hard filter results in NO TRADE/REJECT with reason codes.
+Missing confirmed inputs, stale data, mismatched evidence, insufficient UTC-day context, invalid geometry, missing structural target, failed RR/ATR gate or invalid risk context cannot be repaired by narrative inference.
