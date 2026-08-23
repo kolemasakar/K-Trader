@@ -1,4 +1,4 @@
-# Data Contract v1.1
+# Data Contract v1.2
 
 ## Normalized instrument
 
@@ -35,6 +35,17 @@ Optional, preserved when provider supports them:
 - taker_buy_quote_volume
 
 Derived fields SHALL NOT overwrite normalized provider fields.
+
+## Live candle event
+
+Phase 3 wraps a normalized candle in a provider-independent live event containing:
+
+- event_time;
+- received_at;
+- connection_id where available;
+- raw topic metadata where useful.
+
+The current open candle is provisional. It may be held in memory for observation but is not persisted as canonical closed history and must not be treated as a closed VSA confirmation.
 
 ## Canonical timeframe keys
 
@@ -74,16 +85,20 @@ Each derived field SHALL declare its formula/version in code/tests.
 - No synthetic OHLCV values unless explicitly tagged as derived aggregation.
 - No interpolation of missing exchange candles for Trading Engine decisions.
 - Historical bootstrap requires contiguous closed bars.
-- Aggregated bars must contain complete child-bar coverage.
+- Live parent aggregation requires complete contiguous child-bar coverage.
 - Provider bars and locally aggregated bars are distinguishable.
 - Cross-provider bar concatenation is forbidden.
-- Stale historical state fails closed before engine use.
+- Stale historical/live state fails closed before engine use.
 
-## Persistence precision
+## Persistence precision and provenance
 
 - timestamps: integer epoch milliseconds;
 - Decimal market values: textual decimal representation;
-- no persistence conversion through binary float.
+- no persistence conversion through binary float;
+- provider-native closed bars: `source_kind=provider`;
+- local aggregates: `source_kind=aggregate`, with `derived_from_interval` populated.
+
+REST reconciliation may replace a local aggregate or earlier live value with provider-native closed data through the same candle identity.
 
 ## Freshness
 
@@ -94,4 +109,4 @@ Every future API snapshot returned to K_Trader includes:
 - provider_id
 - freshness_status: FRESH | STALE | UNKNOWN
 
-Phase 2 bootstrap evaluates freshness from the latest closed bar using a configurable interval-relative data-readiness threshold.
+Historical freshness is interval-relative. Live WebSocket freshness uses a configurable receive-time timeout. Freshness is a data-readiness gate, not a Setup Score contribution.
