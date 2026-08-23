@@ -78,7 +78,7 @@ def test_mtf_bundle_rejects_future_candle():
 
 def test_slice_datasets_asof_removes_future_without_lookahead():
     source = all_datasets(count=8)
-    cutoff = datetime(2026, 8, 1, 2, 0, tzinfo=UTC)
+    cutoff = datetime(2026, 8, 3, 2, 0, tzinfo=UTC)
     bundle = slice_datasets_asof(
         source,
         as_of=cutoff,
