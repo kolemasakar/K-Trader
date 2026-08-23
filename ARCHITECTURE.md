@@ -1,4 +1,4 @@
-# Architecture v1.1
+# Architecture v1.2
 
 ## Context
 
@@ -27,7 +27,7 @@ Public Exchange APIs
 
 ## Provider abstraction
 
-Core interface responsibilities:
+Core provider responsibilities:
 
 - discover instruments;
 - fetch tickers/liquidity inputs;
@@ -38,23 +38,7 @@ Core interface responsibilities:
 
 Initial implemented adapters are Binance USD-M and Bybit Linear. OKX SWAP, KuCoin Futures and others are future adapters through the same provider contract.
 
-No engine/runtime/API module may depend on provider-native payload formats.
-
-## Provider capability model
-
-Each adapter declares support for items such as:
-
-- perpetual derivatives;
-- intervals;
-- quote volume;
-- trade count;
-- taker-buy base/quote volume;
-- book ticker;
-- open interest;
-- WebSocket candles;
-- max REST page size and rate-limit metadata.
-
-Missing optional fields remain null/unsupported; they are never fabricated.
+No engine/runtime/API module depends on provider-native payload formats.
 
 ## Market-series integrity
 
@@ -62,90 +46,61 @@ A single analysis has exactly one primary `provider_id` and one canonical instru
 
 Fallback behavior:
 
-- mark primary source unavailable/stale;
 - select next eligible provider;
-- bootstrap a new coherent series;
-- never splice bars from two providers into one sequence.
+- bootstrap/read a new coherent series;
+- atomically replace the old provider API snapshot;
+- never splice bars from two providers into one OHLCV sequence.
 
-Cross-provider comparison may be implemented as a separate confirmation feature, not data fusion.
+Cross-provider comparison may be a separate confirmation feature, never data fusion.
 
 ## Timeframe model
 
-Canonical analysis timeframes:
+Canonical analysis timeframes: `1d`, `4h`, `1h`, `15m`, `5m`.
 
-- 1d
-- 4h
-- 1h
-- 15m
-- 5m
-
-Preferred live design:
+Live design:
 
 - REST bootstrap for all required timeframes;
-- live provider WebSocket for 5m;
+- public provider WebSocket for 5m;
 - local UTC aggregation upward;
 - periodic REST reconciliation against provider-native candles.
 
-Provider-specific behavior may require direct subscriptions to additional intervals; this is declared by capability/config rather than assumed globally.
-
 ## Persistence
 
-v1 uses SQLite WAL in a persistent Docker volume for canonical market/history state.
+v1 uses SQLite WAL for canonical market/history state. Persistent deployment data lives outside the GitHub runner workspace.
 
-Primary logical persistent data includes:
-
-- instruments;
-- candles;
-- bootstrap/scanner audit state;
-- future level/VSA/trap/signal history where persistence is required.
-
-Current API-facing universe/candidate/signal state is a process read model, not an independent source of truth.
+Current API-facing universe/candidate/signal state is an in-process read projection, not a second source of truth.
 
 ## Engine boundaries
 
 Exchange-specific code lives only under providers.
 
-Provider-independent modules:
-
-- universe/liquidity normalization;
-- candle validation/resampling;
-- ATR/MA;
-- regime/strength;
-- levels;
-- trap;
-- VSA;
-- setup geometry;
-- scoring/rating;
-- TradingDecision;
-- API serialization.
+Provider-independent modules include universe/liquidity, candle validation/aggregation, indicators, regime/strength, levels, Trap/VSA, setup geometry, scoring/rating, TradingDecision, runtime coordination and API serialization.
 
 ## Runtime Scanner Coordinator
 
-The coordinator is the missing application orchestration layer inserted as Phase 8.5 before deployment.
+Phase 8.5 implements the application orchestration layer.
 
 Responsibilities:
 
 - select/fail over provider without cross-provider fusion;
-- refresh universe/liquidity shortlist;
+- refresh ranked universe/liquidity data each scan cycle;
+- analyze a configurable top-N shortlist;
 - enforce historical/live readiness;
-- obtain coherent MTF candle state;
-- run indicators;
-- run market structure/levels/session context;
-- run Trap/VSA evidence;
-- run the Phase 7 Trading Engine;
+- invoke atomic MTF bootstrap when required;
+- retain/restart the Phase 3 live subscription according to provider/shortlist identity;
+- run indicators -> market structure/levels/session -> Trap/VSA -> Phase 7 Trading Engine;
 - isolate failures per symbol;
-- rank decisions/signals;
-- publish immutable current snapshots into `ApiReadModel`;
-- expose scanner status/error state;
-- fail closed when mandatory data is stale, gapped or incomplete.
+- publish current universe/candles/decisions/status atomically to `ApiReadModel`;
+- fail closed on stale, gapped or incomplete data;
+- provide explicit `NO_SETUP`/`NO_TRADE` only when data is valid/fresh but no confirmed setup exists.
 
-The coordinator does not contain exchange-native parsing and does not duplicate Trading Engine rules.
+The coordinator does not duplicate Trading Engine rules.
 
 ## API read-model boundary
 
-`ApiReadModel` is a thread-safe in-process projection updated by the runtime coordinator.
+`ApiReadModel` is thread-safe and receives an atomic scanner-cycle projection.
 
-It exposes current snapshots of:
+It exposes current:
 
 - scanner runtime status;
 - universe;
@@ -154,29 +109,31 @@ It exposes current snapshots of:
 - ranked candidates;
 - A/A+ LONG/SHORT signals.
 
-The API never recalculates Entry/SL/TP/RR/ATR-used/Grade/Score.
+Candle-series provenance supports `provider`, `aggregate` and `mixed`; `mixed` refers only to provider-native history plus local aggregation from the same provider.
 
-If a canonical symbol exists on multiple providers, provider omission is treated as ambiguous and returns HTTP 409 rather than silently selecting a source.
+On total provider/runtime failure the publishable runtime state is cleared and `data_ready=false`.
+
+The API never recalculates Entry/SL/TP/RR/ATR-used/Grade/Score.
 
 ## API boundary
 
-The Custom GPT calls a public HTTPS read-only API.
+The Custom GPT calls a public HTTPS read-only API. v1 application endpoints are GET-only; no account/order/mutation endpoints exist.
 
-v1 application endpoints are GET-only. No account, order or mutation endpoints exist.
+Decimal market values are serialized as strings and timestamps as UTC ISO-8601.
 
-Decimal market values are serialized as strings to preserve exchange precision. Timestamps are UTC ISO-8601.
+A fixed-window application rate limiter exists; reverse-proxy hardening belongs to deployment.
 
-A fixed-window application rate limiter exists in Phase 8; reverse-proxy hardening is added during deployment.
+## Runtime process
 
-Custom GPT Actions are an integration layer only; the scanner remains functional without OpenAI.
+Production process entrypoint:
+
+`uvicorn ktrader.runtime.app:app`
+
+It creates the SQLite repository, provider instances, `ApiReadModel`, scanner coordinator and FastAPI app, and owns clean shutdown of live/provider/repository resources.
 
 ## Custom GPT Action
 
-`custom_gpt/openapi.yaml` defines stable read-only operation IDs.
-
-Before deployment it intentionally points to `https://api.k-trader.invalid`.
-
-Phase 10 replaces that placeholder with the actual HTTPS API host and configures Action authentication/publication requirements.
+`custom_gpt/openapi.yaml` defines stable read-only operation IDs. Before deployment it intentionally points to `https://api.k-trader.invalid`; Phase 10 replaces this with the real HTTPS API host.
 
 ## Deployment
 
@@ -185,14 +142,14 @@ GitHub private repository
   -> self-hosted GitHub Runner on Ubuntu VPS
   -> repository-wide tests
   -> Docker Compose build
-  -> scanner coordinator + API services
-  -> health/readiness checks
+  -> runtime scanner + API process
+  -> health/readiness/live-provider checks
 
-Persistent runtime data/config/logs live under `/opt/k-trader`, outside ephemeral GitHub runner workspaces.
+Persistent runtime data/config/logs live under `/opt/k-trader`.
 
 ## Security boundary
 
 No exchange credentials are required in v1.
 No execution endpoints exist.
-The public API is rate-limited and returns only market/scanner outputs.
-The API does not trust forwarded client-IP headers without a trusted proxy configuration.
+The public API returns only market/scanner outputs and is rate-limited.
+The API does not trust forwarded client-IP headers without trusted-proxy configuration.
