@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.2
+# K-Trader Roadmap v1.3
 
-Status: APPROVED baseline with runtime coordinator implemented, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation complete through Phase 9 production preparation, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -80,8 +80,6 @@ Status: IMPLEMENTATION COMPLETE.
 - LONG/SHORT/NO_TRADE TradingDecision;
 - Phase 7 isolated harness: 17 passed.
 
-Repository-wide CI remains Phase 9.
-
 ## Phase 8 - Read-only K-Trader API
 
 Status: IMPLEMENTATION COMPLETE.
@@ -96,53 +94,63 @@ Status: IMPLEMENTATION COMPLETE.
 
 ## Phase 8.5 - Runtime Scanner Coordinator
 
-Status: IMPLEMENTATION COMPLETE / REPOSITORY-WIDE CI EXECUTION PENDING PHASE 9.
-
-Implemented:
+Status: IMPLEMENTATION COMPLETE / REPOSITORY-WIDE CI VERIFIED.
 
 - provider priority/fallback refresh per scanner cycle;
-- current liquidity-ranked universe publication;
-- configurable top-N analysis shortlist;
+- liquidity-ranked universe and configurable top-N analysis shortlist;
 - bounded MTF bootstrap/analysis concurrency;
-- retained Phase 3 live WebSocket task for the selected provider/shortlist;
-- MTF readiness and freshness validation before every analysis;
-- indicators -> structure -> Trap/VSA -> Phase 7 Trading Engine orchestration;
+- retained live WebSocket task unless provider/shortlist changes;
+- MTF readiness/freshness gate before analysis;
+- indicators -> structure -> Trap/VSA -> Trading Engine orchestration;
 - per-symbol failure isolation;
-- explicit `NO_SETUP` -> `NO_TRADE` sentinel only for valid/fresh data;
-- no fabricated decision when mandatory market data is invalid/stale;
-- atomic replacement of status/universe/candles/decisions in `ApiReadModel`;
-- provider/aggregate/mixed candle-series provenance;
-- expanded runtime status and clean shutdown;
-- production entrypoint `uvicorn ktrader.runtime.app:app`;
-- orchestration tests committed.
+- valid/fresh no-setup -> explicit NO_TRADE;
+- stale/incomplete input -> no fabricated decision;
+- atomic `ApiReadModel` publication;
+- provider/aggregate/mixed provenance;
+- production ASGI lifespan entrypoint and clean shutdown.
 
-Exit condition for implementation: satisfied.
-
-Validation gate: Phase 9 must execute repository-wide pytest before deployment. No Phase 8.5 PASS count is claimed before that CI run.
+Repository-wide CI result including Phase 8.5: **92 tests passed**.
 
 ## Phase 9 - VPS / Docker / CI-CD
 
-NEXT.
+Status: REPOSITORY-SIDE COMPLETE / TARGET-VPS DEPLOYMENT AND LIVE ACCEPTANCE PENDING.
 
-Mandatory first gate:
+Completed and CI-verified:
 
-- run complete repository pytest suite;
-- fix any regression before container/deployment work.
+- GitHub-hosted repository-wide CI;
+- compile + pytest gate;
+- Docker Compose validation;
+- hardened production Docker image;
+- production image runtime import;
+- manual-only `main` deployment workflow for repository-scoped self-hosted runner;
+- immutable `/opt/k-trader/releases/<sha>` deployment model;
+- rollback on failed health/live acceptance;
+- optional Caddy HTTPS profile;
+- Ubuntu/Docker provisioning automation;
+- checksum-verified GitHub runner registration baseline;
+- public REST acceptance on `5m/15m/1h/4h/1d`;
+- public 5m WebSocket acceptance;
+- scanner readiness + MTF API acceptance utility.
 
-Then:
+CI evidence:
 
-- Dockerfile + Docker Compose;
-- Ubuntu VPS persistent `/opt/k-trader` layout;
-- scanner coordinator + API runtime service;
-- private-repo self-hosted GitHub Runner;
-- push-to-main test/build/deploy/health workflow;
-- target-VPS public REST/bootstrap/WebSocket acceptance for Phases 1-3;
-- HTTPS exposure for read-only API.
+- run `32636825758`: 92 pytest PASS, Compose PASS, Docker build/import PASS;
+- run `32637233264`: final production-prep pytest/Compose/Docker/runtime/packaging PASS.
+
+Pending only on real external infrastructure:
+
+- provision Ubuntu VPS;
+- register `k-trader-prod` self-hosted runner;
+- execute production deploy;
+- pass target-VPS REST/WS/runtime acceptance;
+- verify persistence across real restart;
+- configure DNS/TLS and verify public HTTPS.
+
+Phase 9 exit occurs only after those live checks pass.
 
 ## Phase 10 - Custom GPT Update
 
-- deploy canonical SYSTEM instructions;
-- replace `.invalid` OpenAPI server with deployed HTTPS host;
+- replace `.invalid` OpenAPI server with the deployed HTTPS host;
 - connect read-only Action/OpenAPI schema;
 - validate source/freshness/NO_TRADE output;
 - add Privacy Policy URL if distribution mode requires it.
