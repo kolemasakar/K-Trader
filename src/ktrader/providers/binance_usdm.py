@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import AsyncIterator, Sequence
 from datetime import datetime, timezone
 from decimal import Decimal
 
@@ -14,9 +15,12 @@ from ktrader.models import (
 )
 from ktrader.providers.base import MarketDataProvider, ProviderError
 from ktrader.providers.http import PublicHttpClient
-
+from ktrader.providers.live import LiveCandleEvent
+from ktrader.providers.parsers import parse_binance_kline
+from ktrader.providers.ws_transport import json_websocket_session
 
 _INTERVALS = frozenset({"5m", "15m", "1h", "4h", "1d"})
+_WS_URL = "wss://fstream.binance.com/market/stream"
 
 
 class BinanceUSDMProvider(MarketDataProvider):
@@ -47,7 +51,10 @@ class BinanceUSDMProvider(MarketDataProvider):
         payload = await self.http.get_json("/fapi/v1/exchangeInfo")
         result: list[NormalizedInstrument] = []
         for raw in payload.get("symbols", []):
-            filters = {item.get("filterType"): item for item in raw.get("filters", [])}
+            filters = {
+                item.get("filterType"): item
+                for item in raw.get("filters", [])
+            }
             price_filter = filters.get("PRICE_FILTER", {})
             lot_filter = filters.get("LOT_SIZE", {})
             result.append(
@@ -60,8 +67,12 @@ class BinanceUSDMProvider(MarketDataProvider):
                     market_type="LINEAR_FUTURES",
                     contract_type=raw.get("contractType", "UNKNOWN"),
                     status=raw.get("status", "UNKNOWN"),
-                    price_tick=_decimal_or_none(price_filter.get("tickSize")),
-                    quantity_step=_decimal_or_none(lot_filter.get("stepSize")),
+                    price_tick=_decimal_or_none(
+                        price_filter.get("tickSize")
+                    ),
+                    quantity_step=_decimal_or_none(
+                        lot_filter.get("stepSize")
+                    ),
                 )
             )
         return result
@@ -77,13 +88,23 @@ class BinanceUSDMProvider(MarketDataProvider):
             NormalizedTicker(
                 provider_id=self.provider_id,
                 symbol=raw["symbol"],
-                timestamp=utc_from_ms(raw["closeTime"]) if raw.get("closeTime") else now,
+                timestamp=(
+                    utc_from_ms(raw["closeTime"])
+                    if raw.get("closeTime")
+                    else now
+                ),
                 last_price=Decimal(raw["lastPrice"]),
-                quote_volume_24h=_decimal_or_none(raw.get("quoteVolume")),
+                quote_volume_24h=_decimal_or_none(
+                    raw.get("quoteVolume")
+                ),
                 base_volume_24h=_decimal_or_none(raw.get("volume")),
                 trade_count_24h=_int_or_none(raw.get("count")),
-                bid_price=_decimal_or_none(book_by_symbol.get(raw["symbol"], {}).get("bidPrice")),
-                ask_price=_decimal_or_none(book_by_symbol.get(raw["symbol"], {}).get("askPrice")),
+                bid_price=_decimal_or_none(
+                    book_by_symbol.get(raw["symbol"], {}).get("bidPrice")
+                ),
+                ask_price=_decimal_or_none(
+                    book_by_symbol.get(raw["symbol"], {}).get("askPrice")
+                ),
             )
             for raw in payload
         ]
@@ -98,14 +119,21 @@ class BinanceUSDMProvider(MarketDataProvider):
         self.validate_interval(interval)
         if instrument.provider_id != self.provider_id:
             raise ValueError(
-                f"Instrument provider {instrument.provider_id!r} does not match {self.provider_id!r}"
+                f"Instrument provider {instrument.provider_id!r} "
+                f"does not match {self.provider_id!r}"
             )
         provider_symbol = instrument.provider_symbol or instrument.symbol
         if not 1 <= limit <= 1500:
-            raise ValueError("Binance kline limit must be between 1 and 1500")
+            raise ValueError(
+                "Binance kline limit must be between 1 and 1500"
+            )
         rows = await self.http.get_json(
             "/fapi/v1/klines",
-            {"symbol": provider_symbol, "interval": interval, "limit": limit},
+            {
+                "symbol": provider_symbol,
+                "interval": interval,
+                "limit": limit,
+            },
         )
         now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
         candles = [
@@ -130,6 +158,46 @@ class BinanceUSDMProvider(MarketDataProvider):
         ]
         self.ensure_chronological(candles)
         return candles
+
+    async def stream_candles(
+        self,
+        instruments: Sequence[NormalizedInstrument],
+        interval: str = "5m",
+    ) -> AsyncIterator[LiveCandleEvent]:
+        self.validate_interval(interval)
+        if not instruments:
+            return
+        symbol_map: dict[str, str] = {}
+        streams: list[str] = []
+        for instrument in instruments:
+            if instrument.provider_id != self.provider_id:
+                raise ValueError(
+                    "All live instruments must belong to binance_usdm"
+                )
+            provider_symbol = (
+                instrument.provider_symbol or instrument.symbol
+            )
+            symbol_map[provider_symbol] = instrument.symbol
+            streams.append(
+                f"{provider_symbol.lower()}@kline_{interval}"
+            )
+        subscribe = {
+            "method": "SUBSCRIBE",
+            "params": streams,
+            "id": "ktrader-kline",
+        }
+        async for message in json_websocket_session(
+            _WS_URL,
+            subscribe_payloads=(subscribe,),
+        ):
+            event = parse_binance_kline(
+                message.payload,
+                symbol_map=symbol_map,
+                received_at=message.received_at,
+                connection_id=message.connection_id,
+            )
+            if event is not None:
+                yield event
 
     async def close(self) -> None:
         await self.http.close()
