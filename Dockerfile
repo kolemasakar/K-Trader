@@ -14,6 +14,7 @@ RUN groupadd --system ktrader \
 
 COPY pyproject.toml README.md ./
 COPY src ./src
+COPY scripts ./scripts
 
 RUN python -m pip install --no-cache-dir .
 

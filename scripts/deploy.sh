@@ -34,6 +34,19 @@ if [ -n "${KTRADER_DOMAIN:-}" ]; then
     PROFILE_ARGS="--profile https"
 fi
 
+rollback() {
+    if [ -n "$PREVIOUS" ] && [ -d "$PREVIOUS" ]; then
+        prev_sha="$(basename "$PREVIOUS")"
+        echo "rolling back to $prev_sha" >&2
+        cd "$PREVIOUS"
+        export KTRADER_IMAGE_TAG="$prev_sha"
+        docker compose $PROFILE_ARGS up -d --remove-orphans
+    else
+        cd "$RELEASE"
+        docker compose $PROFILE_ARGS down || true
+    fi
+}
+
 echo "Building K-Trader release $SHA"
 docker compose $PROFILE_ARGS build --pull
 
@@ -52,17 +65,14 @@ while [ "$attempt" -le 24 ]; do
 done
 
 if [ "$healthy" -ne 1 ]; then
-    echo "new release failed health check" >&2
-    if [ -n "$PREVIOUS" ] && [ -d "$PREVIOUS" ]; then
-        prev_sha="$(basename "$PREVIOUS")"
-        echo "rolling back to $prev_sha" >&2
-        cd "$PREVIOUS"
-        export KTRADER_IMAGE_TAG="$prev_sha"
-        docker compose $PROFILE_ARGS up -d --remove-orphans
-    else
-        cd "$RELEASE"
-        docker compose $PROFILE_ARGS down || true
-    fi
+    echo "new release failed process health check" >&2
+    rollback
+    exit 1
+fi
+
+if ! ./scripts/phase9_acceptance.sh; then
+    echo "new release failed market/runtime acceptance" >&2
+    rollback
     exit 1
 fi
 
