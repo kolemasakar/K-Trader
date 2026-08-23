@@ -6,108 +6,72 @@ Status: APPROVED baseline, 2026-08-23.
 
 Status: COMPLETE.
 
-- Repository structure and canonical documentation.
-- System instruction baseline.
-- Data/provider contracts.
-- Testing, security and deployment policy.
-
-Exit: PASSED.
-
 ## Phase 1 - Exchange-Agnostic Market Data Foundation
 
-Status: IMPLEMENTATION COMPLETE / LIVE VPS ACCEPTANCE PENDING.
+Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
 
-- `MarketDataProvider` interface and capability model. DONE.
-- Binance USD-M public provider. DONE.
-- Bybit Linear second provider. DONE.
-- Normalized instruments/tickers/candles and native `provider_symbol`. DONE.
-- Configurable price limit and liquidity ranking. DONE.
-- Provider fallback without cross-provider series mixing. DONE.
-- Contract/pagination/failover/universe tests. DONE: 7 passed.
-- Target-VPS public endpoint acceptance. PENDING TARGET VPS.
+- provider contract/capabilities;
+- Binance USD-M + Bybit Linear public adapters;
+- normalized instruments/tickers/candles;
+- native provider symbols;
+- price/liquidity universe;
+- provider fallback without series mixing;
+- deterministic tests: 7 passed.
 
 ## Phase 2 - Market Data Core
 
 Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
 
-- REST MTF bootstrap `1d/4h/1h/15m/5m`. DONE.
-- Closed-history depth 250/250/250/250/300. DONE.
-- SQLite WAL and Decimal-preserving persistence. DONE.
-- UTC boundaries, missing-bar validation, freshness. DONE.
-- Atomic MTF persistence and bootstrap audit. DONE.
-- Deterministic tests. DONE: 9 passed; compileall PASS.
-- Real provider historical bootstrap on target VPS. PENDING TARGET VPS.
+- REST MTF bootstrap `1d/4h/1h/15m/5m`;
+- SQLite WAL / Decimal persistence;
+- UTC/gap/freshness validation;
+- atomic MTF persistence;
+- deterministic tests: 9 passed.
 
 ## Phase 3 - Live Market Data
 
 Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
 
-- Public Binance/Bybit WebSocket ingestion. DONE.
-- Live `5m` base state; open candle provisional only. DONE.
-- Closed 5m persistence. DONE.
-- Complete UTC aggregation to `15m/1h/4h/1d`. DONE.
-- Provider/aggregate provenance. DONE.
-- Reconnect, stale detection, REST reconciliation and gap recovery. DONE.
-- WebSocket smoke utility. DONE.
-- Deterministic tests. DONE: 10 passed; compileall PASS.
-- Continuous real-provider VPS acceptance. PENDING TARGET VPS.
+- Binance/Bybit public WebSocket;
+- live 5m base state;
+- local 15m/1h/4h/1d aggregation;
+- reconnect/stale/reconciliation/gap recovery;
+- deterministic tests: 10 passed.
 
 ## Phase 4 - Indicators
 
 Status: IMPLEMENTATION COMPLETE.
 
-- True Range and Wilder ATR14. DONE.
-- ATR5D with same-bar ATR14 abnormal filter and five valid D1 ranges. DONE.
-- No rejected-bar replacement/duplication. DONE.
-- SMA/EMA; canonical MA50/200 baseline `sma`. DONE.
-- Previous-20-bar relative volume and relative candle spread. DONE.
-- Optional confirmed relative quote volume. DONE.
-- Generic ATR-used metric and 40/80% boundaries. DONE.
-- ATR-used move origin deferred to Phase 7. DONE.
-- Deterministic tests. DONE: 12 passed; compileall PASS.
+- Wilder ATR14 / canonical ATR5D;
+- SMA/EMA MA50/200;
+- volume/VSA spread metrics;
+- generic ATR-used metric;
+- deterministic tests: 12 passed.
 
 ## Phase 5 - Market Structure
 
 Status: IMPLEMENTATION COMPLETE.
 
-- Strict swing-high/swing-low detection. DONE.
-- Per-timeframe regime from swing structure + MA50/200 alignment. DONE.
-- MTF regime precedence across `1d/4h/1h`. DONE.
-- Directional strength evidence from structure, MA alignment and participation. DONE.
-- DST-aware Tokyo/London/New York session context. DONE.
-- Historical level clustering using ATR-scaled zones. DONE.
-- Level strength by independent swing touches. DONE.
-- FLOATING/CONFIRMED/BROKEN/MIRROR/INVALIDATED lifecycle. DONE.
-- BROKEN level excluded from active validation until mirror confirmation. DONE.
-- MTF level priority `1d > 4h > 1h > 15m > 5m`. DONE.
-- Consolidation-zone detector. DONE.
-- LIMIT/PARANORMAL_BAR explicit evidence support without invented automatic geometry. DONE.
-- Deterministic Phase 5 tests. DONE: 12 passed; compile validation PASS.
-
-Exit: deterministic provider-independent market structure/session/level context is available for Trap/VSA and later scoring.
+- swings/regime/strength;
+- DST-aware sessions;
+- MTF levels and lifecycle;
+- consolidation;
+- deterministic tests: 12 passed.
 
 ## Phase 6 - Trap + VSA
 
 Status: IMPLEMENTATION COMPLETE.
 
-- Provider-independent trap evidence contract. DONE.
-- Confirmed/mirror support/resistance eligibility. DONE.
-- Failed-break LONG/SHORT sequence with ATR-scaled break threshold. DONE.
-- Return and directional confirmation windows. DONE.
-- Trap states `RETURNED / CONFIRMED / EXPIRED`. DONE.
-- Raw VSA events ND, NS, T, UT, BC, SC, SV. DONE.
-- Previous-20-bar relative volume/spread baseline. DONE.
-- Strict HTF regime and confirmed-level location filters. DONE.
-- ATR-scaled level proximity and next-bar confirmation. DONE.
-- Same-level confirmed trap confluence. DONE.
-- VSA states `RAW / IGNORED / VALID_CONTEXT / CONFIRMED`. DONE.
-- Deterministic Phase 6 harness. DONE: 14 passed; compile validation PASS.
-
-Exit: VSA/trap events are rule-backed evidence and cannot independently create a trade outside approved structure/location/context. No Setup Score or rating is assigned in Phase 6.
+- liquidity-sweep/trap engine;
+- ND/NS/T/UT/BC/SC/SV;
+- HTF/location/confirmation hard rules;
+- deterministic tests: 14 passed.
 
 ## Phase 7 - Setup / Rating Engine
 
-Mandatory evaluation order:
+Status: IMPLEMENTATION COMPLETE.
+
+Mandatory evaluation order implemented:
 
 1. Market regime
 2. Liquidity
@@ -124,17 +88,40 @@ Mandatory evaluation order:
 13. Risk
 14. Rating
 
-Hard rejects include RR < 3, unconfirmed/floating primary level, ATR used > 80%, missing confirmation and stale data.
+Implemented:
 
-Phase 7 must define the canonical setup-specific origin for ATR-used `move_distance`.
+- setup candidate discovery from confirmed evidence;
+- `TRAP_VSA_CONFIRMATION`, `VSA_LEVEL_CONFIRMATION`, `TRAP_LEVEL_CONFIRMATION`;
+- evidence identity and setup-type consistency gates;
+- STRONG confirmed/mirror primary-level hard gate;
+- canonical luft `max(1 tick, 0.02*ATR14)`;
+- confirmation-trigger Entry;
+- structural SL;
+- nearest confirmed opposing structural TP;
+- no synthetic 3R target;
+- RR >=3 hard gate;
+- ATR-used origin from UTC-day directional extreme to proposed Entry;
+- 100-point deterministic score;
+- A+ >=90, A >=80, B >=70, C <70;
+- hard rejects force C and public score <=69;
+- optional explicit RiskContext sizing;
+- final LONG/SHORT/NO_TRADE TradingDecision;
+- deterministic Phase 7 exact-module harness: 17 passed.
 
-Exit: deterministic A+/A/B/C classification; only A/A+ can produce a tradable signal.
+Exit: PASSED for implementation. Repository-wide CI remains Phase 9.
 
 ## Phase 8 - Read-only K-Trader API
 
-- FastAPI HTTPS API.
-- Health, universe, market snapshot, analysis, candidates, signals and scanner-status endpoints.
+NEXT.
+
+- FastAPI read-only service.
+- Health endpoint.
+- Universe/current market snapshot.
+- Per-symbol analysis.
+- Candidates/signals/scanner-status endpoints.
+- Structured serialization of Phase 7 TradingDecision.
 - OpenAPI schema for Custom GPT Action.
+- API-level source/freshness and NO_TRADE guarantees.
 
 ## Phase 9 - VPS / Docker / CI-CD
 
@@ -142,31 +129,31 @@ Exit: deterministic A+/A/B/C classification; only A/A+ can produce a tradable si
 - Docker + Docker Compose.
 - Persistent `/opt/k-trader` data/config/logs.
 - Private-repo self-hosted GitHub Runner.
-- Push-to-main test/build/deploy/health-check workflow.
+- Repository-wide pytest/build/deploy/health workflow.
 - Execute pending live provider acceptance from Phases 1-3.
 
 ## Phase 10 - Custom GPT Update
 
-- Deploy SYSTEM instructions.
-- Connect read-only Action/OpenAPI schema.
-- Validate source/freshness reporting and NO TRADE behavior.
+- deploy canonical SYSTEM instructions;
+- connect read-only Action/OpenAPI schema;
+- validate source/freshness/NO_TRADE output.
 
 ## Phase 11 - Hardening
 
-- Replay and regression testing.
-- Signal history and outcome capture.
-- Metrics, backup, recovery, rate limiting and stale-data fail-closed behavior.
+- replay/regression history;
+- signal outcomes;
+- metrics/backup/recovery/rate limiting;
+- stale-data fail-closed validation.
 
 ## Phase 12 - Multi-provider expansion
 
-- Add further exchanges/providers through the same interface.
-- Keep engines provider-independent.
+- add OKX/KuCoin/other public adapters through same provider contract;
+- keep Trading Engine provider-independent.
 
 ## Deferred beyond v1
 
-- Exchange account credentials.
-- Order execution / automatic trading.
-- Account reads.
-- PostgreSQL/TimescaleDB, Redis, Kafka and Kubernetes unless justified by measured load.
-- Statistical win probability until calibrated on confirmed historical outcomes.
-- Full order-book storage.
+- exchange credentials/account reads;
+- order execution/automatic trading;
+- PostgreSQL/TimescaleDB/Redis/Kafka/Kubernetes unless measured load justifies them;
+- statistical win probability until calibrated from confirmed outcomes;
+- full order-book storage.
