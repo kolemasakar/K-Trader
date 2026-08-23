@@ -1,4 +1,4 @@
-# Test Plan v2.5
+# Test Plan v2.6
 
 ## Test layers
 
@@ -156,15 +156,35 @@
 - Docker healthcheck requires `/health` JSON `status=ok`
 - Docker log configuration is bounded by max-size/max-file rotation
 
-16. Integration tests
+16. Dataset catalogue / study provenance - Phase 11G
+- `ktrader.study_run_provenance.v1` roundtrip and digest validation
+- complete `RuntimeScannerConfig` participates in provenance hashing
+- replay/study configuration changes produce different provenance identities
+- replay-study inspector rejects non-null estimated probability
+- replay-study decision IDs are unique and decision/outcome identity/counts are internally consistent
+- `ktrader.outcome_sample.v1` accepts only WIN/LOSS outcomes
+- immutable outcome sample carries source study ID and exact replay-study file SHA-256
+- repository outcome must exactly match the replay-study embedded binary outcome before sample export
+- `ktrader.dataset_catalogue.v1` entry links bundle/archive/cohort/study/provenance/sample with one provider and symbol
+- cohort archive SHA must equal the supplied universe archive SHA
+- replay-study bundle SHA must equal the supplied MTF bundle SHA
+- provenance context SHA must equal the exact cohort symbol context SHA
+- registered artifact exact content SHA changes are detected
+- directory tree SHA is deterministic and symlink/path traversal escapes are rejected
+- catalogue entry and catalogue SHA roundtrip is deterministic
+- duplicate replay-study registration is rejected
+- full catalogue load can re-open and rebuild all referenced artifact relationships
+
+17. Integration tests
 - provider -> validation -> storage -> indicators -> structure -> Trap/VSA -> Trading Engine -> runtime coordinator -> API
 - provider-recorded MTF bundle + timestamped liquidity context -> shared analysis engine -> TradingDecision -> outcome evaluator -> OutcomeRepository
 - provider instruments/tickers -> captured universe archive -> study cohort -> ReplayStudyContext -> Phase 11D replay
 - selected live universe request -> immutable research capture + scanner analysis without a second provider fetch
+- MTF bundle + universe archive/cohort + full scanner/study configuration -> replay study/provenance -> immutable outcome sample -> verified dataset catalogue
 - source/freshness propagation
 - fail-closed NO_TRADE behavior
 
-17. Deployment and architecture tests
+18. Deployment and architecture tests
 - container build/start
 - persistence across restart
 - scanner coordinator + API health
@@ -215,7 +235,7 @@
 - Historical outcome bars must start after the decision's last closed bar.
 - Outcome evaluation must never guess OHLC intrabar ordering.
 - `NO_TRADE`, `AMBIGUOUS`, pending and expired outcomes must not enter the WIN/LOSS binary sample set.
-- Phase 11B/11C/11D/11E/11F must not populate `estimated_probability` or reinterpret Setup Score as probability.
+- Phase 11B/11C/11D/11E/11F/11G must not populate `estimated_probability` or reinterpret Setup Score as probability.
 - Deep historical collection must never splice another provider to fill a missing page.
 - Deep historical collection must fail if the exact requested closed-bar depth cannot be produced.
 - Historical page cursors must make strict backward progress.
@@ -238,6 +258,12 @@
 - Backup verification must reject corrupt database artifacts.
 - Runtime health must degrade when the scanner exceeds its configured maximum scan age.
 - Container health must depend on semantic `status=ok`, not HTTP reachability alone.
+- A catalogue entry must never connect a cohort to a different universe archive or a replay study to a different MTF bundle.
+- Study provenance must bind the exact cohort symbol context and complete scanner/study configuration.
+- Registered artifact paths must stay within one explicit artifact root and must not escape through traversal or symlinks.
+- A changed registered artifact must fail catalogue verification rather than silently replacing prior evidence.
+- Immutable outcome samples may contain only study-linked WIN/LOSS rows that exactly match `OutcomeRepository`.
+- The dataset catalogue and outcome sample must never calculate win probability.
 
 ## Current deterministic verification
 
@@ -257,10 +283,11 @@
 - Phase 11D final CI run `32653087172`: **140 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - Phase 11E CI run `32654162474`: **147 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - Phase 11F CI run `32656033224`: **155 passed**, Python compile PASS, shell validation PASS, Docker Compose PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- Phase 11G CI run `32657337221`: **163 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 The initial Phase 11D PR gate `32653028353` had 135 passed / 5 failed because one newly added synthetic fixture violated existing OHLC validation (`low > open`). Only the fixture was corrected; production validation was not weakened.
 
-Real provider/Oracle-host acceptance remains a separate Phase 9 live gate. Phase 10 live Action acceptance remains blocked until a real HTTPS endpoint exists. Phase 11F repository-side restart/backup/watchdog logic is verified, while real host restart and persistent-volume evidence remains part of the live gate.
+Real provider/Oracle-host acceptance remains a separate Phase 9 live gate. Phase 10 live Action acceptance remains blocked until a real HTTPS endpoint exists. Phase 11F repository-side restart/backup/watchdog logic is verified, while real host restart and persistent-volume evidence remains part of the live gate. Phase 11G catalogue logic is repository-verified; real catalogue population requires provider-recorded production artifacts.
 
 ## Fixtures
 
@@ -269,3 +296,5 @@ Synthetic fixtures are allowed only inside tests and must be explicitly test dat
 Provider-recorded historical fixtures must preserve provider/symbol/timeframe provenance and the `ktrader.history.v1` content digest. Long real-provider MTF bundles are operator-generated artifacts; normal PR CI uses deterministic mocked provider pages and must not fabricate live exchange captures when network collection is unavailable.
 
 Historical liquidity/universe context must likewise be captured as explicit timestamped study input. A synthetic context may be used only in tests and may never be presented as recorded exchange history.
+
+Catalogue test artifacts may be synthetic only inside tests. A production catalogue entry must reference the original provider-recorded artifacts, exact configuration provenance and verified outcome sample without substituting synthetic evidence.
