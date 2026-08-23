@@ -32,17 +32,27 @@ Exit condition: two independent adapters satisfy equivalent normalized contracts
 
 ## Phase 2 - Market Data Core
 
-- REST bootstrap for D1/4H/1H/15m/5m.
-- SQLite WAL persistence.
-- UTC candle boundaries, missing-bar detection and data validation.
-- Provider/source metadata and freshness tracking.
+Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
 
-Exit: validated historical MTF state is available to the engine.
+- REST bootstrap for 1d/4h/1h/15m/5m. DONE.
+- Default closed-history depth: 250/250/250/250/300. DONE.
+- SQLite WAL persistence. DONE.
+- Decimal-preserving storage and idempotent candle upsert. DONE.
+- UTC candle boundaries and normalized close-time contract. DONE.
+- Missing-bar detection and fail-closed validation. DONE.
+- Provider/source identity preservation. DONE.
+- Interval-relative freshness tracking. DONE.
+- Atomic MTF snapshot persistence only after every requested timeframe passes. DONE.
+- Bootstrap audit records. DONE.
+- Deterministic Phase 2 tests. DONE: 9 passed; compileall PASS.
+- Real provider historical bootstrap on target VPS. PENDING TARGET VPS.
+
+Exit condition: offline integrity contract is implemented and tested; target-VPS live bootstrap confirms a fresh, contiguous persisted MTF snapshot from an accessible public provider.
 
 ## Phase 3 - Live Market Data
 
 - Public WebSocket ingestion.
-- Primary live 5m bars plus local aggregation to 15m/1H/4H/D1 where provider semantics allow.
+- Primary live 5m bars plus local aggregation to 15m/1h/4h/1d where provider semantics allow.
 - Ticker/book-ticker inputs as needed.
 - Automatic reconnect, stale detection and REST reconciliation.
 
@@ -101,7 +111,7 @@ Exit: deterministic A+/A/B/C classification; only A/A+ can produce a tradable si
 - Persistent `/opt/k-trader` data/config/logs.
 - Private-repo self-hosted GitHub Runner.
 - Push-to-main test/build/deploy/health-check workflow.
-- Execute pending live provider acceptance from Phase 1.
+- Execute pending live provider acceptance from Phases 1 and 2.
 
 ## Phase 10 - Custom GPT Update
 

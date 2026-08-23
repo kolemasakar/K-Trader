@@ -24,11 +24,21 @@ universe:
 
 history:
   bars:
-    D1: 250
-    4H: 250
-    1H: 250
+    1d: 250
+    4h: 250
+    1h: 250
     15m: 250
     5m: 300
+
+freshness:
+  fail_on_stale_data: true
+  max_age_intervals: 2.0
+
+validation:
+  require_utc_boundaries: true
+  require_contiguous_closed_history: true
+  fail_on_missing_bars: true
+  atomic_mtf_bootstrap: true
 
 live:
   preferred_base_interval: 5m
@@ -49,7 +59,9 @@ rating:
 
 storage:
   backend: sqlite
+  path: data/ktrader.db
   wal: true
+  busy_timeout_ms: 5000
 
 api:
   read_only: true

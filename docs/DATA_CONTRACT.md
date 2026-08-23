@@ -1,47 +1,59 @@
-# Data Contract v1.0
+# Data Contract v1.1
 
 ## Normalized instrument
 
 Required fields:
 - provider_id
-- exchange
 - provider_symbol
-- canonical_symbol
+- canonical symbol (`symbol` in code)
 - market_type
 - base_asset
 - quote_asset
 - status
 - contract_type
-- tick_size
-- qty_step
-- min_qty
-- max_qty where known
-- price_precision / qty_precision where known
-- source_timestamp
+- price/quantity increments where known
 
 ## Normalized candle
 
 Required:
 - provider_id
-- canonical_symbol
+- canonical symbol
 - interval
-- open_time_utc
-- close_time_utc
+- open_time UTC
+- close_time UTC
 - open
 - high
 - low
 - close
-- base_volume
-- is_closed
-- received_at_utc
+- base volume
+- closed flag
 
 Optional, preserved when provider supports them:
 - quote_volume
 - trade_count
-- taker_buy_base_volume
+- taker_buy_volume
 - taker_buy_quote_volume
 
-Derived fields SHALL NOT overwrite raw provider fields.
+Derived fields SHALL NOT overwrite normalized provider fields.
+
+## Canonical timeframe keys
+
+Provider-independent code uses:
+
+- `1d`
+- `4h`
+- `1h`
+- `15m`
+- `5m`
+
+User-facing labels may use D1/4H/1H/15m/5m.
+
+## Time normalization
+
+- UTC is canonical.
+- `open_time` aligns exactly to the interval boundary.
+- normalized `close_time = interval_end - 1 ms`.
+- historical sequences are strictly chronological.
 
 ## Derived volume-bar features
 
@@ -61,16 +73,25 @@ Each derived field SHALL declare its formula/version in code/tests.
 
 - No synthetic OHLCV values unless explicitly tagged as derived aggregation.
 - No interpolation of missing exchange candles for Trading Engine decisions.
-- Aggregated bars must contain `derived_from_interval` and complete child-bar coverage.
+- Historical bootstrap requires contiguous closed bars.
+- Aggregated bars must contain complete child-bar coverage.
 - Provider bars and locally aggregated bars are distinguishable.
 - Cross-provider bar concatenation is forbidden.
-- UTC is canonical time.
+- Stale historical state fails closed before engine use.
+
+## Persistence precision
+
+- timestamps: integer epoch milliseconds;
+- Decimal market values: textual decimal representation;
+- no persistence conversion through binary float.
 
 ## Freshness
 
-Every snapshot returned to K_Trader includes:
+Every future API snapshot returned to K_Trader includes:
 - data_time
 - last_closed_bar
 - data_age_seconds
 - provider_id
 - freshness_status: FRESH | STALE | UNKNOWN
+
+Phase 2 bootstrap evaluates freshness from the latest closed bar using a configurable interval-relative data-readiness threshold.

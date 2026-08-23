@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-23 - Phase 2 market-data core
+
+- Added canonical UTC timeframe utilities for 1d/4h/1h/15m/5m.
+- Added normalized candle integrity validation and missing-bar detection.
+- Added interval-relative configurable freshness policy.
+- Added fail-closed historical MTF bootstrap service.
+- Added target+1 request behavior to preserve required closed-history depth when a current bar is open.
+- Added SQLite WAL candle repository.
+- Added Decimal-as-TEXT precision-preserving persistence.
+- Added idempotent candle upsert and bootstrap audit records.
+- Added atomic MTF snapshot persistence only after all timeframes pass validation.
+- Added Phase 2 storage/validation/bootstrap tests.
+- Fixed Phase 2 `market` exports to preserve Phase 1 compatibility.
+- Verification: Phase 2 isolated harness 9 tests passed; compileall PASS.
+- Target-VPS live bootstrap acceptance remains pending by design.
+
 ## 2026-08-23 - Phase 1 market-data foundation
 
 - Added Python package baseline and dependency metadata.
