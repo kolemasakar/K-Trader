@@ -8,10 +8,14 @@ from ktrader.history import load_mtf_bundle
 from ktrader.outcomes import OutcomeRepository
 from ktrader.replay import (
     ReplayStudyConfig,
+    build_study_run_provenance,
     load_replay_context,
+    load_study_cohort,
     run_replay_study,
     write_replay_study,
+    write_study_run_provenance,
 )
+from ktrader.runtime.models import RuntimeScannerConfig
 
 
 def main() -> None:
@@ -19,9 +23,21 @@ def main() -> None:
         description="Run full-engine chronological K-Trader replay over an MTF bundle"
     )
     parser.add_argument("--bundle", required=True, type=Path)
-    parser.add_argument("--context", required=True, type=Path)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--context", type=Path, help="Legacy standalone replay context")
+    source.add_argument(
+        "--cohort",
+        type=Path,
+        help="Canonical Phase 11G path: load the bundle symbol context from a verified study cohort",
+    )
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--outcome-db", required=True, type=Path)
+    parser.add_argument(
+        "--provenance-output",
+        type=Path,
+        default=None,
+        help="Optional provenance path. Requires --cohort; defaults to <output>.provenance.json.",
+    )
     parser.add_argument("--step-bars", type=int, default=1)
     parser.add_argument(
         "--horizon-bars",
@@ -31,24 +47,60 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    if args.provenance_output is not None and args.cohort is None:
+        raise SystemExit("--provenance-output requires --cohort")
+
     bundle = load_mtf_bundle(args.bundle)
-    context = load_replay_context(args.context)
+    cohort_sha256: str | None = None
+    if args.cohort is not None:
+        cohort = load_study_cohort(args.cohort)
+        if cohort.provider_id != bundle.manifest.provider_id:
+            raise SystemExit("cohort provider does not match MTF bundle")
+        symbol = bundle.manifest.canonical_symbol
+        if symbol not in cohort.contexts:
+            raise SystemExit(f"bundle symbol {symbol} is absent from cohort")
+        context = cohort.contexts[symbol]
+        cohort_sha256 = cohort.cohort_sha256
+    else:
+        assert args.context is not None
+        context = load_replay_context(args.context)
+
+    scanner_config = RuntimeScannerConfig()
+    study_config = ReplayStudyConfig(
+        step_bars=args.step_bars,
+        horizon_bars=args.horizon_bars,
+    )
     repository = OutcomeRepository(args.outcome_db)
     try:
         result = run_replay_study(
             bundle,
             context,
-            study_config=ReplayStudyConfig(
-                step_bars=args.step_bars,
-                horizon_bars=args.horizon_bars,
-            ),
+            scanner_config=scanner_config,
+            study_config=study_config,
             outcome_repository=repository,
         )
         output = write_replay_study(args.output, result)
+        provenance_output: Path | None = None
+        provenance_sha256: str | None = None
+        if cohort_sha256 is not None:
+            provenance = build_study_run_provenance(
+                result,
+                output,
+                context,
+                scanner_config,
+                study_config,
+                cohort_sha256=cohort_sha256,
+            )
+            provenance_output = args.provenance_output or Path(str(output) + ".provenance.json")
+            write_study_run_provenance(provenance_output, provenance)
+            provenance_sha256 = provenance.provenance_sha256
+
         print(
             json.dumps(
                 {
                     "output": str(output),
+                    "provenance_output": str(provenance_output) if provenance_output is not None else None,
+                    "provenance_sha256": provenance_sha256,
                     "study_id": result.study_id,
                     "bundle_sha256": result.bundle_sha256,
                     "provider_id": result.provider_id,
