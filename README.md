@@ -4,104 +4,100 @@ K-Trader is a read-only, exchange-agnostic market scanner and analysis backend f
 
 ## v1 objective
 
-Continuously collect confirmed public derivatives market data, normalize it, validate and persist multi-timeframe history/live state, evaluate indicators, market structure, levels, traps and VSA, rank only high-quality setups, and expose structured results to K_Trader through a read-only HTTPS API.
+Collect confirmed public derivatives market data, normalize and validate it, maintain MTF history/live state, evaluate indicators/structure/traps/VSA, build deterministic setup geometry and scoring, and expose only high-quality read-only results to K_Trader.
 
 ## Principles
 
-- Read-only in v1: no order placement, account access or exchange credentials.
+- Read-only v1: no order placement, account access or exchange credentials.
 - Exchange-agnostic core: Binance, Bybit, OKX, KuCoin and future providers are adapters, not the engine.
-- One coherent market series per analysis; never mix OHLCV from different exchanges.
-- Canonical symbol and native `provider_symbol` are separate concepts.
-- Confirmed data only; stale, gapped or insufficient data fails closed.
-- UTC is canonical for candle storage and aggregation.
-- Open live candles are provisional and never treated as closed confirmations.
-- Capital preservation: quality over quantity; RR >= 3 for a tradable setup.
-- Rule-based Setup Score in v1; statistical probability is deferred until calibrated from outcomes.
+- Never mix OHLCV series across providers.
+- Confirmed source data only; stale/gapped/insufficient context fails closed.
+- UTC is canonical for storage/aggregation.
+- Open live candles are provisional only.
+- Quality > quantity; `NO_TRADE` is preferred to weak setup.
+- RR >=3 for tradable setup.
+- Setup Score is rule-based, not statistical probability.
 
 ## Target flow
 
-Public Exchange API -> REST/WS Provider Adapter -> Normalized Market Data -> Validation/SQLite -> Universe/Liquidity -> ATR/MA -> Market Structure/Levels -> Trap -> VSA -> Setup Score -> A/A+ -> Signal -> Read-only API -> Custom GPT K_Trader
+Public Exchange API -> REST/WS Provider -> Normalized Data -> Validation/SQLite -> Universe/Liquidity -> ATR/MA -> Structure/Levels -> Trap -> VSA -> Setup Geometry -> Setup Score -> A/A+ -> TradingDecision -> Read-only API -> Custom GPT
 
-## Current implementation
+## Implemented phases
 
-### Phase 1 - provider foundation
+### Phase 1 - Provider foundation
 
-- `MarketDataProvider` contract and capability model;
-- normalized instrument/ticker/candle models;
-- Binance USD-M and Bybit Linear public REST adapters;
-- provider fallback without cross-provider data fusion;
-- configurable price filter and liquidity ranking.
+- exchange-agnostic provider contract;
+- Binance USD-M + Bybit Linear public adapters;
+- public REST history, symbols/tickers, price/liquidity filtering and fallback.
 
-### Phase 2 - market-data core
+### Phase 2 - Market-data core
 
-- REST bootstrap for `1d/4h/1h/15m/5m`;
-- default closed-history depth `250/250/250/250/300`;
-- UTC boundary/OHLCV/gap/freshness validation;
-- SQLite WAL persistence and Decimal-preserving storage;
-- atomic MTF snapshot writes and bootstrap audit.
+- `1d/4h/1h/15m/5m` bootstrap;
+- SQLite WAL;
+- UTC/gap/freshness validation;
+- atomic MTF persistence.
 
-### Phase 3 - live market data
+### Phase 3 - Live market data
 
-- Binance USD-M and Bybit Linear public WebSocket candle streams;
-- canonical live base interval `5m`;
-- open candle held in memory only;
-- provider-confirmed closed 5m persistence;
-- complete UTC aggregation to `15m/1h/4h/1d`;
-- source provenance (`provider` vs `aggregate`);
-- stale detection, reconnect, REST reconciliation and gap recovery;
-- target-VPS WebSocket smoke utility.
+- Binance/Bybit public WebSocket;
+- 5m base stream;
+- local 15m/1h/4h/1d aggregation;
+- stale/reconnect/REST reconciliation/gap recovery.
 
-### Phase 4 - indicators
+### Phase 4 - Indicators
 
-- provider-independent True Range and Wilder ATR14;
-- canonical D1 ATR5D with abnormal-range filtering and no rejected-bar replacement;
-- configurable SMA/EMA with v1 MA50/200 baseline `sma`;
-- 20-bar previous-only volume and VSA candle-spread baselines;
-- relative volume/quote-volume/spread;
-- generic ATR-used calculation with 40/80% classifications;
-- ATR-used move origin reserved for Phase 7 Trading Engine rules.
+- Wilder ATR14;
+- canonical ATR5D;
+- SMA/EMA MA50/200;
+- relative volume/spread;
+- ATR-used helper.
 
-### Phase 5 - market structure
+### Phase 5 - Market structure
 
-- deterministic swing-point detection;
-- regime from swing structure plus MA50/200 alignment;
-- MTF regime precedence across `1d/4h/1h`;
-- strength evidence from structure, MA alignment and configured participation threshold;
-- DST-aware Tokyo/London/New York session context for 24/7 crypto;
-- historical swing-level clustering into ATR-scaled zones;
-- FLOATING/CONFIRMED/BROKEN/MIRROR/INVALIDATED lifecycle;
-- trend-break and mirror lifecycle evidence;
-- consolidation-zone detector;
-- MTF level priority and nearest confirmed support/resistance lookup;
-- `LIMIT` and `PARANORMAL_BAR` remain explicit evidence inputs rather than invented automatic geometry.
+- swing structure and MTF regime;
+- directional strength;
+- DST-aware sessions;
+- confirmed MTF levels and lifecycle.
 
-### Phase 6 - trap + VSA evidence
+### Phase 6 - Trap + VSA
 
-- failed-break trap engine for confirmed/mirror support and resistance;
-- ATR-scaled break threshold, return and directional confirmation windows;
-- Trap states `RETURNED / CONFIRMED / EXPIRED`;
-- deterministic raw VSA events `ND / NS / T / UT / BC / SC / SV`;
-- previous-20-bar relative volume/spread baselines;
-- strict HTF regime and confirmed-level location filters;
-- ATR-scaled VSA level proximity;
-- next-bar directional confirmation;
-- same-level confirmed trap confluence;
-- VSA states `RAW / IGNORED / VALID_CONTEXT / CONFIRMED`;
-- Phase 6 evidence cannot create a trade or rating by itself.
+- failed-break/return/confirmation trap engine;
+- ND/NS/T/UT/BC/SC/SV;
+- HTF/location/confirmation hard filters.
+
+### Phase 7 - Setup / Rating Engine
+
+- three canonical setup types;
+- confirmed-evidence identity matching;
+- STRONG confirmed/mirror primary-level hard gate;
+- Entry trigger from confirmation bar;
+- luft = `max(1 tick, 0.02 * ATR14)`;
+- structural Stop using level/sweep extreme;
+- nearest confirmed opposing structural Target;
+- no synthetic 3R target;
+- RR >=3 hard gate;
+- ATR-used based on UTC-day directional extreme -> proposed Entry;
+- deterministic 100-point Setup Score;
+- A+ >=90, A >=80, B >=70, C <70;
+- hard reject -> C / public score <=69 / NO_TRADE;
+- optional explicit account-risk sizing;
+- final `TradingDecision`.
 
 ## Verification
 
-- Phase 1 contract suite: 7 tests passed.
-- Phase 2 deterministic harness: 9 tests passed; compileall PASS.
-- Phase 3 deterministic harness: 10 tests passed; compileall PASS.
-- Phase 4 deterministic harness: 12 tests passed; compileall PASS.
-- Phase 5 local isolated harness: 12 tests passed; syntax/compile validation PASS.
-- Phase 6 local isolated harness: 14 tests passed; compile validation PASS.
-- Target-VPS REST/bootstrap/WebSocket acceptance remains pending until the VPS exists.
+- Phase 1: 7 deterministic tests.
+- Phase 2: 9 deterministic tests.
+- Phase 3: 10 deterministic tests.
+- Phase 4: 12 deterministic tests.
+- Phase 5: 12 deterministic tests.
+- Phase 6: 14 deterministic tests.
+- Phase 7: 17 exact-module isolated checks; repository test file committed.
+
+Repository-wide pytest/CI and real target-VPS REST/WS acceptance are Phase 9 gates and are not yet claimed.
 
 ## Smoke utilities
 
-REST provider:
+REST:
 
 `PYTHONPATH=src python scripts/provider_smoke.py --providers binance_usdm bybit_linear`
 
@@ -109,7 +105,7 @@ WebSocket:
 
 `PYTHONPATH=src python scripts/ws_smoke.py --provider binance_usdm --symbol BTCUSDT`
 
-or:
+or
 
 `PYTHONPATH=src python scripts/ws_smoke.py --provider bybit_linear --symbol BTCUSDT`
 
@@ -122,15 +118,11 @@ No exchange credentials are used.
 - `ARCHITECTURE.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
 - `docs/*_SPEC.md`
-- `docs/PROVIDER_ENDPOINTS.md`
-- `docs/PHASE_1_CHECKPOINT.md`
-- `docs/PHASE_2_CHECKPOINT.md`
-- `docs/PHASE_3_CHECKPOINT.md`
-- `docs/PHASE_4_CHECKPOINT.md`
-- `docs/PHASE_5_CHECKPOINT.md`
-- `docs/PHASE_6_CHECKPOINT.md`
+- `docs/PHASE_*_CHECKPOINT.md`
 - `docs/adr/*.md`
 
 ## Current phase
 
-Phase 6 - implementation complete. Target-VPS acceptance for Phases 1-3 remains pending until deployment.
+Phase 7 implementation complete.
+
+Next: Phase 8 - read-only FastAPI/OpenAPI layer for Custom GPT integration.
