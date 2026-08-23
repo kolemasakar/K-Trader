@@ -137,5 +137,10 @@ def serialize_status(status: ScannerRuntimeStatus, *, started_at: datetime) -> d
         "data_ready": status.data_ready,
         "last_scan_at": _time(status.last_scan_at),
         "last_error": status.last_error,
+        "cycle_id": status.cycle_id,
+        "symbols_ready": status.symbols_ready,
+        "symbols_failed": status.symbols_failed,
+        "live_streaming": status.live_streaming,
+        "last_cycle_duration_seconds": status.last_cycle_duration_seconds,
         "started_at": _time(started_at),
     }

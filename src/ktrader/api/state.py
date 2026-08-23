@@ -27,6 +27,11 @@ class ScannerRuntimeStatus:
     data_ready: bool = False
     last_scan_at: datetime | None = None
     last_error: str | None = None
+    cycle_id: int = 0
+    symbols_ready: int = 0
+    symbols_failed: int = 0
+    live_streaming: bool = False
+    last_cycle_duration_seconds: float | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,66 +57,28 @@ class ApiReadModel:
     def _key(provider_id: str, symbol: str) -> tuple[str, str]:
         return provider_id, symbol.upper()
 
-    def set_status(self, status: ScannerRuntimeStatus) -> None:
-        with self._lock:
-            self._status = status
-
-    def get_status(self) -> ScannerRuntimeStatus:
-        with self._lock:
-            return self._status
-
-    def replace_universe(self, candidates: Iterable[UniverseCandidate]) -> None:
-        values = list(candidates)
-        new_map = {
-            self._key(item.instrument.provider_id, item.instrument.symbol): item
-            for item in values
-        }
-        with self._lock:
-            self._universe = new_map
-
-    def list_universe(self, *, provider_id: str | None = None) -> tuple[UniverseCandidate, ...]:
-        with self._lock:
-            values = tuple(self._universe.values())
-        if provider_id is not None:
-            values = tuple(item for item in values if item.instrument.provider_id == provider_id)
-        return tuple(sorted(values, key=lambda item: item.liquidity_score, reverse=True))
-
-    def put_candles(
-        self,
-        *,
-        provider_id: str,
-        symbol: str,
-        interval: str,
-        candles: Sequence[NormalizedCandle],
-        source_kind: str,
-    ) -> None:
-        if source_kind not in {"provider", "aggregate"}:
-            raise ValueError("source_kind must be provider or aggregate")
-        normalized_symbol = symbol.upper()
-        values = tuple(candles)
-        for candle in values:
+    @staticmethod
+    def _validate_series(series: CandleSeriesSnapshot) -> None:
+        if series.source_kind not in {"provider", "aggregate", "mixed"}:
+            raise ValueError("source_kind must be provider, aggregate or mixed")
+        normalized_symbol = series.symbol.upper()
+        for candle in series.candles:
             if (
-                candle.provider_id != provider_id
+                candle.provider_id != series.provider_id
                 or candle.symbol.upper() != normalized_symbol
-                or candle.interval != interval
+                or candle.interval != series.interval
             ):
                 raise ValueError("candle series identity mismatch")
-        snapshot = CandleSeriesSnapshot(
-            provider_id=provider_id,
-            symbol=normalized_symbol,
-            interval=interval,
-            source_kind=source_kind,
-            candles=values,
-        )
-        with self._lock:
-            self._candles[(provider_id, normalized_symbol, interval)] = snapshot
 
-    def replace_decisions(self, decisions: Iterable[TradingDecision]) -> None:
+    @staticmethod
+    def _build_decision_views(
+        decisions: Iterable[TradingDecision],
+    ) -> tuple[tuple[TradingDecision, ...], dict[tuple[str, str], TradingDecision]]:
         values = tuple(decisions)
         grouped: dict[tuple[str, str], list[TradingDecision]] = {}
         for decision in values:
             grouped.setdefault(
-                self._key(decision.provider_id, decision.canonical_symbol), []
+                (decision.provider_id, decision.canonical_symbol.upper()), []
             ).append(decision)
         analyses = {
             key: best
@@ -130,6 +97,83 @@ class ApiReadModel:
                 reverse=True,
             )
         )
+        return ordered, analyses
+
+    def set_status(self, status: ScannerRuntimeStatus) -> None:
+        with self._lock:
+            self._status = status
+
+    def get_status(self) -> ScannerRuntimeStatus:
+        with self._lock:
+            return self._status
+
+    def replace_universe(self, candidates: Iterable[UniverseCandidate]) -> None:
+        values = list(candidates)
+        new_map = {
+            self._key(item.instrument.provider_id, item.instrument.symbol): item
+            for item in values
+        }
+        with self._lock:
+            self._universe = new_map
+
+    def publish_cycle(
+        self,
+        *,
+        status: ScannerRuntimeStatus,
+        universe: Iterable[UniverseCandidate],
+        candle_series: Iterable[CandleSeriesSnapshot],
+        decisions: Iterable[TradingDecision],
+    ) -> None:
+        universe_values = tuple(universe)
+        series_values = tuple(candle_series)
+        universe_map = {
+            self._key(item.instrument.provider_id, item.instrument.symbol): item
+            for item in universe_values
+        }
+        candle_map: dict[tuple[str, str, str], CandleSeriesSnapshot] = {}
+        for series in series_values:
+            self._validate_series(series)
+            candle_map[(series.provider_id, series.symbol.upper(), series.interval)] = series
+        ordered, analyses = self._build_decision_views(decisions)
+        with self._lock:
+            self._status = status
+            self._universe = universe_map
+            self._candles = candle_map
+            self._candidates = ordered
+            self._analyses = analyses
+
+    def clear_runtime_data(self, *, status: ScannerRuntimeStatus) -> None:
+        self.publish_cycle(status=status, universe=(), candle_series=(), decisions=())
+
+    def list_universe(self, *, provider_id: str | None = None) -> tuple[UniverseCandidate, ...]:
+        with self._lock:
+            values = tuple(self._universe.values())
+        if provider_id is not None:
+            values = tuple(item for item in values if item.instrument.provider_id == provider_id)
+        return tuple(sorted(values, key=lambda item: item.liquidity_score, reverse=True))
+
+    def put_candles(
+        self,
+        *,
+        provider_id: str,
+        symbol: str,
+        interval: str,
+        candles: Sequence[NormalizedCandle],
+        source_kind: str,
+    ) -> None:
+        snapshot = CandleSeriesSnapshot(
+            provider_id=provider_id,
+            symbol=symbol.upper(),
+            interval=interval,
+            source_kind=source_kind,
+            candles=tuple(candles),
+        )
+        self._validate_series(snapshot)
+        with self._lock:
+            self._candles[(provider_id, symbol.upper(), interval)] = snapshot
+
+    def replace_decisions(self, decisions: Iterable[TradingDecision]) -> None:
+        ordered, analyses = self._build_decision_views(decisions)
         with self._lock:
             self._candidates = ordered
             self._analyses = analyses

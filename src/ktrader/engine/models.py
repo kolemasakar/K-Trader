@@ -85,8 +85,8 @@ class TradingDecision:
     sessions: tuple[str, ...]
     session_overlap: bool
     strength: str
-    primary_level_id: str
-    primary_level_strength: str
+    primary_level_id: str | None
+    primary_level_strength: str | None
     trap_state: str | None
     vsa_events: tuple[str, ...]
     entry: Decimal | None
@@ -94,7 +94,7 @@ class TradingDecision:
     stop: Decimal | None
     target: Decimal | None
     rr: Decimal | None
-    atr5d: Decimal
+    atr5d: Decimal | None
     atr_used_pct: Decimal | None
     atr_state: str | None
     position_size: Decimal | None
