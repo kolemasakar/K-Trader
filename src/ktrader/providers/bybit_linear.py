@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import AsyncIterator, Sequence
 from datetime import datetime, timezone
 from decimal import Decimal
 
@@ -14,7 +15,9 @@ from ktrader.models import (
 )
 from ktrader.providers.base import MarketDataProvider, ProviderError
 from ktrader.providers.http import PublicHttpClient
-
+from ktrader.providers.live import LiveCandleEvent
+from ktrader.providers.parsers import CANONICAL_TO_BYBIT, parse_bybit_kline
+from ktrader.providers.ws_transport import json_websocket_session
 
 _INTERVAL_MAP = {
     "5m": "5",
@@ -23,6 +26,7 @@ _INTERVAL_MAP = {
     "4h": "240",
     "1d": "D",
 }
+_WS_URL = "wss://stream.bybit.com/v5/public/linear"
 
 
 class BybitLinearProvider(MarketDataProvider):
@@ -53,10 +57,16 @@ class BybitLinearProvider(MarketDataProvider):
         result: list[NormalizedInstrument] = []
         cursor: str | None = None
         while True:
-            params: dict[str, object] = {"category": "linear", "limit": 1000}
+            params: dict[str, object] = {
+                "category": "linear",
+                "limit": 1000,
+            }
             if cursor:
                 params["cursor"] = cursor
-            payload = await self.http.get_json("/v5/market/instruments-info", params)
+            payload = await self.http.get_json(
+                "/v5/market/instruments-info",
+                params,
+            )
             data = _result(payload)
             for raw in data.get("list", []):
                 if raw.get("quoteCoin") != "USDT":
@@ -68,7 +78,11 @@ class BybitLinearProvider(MarketDataProvider):
                     if raw.get("contractType") == "LinearPerpetual"
                     else raw.get("contractType", "UNKNOWN")
                 )
-                status = "TRADING" if raw.get("status") == "Trading" else raw.get("status", "UNKNOWN").upper()
+                status = (
+                    "TRADING"
+                    if raw.get("status") == "Trading"
+                    else raw.get("status", "UNKNOWN").upper()
+                )
                 result.append(
                     NormalizedInstrument(
                         provider_id=self.provider_id,
@@ -79,8 +93,12 @@ class BybitLinearProvider(MarketDataProvider):
                         market_type="LINEAR_FUTURES",
                         contract_type=contract_type,
                         status=status,
-                        price_tick=_decimal_or_none(price_filter.get("tickSize")),
-                        quantity_step=_decimal_or_none(lot_filter.get("qtyStep")),
+                        price_tick=_decimal_or_none(
+                            price_filter.get("tickSize")
+                        ),
+                        quantity_step=_decimal_or_none(
+                            lot_filter.get("qtyStep")
+                        ),
                     )
                 )
             cursor = data.get("nextPageCursor") or None
@@ -89,10 +107,19 @@ class BybitLinearProvider(MarketDataProvider):
         return result
 
     async def get_tickers(self) -> list[NormalizedTicker]:
-        payload = await self.http.get_json("/v5/market/tickers", {"category": "linear"})
+        payload = await self.http.get_json(
+            "/v5/market/tickers",
+            {"category": "linear"},
+        )
         data = _result(payload)
-        payload_time = payload.get("time") if isinstance(payload, dict) else None
-        now = utc_from_ms(payload_time) if payload_time else datetime.now(timezone.utc)
+        payload_time = (
+            payload.get("time") if isinstance(payload, dict) else None
+        )
+        now = (
+            utc_from_ms(payload_time)
+            if payload_time
+            else datetime.now(timezone.utc)
+        )
         tickers: list[NormalizedTicker] = []
         for raw in data.get("list", []):
             if not raw.get("symbol", "").endswith("USDT"):
@@ -103,12 +130,18 @@ class BybitLinearProvider(MarketDataProvider):
                     symbol=raw["symbol"],
                     timestamp=now,
                     last_price=Decimal(raw["lastPrice"]),
-                    quote_volume_24h=_decimal_or_none(raw.get("turnover24h")),
-                    base_volume_24h=_decimal_or_none(raw.get("volume24h")),
+                    quote_volume_24h=_decimal_or_none(
+                        raw.get("turnover24h")
+                    ),
+                    base_volume_24h=_decimal_or_none(
+                        raw.get("volume24h")
+                    ),
                     trade_count_24h=None,
                     bid_price=_decimal_or_none(raw.get("bid1Price")),
                     ask_price=_decimal_or_none(raw.get("ask1Price")),
-                    open_interest=_decimal_or_none(raw.get("openInterest")),
+                    open_interest=_decimal_or_none(
+                        raw.get("openInterest")
+                    ),
                 )
             )
         return tickers
@@ -123,11 +156,14 @@ class BybitLinearProvider(MarketDataProvider):
         self.validate_interval(interval)
         if instrument.provider_id != self.provider_id:
             raise ValueError(
-                f"Instrument provider {instrument.provider_id!r} does not match {self.provider_id!r}"
+                f"Instrument provider {instrument.provider_id!r} "
+                f"does not match {self.provider_id!r}"
             )
         provider_symbol = instrument.provider_symbol or instrument.symbol
         if not 1 <= limit <= 1000:
-            raise ValueError("Bybit kline limit must be between 1 and 1000")
+            raise ValueError(
+                "Bybit kline limit must be between 1 and 1000"
+            )
         payload = await self.http.get_json(
             "/v5/market/kline",
             {
@@ -161,6 +197,49 @@ class BybitLinearProvider(MarketDataProvider):
         self.ensure_chronological(candles)
         return candles
 
+    async def stream_candles(
+        self,
+        instruments: Sequence[NormalizedInstrument],
+        interval: str = "5m",
+    ) -> AsyncIterator[LiveCandleEvent]:
+        self.validate_interval(interval)
+        if not instruments:
+            return
+        symbol_map: dict[str, str] = {}
+        topics: list[str] = []
+        raw_interval = CANONICAL_TO_BYBIT[interval]
+        for instrument in instruments:
+            if instrument.provider_id != self.provider_id:
+                raise ValueError(
+                    "All live instruments must belong to bybit_linear"
+                )
+            provider_symbol = (
+                instrument.provider_symbol or instrument.symbol
+            )
+            symbol_map[provider_symbol] = instrument.symbol
+            topics.append(
+                f"kline.{raw_interval}.{provider_symbol}"
+            )
+        subscribe = {
+            "op": "subscribe",
+            "args": topics,
+            "req_id": "ktrader-kline",
+        }
+        async for message in json_websocket_session(
+            _WS_URL,
+            subscribe_payloads=(subscribe,),
+            heartbeat_payload={"op": "ping"},
+            heartbeat_interval_seconds=20.0,
+        ):
+            event = parse_bybit_kline(
+                message.payload,
+                symbol_map=symbol_map,
+                received_at=message.received_at,
+                connection_id=message.connection_id,
+            )
+            if event is not None:
+                yield event
+
     async def close(self) -> None:
         await self.http.close()
 
@@ -170,7 +249,8 @@ def _result(payload: object) -> dict:
         raise ProviderError("Unexpected Bybit payload")
     if payload.get("retCode") != 0:
         raise ProviderError(
-            f"Bybit API error {payload.get('retCode')}: {payload.get('retMsg')}"
+            f"Bybit API error {payload.get('retCode')}: "
+            f"{payload.get('retMsg')}"
         )
     result = payload.get("result")
     if not isinstance(result, dict):
@@ -179,16 +259,14 @@ def _result(payload: object) -> dict:
 
 
 def _decimal_or_none(value: object) -> Decimal | None:
-    if value in (None, ""):
-        return None
-    return Decimal(str(value))
+    return None if value in (None, "") else Decimal(str(value))
 
 
 def _interval_ms(interval: str) -> int:
     return {
-        "5m": 5 * 60_000,
-        "15m": 15 * 60_000,
-        "1h": 60 * 60_000,
-        "4h": 4 * 60 * 60_000,
-        "1d": 24 * 60 * 60_000,
+        "5m": 300_000,
+        "15m": 900_000,
+        "1h": 3_600_000,
+        "4h": 14_400_000,
+        "1d": 86_400_000,
     }[interval]
