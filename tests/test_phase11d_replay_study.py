@@ -36,7 +36,7 @@ def _interval_dataset(interval: str, count: int = 4):
     for index in range(count):
         open_time = start + step * index
         if interval == "5m":
-            lows = [Decimal("99"), Decimal("99.2"), Decimal("99.5"), Decimal("100.5")]
+            lows = [Decimal("99"), Decimal("99.2"), Decimal("99.5"), Decimal("100")]
             highs = [Decimal("101"), Decimal("100.5"), Decimal("100.7"), Decimal("102.5")]
             closes = [Decimal("100"), Decimal("100"), Decimal("100.2"), Decimal("102")]
             low = lows[index]
