@@ -1,4 +1,4 @@
-# Test Plan v2.4
+# Test Plan v2.5
 
 ## Test layers
 
@@ -139,19 +139,39 @@
 - cohort/context digest mismatch and unsafe context paths are rejected
 - current ticker data is never accepted as a retroactive historical rank substitute
 
-15. Integration tests
+15. Operations hardening / continuous research capture - Phase 11F
+- live universe service retains the exact normalized instrument/ticker inputs from the selected provider request cycle
+- research capture reuses those exact source inputs and does not issue a second provider fetch
+- default 300-second capture cadence suppresses premature duplicate captures
+- each capture is written as an immutable digest-verified one-snapshot universe archive
+- online SQLite backup uses the native backup API while the source repository remains open
+- backup must pass `PRAGMA integrity_check` before atomic publication
+- corrupt/non-SQLite files fail backup verification
+- backup retention keeps only the configured newest files
+- a generated backup can be opened as a fresh repository with persisted candle state intact
+- disk guard rejects operation before provider access when configured free-space requirements are not met
+- disk-guard failure clears current publishable scanner state and sets `data_ready=false`
+- stale scanner timestamp degrades `/health` without changing the public response shape
+- fresh scanner timestamp returns normal health when all other readiness gates pass
+- Docker healthcheck requires `/health` JSON `status=ok`
+- Docker log configuration is bounded by max-size/max-file rotation
+
+16. Integration tests
 - provider -> validation -> storage -> indicators -> structure -> Trap/VSA -> Trading Engine -> runtime coordinator -> API
 - provider-recorded MTF bundle + timestamped liquidity context -> shared analysis engine -> TradingDecision -> outcome evaluator -> OutcomeRepository
 - provider instruments/tickers -> captured universe archive -> study cohort -> ReplayStudyContext -> Phase 11D replay
+- selected live universe request -> immutable research capture + scanner analysis without a second provider fetch
 - source/freshness propagation
 - fail-closed NO_TRADE behavior
 
-16. Deployment and architecture tests
+17. Deployment and architecture tests
 - container build/start
 - persistence across restart
 - scanner coordinator + API health
 - repository-wide CI/CD smoke
 - target-host REST/bootstrap/WebSocket acceptance
+- target-host persistence/backup/restart acceptance
+- target-host research capture and watchdog acceptance
 - linux/amd64 production image build/import
 - linux/arm64 production image build/import under QEMU/Buildx in CI
 - image architecture assertion before ARM64 runtime import
@@ -195,7 +215,7 @@
 - Historical outcome bars must start after the decision's last closed bar.
 - Outcome evaluation must never guess OHLC intrabar ordering.
 - `NO_TRADE`, `AMBIGUOUS`, pending and expired outcomes must not enter the WIN/LOSS binary sample set.
-- Phase 11B/11C/11D/11E must not populate `estimated_probability` or reinterpret Setup Score as probability.
+- Phase 11B/11C/11D/11E/11F must not populate `estimated_probability` or reinterpret Setup Score as probability.
 - Deep historical collection must never splice another provider to fill a missing page.
 - Deep historical collection must fail if the exact requested closed-bar depth cannot be produced.
 - Historical page cursors must make strict backward progress.
@@ -212,6 +232,12 @@
 - Historical universe ranks may be used only from snapshots actually captured at that time; current tickers cannot backfill old ranks.
 - A universe archive must never mix provider IDs or UniverseConfig values.
 - A study cohort must derive its context points only from archive snapshots inside the selected window.
+- Continuous research capture must reuse the exact selected live universe source inputs rather than re-fetching a second ticker snapshot.
+- Low disk must fail the scan closed before provider/bootstrap writes and must not leave stale data publishable as current.
+- A SQLite backup is valid only after integrity verification and atomic publication.
+- Backup verification must reject corrupt database artifacts.
+- Runtime health must degrade when the scanner exceeds its configured maximum scan age.
+- Container health must depend on semantic `status=ok`, not HTTP reachability alone.
 
 ## Current deterministic verification
 
@@ -230,10 +256,11 @@
 - Phase 11C CI run `32652044967`: **134 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - Phase 11D final CI run `32653087172`: **140 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - Phase 11E CI run `32654162474`: **147 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- Phase 11F CI run `32656033224`: **155 passed**, Python compile PASS, shell validation PASS, Docker Compose PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 The initial Phase 11D PR gate `32653028353` had 135 passed / 5 failed because one newly added synthetic fixture violated existing OHLC validation (`low > open`). Only the fixture was corrected; production validation was not weakened.
 
-Real provider/Oracle-host acceptance remains a separate Phase 9 live gate. Phase 10 live Action acceptance remains blocked until a real HTTPS endpoint exists.
+Real provider/Oracle-host acceptance remains a separate Phase 9 live gate. Phase 10 live Action acceptance remains blocked until a real HTTPS endpoint exists. Phase 11F repository-side restart/backup/watchdog logic is verified, while real host restart and persistent-volume evidence remains part of the live gate.
 
 ## Fixtures
 
