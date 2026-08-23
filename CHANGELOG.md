@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-23 - Phase 11G dataset catalogue foundation
+
+- Added deterministic audit catalogue schema `ktrader.dataset_catalogue.v1` for fully linked research chains.
+- Added exact artifact file/tree SHA-256 in addition to each artifact's semantic identity so byte/tree changes are detectable even when relationship metadata is unchanged.
+- Added `ktrader.study_run_provenance.v1` binding the exact MTF bundle, cohort, symbol replay context, complete `RuntimeScannerConfig`, `ReplayStudyConfig` and replay-study file SHA-256.
+- Upgraded canonical replay workflow with `run_replay_study.py --cohort` to emit cohort-linked provenance sidecars; standalone `--context` remains a legacy compatibility mode.
+- Added replay-study artifact inspection for manifest/decision/outcome identity, count consistency, duplicate IDs and non-null probability rejection.
+- Added immutable `ktrader.outcome_sample.v1` WIN/LOSS-only exports that require exact equality between replay-study embedded outcomes and `OutcomeRepository` rows.
+- Added catalogue relationship validation for bundle/archive/cohort/context/study/provenance/outcome-sample identities and digests.
+- Added artifact-root containment, relative-path, traversal and symlink guards.
+- Added `scripts/export_outcome_sample.py` and `scripts/build_dataset_catalogue.py`.
+- Preserved Trading Engine setup/scoring/RR/ATR/VSA/Trap behavior and kept `estimated_probability` null/N/A.
+- PR #10 CI run `32657337221`: **163 tests PASS**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- PR #10 squash-merged as `96de78d503432122d98e1c9ad1f01299802862a8`.
+- Phase 11G: VERIFIED repository-side; real catalogue population awaits provider-recorded production artifacts.
+
 ## 2026-08-23 - Phase 11F operations hardening / continuous research capture
 
 - Retained exact normalized instrument/ticker source inputs from the selected live universe request cycle so research capture does not issue a second temporally different provider fetch.
