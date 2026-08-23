@@ -1,10 +1,14 @@
-# K-Trader Roadmap v1.8
+# K-Trader Roadmap v1.9
 
-Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11D full-engine historical replay/outcome-study orchestration, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11E historical universe/liquidity capture and reproducible study cohorts, 2026-08-23.
 
 ## Phase 0 - Foundation
 
 Status: COMPLETE.
+
+- read-only, exchange-agnostic v1 architecture;
+- canonical data, analysis, scoring, API, deployment and security contracts;
+- Setup Score is deterministic and is not statistical probability.
 
 ## Phase 1 - Exchange-Agnostic Market Data Foundation
 
@@ -12,11 +16,9 @@ Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
 
 - provider contract/capabilities;
 - Binance USD-M + Bybit Linear public adapters;
-- normalized instruments/tickers/candles;
-- native provider symbols;
+- normalized instruments/tickers/candles and provider-native symbols;
 - price/liquidity universe;
-- provider fallback without series mixing;
-- deterministic tests: 7 passed.
+- provider fallback without series mixing.
 
 ## Phase 2 - Market Data Core
 
@@ -25,8 +27,7 @@ Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
 - REST MTF bootstrap `1d/4h/1h/15m/5m`;
 - SQLite WAL / Decimal persistence;
 - UTC/gap/freshness validation;
-- atomic MTF persistence;
-- deterministic tests: 9 passed.
+- atomic MTF persistence.
 
 ## Phase 3 - Live Market Data
 
@@ -35,8 +36,7 @@ Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
 - Binance/Bybit public WebSocket;
 - live 5m base state;
 - local 15m/1h/4h/1d aggregation;
-- reconnect/stale/reconciliation/gap recovery;
-- deterministic tests: 10 passed.
+- reconnect/stale/reconciliation/gap recovery.
 
 ## Phase 4 - Indicators
 
@@ -45,8 +45,7 @@ Status: IMPLEMENTATION COMPLETE.
 - Wilder ATR14 / canonical ATR5D;
 - SMA/EMA MA50/200;
 - volume/VSA spread metrics;
-- generic ATR-used metric;
-- deterministic tests: 12 passed.
+- generic ATR-used metric.
 
 ## Phase 5 - Market Structure
 
@@ -55,8 +54,7 @@ Status: IMPLEMENTATION COMPLETE.
 - swings/regime/strength;
 - DST-aware sessions;
 - MTF levels and lifecycle;
-- consolidation;
-- deterministic tests: 12 passed.
+- consolidation.
 
 ## Phase 6 - Trap + VSA
 
@@ -64,33 +62,28 @@ Status: IMPLEMENTATION COMPLETE.
 
 - liquidity-sweep/trap engine;
 - ND/NS/T/UT/BC/SC/SV;
-- HTF/location/confirmation hard rules;
-- deterministic tests: 14 passed.
+- HTF/location/confirmation hard rules.
 
 ## Phase 7 - Setup / Rating Engine
 
 Status: IMPLEMENTATION COMPLETE.
 
-- approved 14-component evaluation flow;
-- canonical setup types and evidence gates;
+- approved evaluation flow and evidence gates;
 - Entry/Luft/SL/structural TP;
 - RR >=3 and ATR-used hard gates;
 - deterministic Setup Score and A+/A/B/C;
 - explicit optional RiskContext;
-- LONG/SHORT/NO_TRADE TradingDecision;
-- Phase 7 isolated harness: 17 passed.
+- LONG/SHORT/NO_TRADE TradingDecision.
 
 ## Phase 8 - Read-only K-Trader API
 
 Status: IMPLEMENTATION COMPLETE.
 
-- FastAPI read-only boundary;
-- health/status/universe/market/candles/analysis/candidates/signals;
+- FastAPI read-only health/status/universe/market/candles/analysis/candidates/signals;
 - Decimal-as-string and UTC serialization;
 - provider ambiguity fail-closed behavior;
 - API rate limiting;
-- Custom GPT OpenAPI/Action guide;
-- isolated API harness: 7 passed.
+- Custom GPT OpenAPI/Action guide.
 
 ## Phase 8.5 - Runtime Scanner Coordinator
 
@@ -106,7 +99,6 @@ Status: IMPLEMENTATION COMPLETE / REPOSITORY-WIDE CI VERIFIED.
 - valid/fresh no-setup -> explicit NO_TRADE;
 - stale/incomplete input -> no fabricated decision;
 - atomic `ApiReadModel` publication;
-- provider/aggregate/mixed provenance;
 - production ASGI lifespan entrypoint and clean shutdown.
 
 Historical Phase 9 baseline including Phase 8.5: **92 tests passed**.
@@ -118,103 +110,73 @@ Status: REPOSITORY-SIDE COMPLETE / TARGET-HOST DEPLOYMENT AND LIVE ACCEPTANCE PE
 Completed and CI-verified:
 
 - GitHub-hosted repository-wide CI;
-- compile + pytest gate;
-- Docker Compose validation;
+- compile + pytest + Compose + Docker gates;
 - hardened production Docker image;
-- production image runtime import;
 - manual-only `main` deployment workflow for repository-scoped self-hosted runner;
-- immutable `/opt/k-trader/releases/<sha>` deployment model;
-- rollback on failed health/live acceptance;
+- immutable `/opt/k-trader/releases/<sha>` deployment model and rollback;
 - optional Caddy HTTPS profile;
 - Ubuntu/Docker provisioning automation;
-- checksum-verified GitHub runner registration baseline;
-- public REST acceptance on `5m/15m/1h/4h/1d`;
-- public 5m WebSocket acceptance;
-- scanner readiness + MTF API acceptance utility.
+- checksum-verified GitHub runner registration;
+- target-host REST/WebSocket/scanner acceptance utilities.
 
-CI evidence:
-
-- run `32636825758`: 92 pytest PASS, Compose PASS, Docker build/import PASS;
-- run `32637233264`: final production-prep pytest/Compose/Docker/runtime/packaging PASS.
+CI evidence includes run `32636825758` (92 tests) and production-prep run `32637233264`.
 
 ## Phase 9.1 - Oracle ARM64 / Multi-arch
 
 Status: VERIFIED.
 
-Primary production host decision:
+Primary production target:
 
 - Oracle Cloud Always Free;
 - Germany Central (Frankfurt);
 - Ubuntu 24.04 Minimal aarch64;
-- `VM.Standard.A1.Flex`;
-- target 2 OCPU / 12 GB RAM;
-- Linux ARM64 self-hosted production runner.
+- `VM.Standard.A1.Flex`, target 2 OCPU / 12 GB RAM;
+- Linux ARM64 self-hosted runner label `k-trader-prod-arm64`.
 
 Repository adaptation:
 
-- production runner label `k-trader-prod-arm64`;
-- runner installer auto-detects amd64/arm64 and pins official SHA-256 for both;
-- Ubuntu provisioning supports amd64 and arm64;
-- CI has separate amd64 and arm64 Docker gates;
-- ARM64 image is built under QEMU/Buildx, architecture-checked and runtime-imported;
-- amd64 compatibility retained for a potential future fallback host.
+- architecture-aware runner installer with pinned official checksums;
+- amd64 and arm64 Ubuntu provisioning;
+- separate amd64/arm64 Docker CI gates;
+- QEMU/Buildx ARM64 image build, architecture assertion and production ASGI import;
+- amd64 compatibility retained.
 
-Verification:
-
-- PR #3 CI run `32646869264` SUCCESS;
-- repository-wide pytest: **92 passed**;
-- shell validation: PASS;
-- linux/amd64 image build/runtime import: PASS;
-- linux/arm64 image build/architecture assertion/runtime import: PASS;
-- acceptance utility packaged on both architectures: PASS;
-- squash merge: `8e7ef38311e8c92398eb7cf530c92ff773e2a9a1`.
+Verification: PR #3 CI `32646869264`, **92 tests PASS**, amd64/arm64 Docker/runtime PASS; squash merge `8e7ef38311e8c92398eb7cf530c92ff773e2a9a1`.
 
 External Oracle status on 2026-08-23:
 
-- Frankfurt A1 capacity unavailable in AD-1, AD-2 and AD-3;
-- reduced 1 OCPU / 6 GB A1 request also unavailable in all three ADs;
+- A1 unavailable in Frankfurt AD-1, AD-2 and AD-3;
+- reduced 1 OCPU / 6 GB A1 request also unavailable;
 - no paid shape approved as workaround;
-- retry A1 creation when capacity becomes available.
+- retry A1 when capacity becomes available.
 
-Potential fallback, not implemented: home Windows PC + Tailscale Funnel.
+Potential fallback, not implemented: home Windows PC + Tailscale Funnel. Cloudflare Workers + Durable Objects are not part of K-Trader v1.
 
-Cloudflare Workers + Durable Objects: not part of K-Trader v1; retained only as an architecture idea for future projects.
+### Phase 9 live exit
 
-## Phase 9 live exit
+Pending on external infrastructure/capacity:
 
-Pending only on external infrastructure/capacity:
-
-- create/provision the Oracle A1 host;
-- register `k-trader-prod-arm64` self-hosted runner;
-- execute production deploy;
-- pass target-host REST/WS/runtime acceptance;
-- verify persistence across real restart;
-- configure DNS/TLS and verify public HTTPS.
-
-Phase 9 exits only after those live checks pass.
+- create/provision Oracle A1 host;
+- register `k-trader-prod-arm64` runner;
+- production deploy;
+- target-host REST/WS/runtime acceptance;
+- persistence across real restart;
+- DNS/TLS and public HTTPS.
 
 ## Phase 10 - Custom GPT Update
 
 Status: REPOSITORY-SIDE PREPARATION VERIFIED / LIVE ACTIVATION PENDING HTTPS.
 
-Prepared and CI-verified:
-
-- precise read-only OpenAPI schemas for all eight Action operations;
+- exact read-only OpenAPI schemas for eight Action operations;
 - Bearer API-key authentication and production secret wiring;
-- public health and privacy endpoints;
-- OpenAPI server-origin render/validation utility;
-- live Phase 10 Action acceptance utility;
-- Builder checklist and privacy-policy baseline;
-- fail-closed Action tests.
+- public health/privacy endpoints;
+- OpenAPI origin renderer/validator;
+- live Action acceptance utility;
+- Builder checklist and privacy-policy baseline.
 
-Verification:
+Verification: PR #4 CI `32647828382`, **106 tests PASS**, amd64/arm64 PASS; squash merge `a1c578524bbc41afa575b3f4fb6446642a48453d`.
 
-- PR #4 CI run `32647828382` SUCCESS;
-- integrated repository-wide pytest: **106 passed**;
-- amd64 and arm64 Docker/runtime gates: PASS;
-- squash merge: `a1c578524bbc41afa575b3f4fb6446642a48453d`.
-
-Activation awaits real HTTPS after Phase 9 live deployment.
+Activation awaits a real HTTPS endpoint after Phase 9 live deployment.
 
 ## Phase 11 - Hardening
 
@@ -222,97 +184,88 @@ Activation awaits real HTTPS after Phase 9 live deployment.
 
 Status: VERIFIED.
 
-- deterministic replay harness;
-- level lifecycle replay;
-- causal Trap lifecycle (`BROKEN -> RETURNED -> CONFIRMED` or `BROKEN -> EXPIRED`);
+- deterministic chronological replay harness;
+- causal level/Trap lifecycle;
 - gap/cross-provider fail-closed replay validation;
-- ATR no-future-lookahead regression;
-- freshness boundary regression;
+- ATR no-future-lookahead and freshness regressions;
 - deterministic replay digest.
 
-Verified in PR #4 CI run `32647828382` as part of the **106-test PASS** baseline.
+Verified in PR #4 final CI as part of the **106-test PASS** baseline.
 
 ### Phase 11B - Provider History / Signal Outcomes
 
 Status: VERIFIED.
 
-- versioned `ktrader.history.v1` provider-history JSONL contract;
-- SHA-256 candle-content integrity digest;
-- coherent closed/contiguous/single-provider history validation;
-- public provider-native history export through Binance/Bybit adapters;
-- conservative no-lookahead `TradingDecision` outcome tracking;
-- explicit OHLC intrabar ambiguity instead of guessed ordering;
+- `ktrader.history.v1` provider-history JSONL contract;
+- content SHA-256 integrity and coherent closed/contiguous/single-provider validation;
+- provider-native Binance/Bybit history export;
+- conservative future-candle outcome tracking;
+- explicit OHLC intrabar ambiguity;
 - deterministic decision fingerprint;
-- separate SQLite outcome persistence and update path;
-- WIN/LOSS-only extraction for future calibration tooling;
-- Setup Score remains non-probabilistic and `estimated_probability` remains null/N/A.
+- separate SQLite outcome persistence/upsert;
+- WIN/LOSS-only extraction for later calibration research;
+- no Probability.
 
-Verification:
-
-- PR #5 CI run `32650220382` SUCCESS;
-- repository-wide pytest: **121 passed**;
-- compile/shell validation: PASS;
-- linux/amd64 Docker/runtime: PASS;
-- linux/arm64 QEMU/Buildx image/architecture/runtime: PASS;
-- squash merge: `0b201a5112dca057e3071ef878d8acc6653ab994`.
+Verification: PR #5 CI `32650220382`, **121 tests PASS**, amd64/arm64 PASS; squash merge `0b201a5112dca057e3071ef878d8acc6653ab994`.
 
 ### Phase 11C - Deep History / MTF Replay Bundles
 
 Status: VERIFIED.
 
-- provider historical-page contract with explicit UTC end cursor;
-- Binance USD-M `endTime` and Bybit Linear `end` backward pagination;
+- Binance `endTime` and Bybit `end` backward pagination;
 - exact-depth multi-page closed-history collection;
-- page deduplication and strict backward cursor progress;
-- fail-closed gaps, insufficient depth, unsupported paging and identity mismatch;
-- deterministic `ktrader.mtf_bundle.v1` bundle for `1d/4h/1h/15m/5m`;
-- one provider/symbol and one UTC `as_of` cutoff across the bundle;
-- per-timeframe and bundle SHA-256 integrity;
-- no-lookahead MTF slicing at an explicit replay cutoff;
-- deep single-timeframe and MTF public-data export utilities.
+- page deduplication and strict cursor progress;
+- fail-closed gaps/insufficient depth/provider mismatch;
+- deterministic `ktrader.mtf_bundle.v1` for `1d/4h/1h/15m/5m`;
+- one provider/symbol and one UTC `as_of` cutoff;
+- per-timeframe and bundle SHA-256;
+- no-lookahead MTF slicing;
+- deep single-timeframe and MTF export utilities.
 
-Verification:
-
-- PR #6 CI run `32652044967` SUCCESS;
-- repository-wide pytest: **134 passed**;
-- compile/shell validation: PASS;
-- linux/amd64 Docker/runtime: PASS;
-- linux/arm64 QEMU/Buildx image/architecture/runtime: PASS;
-- squash merge: `0b7fd93246d4d5e6213ab0bf4ab63ee52b5fc007`.
+Verification: PR #6 CI `32652044967`, **134 tests PASS**, amd64/arm64 PASS; squash merge `0b7fd93246d4d5e6213ab0bf4ab63ee52b5fc007`.
 
 ### Phase 11D - Full-engine Historical Replay / Outcome Studies
 
 Status: VERIFIED.
 
-- live and historical paths share the same pure `analyze_candle_snapshot()` engine path;
-- chronological MTF replay with explicit `as_of` cutoffs and no future-bar access;
-- versioned `ktrader.replay_context.v1` timestamped historical liquidity/universe context;
-- missing/stale historical liquidity context skips the cutoff fail-closed instead of fabricating rank or universe size;
-- deterministic `ktrader.replay_study.v1` study identity/artifact;
+- live and historical paths share `analyze_candle_snapshot()`;
+- chronological MTF replay with explicit `as_of` cutoffs;
+- `ktrader.replay_context.v1` timestamped liquidity score/rank/universe size;
+- missing/stale historical context skips cutoff fail-closed;
+- deterministic `ktrader.replay_study.v1` artifact;
 - exact decision fingerprints retained for audit;
-- stable setup-geometry key deduplicates unchanged signals across consecutive 5m cutoffs;
-- unique tradable signals feed the conservative Phase 11B outcome evaluator and optional SQLite outcome repository;
-- explicit optional outcome horizon; no universal holding period invented;
-- Setup Score remains non-probabilistic and `estimated_probability` remains null/N/A.
+- stable setup-geometry key deduplicates unchanged signals;
+- unique tradable setups feed Phase 11B outcome evaluation/persistence;
+- explicit optional outcome horizon;
+- no Probability.
 
-Verification:
+Verification: first PR #7 gate `32653028353` found only one invalid new synthetic OHLC fixture; production validation was not weakened. Final CI `32653087172`: **140 tests PASS**, amd64/arm64 PASS; squash merge `cb2869bc9d5f56496368920e8b7e43faf9ba3bbd`.
 
-- initial PR #7 CI run `32653028353`: compile/shell PASS, 135 tests PASS / 5 new fixture tests FAIL because one new synthetic OHLC fixture had `low > open`; fixture corrected without weakening production validation;
-- final PR #7 CI run `32653087172` SUCCESS;
-- repository-wide pytest: **140 passed**;
-- compile/shell validation: PASS;
-- linux/amd64 Docker/runtime: PASS;
-- linux/arm64 QEMU/Buildx image/architecture/runtime: PASS;
-- squash merge: `cb2869bc9d5f56496368920e8b7e43faf9ba3bbd`.
+### Phase 11E - Historical Universe / Liquidity Capture + Study Cohorts
 
-Actual real-data outcome studies require both a provider-recorded MTF bundle and matching timestamped historical liquidity/universe context. Phase 11D intentionally does not approximate missing liquidity context.
+Status: VERIFIED.
+
+- `ktrader.universe_snapshot.v1` provider-native timestamped ranked universe snapshots;
+- raw ticker inputs required to reproduce liquidity score/rank are preserved;
+- rank and universe size are generated with the same `UniverseConfig`/`build_universe()` rules as live scanning;
+- snapshot provider identity, timestamp and SHA-256 integrity are fail-closed;
+- `ktrader.universe_archive.v1` append-only chronological same-provider/same-config archive with archive SHA-256;
+- `ktrader.study_cohort.v1` explicit time-window/symbol selection;
+- automatic per-symbol `ktrader.replay_context.v1` generation from actually captured snapshots;
+- provider/config mixing, future ticker timestamps, missing symbols, changed analysis-critical instrument metadata, unsafe paths and digest mismatches are rejected;
+- current ticker data is never used to fabricate historical ranks retroactively;
+- operator utilities: `capture_universe_snapshot.py`, `build_study_cohort.py`.
+
+Verification: PR #8 CI `32654162474` SUCCESS; repository-wide pytest **147 passed**, compile/shell PASS, linux/amd64 Docker/runtime PASS, linux/arm64 QEMU/Buildx image/architecture/runtime PASS; squash merge `3c2a21644442e1d621ca8402e9c1c97bedb0fe80`.
+
+Historical universe archives must accumulate prospectively because current public ticker endpoints do not provide trustworthy historical universe/rank snapshots retroactively.
 
 ### Remaining Phase 11 work
 
-- historical multi-symbol universe/liquidity context capture and reproducible study cohorts;
-- capture/catalogue canonical real-provider MTF bundles plus matching context datasets;
-- operations hardening: SQLite backup/recovery, disk/log guards, metrics and restart/recovery validation;
-- extended stale-data/runtime failure validation;
+- integrate periodic universe-snapshot persistence into the continuously running production runtime;
+- catalogue canonical real-provider MTF bundles + matching universe archives/cohorts + replay-study digests;
+- operations hardening: SQLite backup/recovery, disk/log guards, metrics/watchdog and restart/recovery validation;
+- extended runtime failure/stale-data validation;
 - later approved statistical calibration methodology with time-separated out-of-sample validation.
 
 ## Phase 12 - Multi-provider expansion
@@ -325,5 +278,5 @@ Actual real-data outcome studies require both a provider-recorded MTF bundle and
 - exchange credentials/account reads;
 - order execution/automatic trading;
 - PostgreSQL/TimescaleDB/Redis/Kafka/Kubernetes unless measured load justifies them;
-- statistical win probability until calibrated from confirmed outcomes with approved out-of-sample methodology;
+- statistical win probability until calibrated from confirmed outcomes with an approved out-of-sample methodology;
 - full order-book storage.
