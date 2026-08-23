@@ -17,91 +17,88 @@ Exit: PASSED.
 
 Status: IMPLEMENTATION COMPLETE / LIVE VPS ACCEPTANCE PENDING.
 
-- Define `MarketDataProvider` interface and provider capability model. DONE.
-- Implement first public derivatives provider. DONE: Binance USD-M.
-- Implement a second provider before Trading Engine work to validate abstraction. DONE: Bybit Linear.
-- Discover tradable perpetual instruments and normalize symbols/tickers/candles. DONE.
-- Separate canonical symbol from native `provider_symbol`. DONE.
-- Support configurable price limit, including disabled/all-assets mode. DONE.
-- Rank candidates by liquidity. DONE.
-- Implement priority-provider fallback without cross-provider data fusion. DONE.
-- Offline contract/pagination/failover/universe tests. DONE: 7 passed.
-- Target-VPS public endpoint smoke acceptance. PENDING TARGET VPS.
-
-Exit condition: two independent adapters satisfy equivalent normalized contracts; target-VPS live smoke confirms at least one legally accessible public provider without credentials.
+- `MarketDataProvider` interface and capability model. DONE.
+- Binance USD-M public provider. DONE.
+- Bybit Linear second provider. DONE.
+- Normalized instruments/tickers/candles and native `provider_symbol`. DONE.
+- Configurable price limit and liquidity ranking. DONE.
+- Provider fallback without cross-provider series mixing. DONE.
+- Contract/pagination/failover/universe tests. DONE: 7 passed.
+- Target-VPS public endpoint acceptance. PENDING TARGET VPS.
 
 ## Phase 2 - Market Data Core
 
 Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
 
-- REST bootstrap for 1d/4h/1h/15m/5m. DONE.
-- Default closed-history depth: 250/250/250/250/300. DONE.
-- SQLite WAL persistence. DONE.
-- Decimal-preserving storage and idempotent candle upsert. DONE.
-- UTC candle boundaries and normalized close-time contract. DONE.
-- Missing-bar detection and fail-closed validation. DONE.
-- Provider/source identity preservation. DONE.
-- Interval-relative freshness tracking. DONE.
-- Atomic MTF snapshot persistence only after every requested timeframe passes. DONE.
-- Bootstrap audit records. DONE.
-- Deterministic Phase 2 tests. DONE: 9 passed; compileall PASS.
+- REST MTF bootstrap `1d/4h/1h/15m/5m`. DONE.
+- Closed-history depth 250/250/250/250/300. DONE.
+- SQLite WAL and Decimal-preserving persistence. DONE.
+- UTC boundaries, missing-bar validation, freshness. DONE.
+- Atomic MTF persistence and bootstrap audit. DONE.
+- Deterministic tests. DONE: 9 passed; compileall PASS.
 - Real provider historical bootstrap on target VPS. PENDING TARGET VPS.
-
-Exit condition: offline integrity contract is implemented and tested; target-VPS live bootstrap confirms a fresh, contiguous persisted MTF snapshot from an accessible public provider.
 
 ## Phase 3 - Live Market Data
 
 Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
 
-- Provider-independent live candle event contract. DONE.
-- Public WebSocket ingestion for Binance USD-M and Bybit Linear. DONE.
-- Primary live `5m` candle state. DONE.
-- Open candle remains provisional/in-memory; only confirmed closed 5m persists. DONE.
-- Local complete UTC aggregation to `15m/1h/4h/1d`. DONE.
-- Provider-versus-aggregate storage provenance and SQLite schema v2 migration. DONE.
-- Automatic reconnect/stale detection. DONE.
-- Periodic REST reconciliation. DONE.
-- Gap-triggered REST recovery. DONE.
-- Duplicate closed-event idempotency. DONE.
-- Public WebSocket VPS smoke utility. DONE.
-- Deterministic Phase 3 tests. DONE: 10 passed; compileall PASS.
-- Continuous real-provider WebSocket/reconnect/gap-recovery acceptance. PENDING TARGET VPS.
-
-Exit condition: target VPS receives continuous public 5m data from an accessible provider, persists closed bars, builds complete parent bars, survives reconnects and reconciles gaps without silent data loss.
+- Public Binance/Bybit WebSocket ingestion. DONE.
+- Live `5m` base state; open candle provisional only. DONE.
+- Closed 5m persistence. DONE.
+- Complete UTC aggregation to `15m/1h/4h/1d`. DONE.
+- Provider/aggregate provenance. DONE.
+- Reconnect, stale detection, REST reconciliation and gap recovery. DONE.
+- WebSocket smoke utility. DONE.
+- Deterministic tests. DONE: 10 passed; compileall PASS.
+- Continuous real-provider VPS acceptance. PENDING TARGET VPS.
 
 ## Phase 4 - Indicators
 
 Status: IMPLEMENTATION COMPLETE.
 
-- Standard True Range and Wilder ATR14 over confirmed closed contiguous candles. DONE.
-- ATR5D abnormal-range filter using per-bar D1 ATR14 reference and five valid daily ranges. DONE.
+- True Range and Wilder ATR14. DONE.
+- ATR5D with same-bar ATR14 abnormal filter and five valid D1 ranges. DONE.
 - No rejected-bar replacement/duplication. DONE.
-- MA50/200 over close prices with configurable `sma|ema`; canonical baseline `sma`. DONE.
-- Volume baseline and relative volume. DONE.
-- VSA candle spread (`high-low`) baseline and relative spread. DONE.
-- Optional relative quote volume only when confirmed data is complete. DONE.
-- Generic ATR-used metric and 40/80% classification boundaries. DONE.
-- ATR-used move origin intentionally deferred to Phase 7 Trading Engine. DONE.
-- Deterministic Phase 4 tests. DONE: 12 passed; compileall PASS.
-
-Exit: indicator functions are deterministic, provider-independent and consume only validated closed contiguous candles. Trading interpretation of ATR-used origin remains a Phase 7 rule, not an indicator-side assumption.
+- SMA/EMA; canonical MA50/200 baseline `sma`. DONE.
+- Previous-20-bar relative volume and relative candle spread. DONE.
+- Optional confirmed relative quote volume. DONE.
+- Generic ATR-used metric and 40/80% boundaries. DONE.
+- ATR-used move origin deferred to Phase 7. DONE.
+- Deterministic tests. DONE: 12 passed; compileall PASS.
 
 ## Phase 5 - Market Structure
 
-- Market regime and strength.
-- Session context.
-- MTF levels and level lifecycle.
+Status: IMPLEMENTATION COMPLETE.
+
+- Strict swing-high/swing-low detection. DONE.
+- Per-timeframe regime from swing structure + MA50/200 alignment. DONE.
+- MTF regime precedence across `1d/4h/1h`. DONE.
+- Directional strength evidence from structure, MA alignment and participation. DONE.
+- DST-aware Tokyo/London/New York session context. DONE.
+- Historical level clustering using ATR-scaled zones. DONE.
+- Level strength by independent swing touches. DONE.
+- FLOATING/CONFIRMED/BROKEN/MIRROR/INVALIDATED lifecycle. DONE.
+- BROKEN level excluded from active validation until mirror confirmation. DONE.
+- MTF level priority `1d > 4h > 1h > 15m > 5m`. DONE.
+- Consolidation-zone detector. DONE.
+- LIMIT/PARANORMAL_BAR explicit evidence support without invented automatic geometry. DONE.
+- Deterministic Phase 5 tests. DONE: 12 passed; compile validation PASS.
+
+Exit: deterministic provider-independent market structure/session/level context is available for Trap/VSA and later scoring.
 
 ## Phase 6 - Trap + VSA
 
 - Trap/liquidity-sweep engine.
 - VSA events: ND, NS, T, UT, BC, SC, SV.
-- Context and confirmation hard rules.
-- Replay tests.
+- Context/location/confirmation hard rules.
+- Replay tests against deterministic sequences.
+
+Exit: VSA/trap events are rule-backed evidence and cannot independently create a trade outside approved structure/location context.
 
 ## Phase 7 - Setup / Rating Engine
 
 Mandatory evaluation order:
+
 1. Market regime
 2. Liquidity
 3. Session
@@ -117,7 +114,9 @@ Mandatory evaluation order:
 13. Risk
 14. Rating
 
-Hard rejects include RR < 3, unconfirmed floating level, ATR used > 80%, missing confirmation and stale data.
+Hard rejects include RR < 3, unconfirmed/floating primary level, ATR used > 80%, missing confirmation and stale data.
+
+Phase 7 must define the canonical setup-specific origin for ATR-used `move_distance`.
 
 Exit: deterministic A+/A/B/C classification; only A/A+ can produce a tradable signal.
 
@@ -134,7 +133,7 @@ Exit: deterministic A+/A/B/C classification; only A/A+ can produce a tradable si
 - Persistent `/opt/k-trader` data/config/logs.
 - Private-repo self-hosted GitHub Runner.
 - Push-to-main test/build/deploy/health-check workflow.
-- Execute pending live provider acceptance from Phases 1, 2 and 3.
+- Execute pending live provider acceptance from Phases 1-3.
 
 ## Phase 10 - Custom GPT Update
 
