@@ -81,7 +81,7 @@ Public Exchange API -> REST/WS Provider Adapter -> Normalized Market Data -> Val
 - Phase 2 deterministic harness: 9 tests passed; compileall PASS.
 - Phase 3 deterministic harness: 10 tests passed; compileall PASS.
 - Phase 4 deterministic harness: 12 tests passed; compileall PASS.
-- Phase 5 deterministic harness: 12 tests passed; compileall PASS.
+- Phase 5 local isolated harness: 12 tests passed; syntax/compile validation PASS.
 - Target-VPS REST/bootstrap/WebSocket acceptance remains pending until the VPS exists.
 
 ## Smoke utilities
