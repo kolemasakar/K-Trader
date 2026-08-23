@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 from collections.abc import Iterable
 from datetime import datetime, timezone
@@ -274,6 +275,41 @@ class CandleRepository:
             "interval_counts": json.loads(str(row["interval_counts_json"])),
             "error": row["error"],
         }
+
+    def backup_to(self, destination: str | Path) -> Path:
+        """Create an atomic, integrity-checked online SQLite backup."""
+        if self.path == ":memory:":
+            raise ValueError("cannot create durable backup from in-memory repository")
+        target = Path(destination).expanduser().resolve()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        temp = target.with_suffix(target.suffix + ".tmp")
+        temp.unlink(missing_ok=True)
+        try:
+            with sqlite3.connect(str(temp)) as backup_connection:
+                self._connection.backup(backup_connection)
+                row = backup_connection.execute("PRAGMA integrity_check").fetchone()
+                if row is None or str(row[0]).lower() != "ok":
+                    raise RuntimeError("SQLite backup integrity_check failed")
+            os.replace(temp, target)
+        except BaseException:
+            temp.unlink(missing_ok=True)
+            raise
+        return target
+
+    @staticmethod
+    def verify_database(path: str | Path) -> bool:
+        target = Path(path).expanduser().resolve()
+        if not target.is_file():
+            return False
+        try:
+            connection = sqlite3.connect(f"file:{target}?mode=ro", uri=True)
+            try:
+                row = connection.execute("PRAGMA integrity_check").fetchone()
+                return row is not None and str(row[0]).lower() == "ok"
+            finally:
+                connection.close()
+        except sqlite3.DatabaseError:
+            return False
 
     def close(self) -> None:
         self._connection.close()
