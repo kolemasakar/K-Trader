@@ -69,24 +69,42 @@ Public Exchange API -> REST/WS Provider -> Normalized Data -> Validation/SQLite 
 Repository-side implementation is complete:
 
 - GitHub-hosted repository-wide CI;
-- **92 tests PASS** on the final integrated code baseline;
+- **92 tests PASS** on the integrated pre-ARM64 baseline;
 - Docker Compose validation and production image build/import PASS;
 - hardened non-root/read-only container baseline;
 - manual-only production deployment on `main`;
 - repository-scoped self-hosted runner provisioning baseline;
 - immutable commit-SHA releases and rollback;
 - optional Caddy HTTPS;
-- target-VPS REST acceptance on all five timeframes;
-- target-VPS public WebSocket acceptance;
+- target-host REST acceptance on all five timeframes;
+- target-host public WebSocket acceptance;
 - scanner/API readiness acceptance;
 - Ubuntu/Docker and runner registration scripts.
 
-The only remaining Phase 9 work requires a real external VPS: provisioning, runner registration, live provider checks, persistence/restart verification and public HTTPS.
+### Phase 9.1 - Oracle ARM64 / Multi-arch
+
+Primary production hosting is Oracle Cloud Always Free Ampere A1 in Germany Central (Frankfurt).
+
+Repository adaptation includes:
+
+- Ubuntu 24.04 Minimal aarch64 target;
+- `VM.Standard.A1.Flex` target at 2 OCPU / 12 GB RAM;
+- ARM64 production self-hosted runner label `k-trader-prod-arm64`;
+- multi-arch runner registration for Linux arm64 and amd64;
+- architecture-aware Ubuntu/Docker provisioning;
+- separate CI Docker gates for linux/amd64 and linux/arm64;
+- ARM64 image build/import verification under QEMU/Buildx;
+- amd64 support retained as a potential fallback host path.
+
+Oracle external status on 2026-08-23: A1 capacity was unavailable in Frankfurt AD-1, AD-2 and AD-3, including a reduced 1 OCPU / 6 GB request. No paid shape is approved as a workaround.
+
+Potential fallback, not implemented: home Windows PC + Tailscale Funnel. Cloudflare Workers + Durable Objects is not planned for K-Trader v1 and is retained only as a future-project architecture idea.
 
 ## CI evidence
 
 - CI run `32636825758`: repository-wide pytest **92 passed**, Compose PASS, Docker build PASS, runtime import PASS.
-- CI run `32637233264`: final production-prep pytest/compile/Compose/Docker/runtime/acceptance-packaging PASS.
+- CI run `32637233264`: production-prep pytest/compile/Compose/Docker/runtime/acceptance-packaging PASS.
+- Phase 9.1 multi-arch PR CI: pending until the current branch gate completes.
 
 ## Runtime entrypoint
 
@@ -113,10 +131,12 @@ No exchange credentials are used.
 - `ROADMAP.md`
 - `REQUIREMENTS.md`
 - `ARCHITECTURE.md`
+- `docs/HOSTING_OPTIONS.md`
 - `docs/VPS_PROVISIONING.md`
 - `docs/DEPLOYMENT.md`
 - `docs/SECURITY.md`
 - `docs/PHASE_9_CHECKPOINT.md`
+- `docs/PHASE_9_1_CHECKPOINT.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
@@ -126,6 +146,6 @@ No exchange credentials are used.
 
 ## Current phase
 
-Phase 9 repository-side preparation is complete and CI-validated.
+Phase 9.1 repository-side Oracle ARM64 adaptation is implemented and awaiting its multi-arch PR CI gate.
 
-Next external checkpoint: provision the target Ubuntu VPS, register the production runner, deploy and pass live REST/WS/runtime/HTTPS acceptance.
+Next external checkpoint after CI: obtain Oracle A1 capacity, provision the ARM64 host, register the production runner, deploy and pass live REST/WS/runtime/HTTPS acceptance.
