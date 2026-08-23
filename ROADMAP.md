@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.0
+# K-Trader Roadmap v1.1
 
-Status: APPROVED baseline, 2026-08-23.
+Status: APPROVED baseline with runtime-coordinator correction, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -112,31 +112,76 @@ Exit: PASSED for implementation. Repository-wide CI remains Phase 9.
 
 ## Phase 8 - Read-only K-Trader API
 
-NEXT.
+Status: IMPLEMENTATION COMPLETE.
 
-- FastAPI read-only service.
-- Health endpoint.
-- Universe/current market snapshot.
-- Per-symbol analysis.
-- Candidates/signals/scanner-status endpoints.
-- Structured serialization of Phase 7 TradingDecision.
-- OpenAPI schema for Custom GPT Action.
-- API-level source/freshness and NO_TRADE guarantees.
+- FastAPI read-only application boundary;
+- `/health`, scanner-status, universe, market, candles, analysis, candidates and signals endpoints;
+- internal `ApiReadModel` populated by scanner runtime;
+- Decimal-as-string exact serialization;
+- UTC ISO-8601 timestamps;
+- provider ambiguity -> HTTP 409, never silent provider substitution;
+- provider/aggregate candle provenance;
+- A/A+ LONG/SHORT-only `/v1/signals`;
+- single-process rate-limit baseline with HTTP 429;
+- FastAPI/Uvicorn runtime dependencies;
+- `custom_gpt/openapi.yaml` with stable operation IDs;
+- Custom GPT Action guide;
+- isolated API harness: 7 passed.
+
+Exit: API implementation PASSED.
+
+## Phase 8.5 - Runtime Scanner Coordinator
+
+Status: REQUIRED / NEXT.
+
+This phase was added after Phase 8 repository audit identified a missing application-level orchestration layer.
+
+Purpose: turn the already implemented Phase 1-7 modules into one autonomous scanner process and publish its state to the Phase 8 API read model.
+
+Required flow:
+
+provider selection
+-> universe/liquidity shortlist
+-> REST bootstrap and live state readiness
+-> indicators
+-> market structure/levels/session
+-> Trap/VSA
+-> Setup/Rating Engine
+-> ranked decisions/signals
+-> `ApiReadModel`
+
+Requirements:
+
+- provider-independent orchestration;
+- read-only only;
+- no cross-provider OHLCV mixing;
+- fail closed on stale/gapped/incomplete data;
+- no TradingDecision until all mandatory inputs are confirmed;
+- repeatable scanner cycle;
+- per-symbol exception isolation;
+- scanner runtime status/error reporting;
+- deterministic orchestration tests;
+- clean shutdown/restart boundaries for Phase 9 Docker service.
+
+Exit: one process can autonomously produce current universe/candidates/signals and continuously update the API read model without manual calls.
 
 ## Phase 9 - VPS / Docker / CI-CD
 
-- Ubuntu VPS.
-- Docker + Docker Compose.
-- Persistent `/opt/k-trader` data/config/logs.
-- Private-repo self-hosted GitHub Runner.
-- Repository-wide pytest/build/deploy/health workflow.
-- Execute pending live provider acceptance from Phases 1-3.
+- Ubuntu VPS;
+- Docker + Docker Compose;
+- persistent `/opt/k-trader` data/config/logs;
+- private-repo self-hosted GitHub Runner;
+- repository-wide pytest/build/deploy/health workflow;
+- run scanner coordinator + API as production services;
+- execute pending live provider acceptance from Phases 1-3.
 
 ## Phase 10 - Custom GPT Update
 
 - deploy canonical SYSTEM instructions;
+- replace `.invalid` server in OpenAPI with deployed HTTPS host;
 - connect read-only Action/OpenAPI schema;
-- validate source/freshness/NO_TRADE output.
+- validate source/freshness/NO_TRADE output;
+- add valid Privacy Policy URL if GPT distribution mode requires it.
 
 ## Phase 11 - Hardening
 
