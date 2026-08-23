@@ -13,7 +13,8 @@
 - No paid Oracle shape approved as a capacity workaround.
 - Retained home Windows PC + Tailscale Funnel as a potential fallback only; no implementation approved.
 - Cloudflare Workers + Durable Objects deferred from K-Trader v1 and retained only as a future-project architecture idea.
-- Phase 9.1 multi-arch PR CI pending before verification is claimed.
+- Verification: PR #3 CI run `32646869264` SUCCESS; **92 tests passed**, shell validation PASS, amd64 Docker/runtime PASS, ARM64 QEMU/Buildx image build/architecture/runtime PASS.
+- PR #3 squash-merged as `8e7ef38311e8c92398eb7cf530c92ff773e2a9a1`.
 
 ## 2026-08-23 - Phase 9 CI / Docker / production preparation
 
