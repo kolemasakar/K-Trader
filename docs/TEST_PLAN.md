@@ -1,4 +1,4 @@
-# Test Plan v1.1
+# Test Plan v1.2
 
 ## Test layers
 
@@ -6,7 +6,9 @@
 - normalization
 - candle boundary/OHLCV validation
 - gap and freshness logic
-- storage round-trip/upsert
+- storage round-trip/upsert/provenance/migration
+- live WebSocket payload parsing
+- local MTF aggregation
 - ATR/MA
 - levels/trap/VSA state logic
 - scoring hard filters
@@ -15,7 +17,7 @@
 - same normalized interface for each adapter
 - capability declarations
 - historical fetch
-- live subscription/reconnect where testable
+- live candle stream contract where testable
 
 3. Historical bootstrap tests
 - required closed-bar depth
@@ -26,22 +28,36 @@
 - no partial MTF persistence on failure
 - repeat bootstrap idempotency
 
-4. Replay tests
+4. Live market-data tests
+- Binance and Bybit kline normalization
+- open candle remains provisional and is not persisted as closed history
+- provider-confirmed closed 5m persistence
+- complete 5m -> 15m/1h/4h/1d aggregation
+- aggregate provenance
+- duplicate closed-event idempotency
+- stale-state detection
+- reconnect policy behavior where deterministically testable
+- REST reconciliation of recent closed bars
+- gap-triggered REST recovery
+- schema v1 -> v2 migration
+
+5. Replay tests
 - deterministic sequences for VSA/trap/levels
 - missing/stale bars
 - provider reconnect/gap reconciliation
 
-5. Integration tests
+6. Integration tests
 - provider -> validation -> storage -> engine -> API
 - source/freshness propagation
 - NO TRADE fail-closed behavior
 
-6. Deployment tests
+7. Deployment tests
 - container build/start
 - persistence across restart
 - health endpoint
 - CI/CD smoke test
-- target-VPS provider and historical-bootstrap acceptance
+- target-VPS REST provider and historical-bootstrap acceptance
+- target-VPS public WebSocket smoke and reconnect/gap-recovery acceptance
 
 ## Mandatory acceptance cases
 
@@ -53,6 +69,11 @@
 - Missing historical bars are rejected, not interpolated.
 - Stale bootstrap data is rejected.
 - Failed MTF bootstrap writes no partial candle snapshot.
+- Open live candles cannot masquerade as closed history.
+- Local parent aggregation requires complete child coverage.
+- Provider/native and locally aggregated candles remain distinguishable.
+- Live base-interval gap triggers REST recovery or fails closed.
+- Duplicate closed events remain idempotent.
 - Stale data cannot emit a tradable signal.
 - RR < 3 is rejected.
 - ATR used > 80% is rejected.
@@ -61,6 +82,14 @@
 - B/C never emits tradable LONG/SHORT.
 - Missing account/risk data produces position size/risk N/A.
 - Restart does not enable analysis before data-readiness validation.
+
+## Current deterministic verification
+
+- Phase 1 provider contract suite: 7 passed.
+- Phase 2 deterministic harness: 9 passed plus compileall PASS.
+- Phase 3 deterministic harness: 10 passed plus compileall PASS.
+
+Repository-wide CI and real provider/VPS acceptance are separate later acceptance gates and are not implied by these deterministic suites.
 
 ## Fixtures
 
