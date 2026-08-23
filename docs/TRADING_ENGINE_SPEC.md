@@ -1,4 +1,4 @@
-# Trading Engine Specification v1.0
+# Trading Engine Specification v1.1
 
 ## Mandatory evaluation sequence
 
@@ -21,9 +21,23 @@ Every complete setup evaluation covers:
 
 ## 1. Market regime
 
-Determine directional/range context from confirmed MTF structure and configured HTF trend filters. MA50/MA200 are supporting trend inputs, not independent signals.
+Consume Phase 5 `MarketStructureSnapshot`.
 
-Exact HTF precedence and MA rules SHALL be versioned before Phase 5 production use.
+Canonical per-timeframe regime:
+
+- HH + HL structure plus `close > MA50 > MA200` -> BULLISH;
+- LH + LL structure plus `close < MA50 < MA200` -> BEARISH;
+- range/transition structure plus neutral MA -> RANGE;
+- otherwise MIXED.
+
+Canonical HTF precedence:
+
+1. agreeing directional `1d + 4h` wins;
+2. if D1 is non-directional, agreeing directional `4h + 1h` may define direction;
+3. all RANGE -> RANGE;
+4. otherwise MIXED.
+
+MA50/MA200 confirm structure; they are not independent signals.
 
 ## 2. Liquidity
 
@@ -31,7 +45,9 @@ Consume normalized liquidity rank/score and hard spread/liquidity filters from `
 
 ## 3. Session
 
-Classify current market time using UTC internally and Europe/Kyiv for presentation. Session weighting must be configurable and tested; crypto is 24/7, so session is context rather than market-open permission.
+Consume DST-aware session context from `MARKET_STRUCTURE_SPEC.md`.
+
+Crypto is 24/7: session is context, not a market-open permission. Phase 5 provides active session labels/overlap only. Any future scoring weight must be explicitly versioned in Phase 7.
 
 ## 4. Trap
 
@@ -39,11 +55,25 @@ Consume deterministic trap state from `TRAP_SPEC.md`.
 
 ## 5. MTF levels
 
-Consume confirmed active levels/zones from `LEVELS_SPEC.md`. Floating/unconfirmed primary levels cannot validate a trade.
+Consume active confirmed levels/zones from `LEVELS_SPEC.md`.
+
+FLOATING, BROKEN and INVALIDATED levels cannot independently validate a trade. MIRROR becomes active only after the defined retest/confirmation transition.
+
+Canonical HTF level priority:
+
+`1d > 4h > 1h > 15m > 5m`
 
 ## 6. Strength
 
-Strength is a deterministic composite of structure/momentum/participation inputs. Exact formula is deferred to a versioned spec update before implementation.
+Phase 5 directional strength is evidence count, not probability and not Setup Score:
+
+- structure agreement;
+- MA agreement;
+- relative-volume participation >= configured threshold.
+
+3 -> STRONG, 2 -> MODERATE, <=1 -> WEAK. RANGE -> NEUTRAL.
+
+Phase 7 will define how strength affects Setup Score; no implicit weight is allowed before then.
 
 ## 7. Setup Score
 
@@ -53,9 +83,11 @@ Use `SCORING_SPEC.md`. Score is not probability.
 
 Use ATR14/ATR5D/ATR-used from `ATR_SPEC.md`. ATR used > 80% is a hard reject.
 
+The setup-specific origin for ATR-used `move_distance` must be defined in Phase 7 before tradable output.
+
 ## 9. Setup type
 
-Setup type must be explicit and rule-backed (for example sweep/test/confirmation), not free-form narrative.
+Setup type must be explicit and rule-backed, not free-form narrative.
 
 ## 10. Stop
 
@@ -79,4 +111,4 @@ A+/A/B/C. Only A+/A may produce LONG/SHORT signal; B/C returns NO TRADE.
 
 ## Fail-closed rule
 
-Missing confirmed inputs, stale data, unresolved provider integrity or failed hard filter results in NO TRADE/REJECT with reason codes.
+Missing confirmed inputs, stale data, unresolved provider integrity, insufficient structural history, conflicting HTF context or failed hard filter results in NO TRADE/REJECT with reason codes.
