@@ -58,44 +58,53 @@ Public Exchange API -> REST/WS Provider -> Normalized Data -> Validation/SQLite 
 - bounded bootstrap/analysis concurrency;
 - retained live WebSocket task unless provider/shortlist changes;
 - per-symbol failure isolation;
-- explicit `NO_SETUP` -> `NO_TRADE` sentinel for valid/fresh symbols without setup;
+- explicit valid/fresh `NO_SETUP` -> `NO_TRADE` result;
 - no fabricated decision for stale/incomplete data;
 - atomic read-model publication;
 - `provider|aggregate|mixed` series provenance;
-- expanded runtime health/status;
-- production entrypoint `ktrader.runtime.app:app`.
+- production ASGI lifespan entrypoint.
 
-## Verification status
+### Phase 9 - CI / Docker / production preparation
 
-- Phase 1: 7 deterministic tests.
-- Phase 2: 9 deterministic tests.
-- Phase 3: 10 deterministic tests.
-- Phase 4: 12 deterministic tests.
-- Phase 5: 12 deterministic tests.
-- Phase 6: 14 deterministic tests.
-- Phase 7: 17 isolated exact-module checks.
-- Phase 8: 7 isolated API tests.
-- Phase 8.5 orchestration tests are committed but are not yet claimed as executed.
+Repository-side implementation is complete:
 
-Repository-wide pytest/CI is the first mandatory Phase 9 gate. Real target-VPS REST/WS acceptance also remains Phase 9.
+- GitHub-hosted repository-wide CI;
+- **92 tests PASS** on the final integrated code baseline;
+- Docker Compose validation and production image build/import PASS;
+- hardened non-root/read-only container baseline;
+- manual-only production deployment on `main`;
+- repository-scoped self-hosted runner provisioning baseline;
+- immutable commit-SHA releases and rollback;
+- optional Caddy HTTPS;
+- target-VPS REST acceptance on all five timeframes;
+- target-VPS public WebSocket acceptance;
+- scanner/API readiness acceptance;
+- Ubuntu/Docker and runner registration scripts.
+
+The only remaining Phase 9 work requires a real external VPS: provisioning, runner registration, live provider checks, persistence/restart verification and public HTTPS.
+
+## CI evidence
+
+- CI run `32636825758`: repository-wide pytest **92 passed**, Compose PASS, Docker build PASS, runtime import PASS.
+- CI run `32637233264`: final production-prep pytest/compile/Compose/Docker/runtime/acceptance-packaging PASS.
 
 ## Runtime entrypoint
 
 `PYTHONPATH=src uvicorn ktrader.runtime.app:app --host 127.0.0.1 --port 8000`
 
-The legacy API-only entrypoint remains available for isolated API development:
+The API-only entrypoint remains available for isolated API development:
 
 `PYTHONPATH=src uvicorn ktrader.api.app:app --host 127.0.0.1 --port 8000`
 
-## Smoke utilities
+## Operator utilities
 
-REST provider:
-
-`PYTHONPATH=src python scripts/provider_smoke.py --providers binance_usdm bybit_linear`
-
-WebSocket:
-
-`PYTHONPATH=src python scripts/ws_smoke.py --provider binance_usdm --symbol BTCUSDT`
+- `scripts/provider_smoke.py`
+- `scripts/ws_smoke.py`
+- `scripts/vps_acceptance.py`
+- `scripts/phase9_acceptance.sh`
+- `scripts/provision_vps.sh`
+- `scripts/register_runner.sh`
+- `scripts/deploy.sh`
 
 No exchange credentials are used.
 
@@ -104,6 +113,10 @@ No exchange credentials are used.
 - `ROADMAP.md`
 - `REQUIREMENTS.md`
 - `ARCHITECTURE.md`
+- `docs/VPS_PROVISIONING.md`
+- `docs/DEPLOYMENT.md`
+- `docs/SECURITY.md`
+- `docs/PHASE_9_CHECKPOINT.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
@@ -113,6 +126,6 @@ No exchange credentials are used.
 
 ## Current phase
 
-Phase 8.5 implementation complete.
+Phase 9 repository-side preparation is complete and CI-validated.
 
-Next: Phase 9 - repository-wide CI, Docker/VPS deployment and live acceptance.
+Next external checkpoint: provision the target Ubuntu VPS, register the production runner, deploy and pass live REST/WS/runtime/HTTPS acceptance.
