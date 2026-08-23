@@ -1,0 +1,58 @@
+project:
+  name: K-Trader
+  mode: read_only
+  timezone_display: Europe/Kyiv
+  timezone_storage: UTC
+
+providers:
+  mode: primary_with_fallback
+  priority:
+    - binance_usdm
+    - bybit_linear
+    - okx_swap
+    - kucoin_futures
+  require_public_market_data: true
+  allow_cross_provider_series_mix: false
+
+universe:
+  quote_asset: USDT
+  perpetual_only: true
+  price_limit:
+    enabled: true
+    max_price: 3.0
+  max_candidates: 50
+
+history:
+  bars:
+    D1: 250
+    4H: 250
+    1H: 250
+    15m: 250
+    5m: 300
+
+live:
+  preferred_base_interval: 5m
+  local_aggregation: true
+  rest_reconciliation: true
+  fail_on_stale_data: true
+
+risk_rules:
+  min_rr: 3.0
+  atr_used_strong_max_pct: 40
+  atr_used_acceptable_max_pct: 80
+
+rating:
+  tradable_grades:
+    - A+
+    - A
+  score_is_probability: false
+
+storage:
+  backend: sqlite
+  wal: true
+
+api:
+  read_only: true
+  https_required: true
+  auth_mode: none_initial
+  rate_limit_required: true
