@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-23 - Phase 9.1 Oracle ARM64 / multi-arch
+
+- Selected Oracle Cloud Always Free Ampere A1 in Germany Central (Frankfurt) as the primary K-Trader production hosting path.
+- Added Linux ARM64 production runner target `k-trader-prod-arm64` while retaining amd64 fallback compatibility.
+- Generalized GitHub Actions Runner registration to auto-detect linux-x64 vs linux-arm64 and verify architecture-specific official SHA-256 checksums.
+- Updated Ubuntu provisioning to support both `arm64` and `amd64` Docker repositories.
+- Split Docker CI into amd64 and ARM64 gates.
+- Added QEMU/Buildx ARM64 image build, architecture assertion, production ASGI import, and packaged acceptance-utility verification.
+- Added Oracle A1 provisioning documentation and hosting decision record.
+- Recorded Oracle capacity status: `VM.Standard.A1.Flex` unavailable in Frankfurt AD-1/AD-2/AD-3 on 2026-08-23, including reduced 1 OCPU / 6 GB attempts.
+- No paid Oracle shape approved as a capacity workaround.
+- Retained home Windows PC + Tailscale Funnel as a potential fallback only; no implementation approved.
+- Cloudflare Workers + Durable Objects deferred from K-Trader v1 and retained only as a future-project architecture idea.
+- Phase 9.1 multi-arch PR CI pending before verification is claimed.
+
 ## 2026-08-23 - Phase 9 CI / Docker / production preparation
 
 - Added GitHub-hosted repository-wide CI and separated it from the production self-hosted runner.

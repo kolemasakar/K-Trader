@@ -17,6 +17,15 @@ if [ "${ID:-}" != "ubuntu" ]; then
     exit 1
 fi
 
+DEB_ARCH="$(dpkg --print-architecture)"
+case "$DEB_ARCH" in
+    arm64|amd64) ;;
+    *)
+        echo "unsupported Ubuntu architecture: $DEB_ARCH" >&2
+        exit 1
+        ;;
+esac
+
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y ca-certificates curl gnupg git tar
@@ -25,7 +34,7 @@ install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 chmod a+r /etc/apt/keyrings/docker.asc
 
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu ${VERSION_CODENAME} stable" \
+echo "deb [arch=${DEB_ARCH} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu ${VERSION_CODENAME} stable" \
     > /etc/apt/sources.list.d/docker.list
 
 apt-get update
@@ -42,6 +51,6 @@ for path in releases data caddy_data caddy_config runner; do
     install -d -o ktrader -g ktrader "/opt/k-trader/$path"
 done
 
-printf '%s\n' "PASS Ubuntu/Docker provisioning complete"
+printf '%s\n' "PASS Ubuntu/Docker provisioning complete on ${DEB_ARCH}"
 printf '%s\n' "Next: obtain a repository Actions runner registration token and run scripts/register_runner.sh as root."
 printf '%s\n' "Firewall/SSH policy is intentionally not changed automatically; apply the documented VPS security checklist before exposing HTTPS."

@@ -31,14 +31,17 @@ jobs:
       - name: Install
         run: python -m pip install --upgrade pip && python -m pip install -e '.[dev]'
 
-      - name: Compile
+      - name: Compile Python
         run: python -m compileall -q src tests scripts
+
+      - name: Validate shell scripts
+        run: sh -n scripts/deploy.sh scripts/provision_vps.sh scripts/register_runner.sh scripts/phase9_acceptance.sh
 
       - name: Repository-wide tests
         run: python -m pytest -q
 
-  docker:
-    name: docker-build
+  docker-amd64:
+    name: docker-amd64
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -49,18 +52,57 @@ jobs:
       - name: Validate Compose
         env:
           KTRADER_DOMAIN: example.invalid
-          KTRADER_IMAGE_TAG: ci
+          KTRADER_IMAGE_TAG: ci-amd64
         run: docker compose config >/dev/null
 
-      - name: Build image
-        run: docker build --pull --tag k-trader:${{ github.sha }} .
+      - name: Build amd64 image
+        run: docker build --pull --platform linux/amd64 --tag k-trader:${{ github.sha }}-amd64 .
 
-      - name: Import runtime application from image
+      - name: Import runtime application from amd64 image
         run: >-
-          docker run --rm
+          docker run --rm --platform linux/amd64
           -e KTRADER_DB_PATH=/tmp/ktrader-ci.db
-          k-trader:${{ github.sha }}
+          k-trader:${{ github.sha }}-amd64
           python -c "from ktrader.runtime.app import app; assert app.title == 'K-Trader Read-only API'"
 
       - name: Verify VPS acceptance utility is packaged
-        run: docker run --rm k-trader:${{ github.sha }} python scripts/vps_acceptance.py --help >/dev/null
+        run: docker run --rm --platform linux/amd64 k-trader:${{ github.sha }}-amd64 python scripts/vps_acceptance.py --help >/dev/null
+
+  docker-arm64:
+    name: docker-arm64
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and load arm64 image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          load: true
+          pull: true
+          tags: k-trader:${{ github.sha }}-arm64
+
+      - name: Verify arm64 architecture
+        run: test "$(docker image inspect k-trader:${{ github.sha }}-arm64 --format '{{.Architecture}}')" = "arm64"
+
+      - name: Import runtime application from arm64 image
+        run: >-
+          docker run --rm --platform linux/arm64
+          -e KTRADER_DB_PATH=/tmp/ktrader-ci.db
+          k-trader:${{ github.sha }}-arm64
+          python -c "import platform; from ktrader.runtime.app import app; assert platform.machine() in ('aarch64','arm64'); assert app.title == 'K-Trader Read-only API'"
+
+      - name: Verify VPS acceptance utility is packaged
+        run: docker run --rm --platform linux/arm64 k-trader:${{ github.sha }}-arm64 python scripts/vps_acceptance.py --help >/dev/null

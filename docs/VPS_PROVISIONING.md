@@ -1,16 +1,52 @@
-# VPS Provisioning v1.0
+# VPS Provisioning v1.1
 
 ## Target
 
-- Ubuntu x86_64 VPS (22.04 LTS or newer; 24.04 LTS preferred).
-- Private repository `kolemasakar/K-Trader`.
-- Docker Engine + Compose plugin.
-- Repository-scoped GitHub Actions self-hosted runner.
-- Optional public DNS name for Caddy HTTPS.
+Primary production target for K-Trader v1:
 
-K-Trader v1 uses no exchange API credentials.
+- Oracle Cloud Always Free Ampere A1;
+- Germany Central (Frankfurt) home region;
+- Ubuntu 24.04 LTS Minimal aarch64;
+- `VM.Standard.A1.Flex`;
+- target allocation: 2 OCPU / 12 GB RAM within the account's Always Free allocation;
+- Docker Engine + Compose plugin;
+- repository-scoped GitHub Actions self-hosted runner on Linux ARM64;
+- optional public DNS name for Caddy HTTPS.
 
-## 1. Obtain the repository on the VPS
+The deployment tooling also keeps Linux amd64 compatibility as a fallback path. K-Trader v1 uses no exchange API credentials.
+
+## 1. Oracle instance baseline
+
+Use only resources explicitly marked Always Free-eligible in the OCI console.
+
+Canonical VM target:
+
+```text
+Name: k-trader-prod
+Region: Germany Central (Frankfurt)
+Image: Canonical Ubuntu 24.04 Minimal aarch64
+Shape: VM.Standard.A1.Flex
+OCPU: 2
+Memory: 12 GB
+Capacity: on-demand
+Fault domain: let Oracle choose
+```
+
+Networking target:
+
+```text
+VCN: k-trader-vcn
+Public subnet: k-trader-public-subnet
+Private IPv4: automatic
+Public IPv4: required before SSH/public deployment
+IPv6: optional; not required in v1
+```
+
+Use SSH public-key authentication. Never commit or upload the private SSH key to this repository.
+
+If OCI reports `Out of capacity` for A1, do not switch to a non-Always-Free shape. Try another availability domain or retry later.
+
+## 2. Obtain the repository on the host
 
 Authenticate to the private repository using an operator-controlled GitHub method. Do not store a personal access token in the repository or shell scripts.
 
@@ -21,7 +57,7 @@ git clone https://github.com/kolemasakar/K-Trader.git
 cd K-Trader
 ```
 
-## 2. Provision Ubuntu and Docker
+## 3. Provision Ubuntu and Docker
 
 ```sh
 sudo ./scripts/provision_vps.sh
@@ -30,7 +66,8 @@ sudo ./scripts/provision_vps.sh
 The script:
 
 - verifies Ubuntu;
-- installs Docker from Docker's official Ubuntu repository;
+- accepts Ubuntu `arm64` and `amd64` only;
+- installs Docker from Docker's official Ubuntu repository for the detected architecture;
 - installs Docker Compose/Buildx plugins;
 - enables Docker;
 - creates the non-root `ktrader` user;
@@ -39,11 +76,11 @@ The script:
 
 It deliberately does not alter SSH or firewall policy automatically.
 
-## 3. Register the repository runner
+## 4. Register the repository runner
 
 In GitHub repository settings open Actions -> Runners -> New self-hosted runner and obtain a short-lived repository registration token.
 
-Then on the VPS:
+Then on the host:
 
 ```sh
 sudo env \
@@ -52,19 +89,33 @@ sudo env \
   ./scripts/register_runner.sh
 ```
 
-The registration script pins GitHub Actions Runner `2.336.0` and verifies the Linux x64 archive using SHA-256:
+The registration script pins GitHub Actions Runner `2.336.0`, auto-detects the host architecture, and verifies the official release archive SHA-256.
 
-`04cf0be1aff4c3ec3554466c39124ca250e3effd8873bb7e8d68535aa9505d5d`
+Checksums:
 
-The installed custom runner label is:
+```text
+linux-x64:
+04cf0be1aff4c3ec3554466c39124ca250e3effd8873bb7e8d68535aa9505d5d
 
-`k-trader-prod`
+linux-arm64:
+58b758e420b87093fbd4bfddd368074960053e2f1388f01848c82624b90f27d1
+```
+
+Custom labels:
+
+```text
+all production hosts: k-trader-prod
+Oracle ARM64 host:     k-trader-prod-arm64
+amd64 fallback host:   k-trader-prod-x64
+```
+
+The current production workflow intentionally targets `k-trader-prod-arm64` because Oracle A1 is the primary hosting plan.
 
 The runner is installed as a system service under user `ktrader`.
 
 Do not reuse the registration token as an application secret. It is only for runner registration.
 
-## 4. Production GitHub environment
+## 5. Production GitHub environment
 
 Create/verify GitHub Environment:
 
@@ -74,9 +125,9 @@ Optional repository/environment variable:
 
 `KTRADER_DOMAIN=api.example.com`
 
-If no domain is configured, deployment keeps the API bound to VPS localhost only. A real HTTPS domain is required before Phase 10 Custom GPT Action activation.
+If no domain is configured, deployment keeps the API bound to host localhost only. A real HTTPS domain is required before Phase 10 Custom GPT Action activation.
 
-## 5. Network/security checklist
+## 6. Network/security checklist
 
 Before enabling UFW, confirm SSH key access in a second session.
 
@@ -97,9 +148,9 @@ Recommended host controls:
 - least-privilege operator accounts;
 - no unrelated workloads on the production runner if avoidable.
 
-## 6. First deployment
+## 7. First deployment
 
-After the runner is online, start GitHub Action:
+After the ARM64 runner is online, start GitHub Action:
 
 `Deploy Production`
 
@@ -108,7 +159,7 @@ It is manual-only and accepts `main` only.
 Deployment performs:
 
 1. immutable release build under `/opt/k-trader/releases/<commit-sha>`;
-2. Docker Compose start;
+2. native ARM64 Docker Compose build/start on Oracle A1;
 3. local process health check;
 4. public-provider REST checks on 5m/15m/1h/4h/1d;
 5. public 5m WebSocket check;
@@ -116,10 +167,10 @@ Deployment performs:
 7. API MTF publication check;
 8. rollback to the previous release if acceptance fails.
 
-## 7. HTTPS
+## 8. HTTPS
 
 When `KTRADER_DOMAIN` is non-empty, deployment enables the Caddy `https` profile.
 
-DNS for the domain must already resolve to the VPS and ports 80/443 must be reachable.
+DNS for the domain must already resolve to the host and ports 80/443 must be reachable.
 
 Do not replace `https://api.k-trader.invalid` in the Custom GPT OpenAPI file until the real HTTPS endpoint passes Phase 9 acceptance.

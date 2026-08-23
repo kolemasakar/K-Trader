@@ -1,4 +1,4 @@
-# Test Plan v1.8
+# Test Plan v1.9
 
 ## Test layers
 
@@ -62,12 +62,17 @@
 - source/freshness propagation
 - fail-closed NO_TRADE behavior
 
-11. Deployment tests
+11. Deployment and architecture tests
 - container build/start
 - persistence across restart
 - scanner coordinator + API health
 - repository-wide CI/CD smoke
-- target-VPS REST/bootstrap/WebSocket acceptance
+- target-host REST/bootstrap/WebSocket acceptance
+- linux/amd64 production image build/import
+- linux/arm64 production image build/import under QEMU/Buildx in CI
+- image architecture assertion before ARM64 runtime import
+- packaged target-host acceptance utility on both image architectures
+- production runner architecture label must match the approved Oracle ARM64 host
 
 ## Mandatory acceptance cases
 
@@ -96,6 +101,8 @@
 - Valid/fresh symbol with no setup must return explicit NO_SETUP/NO_TRADE rather than a fabricated setup.
 - Total provider/runtime failure must clear current publishable market/decision state.
 - Provider fallback must atomically replace the prior provider snapshot.
+- ARM64 CI image must report architecture `arm64` and import the same production ASGI app as amd64.
+- Runner registration must reject unsupported host architectures and checksum-verify the architecture-specific archive.
 
 ## Current deterministic verification
 
@@ -107,9 +114,11 @@
 - Phase 6 isolated harness: 14 passed; compile validation PASS.
 - Phase 7 exact-module isolated harness: 17 passed; syntax compilation PASS.
 - Phase 8 isolated API harness: 7 passed; FastAPI/OpenAPI generation and syntax validation PASS.
-- Phase 8.5 orchestration tests: committed, execution NOT YET CLAIMED.
+- Phase 8.5 orchestration code is included in the integrated repository-wide Phase 9 result.
+- Phase 9 integrated repository-wide CI: **92 passed**, compile/Compose/Docker/runtime import PASS.
+- Phase 9.1 multi-arch CI: pending current PR gate.
 
-Repository-wide pytest/CI is the mandatory first gate of Phase 9. Real provider/VPS acceptance remains a separate Phase 9 gate.
+Real provider/Oracle-host acceptance remains a separate Phase 9 live gate and cannot be claimed until OCI A1 capacity is available.
 
 ## Fixtures
 

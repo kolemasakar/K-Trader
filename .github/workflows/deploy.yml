@@ -13,7 +13,7 @@ concurrency:
 jobs:
   deploy:
     if: github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, linux, x64, k-trader-prod]
+    runs-on: [self-hosted, linux, k-trader-prod-arm64]
     environment: production
     timeout-minutes: 30
     env:
@@ -24,6 +24,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Verify Oracle production architecture
+        run: test "$(uname -m)" = "aarch64" -o "$(uname -m)" = "arm64"
 
       - name: Deploy and run live acceptance
         run: ./scripts/deploy.sh
