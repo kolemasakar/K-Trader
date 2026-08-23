@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-08-23 - Phase 11F operations hardening / continuous research capture
+
+- Retained exact normalized instrument/ticker source inputs from the selected live universe request cycle so research capture does not issue a second temporally different provider fetch.
+- Added periodic provider-coherent universe capture with a default 300-second interval.
+- Stored every automatic research capture as an immutable one-snapshot digest-verified `ktrader.universe_archive.v1` artifact under the persistent provider/date tree.
+- Added pre-cycle disk-space safety guard with hard fail-closed behavior and current publishable-state clearing when storage is below the configured threshold.
+- Added online SQLite backups using `sqlite3.Connection.backup()`, mandatory `PRAGMA integrity_check`, atomic publication and configurable retention.
+- Added `scripts/backup_sqlite.py` and recovery regression proving generated backups can be reopened as fresh repositories with persisted candle state intact.
+- Added scanner-age watchdog semantics to `/health` without changing the existing public response shape.
+- Hardened Docker healthcheck to require semantic `/health` JSON `status=ok` rather than HTTP reachability alone.
+- Added bounded json-file log rotation for the K-Trader and Caddy containers.
+- Added production environment controls for research capture, backups, disk guard and watchdog.
+- Preserved Trading Engine setup/scoring/RR/ATR/VSA/Trap behavior and kept `estimated_probability` null/N/A.
+- PR #9 CI run `32656033224`: **155 tests PASS**, Python compile PASS, shell validation PASS, Compose PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- PR #9 squash-merged as `ae3620f7ce4bb6b857098ba470a5f2ddbfe374d5`.
+- Phase 11F: VERIFIED repository-side; real persistent-volume restart/backup/watchdog acceptance remains part of the target-host live gate.
+
+## 2026-08-23 - Phase 11E historical universe / liquidity capture and study cohorts
+
+- Added versioned `ktrader.universe_snapshot.v1` provider-native timestamped universe snapshots.
+- Preserved raw normalized ticker inputs required to reproduce liquidity score, rank and live-compatible universe size.
+- Added strict provider/timestamp/config validation and per-snapshot SHA-256 integrity.
+- Added versioned `ktrader.universe_archive.v1` for chronological same-provider/same-config snapshot archives with archive-level SHA-256.
+- Added versioned `ktrader.study_cohort.v1` with explicit time-window and optional symbol selection.
+- Added automatic per-symbol `ktrader.replay_context.v1` generation using only actually captured historical membership observations.
+- Explicitly prohibited reconstructing old liquidity ranks from current ticker data; historical universe context must be captured prospectively.
+- Added operator utilities `scripts/capture_universe_snapshot.py` and `scripts/build_study_cohort.py`.
+- Preserved Setup Score as non-probabilistic and kept `estimated_probability` null/N/A.
+- PR #8 CI run `32654162474`: **147 tests PASS**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- PR #8 squash-merged as `3c2a21644442e1d621ca8402e9c1c97bedb0fe80`.
+- Phase 11E: VERIFIED.
+
 ## 2026-08-23 - Phase 11D full-engine historical replay / outcome studies
 
 - Refactored live `EngineSymbolAnalyzer` to call a shared pure `analyze_candle_snapshot()` path.
