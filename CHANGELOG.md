@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-23 - Phase 11C deep history / MTF replay bundles
+
+- Added optional provider historical-page contract with explicit UTC end cursor.
+- Added Binance USD-M backward kline pagination through `endTime` and Bybit Linear pagination through `end`.
+- Added exact-depth multi-page closed-history collection with page deduplication and strict backward cursor progress.
+- Added fail-closed handling for unsupported paging, insufficient depth, gaps and provider identity mismatch.
+- Added deterministic `ktrader.mtf_bundle.v1` bundles for canonical `1d/4h/1h/15m/5m` history under one provider/symbol and one UTC `as_of` cutoff.
+- Added per-timeframe history SHA-256 digests and bundle-level SHA-256 integrity verification.
+- Added no-lookahead MTF slicing and bundle roundtrip/tamper validation.
+- Added deep single-timeframe export and `scripts/export_mtf_history.py` using public market-data endpoints only.
+- Preserved Trading Engine scoring/RR/ATR rules and kept `estimated_probability` null/N/A.
+- PR #6 CI run `32652044967`: **134 tests PASS**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- PR #6 squash-merged as `0b7fd93246d4d5e6213ab0bf4ab63ee52b5fc007`.
+- Phase 11C: VERIFIED.
+- Long real provider-recorded MTF bundles remain operator-generated artifacts; deterministic PR CI does not fabricate live exchange captures.
+
 ## 2026-08-23 - Phase 11B provider history / signal outcomes
 
 - Added versioned `ktrader.history.v1` JSONL datasets for provider-recorded closed candles.
@@ -61,8 +77,7 @@
 - Added immutable commit-SHA releases and rollback when process/live acceptance fails.
 - Added target-VPS REST acceptance for 5m/15m/1h/4h/1d and public 5m WebSocket acceptance.
 - Added scanner `data_ready` and MTF API acceptance gate.
-- Added Ubuntu/Docker provisioning and checksum-verified GitHub runner registration automation.
-- Updated CI/deploy workflows to current Node-24 action major versions.
+- Added Ubuntu/Docker and runner registration scripts.
 - Final production-prep CI run `32637233264`: pytest/compile/Compose/Docker/runtime/acceptance-packaging PASS.
 - Phase 9 remains open only for external VPS provisioning, live acceptance, persistence/restart and HTTPS verification.
 
