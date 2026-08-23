@@ -75,6 +75,20 @@ Public Exchange API -> REST/WS Provider Adapter -> Normalized Market Data -> Val
 - MTF level priority and nearest confirmed support/resistance lookup;
 - `LIMIT` and `PARANORMAL_BAR` remain explicit evidence inputs rather than invented automatic geometry.
 
+### Phase 6 - trap + VSA evidence
+
+- failed-break trap engine for confirmed/mirror support and resistance;
+- ATR-scaled break threshold, return and directional confirmation windows;
+- Trap states `RETURNED / CONFIRMED / EXPIRED`;
+- deterministic raw VSA events `ND / NS / T / UT / BC / SC / SV`;
+- previous-20-bar relative volume/spread baselines;
+- strict HTF regime and confirmed-level location filters;
+- ATR-scaled VSA level proximity;
+- next-bar directional confirmation;
+- same-level confirmed trap confluence;
+- VSA states `RAW / IGNORED / VALID_CONTEXT / CONFIRMED`;
+- Phase 6 evidence cannot create a trade or rating by itself.
+
 ## Verification
 
 - Phase 1 contract suite: 7 tests passed.
@@ -82,6 +96,7 @@ Public Exchange API -> REST/WS Provider Adapter -> Normalized Market Data -> Val
 - Phase 3 deterministic harness: 10 tests passed; compileall PASS.
 - Phase 4 deterministic harness: 12 tests passed; compileall PASS.
 - Phase 5 local isolated harness: 12 tests passed; syntax/compile validation PASS.
+- Phase 6 local isolated harness: 14 tests passed; compile validation PASS.
 - Target-VPS REST/bootstrap/WebSocket acceptance remains pending until the VPS exists.
 
 ## Smoke utilities
@@ -113,8 +128,9 @@ No exchange credentials are used.
 - `docs/PHASE_3_CHECKPOINT.md`
 - `docs/PHASE_4_CHECKPOINT.md`
 - `docs/PHASE_5_CHECKPOINT.md`
+- `docs/PHASE_6_CHECKPOINT.md`
 - `docs/adr/*.md`
 
 ## Current phase
 
-Phase 5 - implementation complete. Target-VPS acceptance for Phases 1-3 remains pending until deployment.
+Phase 6 - implementation complete. Target-VPS acceptance for Phases 1-3 remains pending until deployment.
