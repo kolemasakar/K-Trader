@@ -69,7 +69,7 @@ Public Exchange API -> REST/WS Provider -> Normalized Data -> Validation/SQLite 
 Repository-side implementation is complete:
 
 - GitHub-hosted repository-wide CI;
-- **92 tests PASS** on the integrated pre-ARM64 baseline;
+- **92 tests PASS** on the integrated baseline;
 - Docker Compose validation and production image build/import PASS;
 - hardened non-root/read-only container baseline;
 - manual-only production deployment on `main`;
@@ -104,7 +104,7 @@ Potential fallback, not implemented: home Windows PC + Tailscale Funnel. Cloudfl
 
 - CI run `32636825758`: repository-wide pytest **92 passed**, Compose PASS, Docker build PASS, runtime import PASS.
 - CI run `32637233264`: production-prep pytest/compile/Compose/Docker/runtime/acceptance-packaging PASS.
-- Phase 9.1 multi-arch PR CI: pending until the current branch gate completes.
+- CI run `32646869264`: Phase 9.1 **92 pytest PASS**, shell validation PASS, linux/amd64 build/import PASS, linux/arm64 build/architecture/runtime import PASS.
 
 ## Runtime entrypoint
 
@@ -146,6 +146,6 @@ No exchange credentials are used.
 
 ## Current phase
 
-Phase 9.1 repository-side Oracle ARM64 adaptation is implemented and awaiting its multi-arch PR CI gate.
+Phase 9.1 repository-side Oracle ARM64 adaptation is **VERIFIED**.
 
-Next external checkpoint after CI: obtain Oracle A1 capacity, provision the ARM64 host, register the production runner, deploy and pass live REST/WS/runtime/HTTPS acceptance.
+Next external checkpoint: obtain Oracle A1 capacity, provision the ARM64 host, register the production runner, deploy and pass live REST/WS/runtime/HTTPS acceptance.
