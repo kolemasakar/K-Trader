@@ -35,7 +35,7 @@ def make_wave(
     for index in range(n):
         trend = Decimal(str(direction)) * Decimal("0.7") * Decimal(index)
         wave = oscillation[index % 4] * Decimal(str(direction))
-        close = Decimal("100") + trend + wave
+        close = Decimal("1000") + trend + wave
         open_price = close - Decimal("0.1") * Decimal(str(direction))
         high = max(open_price, close) + Decimal("0.5")
         low = min(open_price, close) - Decimal("0.5")

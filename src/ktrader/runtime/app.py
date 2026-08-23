@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+from contextlib import asynccontextmanager
 from decimal import Decimal
 
 from ktrader.api.app import create_app
@@ -46,28 +47,26 @@ def build_runtime_app():
     read_model = ApiReadModel()
     providers = [create_provider(provider_id) for provider_id in provider_ids]
     coordinator = ScannerCoordinator(providers, repository, read_model, config=config)
-    app = create_app(read_model)
-    app.state.coordinator = coordinator
-    app.state.repository = repository
 
-    async def startup() -> None:
-        app.state.coordinator_task = asyncio.create_task(
+    @asynccontextmanager
+    async def lifespan(_app):
+        coordinator_task = asyncio.create_task(
             coordinator.run_forever(),
             name="ktrader-scanner-coordinator",
         )
-
-    async def shutdown() -> None:
-        await coordinator.stop()
-        task = getattr(app.state, "coordinator_task", None)
-        if task is not None:
+        try:
+            yield
+        finally:
+            await coordinator.stop()
             try:
-                await task
+                await coordinator_task
             except asyncio.CancelledError:
                 pass
-        repository.close()
+            repository.close()
 
-    app.add_event_handler("startup", startup)
-    app.add_event_handler("shutdown", shutdown)
+    app = create_app(read_model, lifespan=lifespan)
+    app.state.coordinator = coordinator
+    app.state.repository = repository
     return app
 
 
