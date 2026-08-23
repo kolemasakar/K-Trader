@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-23 - Phase 4 indicators
+
+- Added provider-independent indicator package.
+- Added standard True Range and Wilder ATR14.
+- Added D1 ATR5D filtering against same-bar ATR14, avoiding look-ahead in replay.
+- Preserved the approved no-replacement/no-duplication abnormal-bar rule.
+- Added SMA and EMA calculations with canonical MA50/200 baseline `sma`.
+- Added previous-20-bar volume baseline and relative volume.
+- Added VSA candle-spread baseline and relative spread.
+- Added optional relative quote volume only when all required quote-volume data is confirmed.
+- Added generic ATR-used calculation and exact STRONG/ACCEPTABLE/LATE_REJECT boundaries.
+- Kept ATR-used move origin explicitly deferred to Phase 7.
+- Added normalized indicator snapshot.
+- Verification: Phase 4 deterministic harness 12 tests passed; compileall PASS.
+
 ## 2026-08-23 - Phase 3 live market data
 
 - Added provider-independent `LiveCandleEvent` contract.
