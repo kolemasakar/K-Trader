@@ -1,58 +1,47 @@
-# Historical Replay / Signal Outcome Spec v1.2
+# Historical Replay / Signal Outcome Spec v1.3
 
 ## Purpose
 
-Phases 11B-11D provide reproducible provider-recorded historical data, deterministic MTF replay snapshots, conservative signal-outcome tracking and full-engine chronological study orchestration. They do not convert Setup Score into probability.
+Phases 11B-11E provide reproducible provider-recorded historical candles, deterministic MTF replay snapshots, conservative signal-outcome tracking, full-engine chronological study orchestration and timestamped historical universe/liquidity context captured prospectively.
+
+They do not convert Setup Score into statistical probability. `estimated_probability` remains null/N/A.
 
 ## Provider history contract
+
+Schema: `ktrader.history.v1`.
 
 A history dataset is a coherent series from exactly one provider, canonical symbol and timeframe.
 
 Rules:
 
-- only confirmed closed candles;
-- chronological and contiguous;
-- UTC timestamps;
-- no provider mixing or provider fallback inside a dataset;
+- confirmed closed candles only;
+- chronological, contiguous and UTC aligned;
+- no provider mixing/fallback inside a dataset;
 - Decimal market values serialized as strings;
 - source kind `provider`;
 - SHA-256 digest over canonical candle content;
-- requested bar count and actual time range recorded separately.
-
-Schema version: `ktrader.history.v1`.
-
-The JSONL file starts with one manifest record followed by candle records.
+- requested bar count and actual range recorded separately.
 
 ## Historical collection
 
-`collect_provider_history()` remains the single-page compatibility path.
+`collect_provider_history()` is the one-page compatibility path. `collect_deep_provider_history()` pages backward through the same provider with an explicit UTC end cursor.
 
-`collect_deep_provider_history()` pages backward through the same provider with an explicit UTC end cursor.
+Current implementations:
 
-Current provider implementations:
+- Binance USD-M `/fapi/v1/klines` with `endTime`;
+- Bybit Linear `/v5/market/kline` with `end`.
 
-- Binance USD-M: `/fapi/v1/klines` with `endTime`;
-- Bybit Linear: `/v5/market/kline` with `end`.
-
-Deep collection rules:
-
-- exact requested closed-bar depth is mandatory;
-- pages are deduplicated by candle open time;
-- paging cursor must strictly move backward;
-- every page preserves provider/symbol/timeframe identity;
-- merged history remains contiguous and closed;
-- insufficient depth or unsupported pagination fails closed;
-- another provider may never fill a missing page.
+Deep collection requires exact requested closed-bar depth, strict backward cursor progress, page deduplication, provider/symbol/timeframe identity and final contiguity. Insufficient depth, unsupported pagination or gaps fail closed. Another provider may never fill a missing page.
 
 ## MTF replay bundle
 
-Schema version: `ktrader.mtf_bundle.v1`.
+Schema: `ktrader.mtf_bundle.v1`.
 
-A canonical bundle contains exactly `1d/4h/1h/15m/5m`. All datasets share provider ID, canonical symbol, provider-native symbol and one UTC `as_of` cutoff. Any candle closing after `as_of` invalidates the bundle.
+A canonical bundle contains exactly `1d/4h/1h/15m/5m`, all under one provider, canonical symbol, provider-native symbol and UTC `as_of` cutoff. Any included candle closing after `as_of` invalidates the bundle.
 
-The manifest stores per-timeframe candle counts/digests plus one bundle SHA-256. `slice_datasets_asof()` is the canonical no-future-lookahead boundary: it removes all bars not closed by the selected cutoff and can require minimum history per timeframe.
+The manifest stores per-timeframe counts/digests plus a bundle SHA-256. `slice_datasets_asof()` removes all bars not closed by the selected replay cutoff and can require the live minimum history per timeframe.
 
-Default operational depths remain:
+Default live-compatible history depths:
 
 ```text
 1d   250
@@ -62,17 +51,11 @@ Default operational depths remain:
 5m   300
 ```
 
-Deeper research captures may request larger depths.
+Research captures may be deeper without changing the schema.
 
-## Full-engine historical replay
+## Shared live/replay analysis path
 
-Phase 11D uses one shared pure analysis path:
-
-`analyze_candle_snapshot()`
-
-The live `EngineSymbolAnalyzer` loads its validated SQLite snapshot and calls this function. Historical replay slices the MTF bundle at a historical cutoff and calls the same function. This prevents a separate replay-only implementation of ATR, market structure, Trap/VSA, setup geometry or scoring.
-
-At each accepted cutoff the shared analyzer applies the configured live history windows and runs:
+Phase 11D uses the same pure `analyze_candle_snapshot()` path for live runtime and historical replay.
 
 ```text
 validated MTF snapshot
@@ -87,73 +70,140 @@ validated MTF snapshot
 -> TradingDecision
 ```
 
-Historical replay may not alter scoring weights, RR requirements, ATR-used limits or setup eligibility rules.
+Historical replay may not change scoring weights, RR requirements, ATR-used limits or setup eligibility rules.
 
-## Replay liquidity/universe context
+## Why OHLCV alone is insufficient
 
-OHLCV history alone cannot reproduce the complete live Setup Score because live scoring also consumes liquidity rank, universe size and liquidity score.
+The live Setup Score also consumes market-universe context:
 
-Schema version: `ktrader.replay_context.v1`.
+- liquidity score;
+- liquidity rank;
+- universe size.
 
-A replay context contains:
+Therefore an MTF OHLCV bundle alone cannot faithfully reproduce the live decision context. Missing historical liquidity information may not be replaced by assumed values such as `rank=1`.
 
-- confirmed instrument identity including provider-native symbol and positive price tick;
-- strictly chronological liquidity observations;
-- observation timestamp;
+## Replay context
+
+Schema: `ktrader.replay_context.v1`.
+
+A context contains confirmed instrument identity and strictly chronological liquidity observations with:
+
+- UTC timestamp;
 - liquidity score;
 - liquidity rank;
 - universe size;
 - maximum allowed context age.
 
-For a cutoff `T`, replay may use only the latest context point whose timestamp is `<= T`. If none exists or it is older than the configured maximum age, the cutoff is skipped fail-closed.
+At replay cutoff `T`, only the newest point with `timestamp <= T` may be used. If no point exists or it is stale, that cutoff is skipped fail-closed.
 
-Forbidden behavior:
+Forbidden:
 
-- assuming `rank=1`;
-- inventing universe size;
-- using a future context point;
-- carrying a stale observation indefinitely;
-- filling a missing provider context with another exchange.
+- guessed rank/universe size;
+- future context points;
+- indefinite stale carry-forward;
+- provider substitution.
 
-## Replay study contract
+## Historical universe snapshot contract - Phase 11E
 
-Schema version: `ktrader.replay_study.v1`.
+Schema: `ktrader.universe_snapshot.v1`.
 
-`run_replay_study()` walks the setup timeframe chronologically. For each cutoff it:
+A snapshot records one provider-native market universe at a specific UTC capture time using an explicit `UniverseConfig`.
 
-- slices the full MTF archive to bars closed at that cutoff;
-- verifies minimum live-analysis history;
-- resolves a valid timestamped liquidity context point;
-- calls the canonical shared snapshot analyzer;
-- selects the best `TradingDecision` using normal engine ordering;
-- preserves the exact time-specific decision fingerprint for audit;
-- optionally evaluates the first occurrence of a unique tradable setup on confirmed future bars;
-- optionally persists the outcome through `OutcomeRepository`.
+It preserves the inputs required to audit/reproduce live-compatible liquidity ranking, including where available:
 
-Study output records every selected best decision, while outcome counts are based on unique tradable setups rather than every repeated 5m observation of the same geometry.
+- instrument identity and provider-native symbol;
+- price tick / quantity step;
+- last price;
+- 24h quote volume and base volume;
+- 24h trade count;
+- bid / ask;
+- open interest field when present;
+- calculated liquidity score;
+- rank;
+- resulting universe size.
 
-## Decision identity vs stable signal identity
+The snapshot uses the same `build_universe()` / `liquidity_score()` logic as live scanning. Ranks must be contiguous from one and reproducible from stored ticker inputs.
 
-`decision_fingerprint()` is the exact audit identity of one emitted decision and includes decision timing fields.
+Snapshot validation rejects:
 
-`stable_signal_key()` is a separate study identity based on:
+- cross-provider instruments/tickers;
+- duplicate symbols;
+- ticker timestamps after `captured_at`;
+- rank/score inconsistencies;
+- digest mismatch.
 
-- provider;
-- canonical symbol;
-- side;
-- setup type;
-- primary level ID;
-- Entry;
-- Stop;
-- Target.
+Each snapshot has a content SHA-256.
 
-This prevents unchanged setup geometry from being counted as a new independent signal at every consecutive cutoff while retaining complete time-specific decision audit records.
+## Prospective-only historical rank rule
 
-## Signal outcome contract
+Public exchange ticker endpoints used by K-Trader expose current market state. They do not provide a trustworthy historical reconstruction of the full ranked universe for arbitrary past timestamps.
 
-Outcome evaluation consumes a previously emitted tradable `TradingDecision` and later confirmed candles from the same provider/symbol.
+Therefore Phase 11E follows a strict rule:
 
-Eligible decisions require side `LONG`/`SHORT` and confirmed Entry, Stop and Target geometry. `NO_TRADE` and missing geometry never enter calibration samples.
+> Historical liquidity rank/universe size exists only if K-Trader actually captured a timestamped provider-native universe snapshot at that time.
+
+Current ticker data must never be used to backfill an old replay cutoff. Real historical universe context must be accumulated prospectively by a continuously running capture process.
+
+## Universe archive
+
+Schema: `ktrader.universe_archive.v1`.
+
+An archive is an append-only ordered set of universe snapshots and must use:
+
+- exactly one provider;
+- exactly one `UniverseConfig`;
+- strictly increasing capture timestamps.
+
+It stores each snapshot digest and one archive SHA-256. Provider/config mixing, non-chronological append and tampering fail closed.
+
+A provider switch starts a separate coherent archive; exchanges are never spliced into one historical universe series.
+
+## Study cohort
+
+Schema: `ktrader.study_cohort.v1`.
+
+A cohort deterministically selects from one verified universe archive:
+
+- explicit UTC start/end window;
+- optional explicit symbol subset;
+- maximum replay-context age.
+
+For every selected symbol, Phase 11E generates a `ktrader.replay_context.v1` using only snapshot observations in that cohort window. Each point receives the snapshot's captured liquidity score, rank and live-compatible universe size.
+
+Cohort validation rejects:
+
+- symbols never present in the selected captured universe;
+- provider mismatch;
+- changed analysis-critical instrument metadata within one study identity;
+- unsafe context file paths;
+- context/cohort digest mismatch.
+
+The cohort manifest records source archive identity, selected snapshot digests, symbols, time range, context digests and a cohort SHA-256.
+
+## Full replay study
+
+Schema: `ktrader.replay_study.v1`.
+
+`run_replay_study()` walks setup-timeframe cutoffs chronologically. At each accepted cutoff it:
+
+- slices the MTF bundle to confirmed bars only;
+- verifies minimum history;
+- resolves a valid captured replay context point;
+- calls the canonical shared analyzer;
+- selects the best `TradingDecision` through normal engine ordering;
+- retains exact time-specific decision fingerprint for audit;
+- evaluates only the first occurrence of a unique tradable setup on future confirmed bars;
+- optionally persists outcome through `OutcomeRepository`.
+
+## Decision identity vs stable setup identity
+
+`decision_fingerprint()` identifies one exact emitted decision and includes decision timing.
+
+`stable_signal_key()` identifies unchanged setup geometry by provider, symbol, side, setup type, primary level, Entry, Stop and Target. This prevents an unchanged setup observed across multiple consecutive 5m cutoffs from being counted as multiple independent signals.
+
+## Outcome contract
+
+Eligible outcomes require a tradable LONG/SHORT decision with Entry, Stop and Target. `NO_TRADE` and missing geometry never enter binary samples.
 
 Canonical states:
 
@@ -166,37 +216,51 @@ Canonical states:
 - `EXPIRED_OPEN`;
 - `NOT_ELIGIBLE`.
 
-Future outcome candles must begin strictly after the decision's last closed bar.
+Future outcome candles must start strictly after the decision's last closed bar and remain contiguous under the same provider/symbol.
 
 ## Intrabar ambiguity
 
-OHLC bars do not prove intrabar ordering. Therefore:
+OHLC does not prove intrabar ordering.
 
-- Entry plus Stop/Target in one candle -> `AMBIGUOUS`;
-- Stop and Target both touched in one post-entry candle -> `AMBIGUOUS`;
-- ambiguous outcomes are excluded from binary WIN/LOSS samples.
+- Entry and an exit touched in the same candle -> `AMBIGUOUS`.
+- Stop and Target both touched in one post-entry candle -> `AMBIGUOUS`.
 
-No optimistic or pessimistic ordering assumption is allowed.
+Ambiguous outcomes are excluded from WIN/LOSS samples. No optimistic or pessimistic ordering is invented.
 
 ## Outcome horizon and R
 
-The study does not invent a universal holding period. The horizon is explicit and optional; Phase 11D can express it as a number of setup-timeframe bars.
+The study horizon is explicit and optional. For 5m setup bars, `24` bars represents a two-hour observation horizon without changing Trading Engine rules.
 
-`outcome_r` remains planned geometry touch outcome, not realized broker PnL:
+`outcome_r` is a planned geometry-touch label, not realized broker PnL:
 
-- target touch -> planned reward/risk multiple;
-- stop touch -> `-1R`;
+- target -> planned reward/risk multiple;
+- stop -> `-1R`;
 - ambiguous/open/expired/not-eligible -> N/A.
 
-Fees, funding, slippage and execution quality are not modeled by the current OHLC outcome layer.
-
-## Persistence
-
-`OutcomeRepository` stores outcomes separately in SQLite under deterministic decision IDs. Unresolved states may be upserted later to resolved states. `list_binary_resolved()` exposes only WIN/LOSS records and intentionally does not calculate a probability.
+Fees, funding, slippage and execution quality are not yet modeled.
 
 ## Operator workflow
 
-Capture provider-recorded MTF history:
+Prospectively capture current universe snapshots repeatedly under one fixed universe configuration:
+
+```sh
+python scripts/capture_universe_snapshot.py \
+  --provider bybit_linear \
+  --max-price 3 \
+  --max-candidates 50 \
+  --output data/replay/bybit_linear/universe.jsonl
+```
+
+Build a reproducible cohort after enough snapshots exist:
+
+```sh
+python scripts/build_study_cohort.py \
+  --archive data/replay/bybit_linear/universe.jsonl \
+  --symbols SUIUSDT DOGEUSDT \
+  --output data/replay/bybit_linear/cohort
+```
+
+Capture provider-recorded MTF history for a selected symbol:
 
 ```sh
 python scripts/export_mtf_history.py \
@@ -210,36 +274,37 @@ python scripts/export_mtf_history.py \
   --output data/replay/bybit_linear/SUIUSDT/sample
 ```
 
-Then run a study only after a matching timestamped replay-context file has been captured/prepared:
+Run the full-engine study with the matching generated replay context:
 
 ```sh
 python scripts/run_replay_study.py \
   --bundle data/replay/bybit_linear/SUIUSDT/sample \
-  --context data/replay/bybit_linear/SUIUSDT/context.json \
+  --context data/replay/bybit_linear/cohort/contexts/SUIUSDT.json \
   --outcome-db data/replay/outcomes.sqlite3 \
   --output data/replay/studies/sui-study.jsonl \
   --horizon-bars 24
 ```
 
-For 5m setup bars, `24` bars represents an explicit two-hour study horizon. This changes only study observation length, not Trading Engine entry rules.
+## Real vs synthetic artifacts
 
-## Provider-recorded regression artifacts
+Real exchange captures are operator-generated from public provider endpoints and are never silently replaced with synthetic data. Normal PR CI uses deterministic synthetic/mocked fixtures explicitly marked as test data.
 
-Real exchange captures are operator-generated from public APIs and are never silently substituted with synthetic candles. PR CI uses deterministic mocked provider pages and synthetic replay contexts marked as test data so repository verification does not depend on exchange availability.
-
-A real historical study requires both:
+A real full-engine historical study requires coherent matching inputs:
 
 - provider-recorded MTF candle bundle;
-- corresponding timestamped historical liquidity/universe context.
+- provider-native universe archive captured prospectively;
+- derived study cohort / replay context.
+
+Their SHA-256 identities make the study inputs auditable.
 
 ## Calibration guardrail
 
-Phase 11D reports deterministic decisions, outcome states/counts and the number of binary-resolved observations. It still does not report win probability.
+Phases 11B-11E can report decisions, outcome states/counts and binary-resolved sample size. They do not report a calibrated win probability.
 
 Before any `Estimated Probability` is introduced, a later approved phase must define at minimum:
 
 - sufficient sample size;
-- time-separated train/validation/test sets;
+- time-separated train/validation/test datasets;
 - provider/symbol/regime stratification;
 - survivorship/listing bias handling;
 - ambiguous/unresolved outcome policy;
@@ -247,4 +312,4 @@ Before any `Estimated Probability` is introduced, a later approved phase must de
 - confidence intervals and calibration metrics;
 - true out-of-sample validation.
 
-Until that work is complete, `estimated_probability` remains N/A/null.
+Until then, `estimated_probability` remains N/A/null.
