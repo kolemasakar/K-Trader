@@ -22,6 +22,15 @@ universe:
     max_price: 3.0
   max_candidates: 50
 
+runtime:
+  analysis_limit: 20
+  scan_interval_seconds: 60
+  bootstrap_concurrency: 2
+  setup_interval: 5m
+  atomic_api_publication: true
+  fail_closed_per_symbol: true
+  no_setup_sentinel: true
+
 history:
   bars:
     1d: 250
