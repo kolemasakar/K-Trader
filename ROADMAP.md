@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.9
+# K-Trader Roadmap v1.10
 
-Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11E historical universe/liquidity capture and reproducible study cohorts, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11F operations hardening / continuous research capture, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -160,7 +160,8 @@ Pending on external infrastructure/capacity:
 - register `k-trader-prod-arm64` runner;
 - production deploy;
 - target-host REST/WS/runtime acceptance;
-- persistence across real restart;
+- real persistence/backup/restart validation;
+- continuous research-capture validation;
 - DNS/TLS and public HTTPS.
 
 ## Phase 10 - Custom GPT Update
@@ -249,7 +250,7 @@ Status: VERIFIED.
 - raw ticker inputs required to reproduce liquidity score/rank are preserved;
 - rank and universe size are generated with the same `UniverseConfig`/`build_universe()` rules as live scanning;
 - snapshot provider identity, timestamp and SHA-256 integrity are fail-closed;
-- `ktrader.universe_archive.v1` append-only chronological same-provider/same-config archive with archive SHA-256;
+- `ktrader.universe_archive.v1` chronological same-provider/same-config archive with archive SHA-256;
 - `ktrader.study_cohort.v1` explicit time-window/symbol selection;
 - automatic per-symbol `ktrader.replay_context.v1` generation from actually captured snapshots;
 - provider/config mixing, future ticker timestamps, missing symbols, changed analysis-critical instrument metadata, unsafe paths and digest mismatches are rejected;
@@ -260,12 +261,31 @@ Verification: PR #8 CI `32654162474` SUCCESS; repository-wide pytest **147 passe
 
 Historical universe archives must accumulate prospectively because current public ticker endpoints do not provide trustworthy historical universe/rank snapshots retroactively.
 
+### Phase 11F - Operations Hardening / Continuous Research Capture
+
+Status: VERIFIED.
+
+- selected live provider cycle retains the exact normalized instrument/ticker source inputs for research persistence without a second provider fetch;
+- automatic provider-coherent universe capture, default every 300 seconds;
+- immutable per-capture one-snapshot archive files under the persistent research tree;
+- pre-cycle disk-space guard with hard fail-closed behavior and stale publishable-state clearing;
+- online SQLite backup through native backup API;
+- mandatory `PRAGMA integrity_check` before atomic backup publication;
+- configurable backup interval/retention and standalone backup utility;
+- restore regression by opening a generated backup as a fresh repository;
+- scanner-age watchdog integrated into health evaluation without changing response schema;
+- Docker healthcheck requires health JSON `status=ok`;
+- bounded K-Trader/Caddy json-file log rotation;
+- production environment configuration for research capture, backup, disk guard and watchdog.
+
+Verification: PR #9 CI `32656033224` SUCCESS; repository-wide pytest **155 passed**, compile/shell/Compose PASS, linux/amd64 Docker/runtime PASS, linux/arm64 QEMU/Buildx image/architecture/runtime PASS; squash merge `ae3620f7ce4bb6b857098ba470a5f2ddbfe374d5`.
+
 ### Remaining Phase 11 work
 
-- integrate periodic universe-snapshot persistence into the continuously running production runtime;
-- catalogue canonical real-provider MTF bundles + matching universe archives/cohorts + replay-study digests;
-- operations hardening: SQLite backup/recovery, disk/log guards, metrics/watchdog and restart/recovery validation;
-- extended runtime failure/stale-data validation;
+- dataset catalogue linking canonical MTF bundle digests, immutable universe captures/archives, study cohorts, replay-study artifacts and outcome databases;
+- capture/catalogue real-provider datasets once the continuous production host exists;
+- target-host restart/recovery, backup, disk guard and watchdog acceptance;
+- extended runtime failure/stale-data validation if live evidence exposes gaps;
 - later approved statistical calibration methodology with time-separated out-of-sample validation.
 
 ## Phase 12 - Multi-provider expansion
