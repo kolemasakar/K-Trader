@@ -19,18 +19,29 @@ from ktrader.replay.study import (
     write_replay_context,
     write_replay_study,
 )
+from ktrader.replay.cohort import (
+    STUDY_COHORT_SCHEMA_VERSION,
+    HistoricalStudyCohort,
+    build_study_cohort,
+    load_study_cohort,
+    write_study_cohort,
+)
 
 __all__ = [
     "REPLAY_CONTEXT_SCHEMA_VERSION",
     "REPLAY_STUDY_SCHEMA_VERSION",
+    "STUDY_COHORT_SCHEMA_VERSION",
+    "HistoricalStudyCohort",
     "ReplayDecisionRecord",
     "ReplayLiquidityPoint",
     "ReplayObservation",
     "ReplayStudyConfig",
     "ReplayStudyContext",
     "ReplayStudyResult",
+    "build_study_cohort",
     "canonical_digest",
     "load_replay_context",
+    "load_study_cohort",
     "replay_level_lifecycle",
     "replay_trap_states",
     "run_replay_study",
@@ -38,4 +49,5 @@ __all__ = [
     "validate_replay_series",
     "write_replay_context",
     "write_replay_study",
+    "write_study_cohort",
 ]
