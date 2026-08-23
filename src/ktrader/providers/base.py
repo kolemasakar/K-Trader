@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
+from collections.abc import AsyncIterator, Sequence
 
 from ktrader.models import (
     NormalizedCandle,
@@ -9,6 +9,7 @@ from ktrader.models import (
     NormalizedTicker,
     ProviderCapabilities,
 )
+from ktrader.providers.live import LiveCandleEvent
 
 
 class ProviderError(RuntimeError):
@@ -37,6 +38,16 @@ class MarketDataProvider(ABC):
         limit: int,
     ) -> list[NormalizedCandle]: ...
 
+    async def stream_candles(
+        self,
+        instruments: Sequence[NormalizedInstrument],
+        interval: str = "5m",
+    ) -> AsyncIterator[LiveCandleEvent]:
+        raise NotImplementedError(
+            f"{self.provider_id} does not implement live candle streaming"
+        )
+        yield  # pragma: no cover
+
     async def close(self) -> None:
         """Release provider resources."""
 
@@ -50,4 +61,6 @@ class MarketDataProvider(ABC):
     def ensure_chronological(candles: Sequence[NormalizedCandle]) -> None:
         times = [c.open_time for c in candles]
         if times != sorted(times):
-            raise ProviderError("Provider returned non-chronological normalized candles")
+            raise ProviderError(
+                "Provider returned non-chronological normalized candles"
+            )
