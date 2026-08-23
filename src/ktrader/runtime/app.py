@@ -64,7 +64,11 @@ def build_runtime_app():
                 pass
             repository.close()
 
-    app = create_app(read_model, lifespan=lifespan)
+    app = create_app(
+        read_model,
+        lifespan=lifespan,
+        action_api_key=os.getenv("KTRADER_ACTION_API_KEY") or None,
+    )
     app.state.coordinator = coordinator
     app.state.repository = repository
     return app

@@ -95,6 +95,7 @@ def detect_level_traps(
                 break
 
         if return_index is None:
+            return_window_complete = len(candles) >= i + 1 + max_return_bars
             events.append(TrapEvent(
                 provider_id=level.provider_id,
                 symbol=level.symbol,
@@ -110,9 +111,9 @@ def detect_level_traps(
                 sweep_distance=sweep_distance,
                 return_time=None,
                 confirmation_time=None,
-                status="EXPIRED",
+                status="EXPIRED" if return_window_complete else "BROKEN",
                 confirmed=False,
-                reason="NO_RETURN_THROUGH_LEVEL",
+                reason="NO_RETURN_THROUGH_LEVEL" if return_window_complete else "AWAITING_RETURN",
             ))
             i += 1
             continue
