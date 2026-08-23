@@ -42,9 +42,12 @@ def create_app(
     rate_limit_window_seconds: int = 60,
     lifespan=None,
     action_api_key: str | None = None,
+    health_max_scan_age_seconds: float | None = None,
 ) -> FastAPI:
     state = read_model or ApiReadModel()
     secret = action_api_key.strip() if action_api_key and action_api_key.strip() else None
+    if health_max_scan_age_seconds is not None and health_max_scan_age_seconds <= 0:
+        raise ValueError("health_max_scan_age_seconds must be positive when configured")
     app = FastAPI(
         title="K-Trader Read-only API",
         version=API_VERSION,
@@ -56,6 +59,7 @@ def create_app(
     )
     app.state.read_model = state
     app.state.action_auth_enabled = secret is not None
+    app.state.health_max_scan_age_seconds = health_max_scan_age_seconds
     app.add_middleware(
         FixedWindowRateLimitMiddleware,
         max_requests=rate_limit_requests,
@@ -94,8 +98,19 @@ def create_app(
     def health() -> dict:
         status = state.get_status()
         now = datetime.now(timezone.utc)
+        watchdog_ok = True
+        if health_max_scan_age_seconds is not None:
+            if status.last_scan_at is None:
+                watchdog_ok = False
+            else:
+                age = max(0.0, (now - status.last_scan_at.astimezone(timezone.utc)).total_seconds())
+                watchdog_ok = age <= health_max_scan_age_seconds
         return {
-            "status": "ok" if status.data_ready and not status.last_error else "degraded",
+            "status": (
+                "ok"
+                if status.data_ready and not status.last_error and watchdog_ok
+                else "degraded"
+            ),
             "mode": "read_only",
             "api_version": API_VERSION,
             "data_ready": status.data_ready,
