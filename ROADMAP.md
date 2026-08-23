@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.3
+# K-Trader Roadmap v1.4
 
-Status: APPROVED baseline; repository-side implementation complete through Phase 9 production preparation, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation complete through Phase 9.1 Oracle ARM64 preparation, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -8,7 +8,7 @@ Status: COMPLETE.
 
 ## Phase 1 - Exchange-Agnostic Market Data Foundation
 
-Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
+Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
 
 - provider contract/capabilities;
 - Binance USD-M + Bybit Linear public adapters;
@@ -20,7 +20,7 @@ Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
 
 ## Phase 2 - Market Data Core
 
-Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
+Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
 
 - REST MTF bootstrap `1d/4h/1h/15m/5m`;
 - SQLite WAL / Decimal persistence;
@@ -30,7 +30,7 @@ Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
 
 ## Phase 3 - Live Market Data
 
-Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
+Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
 
 - Binance/Bybit public WebSocket;
 - live 5m base state;
@@ -111,9 +111,9 @@ Status: IMPLEMENTATION COMPLETE / REPOSITORY-WIDE CI VERIFIED.
 
 Repository-wide CI result including Phase 8.5: **92 tests passed**.
 
-## Phase 9 - VPS / Docker / CI-CD
+## Phase 9 - Docker / CI-CD / live deployment
 
-Status: REPOSITORY-SIDE COMPLETE / TARGET-VPS DEPLOYMENT AND LIVE ACCEPTANCE PENDING.
+Status: REPOSITORY-SIDE COMPLETE / TARGET-HOST DEPLOYMENT AND LIVE ACCEPTANCE PENDING.
 
 Completed and CI-verified:
 
@@ -137,16 +137,51 @@ CI evidence:
 - run `32636825758`: 92 pytest PASS, Compose PASS, Docker build/import PASS;
 - run `32637233264`: final production-prep pytest/Compose/Docker/runtime/packaging PASS.
 
-Pending only on real external infrastructure:
+## Phase 9.1 - Oracle ARM64 / Multi-arch
 
-- provision Ubuntu VPS;
-- register `k-trader-prod` self-hosted runner;
+Status: IMPLEMENTATION COMPLETE / PR CI VERIFICATION PENDING.
+
+Primary production host decision:
+
+- Oracle Cloud Always Free;
+- Germany Central (Frankfurt);
+- Ubuntu 24.04 Minimal aarch64;
+- `VM.Standard.A1.Flex`;
+- target 2 OCPU / 12 GB RAM;
+- Linux ARM64 self-hosted production runner.
+
+Repository adaptation:
+
+- production runner label `k-trader-prod-arm64`;
+- runner installer auto-detects amd64/arm64 and pins official SHA-256 for both;
+- Ubuntu provisioning supports amd64 and arm64;
+- CI has separate amd64 and arm64 Docker gates;
+- ARM64 image is built under QEMU/Buildx, architecture-checked and runtime-imported;
+- amd64 compatibility retained for a potential future fallback host.
+
+External Oracle status on 2026-08-23:
+
+- Frankfurt A1 capacity unavailable in AD-1, AD-2 and AD-3;
+- reduced 1 OCPU / 6 GB A1 request also unavailable in all three ADs;
+- no paid shape approved as workaround;
+- retry A1 creation when capacity becomes available.
+
+Potential fallback, not implemented: home Windows PC + Tailscale Funnel.
+
+Cloudflare Workers + Durable Objects: not part of K-Trader v1; retained only as an architecture idea for future projects.
+
+## Phase 9 live exit
+
+Pending only on external infrastructure/capacity:
+
+- create/provision the Oracle A1 host;
+- register `k-trader-prod-arm64` self-hosted runner;
 - execute production deploy;
-- pass target-VPS REST/WS/runtime acceptance;
+- pass target-host REST/WS/runtime acceptance;
 - verify persistence across real restart;
 - configure DNS/TLS and verify public HTTPS.
 
-Phase 9 exit occurs only after those live checks pass.
+Phase 9 exits only after those live checks pass.
 
 ## Phase 10 - Custom GPT Update
 
