@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.10
+# K-Trader Roadmap v1.11
 
-Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11F operations hardening / continuous research capture, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11G dataset catalogue foundation, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -280,10 +280,28 @@ Status: VERIFIED.
 
 Verification: PR #9 CI `32656033224` SUCCESS; repository-wide pytest **155 passed**, compile/shell/Compose PASS, linux/amd64 Docker/runtime PASS, linux/arm64 QEMU/Buildx image/architecture/runtime PASS; squash merge `ae3620f7ce4bb6b857098ba470a5f2ddbfe374d5`.
 
+### Phase 11G - Dataset Catalogue Foundation
+
+Status: VERIFIED.
+
+- `ktrader.dataset_catalogue.v1` deterministic research audit catalogue;
+- one entry links one coherent provider/symbol chain: MTF bundle -> universe archive -> study cohort -> replay study -> study provenance -> optional outcome sample;
+- every reference stores artifact schema, semantic identity and exact file/tree content SHA-256;
+- deterministic catalogue-entry and catalogue SHA-256 identities;
+- catalogue verification re-opens source artifacts and rebuilds relationships instead of trusting stored hashes alone;
+- artifact-root containment plus absolute-path, traversal and symlink guards;
+- `ktrader.study_run_provenance.v1` records exact bundle/cohort/context, full `RuntimeScannerConfig`, `ReplayStudyConfig` and replay-study file hashes;
+- canonical `run_replay_study.py --cohort` mode emits cohort-linked provenance;
+- replay-study inspection validates decision/outcome identity/counts and rejects non-null `estimated_probability`;
+- `ktrader.outcome_sample.v1` is an immutable WIN/LOSS-only study sample that must exactly match both the replay-study artifact and `OutcomeRepository`;
+- utilities: `export_outcome_sample.py`, `build_dataset_catalogue.py`.
+
+Verification: PR #10 CI `32657337221` SUCCESS; repository-wide pytest **163 passed**, compile/shell PASS, linux/amd64 Docker/runtime PASS, linux/arm64 QEMU/Buildx image/architecture/runtime PASS; squash merge `96de78d503432122d98e1c9ad1f01299802862a8`.
+
 ### Remaining Phase 11 work
 
-- dataset catalogue linking canonical MTF bundle digests, immutable universe captures/archives, study cohorts, replay-study artifacts and outcome databases;
-- capture/catalogue real-provider datasets once the continuous production host exists;
+- populate the catalogue with real provider-recorded MTF/universe/cohort/study/outcome artifacts after continuous production capture begins;
+- optionally automate catalogue registration after scheduled study jobs exist;
 - target-host restart/recovery, backup, disk guard and watchdog acceptance;
 - extended runtime failure/stale-data validation if live evidence exposes gaps;
 - later approved statistical calibration methodology with time-separated out-of-sample validation.
