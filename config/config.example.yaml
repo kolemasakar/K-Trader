@@ -124,6 +124,27 @@ market_structure:
     window: 12
     max_width_atr: 2.0
 
+trap:
+  min_break_atr_fraction: 0.05
+  max_return_bars: 3
+  max_confirmation_bars: 2
+  eligible_level_statuses:
+    - CONFIRMED
+    - MIRROR
+
+vsa:
+  baseline_window: 20
+  narrow_spread_max: 0.8
+  wide_spread_min: 1.5
+  low_volume_max: 0.8
+  high_volume_min: 1.8
+  stopping_volume_min: 1.5
+  context:
+    max_level_distance_atr_fraction: 0.25
+    confirmation_bars: 2
+    require_htf_direction: true
+    require_confirmed_level: true
+
 risk_rules:
   min_rr: 3.0
   atr_used_strong_max_pct: 40
