@@ -1,4 +1,4 @@
-# Test Plan v1.2
+# Test Plan v1.3
 
 ## Test layers
 
@@ -9,7 +9,11 @@
 - storage round-trip/upsert/provenance/migration
 - live WebSocket payload parsing
 - local MTF aggregation
-- ATR/MA
+- True Range / Wilder ATR14
+- ATR5D valid-bar filter
+- SMA/EMA and MA50/200
+- volume/relative-volume/relative-spread
+- generic ATR-used metric
 - levels/trap/VSA state logic
 - scoring hard filters
 
@@ -74,6 +78,10 @@
 - Provider/native and locally aggregated candles remain distinguishable.
 - Live base-interval gap triggers REST recovery or fails closed.
 - Duplicate closed events remain idempotent.
+- Indicator inputs must be closed and contiguous.
+- ATR5D cannot replace or duplicate rejected D1 bars.
+- Relative volume/spread baselines exclude the current bar.
+- ATR-used exactly 40% and 80% are ACCEPTABLE; above 80% is LATE_REJECT.
 - Stale data cannot emit a tradable signal.
 - RR < 3 is rejected.
 - ATR used > 80% is rejected.
@@ -88,6 +96,7 @@
 - Phase 1 provider contract suite: 7 passed.
 - Phase 2 deterministic harness: 9 passed plus compileall PASS.
 - Phase 3 deterministic harness: 10 passed plus compileall PASS.
+- Phase 4 deterministic harness: 12 passed plus compileall PASS.
 
 Repository-wide CI and real provider/VPS acceptance are separate later acceptance gates and are not implied by these deterministic suites.
 
