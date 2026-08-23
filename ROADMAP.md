@@ -4,23 +4,31 @@ Status: APPROVED baseline, 2026-08-23.
 
 ## Phase 0 - Foundation
 
+Status: COMPLETE.
+
 - Repository structure and canonical documentation.
 - System instruction baseline.
 - Data/provider contracts.
 - Testing, security and deployment policy.
 
-Exit: all Phase 0 documents committed to `main`; implementation starts only from this baseline.
+Exit: PASSED.
 
 ## Phase 1 - Exchange-Agnostic Market Data Foundation
 
-- Define `MarketDataProvider` interface and provider capability model.
-- Implement first public derivatives provider.
-- Implement a second provider before Trading Engine work to validate abstraction.
-- Discover tradable perpetual instruments and normalize symbols/tickers/candles.
-- Support configurable price limit, including disabled/all-assets mode.
-- Rank candidates by liquidity.
+Status: IMPLEMENTATION COMPLETE / LIVE VPS ACCEPTANCE PENDING.
 
-Exit: at least two providers return equivalent normalized contracts without mixing their market series.
+- Define `MarketDataProvider` interface and provider capability model. DONE.
+- Implement first public derivatives provider. DONE: Binance USD-M.
+- Implement a second provider before Trading Engine work to validate abstraction. DONE: Bybit Linear.
+- Discover tradable perpetual instruments and normalize symbols/tickers/candles. DONE.
+- Separate canonical symbol from native `provider_symbol`. DONE.
+- Support configurable price limit, including disabled/all-assets mode. DONE.
+- Rank candidates by liquidity. DONE.
+- Implement priority-provider fallback without cross-provider data fusion. DONE.
+- Offline contract/pagination/failover/universe tests. DONE: 7 passed.
+- Target-VPS public endpoint smoke acceptance. PENDING TARGET VPS.
+
+Exit condition: two independent adapters satisfy equivalent normalized contracts; target-VPS live smoke confirms at least one legally accessible public provider without credentials.
 
 ## Phase 2 - Market Data Core
 
@@ -93,6 +101,7 @@ Exit: deterministic A+/A/B/C classification; only A/A+ can produce a tradable si
 - Persistent `/opt/k-trader` data/config/logs.
 - Private-repo self-hosted GitHub Runner.
 - Push-to-main test/build/deploy/health-check workflow.
+- Execute pending live provider acceptance from Phase 1.
 
 ## Phase 10 - Custom GPT Update
 
