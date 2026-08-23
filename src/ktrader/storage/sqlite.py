@@ -10,7 +10,7 @@ from pathlib import Path
 from ktrader.market.timeframes import datetime_from_ms, datetime_to_ms, require_utc
 from ktrader.models import NormalizedCandle
 
-_SCHEMA_VERSION = 1
+_SCHEMA_VERSION = 2
 
 
 class CandleRepository:
@@ -57,6 +57,8 @@ class CandleRepository:
                 taker_buy_quote_volume TEXT,
                 closed INTEGER NOT NULL CHECK (closed IN (0, 1)),
                 ingested_at_ms INTEGER NOT NULL,
+                source_kind TEXT NOT NULL DEFAULT 'provider',
+                derived_from_interval TEXT,
                 PRIMARY KEY (provider_id, symbol, interval, open_time_ms)
             );
 
@@ -75,15 +77,47 @@ class CandleRepository:
             );
             """
         )
+        columns = {
+            str(row["name"])
+            for row in self._connection.execute("PRAGMA table_info(candles)").fetchall()
+        }
+        if "source_kind" not in columns:
+            self._connection.execute(
+                "ALTER TABLE candles ADD COLUMN source_kind TEXT NOT NULL DEFAULT 'provider'"
+            )
+        if "derived_from_interval" not in columns:
+            self._connection.execute(
+                "ALTER TABLE candles ADD COLUMN derived_from_interval TEXT"
+            )
         self._connection.execute(f"PRAGMA user_version={_SCHEMA_VERSION}")
         self._connection.commit()
 
-    def upsert_many(self, candles: Iterable[NormalizedCandle]) -> int:
+    def upsert_many(
+        self,
+        candles: Iterable[NormalizedCandle],
+        *,
+        source_kind: str = "provider",
+        derived_from_interval: str | None = None,
+    ) -> int:
+        if source_kind not in {"provider", "aggregate"}:
+            raise ValueError("source_kind must be provider or aggregate")
+        if source_kind == "provider" and derived_from_interval is not None:
+            raise ValueError("provider candles cannot set derived_from_interval")
+        if source_kind == "aggregate" and not derived_from_interval:
+            raise ValueError("aggregate candles require derived_from_interval")
         materialized = list(candles)
         if not materialized:
             return 0
         ingested_at_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
-        rows = [self._serialize(candle, ingested_at_ms) for candle in materialized]
+        rows = [
+            self._serialize(
+                candle,
+                ingested_at_ms,
+                source_kind=source_kind,
+                derived_from_interval=derived_from_interval,
+            )
+            for candle in materialized
+        ]
         with self._connection:
             self._connection.executemany(
                 """
@@ -91,8 +125,9 @@ class CandleRepository:
                     provider_id, symbol, interval, open_time_ms, close_time_ms,
                     open_price, high_price, low_price, close_price, volume,
                     quote_volume, trade_count, taker_buy_volume,
-                    taker_buy_quote_volume, closed, ingested_at_ms
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    taker_buy_quote_volume, closed, ingested_at_ms,
+                    source_kind, derived_from_interval
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(provider_id, symbol, interval, open_time_ms)
                 DO UPDATE SET
                     close_time_ms=excluded.close_time_ms,
@@ -106,7 +141,9 @@ class CandleRepository:
                     taker_buy_volume=excluded.taker_buy_volume,
                     taker_buy_quote_volume=excluded.taker_buy_quote_volume,
                     closed=excluded.closed,
-                    ingested_at_ms=excluded.ingested_at_ms
+                    ingested_at_ms=excluded.ingested_at_ms,
+                    source_kind=excluded.source_kind,
+                    derived_from_interval=excluded.derived_from_interval
                 """,
                 rows,
             )
@@ -146,6 +183,29 @@ class CandleRepository:
             (provider_id, symbol, interval),
         ).fetchone()
         return int(row[0])
+
+    def source_info(
+        self,
+        provider_id: str,
+        symbol: str,
+        interval: str,
+        open_time: datetime,
+    ) -> tuple[str, str | None] | None:
+        require_utc(open_time)
+        row = self._connection.execute(
+            """
+            SELECT source_kind, derived_from_interval FROM candles
+            WHERE provider_id=? AND symbol=? AND interval=? AND open_time_ms=?
+            """,
+            (provider_id, symbol, interval, datetime_to_ms(open_time)),
+        ).fetchone()
+        if row is None:
+            return None
+        return str(row["source_kind"]), (
+            str(row["derived_from_interval"])
+            if row["derived_from_interval"] is not None
+            else None
+        )
 
     def interval_counts(self, provider_id: str, symbol: str) -> dict[str, int]:
         rows = self._connection.execute(
@@ -219,7 +279,13 @@ class CandleRepository:
         self._connection.close()
 
     @staticmethod
-    def _serialize(candle: NormalizedCandle, ingested_at_ms: int) -> tuple[object, ...]:
+    def _serialize(
+        candle: NormalizedCandle,
+        ingested_at_ms: int,
+        *,
+        source_kind: str,
+        derived_from_interval: str | None,
+    ) -> tuple[object, ...]:
         return (
             candle.provider_id,
             candle.symbol,
@@ -237,6 +303,8 @@ class CandleRepository:
             _decimal_text(candle.taker_buy_quote_volume),
             1 if candle.closed else 0,
             ingested_at_ms,
+            source_kind,
+            derived_from_interval,
         )
 
     @staticmethod
