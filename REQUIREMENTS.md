@@ -1,4 +1,4 @@
-# Requirements v1.0
+# Requirements v1.1
 
 ## Functional requirements
 
@@ -11,7 +11,7 @@ FR-006. Provider fallback SHALL start a new coherent snapshot and preserve provi
 FR-007. Universe discovery SHALL filter tradable perpetual derivatives by status/contract/quote semantics supported by each provider.
 FR-008. User-configurable price limit SHALL support an enabled threshold and disabled/all-assets mode.
 FR-009. Liquidity ranking SHALL use normalized liquidity inputs, not raw base volume alone.
-FR-010. Historical bootstrap target: D1 250, 4H 250, 1H 250, 15m 250, 5m 300 bars, configurable.
+FR-010. Historical bootstrap target: 1d 250, 4h 250, 1h 250, 15m 250, 5m 300 bars, configurable.
 FR-011. The normalized candle contract SHALL preserve OHLCV plus quote volume, trade count, taker-buy fields where available and source metadata.
 FR-012. The system SHALL track freshness and reject stale inputs.
 FR-013. Trading Engine SHALL evaluate the approved 14 components in canonical order.
@@ -24,6 +24,13 @@ FR-019. Position size/risk SHALL be N/A unless account balance, risk settings an
 FR-020. The backend SHALL expose read-only HTTPS GET endpoints for Custom GPT integration.
 FR-021. The Custom GPT SHALL report source and data time for live analysis.
 FR-022. Insufficient confirmed data SHALL fail closed to NO TRADE.
+FR-023. The runtime SHALL autonomously compose provider data, indicators, market structure, Trap/VSA and Trading Engine outputs into repeated scanner cycles.
+FR-024. The runtime SHALL publish current scanner state to a read-only API projection without recalculating TradingDecision fields in the API layer.
+FR-025. Scanner failures SHALL be isolated per symbol where possible so one invalid candidate does not abort the whole cycle.
+FR-026. The runtime SHALL NOT publish a TradingDecision until mandatory market-data readiness and freshness requirements are satisfied.
+FR-027. Ambiguous canonical symbols present on more than one provider SHALL require explicit `provider_id`; silent provider substitution is forbidden.
+FR-028. API market Decimal values SHALL preserve exact precision and SHALL NOT be serialized through binary float conversion.
+FR-029. The public API SHALL expose no order/account mutation operations in v1.
 
 ## Non-functional requirements
 
@@ -37,6 +44,10 @@ NFR-007. Deployment SHALL be reproducible with Docker Compose.
 NFR-008. CI/CD SHALL deploy only approved `main` state to the VPS.
 NFR-009. Secrets SHALL NOT be required for public exchange market-data collection in v1.
 NFR-010. Logs SHALL not contain sensitive credentials if such credentials are introduced in later phases.
+NFR-011. Scanner runtime SHALL expose explicit readiness/error status.
+NFR-012. API calls SHALL be rate-limited in public deployment.
+NFR-013. API timestamps SHALL use UTC ISO-8601 representation.
+NFR-014. Custom GPT integration SHALL use a stable OpenAPI schema with explicit operation IDs.
 
 ## v1 exclusions
 
