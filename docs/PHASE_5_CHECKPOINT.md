@@ -69,4 +69,6 @@ Phase 5 also does not assign Setup Score weights to regime, strength, sessions o
 
 ## Repository correction note
 
-During Phase 5 assembly, one intermediate `noop` commit temporarily reduced `README.md`. The next fast-forward corrective commit restored the full README and added the Phase 5 core. No force-push/history rewrite was used and the final main tree is the authoritative state.
+During Phase 5 assembly, one intermediate `noop` commit temporarily reduced `README.md`. The next fast-forward corrective commit restored the full README and added the Phase 5 core. No force-push/history rewrite was used.
+
+Final verification confirmed the restored README, Phase 5 structure package/tests and canonical Phase 5 specifications on `main`.
