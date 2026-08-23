@@ -1,4 +1,4 @@
-# Test Plan v1.4
+# Test Plan v1.5
 
 ## Test layers
 
@@ -13,7 +13,9 @@
 - swing detection and regime classification
 - session context and DST behavior
 - level clustering/lifecycle/MTF lookup
-- trap/VSA state logic
+- trap state logic
+- raw VSA pattern geometry
+- VSA location/context/confirmation logic
 - scoring hard filters
 
 2. Provider contract tests
@@ -57,17 +59,30 @@
 - nearest confirmed MTF support/resistance
 - explicit LIMIT/PARANORMAL_BAR evidence handling
 
-6. Replay tests
-- deterministic trap/VSA/levels sequences
+6. Trap/VSA replay tests
+- confirmed LONG trap at support
+- confirmed SHORT trap at resistance
+- break without return -> EXPIRED
+- return without directional confirmation -> RETURNED
+- all seven raw VSA types ND/NS/T/UT/BC/SC/SV
+- wrong HTF direction -> IGNORED
+- no confirmed level location -> IGNORED
+- valid location/context without next-bar confirmation -> VALID_CONTEXT only
+- confirmed VSA requires directional confirmation
+- trap confluence must match provider/symbol/direction/reference level
+- context-free VSA cannot validate a setup
+
+7. General replay tests
+- deterministic levels/structure sequences
 - missing/stale bars
 - provider reconnect/gap reconciliation
 
-7. Integration tests
-- provider -> validation -> storage -> indicators -> structure -> engine -> API
+8. Integration tests
+- provider -> validation -> storage -> indicators -> structure -> trap/VSA -> engine -> API
 - source/freshness propagation
 - NO TRADE fail-closed behavior
 
-8. Deployment tests
+9. Deployment tests
 - container build/start
 - persistence across restart
 - health endpoint
@@ -89,7 +104,8 @@
 - FLOATING/BROKEN/INVALIDATED levels cannot act as active primary validation levels.
 - Mirror becomes active only after defined retest confirmation.
 - LIMIT/PARANORMAL_BAR automatic geometry is not fabricated without a versioned rule.
-- Context-free VSA cannot validate a setup.
+- A sweep/break without return+confirmation is not a confirmed trap.
+- Raw VSA cannot become CONFIRMED without HTF direction, confirmed level location and directional confirmation.
 - RR <3 is rejected.
 - B/C never emits tradable LONG/SHORT.
 - Missing account/risk inputs produce position size/risk N/A.
@@ -101,6 +117,7 @@
 - Phase 3 deterministic harness: 10 passed; compileall PASS.
 - Phase 4 deterministic harness: 12 passed; compileall PASS.
 - Phase 5 local isolated harness: 12 passed; syntax/compile validation PASS.
+- Phase 6 local isolated harness: 14 passed; compile validation PASS.
 
 Repository-wide CI and real provider/VPS acceptance remain separate Phase 9 gates.
 
