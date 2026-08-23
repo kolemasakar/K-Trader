@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.7
+# K-Trader Roadmap v1.8
 
-Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11C deep-history/MTF replay hardening, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11D full-engine historical replay/outcome-study orchestration, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -280,16 +280,40 @@ Verification:
 - linux/arm64 QEMU/Buildx image/architecture/runtime: PASS;
 - squash merge: `0b7fd93246d4d5e6213ab0bf4ab63ee52b5fc007`.
 
-Actual long provider-recorded bundles are operator-generated artifacts. PR CI remains deterministic and does not depend on exchange network availability; captured real bundles are audited by their content and bundle digests.
+### Phase 11D - Full-engine Historical Replay / Outcome Studies
+
+Status: VERIFIED.
+
+- live and historical paths share the same pure `analyze_candle_snapshot()` engine path;
+- chronological MTF replay with explicit `as_of` cutoffs and no future-bar access;
+- versioned `ktrader.replay_context.v1` timestamped historical liquidity/universe context;
+- missing/stale historical liquidity context skips the cutoff fail-closed instead of fabricating rank or universe size;
+- deterministic `ktrader.replay_study.v1` study identity/artifact;
+- exact decision fingerprints retained for audit;
+- stable setup-geometry key deduplicates unchanged signals across consecutive 5m cutoffs;
+- unique tradable signals feed the conservative Phase 11B outcome evaluator and optional SQLite outcome repository;
+- explicit optional outcome horizon; no universal holding period invented;
+- Setup Score remains non-probabilistic and `estimated_probability` remains null/N/A.
+
+Verification:
+
+- initial PR #7 CI run `32653028353`: compile/shell PASS, 135 tests PASS / 5 new fixture tests FAIL because one new synthetic OHLC fixture had `low > open`; fixture corrected without weakening production validation;
+- final PR #7 CI run `32653087172` SUCCESS;
+- repository-wide pytest: **140 passed**;
+- compile/shell validation: PASS;
+- linux/amd64 Docker/runtime: PASS;
+- linux/arm64 QEMU/Buildx image/architecture/runtime: PASS;
+- squash merge: `cb2869bc9d5f56496368920e8b7e43faf9ba3bbd`.
+
+Actual real-data outcome studies require both a provider-recorded MTF bundle and matching timestamped historical liquidity/universe context. Phase 11D intentionally does not approximate missing liquidity context.
 
 ### Remaining Phase 11 work
 
-- capture/catalogue canonical real-provider MTF regression bundles;
-- bulk chronological full-engine replay over provider-recorded bundles;
-- connect historical TradingDecision generation to outcome studies;
-- approved signal-outcome cohorts/horizons and later calibration methodology;
-- metrics/backup/recovery hardening;
-- extended stale-data/runtime failure validation.
+- historical multi-symbol universe/liquidity context capture and reproducible study cohorts;
+- capture/catalogue canonical real-provider MTF bundles plus matching context datasets;
+- operations hardening: SQLite backup/recovery, disk/log guards, metrics and restart/recovery validation;
+- extended stale-data/runtime failure validation;
+- later approved statistical calibration methodology with time-separated out-of-sample validation.
 
 ## Phase 12 - Multi-provider expansion
 
