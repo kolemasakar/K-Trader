@@ -9,6 +9,7 @@ from collections.abc import Sequence
 from ktrader.api.state import ApiReadModel, ScannerRuntimeStatus
 from ktrader.market.live import LiveMarketDataService
 from ktrader.market.service import select_first_available_provider
+from ktrader.operations.maintenance import OperationalSafetyError, RuntimeMaintenance
 from ktrader.providers.base import MarketDataProvider, ProviderError
 from ktrader.runtime.analyzer import EngineSymbolAnalyzer, SymbolAnalysisResult
 from ktrader.runtime.models import RuntimeScannerConfig, ScannerCycleResult, SymbolScanError
@@ -24,6 +25,7 @@ class ScannerCoordinator:
         *,
         config: RuntimeScannerConfig | None = None,
         analyzer: EngineSymbolAnalyzer | None = None,
+        maintenance: RuntimeMaintenance | None = None,
     ) -> None:
         if not providers:
             raise ValueError("at least one provider is required")
@@ -32,6 +34,7 @@ class ScannerCoordinator:
         self.read_model = read_model
         self.config = config or RuntimeScannerConfig()
         self.analyzer = analyzer or EngineSymbolAnalyzer(repository, config=self.config)
+        self.maintenance = maintenance
         self.live_service = LiveMarketDataService(repository, config=self.config.live)
         self._stop = asyncio.Event()
         self._live_task: asyncio.Task | None = None
@@ -43,6 +46,27 @@ class ScannerCoordinator:
         started = time.monotonic()
         self._cycle_id += 1
         cycle_id = self._cycle_id
+
+        if self.maintenance is not None:
+            try:
+                self.maintenance.preflight()
+            except OperationalSafetyError as exc:
+                status = ScannerRuntimeStatus(
+                    status="ERROR",
+                    provider_id=None,
+                    universe_size=0,
+                    data_ready=False,
+                    last_scan_at=current,
+                    last_error=str(exc),
+                    cycle_id=cycle_id,
+                    symbols_ready=0,
+                    symbols_failed=0,
+                    live_streaming=False,
+                    last_cycle_duration_seconds=time.monotonic() - started,
+                )
+                self.read_model.clear_runtime_data(status=status)
+                return ScannerCycleResult(cycle_id, None, 0, 0, 0, ())
+
         try:
             selection = await select_first_available_provider(self.providers, self.config.universe)
         except Exception as exc:
@@ -65,6 +89,17 @@ class ScannerCoordinator:
         provider = self._provider_for(selection.snapshot.provider_id)
         universe = selection.snapshot.candidates
         selected = universe[: self.config.analysis_limit]
+        operations_warnings: list[str] = []
+        if self.maintenance is not None:
+            capture_time = current if now is not None else datetime.now(timezone.utc)
+            try:
+                self.maintenance.capture_universe_if_due(
+                    selection.snapshot,
+                    captured_at=capture_time,
+                )
+            except Exception as exc:
+                operations_warnings.append(self.maintenance.note_warning(exc))
+
         await self._ensure_live(provider, [item.instrument for item in selected])
 
         semaphore = asyncio.Semaphore(self.config.bootstrap_concurrency)
@@ -96,12 +131,25 @@ class ScannerCoordinator:
             decisions.extend(result.decision_set)
             series.extend(result.candle_series)
 
+        if self.maintenance is not None:
+            backup_time = current if now is not None else datetime.now(timezone.utc)
+            try:
+                self.maintenance.backup_if_due(now=backup_time)
+            except Exception as exc:
+                operations_warnings.append(self.maintenance.note_warning(exc))
+
         ready = len(selected) - len(errors)
         duration = time.monotonic() - started
         provider_failures = [f"{failure.provider_id}: {failure.error}" for failure in selection.failures]
         symbol_failures = [f"{error.symbol}: {error.error}" for error in errors[:5]]
-        messages = provider_failures + symbol_failures
-        status_name = "READY" if ready and not errors else "DEGRADED" if ready else "ERROR"
+        messages = provider_failures + symbol_failures + operations_warnings
+        status_name = (
+            "READY"
+            if ready and not errors and not operations_warnings
+            else "DEGRADED"
+            if ready
+            else "ERROR"
+        )
         status = ScannerRuntimeStatus(
             status=status_name,
             provider_id=provider.provider_id,
