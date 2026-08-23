@@ -116,7 +116,7 @@
 - Phase 8 isolated API harness: 7 passed; FastAPI/OpenAPI generation and syntax validation PASS.
 - Phase 8.5 orchestration code is included in the integrated repository-wide Phase 9 result.
 - Phase 9 integrated repository-wide CI: **92 passed**, compile/Compose/Docker/runtime import PASS.
-- Phase 9.1 multi-arch CI: pending current PR gate.
+- Phase 9.1 CI run `32646869264`: **92 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, ARM64 QEMU/Buildx image build/architecture/runtime import PASS.
 
 Real provider/Oracle-host acceptance remains a separate Phase 9 live gate and cannot be claimed until OCI A1 capacity is available.
 
