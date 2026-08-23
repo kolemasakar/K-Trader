@@ -2,7 +2,7 @@
 
 Date: 2026-08-23
 
-Status: REPOSITORY-SIDE COMPLETE THROUGH PHASE 9.1 / ORACLE A1 DEPLOYMENT AND LIVE ACCEPTANCE PENDING.
+Status: REPOSITORY-SIDE COMPLETE AND VERIFIED THROUGH PHASE 9.1 / ORACLE A1 DEPLOYMENT AND LIVE ACCEPTANCE PENDING.
 
 ## Repository-wide CI evidence
 
@@ -44,7 +44,7 @@ PR #2 was squash-merged as:
 
 ## Phase 9.1 Oracle ARM64 adaptation
 
-Primary production hosting is now Oracle Cloud Always Free Ampere A1 in Germany Central (Frankfurt).
+Primary production hosting is Oracle Cloud Always Free Ampere A1 in Germany Central (Frankfurt).
 
 Repository changes:
 
@@ -56,7 +56,18 @@ Repository changes:
 - ARM64 image is built under QEMU/Buildx, architecture-checked, runtime-imported, and checked for the packaged acceptance utility;
 - amd64 support is retained as a future fallback host path.
 
-Phase 9.1 PR CI must pass before this subsection is marked VERIFIED.
+Verification evidence:
+
+- PR #3 CI run `32646869264`: SUCCESS;
+- Python compile: PASS;
+- shell validation: PASS;
+- repository-wide pytest: **92 passed**;
+- linux/amd64 Docker build/runtime import: PASS;
+- linux/arm64 QEMU/Buildx build: PASS;
+- ARM64 architecture assertion: PASS;
+- ARM64 production runtime import: PASS;
+- packaged acceptance utility on both architectures: PASS;
+- PR #3 squash merge: `8e7ef38311e8c92398eb7cf530c92ff773e2a9a1`.
 
 ## Runner baseline
 
