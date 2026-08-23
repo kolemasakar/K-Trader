@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.6
+# K-Trader Roadmap v1.7
 
-Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11B provider-history/outcome hardening, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11C deep-history/MTF replay hardening, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -239,9 +239,9 @@ Status: VERIFIED.
 - versioned `ktrader.history.v1` provider-history JSONL contract;
 - SHA-256 candle-content integrity digest;
 - coherent closed/contiguous/single-provider history validation;
-- public provider-native history export through the existing Binance/Bybit adapters;
+- public provider-native history export through Binance/Bybit adapters;
 - conservative no-lookahead `TradingDecision` outcome tracking;
-- explicit OHLC intrabar ambiguity state instead of guessed ordering;
+- explicit OHLC intrabar ambiguity instead of guessed ordering;
 - deterministic decision fingerprint;
 - separate SQLite outcome persistence and update path;
 - WIN/LOSS-only extraction for future calibration tooling;
@@ -256,14 +256,38 @@ Verification:
 - linux/arm64 QEMU/Buildx image/architecture/runtime: PASS;
 - squash merge: `0b201a5112dca057e3071ef878d8acc6653ab994`.
 
-Current provider-history export is intentionally limited to one provider-native REST page. The next historical-hardening step may add deep pagination and reproducible multi-timeframe bundles without changing the `ktrader.history.v1` record contract.
+### Phase 11C - Deep History / MTF Replay Bundles
+
+Status: VERIFIED.
+
+- provider historical-page contract with explicit UTC end cursor;
+- Binance USD-M `endTime` and Bybit Linear `end` backward pagination;
+- exact-depth multi-page closed-history collection;
+- page deduplication and strict backward cursor progress;
+- fail-closed gaps, insufficient depth, unsupported paging and identity mismatch;
+- deterministic `ktrader.mtf_bundle.v1` bundle for `1d/4h/1h/15m/5m`;
+- one provider/symbol and one UTC `as_of` cutoff across the bundle;
+- per-timeframe and bundle SHA-256 integrity;
+- no-lookahead MTF slicing at an explicit replay cutoff;
+- deep single-timeframe and MTF public-data export utilities.
+
+Verification:
+
+- PR #6 CI run `32652044967` SUCCESS;
+- repository-wide pytest: **134 passed**;
+- compile/shell validation: PASS;
+- linux/amd64 Docker/runtime: PASS;
+- linux/arm64 QEMU/Buildx image/architecture/runtime: PASS;
+- squash merge: `0b7fd93246d4d5e6213ab0bf4ab63ee52b5fc007`.
+
+Actual long provider-recorded bundles are operator-generated artifacts. PR CI remains deterministic and does not depend on exchange network availability; captured real bundles are audited by their content and bundle digests.
 
 ### Remaining Phase 11 work
 
-- deep multi-page provider history collection;
-- reproducible multi-timeframe historical replay bundles;
-- provider-recorded regression datasets;
-- approved signal-outcome studies and later calibration methodology;
+- capture/catalogue canonical real-provider MTF regression bundles;
+- bulk chronological full-engine replay over provider-recorded bundles;
+- connect historical TradingDecision generation to outcome studies;
+- approved signal-outcome cohorts/horizons and later calibration methodology;
 - metrics/backup/recovery hardening;
 - extended stale-data/runtime failure validation.
 
