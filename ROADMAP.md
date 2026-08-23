@@ -71,8 +71,20 @@ Exit condition: target VPS receives continuous public 5m data from an accessible
 
 ## Phase 4 - Indicators
 
-- ATR14, ATR5D, MA50/200.
-- Volume statistics, relative volume/spread and ATR-used metrics.
+Status: IMPLEMENTATION COMPLETE.
+
+- Standard True Range and Wilder ATR14 over confirmed closed contiguous candles. DONE.
+- ATR5D abnormal-range filter using per-bar D1 ATR14 reference and five valid daily ranges. DONE.
+- No rejected-bar replacement/duplication. DONE.
+- MA50/200 over close prices with configurable `sma|ema`; canonical baseline `sma`. DONE.
+- Volume baseline and relative volume. DONE.
+- VSA candle spread (`high-low`) baseline and relative spread. DONE.
+- Optional relative quote volume only when confirmed data is complete. DONE.
+- Generic ATR-used metric and 40/80% classification boundaries. DONE.
+- ATR-used move origin intentionally deferred to Phase 7 Trading Engine. DONE.
+- Deterministic Phase 4 tests. DONE: 12 passed; compileall PASS.
+
+Exit: indicator functions are deterministic, provider-independent and consume only validated closed contiguous candles. Trading interpretation of ATR-used origin remains a Phase 7 rule, not an indicator-side assumption.
 
 ## Phase 5 - Market Structure
 
