@@ -74,7 +74,7 @@ def replay_trap_states(
             max_return_bars=max_return_bars,
             max_confirmation_bars=max_confirmation_bars,
         )
-        event = events[-1] if events else None
+        event = events[0] if events else None
         observations.append(
             ReplayObservation(
                 end - 1,
