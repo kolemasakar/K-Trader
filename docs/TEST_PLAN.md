@@ -1,4 +1,4 @@
-# Test Plan v2.3
+# Test Plan v2.4
 
 ## Test layers
 
@@ -123,13 +123,30 @@
 - replay study JSONL artifact always keeps `estimated_probability=null`
 - deterministic study identity inputs
 
-14. Integration tests
+14. Historical universe / study cohorts - Phase 11E
+- `ktrader.universe_snapshot.v1` preserves provider-native instrument/ticker inputs, liquidity score, rank and live-compatible universe size
+- snapshot ranks are contiguous and reproducible from captured ticker inputs
+- cross-provider instruments/tickers are rejected
+- ticker timestamps after snapshot capture time are rejected
+- `ktrader.universe_archive.v1` requires one provider, one UniverseConfig and strictly chronological snapshots
+- per-snapshot and archive SHA-256 tampering is detected
+- append preserves prior snapshots and archive identity
+- cohort time window selects only actually captured snapshots
+- requested symbols absent from captured universe are rejected
+- per-symbol ReplayStudyContext is generated only from captured membership observations
+- context points use snapshot timestamps and captured score/rank/universe size
+- changed analysis-critical instrument metadata inside one cohort is rejected
+- cohort/context digest mismatch and unsafe context paths are rejected
+- current ticker data is never accepted as a retroactive historical rank substitute
+
+15. Integration tests
 - provider -> validation -> storage -> indicators -> structure -> Trap/VSA -> Trading Engine -> runtime coordinator -> API
 - provider-recorded MTF bundle + timestamped liquidity context -> shared analysis engine -> TradingDecision -> outcome evaluator -> OutcomeRepository
+- provider instruments/tickers -> captured universe archive -> study cohort -> ReplayStudyContext -> Phase 11D replay
 - source/freshness propagation
 - fail-closed NO_TRADE behavior
 
-15. Deployment and architecture tests
+16. Deployment and architecture tests
 - container build/start
 - persistence across restart
 - scanner coordinator + API health
@@ -178,7 +195,7 @@
 - Historical outcome bars must start after the decision's last closed bar.
 - Outcome evaluation must never guess OHLC intrabar ordering.
 - `NO_TRADE`, `AMBIGUOUS`, pending and expired outcomes must not enter the WIN/LOSS binary sample set.
-- Phase 11B/11C/11D must not populate `estimated_probability` or reinterpret Setup Score as probability.
+- Phase 11B/11C/11D/11E must not populate `estimated_probability` or reinterpret Setup Score as probability.
 - Deep historical collection must never splice another provider to fill a missing page.
 - Deep historical collection must fail if the exact requested closed-bar depth cannot be produced.
 - Historical page cursors must make strict backward progress.
@@ -192,6 +209,9 @@
 - A stale or missing replay context observation must skip the cutoff fail-closed.
 - Repeated unchanged setup geometry must not be counted as independent signals on every 5m cutoff.
 - Exact decision fingerprint and stable signal key must remain separate concepts: audit identity vs setup-study identity.
+- Historical universe ranks may be used only from snapshots actually captured at that time; current tickers cannot backfill old ranks.
+- A universe archive must never mix provider IDs or UniverseConfig values.
+- A study cohort must derive its context points only from archive snapshots inside the selected window.
 
 ## Current deterministic verification
 
@@ -209,6 +229,7 @@
 - Phase 11B CI run `32650220382`: **121 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - Phase 11C CI run `32652044967`: **134 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - Phase 11D final CI run `32653087172`: **140 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- Phase 11E CI run `32654162474`: **147 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 The initial Phase 11D PR gate `32653028353` had 135 passed / 5 failed because one newly added synthetic fixture violated existing OHLC validation (`low > open`). Only the fixture was corrected; production validation was not weakened.
 
