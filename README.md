@@ -93,11 +93,29 @@ The canonical OpenAPI file deliberately keeps `https://api.k-trader.invalid` unt
 - freshness boundary regression;
 - deterministic replay digest for future provider-recorded fixtures.
 
+### Phase 11B - Provider History / Signal Outcomes
+
+Repository-side implementation is **VERIFIED**:
+
+- versioned `ktrader.history.v1` JSONL dataset for provider-recorded closed candles;
+- canonical SHA-256 candle-content integrity digest;
+- closed/contiguous/single-provider validation;
+- Binance USD-M / Bybit Linear public-history export through the existing provider contract;
+- deterministic `TradingDecision` fingerprints;
+- conservative no-lookahead outcome tracking;
+- `WIN`, `LOSS`, `PENDING_ENTRY`, `OPEN`, `AMBIGUOUS`, `EXPIRED_NO_ENTRY`, `EXPIRED_OPEN`, `NOT_ELIGIBLE` states;
+- same-candle event ordering is never guessed from OHLC data;
+- separate SQLite outcome persistence/upsert;
+- WIN/LOSS-only extraction for later statistical research.
+
+Phase 11B does **not** turn Setup Score into probability. `estimated_probability` remains null/N/A. Current history export is bounded to one provider-native page; deep pagination is a later hardening step.
+
 ## CI evidence
 
 - CI run `32636825758`: historical Phase 9 repository baseline, **92 tests PASS**.
 - CI run `32646869264`: Phase 9.1 multi-arch gate, **92 tests PASS**, amd64/arm64 Docker/runtime PASS.
 - CI run `32647828382`: Phase 10 preparation + Phase 11A integrated gate, **106 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- CI run `32650220382`: Phase 11B integrated gate, **121 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 ## Runtime entrypoint
 
@@ -115,6 +133,7 @@ The API-only entrypoint remains available for isolated API development:
 - `scripts/phase9_acceptance.sh`
 - `scripts/phase10_action_acceptance.py`
 - `scripts/render_custom_gpt_openapi.py`
+- `scripts/export_provider_history.py`
 - `scripts/provision_vps.sh`
 - `scripts/register_runner.sh`
 - `scripts/deploy.sh`
@@ -130,10 +149,12 @@ No exchange credentials are used.
 - `docs/VPS_PROVISIONING.md`
 - `docs/DEPLOYMENT.md`
 - `docs/SECURITY.md`
+- `docs/HISTORICAL_REPLAY_SPEC.md`
 - `docs/PHASE_9_CHECKPOINT.md`
 - `docs/PHASE_9_1_CHECKPOINT.md`
 - `docs/PHASE_10_PREP_CHECKPOINT.md`
 - `docs/PHASE_11A_CHECKPOINT.md`
+- `docs/PHASE_11B_CHECKPOINT.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
@@ -145,6 +166,6 @@ No exchange credentials are used.
 
 ## Current phase
 
-Repository-side Phase 10 preparation and Phase 11A are **VERIFIED** with the current **106-test** CI baseline.
+Repository-side Phase 10 preparation and Phase 11A/11B hardening are **VERIFIED** with the current **121-test** CI baseline.
 
 External critical path remains: obtain Oracle A1 capacity, provision the ARM64 host, run Phase 9 live acceptance, configure public HTTPS, then activate and validate the Custom GPT Action.
