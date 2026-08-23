@@ -2,17 +2,17 @@
 
 Date: 2026-08-23
 
-Status: CI/DOCKER/DEPLOYMENT AUTOMATION COMPLETE / TARGET-VPS DEPLOYMENT AND LIVE ACCEPTANCE PENDING.
+Status: REPOSITORY-SIDE COMPLETE / TARGET-VPS DEPLOYMENT AND LIVE ACCEPTANCE PENDING.
 
 ## Repository-wide CI evidence
 
 A control pull request was used because the available connector exposes PR-triggered workflow runs directly.
 
-Initial real CI run found two invalid synthetic fixtures. Production candle validation was not weakened; the fixtures were corrected.
+Initial real CI found two invalid synthetic fixtures. Production candle validation was not weakened; only the fixtures were corrected.
 
-A later Docker gate found a real FastAPI lifecycle compatibility issue. Runtime startup/shutdown was migrated from removed event-handler methods to the ASGI lifespan contract.
+A later Docker gate found a real FastAPI lifecycle compatibility issue. Runtime startup/shutdown was migrated to the ASGI lifespan contract.
 
-Final CI run `32636825758` completed successfully:
+Successful CI run `32636825758` proved the repaired complete repository:
 
 - Python compile: PASS;
 - repository-wide pytest: **92 passed**;
@@ -21,23 +21,40 @@ Final CI run `32636825758` completed successfully:
 - Docker image build: PASS;
 - production runtime import from built image: PASS.
 
-The fixes were squash-merged to main as commit:
+Those fixes were squash-merged as:
 
 `8ce912903224f6968479650eb0c3f4870bea6269`.
 
-## Production preparation
+## Final production-prep gate
 
-Implemented:
+PR #2 validated the deployment/provisioning additions with CI run `32637233264`.
+
+Result:
+
+- repository-wide pytest: PASS;
+- compile source/tests/scripts: PASS;
+- Docker Compose validation: PASS;
+- Docker image build: PASS;
+- production runtime import: PASS;
+- packaged VPS acceptance utility: PASS.
+
+PR #2 was squash-merged as:
+
+`377b4b412afcb85ccb8fa6a0b567482119c21349`.
+
+## Production preparation implemented
 
 - GitHub-hosted CI separated from production self-hosted runner;
-- manual-only production deployment workflow;
+- current Node-24 GitHub Action major versions in CI/deploy workflows;
+- manual-only production deployment workflow on `main`;
 - hardened non-root Docker image;
 - read-only Compose root filesystem and loopback API bind;
 - optional Caddy HTTPS profile;
 - immutable commit-SHA deployment releases;
 - rollback on process or live acceptance failure;
-- target-VPS public REST/WebSocket acceptance utility;
-- scanner/API readiness acceptance;
+- target-VPS public REST checks on all five canonical timeframes;
+- target-VPS public 5m WebSocket acceptance;
+- scanner `data_ready` and MTF API acceptance;
 - Ubuntu/Docker provisioning script;
 - checksum-verified repository runner registration script;
 - canonical VPS provisioning/security documentation.
@@ -65,4 +82,4 @@ The following cannot be claimed before a real VPS is supplied/provisioned:
 
 Phase 9 is not fully complete until target-VPS live acceptance passes.
 
-Repository-side preparation is complete subject to the final production-prep CI pull request.
+All work that can be completed solely inside the repository is complete and CI-validated.
