@@ -42,69 +42,62 @@ Public Exchange API -> REST/WS Provider -> Normalized Data -> Validation/SQLite 
 - canonical setup geometry, RR/ATR hard gates, Setup Score and A+/A/B/C;
 - final `TradingDecision`.
 
-### Phase 8 - Read-only API
+### Phase 8-8.5 - API and runtime coordinator
 
-- FastAPI endpoints for health/status/universe/market/candles/analysis/candidates/signals;
+- FastAPI health/status/universe/market/candles/analysis/candidates/signals;
 - thread-safe `ApiReadModel`;
 - exact Decimal strings and UTC timestamps;
 - provider ambiguity fail-closed behavior;
-- rate limiting;
-- Custom GPT OpenAPI/Action guide.
-
-### Phase 8.5 - Runtime Scanner Coordinator
-
-- autonomous provider -> universe -> data readiness -> indicators -> structure -> Trap/VSA -> Trading Engine flow;
-- configurable top-N liquidity shortlist;
-- bounded bootstrap/analysis concurrency;
-- retained live WebSocket task unless provider/shortlist changes;
-- per-symbol failure isolation;
-- explicit valid/fresh `NO_SETUP` -> `NO_TRADE` result;
-- no fabricated decision for stale/incomplete data;
-- atomic read-model publication;
-- `provider|aggregate|mixed` series provenance;
+- autonomous provider -> universe -> readiness -> indicators -> structure -> Trap/VSA -> Trading Engine flow;
+- bounded concurrency, per-symbol failure isolation and atomic publication;
+- explicit valid/fresh `NO_SETUP` -> `NO_TRADE`;
 - production ASGI lifespan entrypoint.
 
-### Phase 9 - CI / Docker / production preparation
-
-Repository-side implementation is complete:
+### Phase 9-9.1 - Production preparation / Oracle ARM64
 
 - GitHub-hosted repository-wide CI;
-- **92 tests PASS** on the integrated baseline;
-- Docker Compose validation and production image build/import PASS;
-- hardened non-root/read-only container baseline;
+- hardened non-root/read-only Docker runtime;
 - manual-only production deployment on `main`;
-- repository-scoped self-hosted runner provisioning baseline;
 - immutable commit-SHA releases and rollback;
 - optional Caddy HTTPS;
-- target-host REST acceptance on all five timeframes;
-- target-host public WebSocket acceptance;
-- scanner/API readiness acceptance;
-- Ubuntu/Docker and runner registration scripts.
+- target-host REST/WebSocket/scanner acceptance utilities;
+- Oracle Cloud Always Free Ampere A1 production target in Frankfurt;
+- Ubuntu 24.04 Minimal aarch64 target, 2 OCPU / 12 GB RAM;
+- production runner label `k-trader-prod-arm64`;
+- amd64 compatibility retained;
+- multi-arch Docker CI with QEMU/Buildx ARM64 runtime import.
 
-### Phase 9.1 - Oracle ARM64 / Multi-arch
+Oracle external status on 2026-08-23: A1 capacity unavailable in Frankfurt AD-1, AD-2 and AD-3, including reduced 1 OCPU / 6 GB attempts. No paid shape is approved as a workaround.
 
-Primary production hosting is Oracle Cloud Always Free Ampere A1 in Germany Central (Frankfurt).
+### Phase 10 preparation - Custom GPT Action
 
-Repository adaptation includes:
+Repository-side preparation is **VERIFIED**:
 
-- Ubuntu 24.04 Minimal aarch64 target;
-- `VM.Standard.A1.Flex` target at 2 OCPU / 12 GB RAM;
-- ARM64 production self-hosted runner label `k-trader-prod-arm64`;
-- multi-arch runner registration for Linux arm64 and amd64;
-- architecture-aware Ubuntu/Docker provisioning;
-- separate CI Docker gates for linux/amd64 and linux/arm64;
-- ARM64 image build/import verification under QEMU/Buildx;
-- amd64 support retained as a potential fallback host path.
+- exact read-only OpenAPI schemas for eight Action operations;
+- optional Bearer API-key enforcement for `/v1/*`;
+- `KTRADER_ACTION_API_KEY` production secret wiring;
+- public `/health` and `/privacy`;
+- OpenAPI render/validation script for the eventual real HTTPS origin;
+- live Action acceptance script;
+- Builder checklist and privacy-policy baseline.
 
-Oracle external status on 2026-08-23: A1 capacity was unavailable in Frankfurt AD-1, AD-2 and AD-3, including a reduced 1 OCPU / 6 GB request. No paid shape is approved as a workaround.
+The canonical OpenAPI file deliberately keeps `https://api.k-trader.invalid` until a real host passes live acceptance.
 
-Potential fallback, not implemented: home Windows PC + Tailscale Funnel. Cloudflare Workers + Durable Objects is not planned for K-Trader v1 and is retained only as a future-project architecture idea.
+### Phase 11A - Replay / Regression Hardening
+
+- deterministic chronological replay harness;
+- level lifecycle replay;
+- causal Trap lifecycle: `BROKEN -> RETURNED -> CONFIRMED`, or `BROKEN -> EXPIRED` only after the return window elapses;
+- gap/cross-provider fail-closed replay validation;
+- ATR no-future-lookahead regression;
+- freshness boundary regression;
+- deterministic replay digest for future provider-recorded fixtures.
 
 ## CI evidence
 
-- CI run `32636825758`: repository-wide pytest **92 passed**, Compose PASS, Docker build PASS, runtime import PASS.
-- CI run `32637233264`: production-prep pytest/compile/Compose/Docker/runtime/acceptance-packaging PASS.
-- CI run `32646869264`: Phase 9.1 **92 pytest PASS**, shell validation PASS, linux/amd64 build/import PASS, linux/arm64 build/architecture/runtime import PASS.
+- CI run `32636825758`: historical Phase 9 repository baseline, **92 tests PASS**.
+- CI run `32646869264`: Phase 9.1 multi-arch gate, **92 tests PASS**, amd64/arm64 Docker/runtime PASS.
+- CI run `32647828382`: Phase 10 preparation + Phase 11A integrated gate, **106 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 ## Runtime entrypoint
 
@@ -120,6 +113,8 @@ The API-only entrypoint remains available for isolated API development:
 - `scripts/ws_smoke.py`
 - `scripts/vps_acceptance.py`
 - `scripts/phase9_acceptance.sh`
+- `scripts/phase10_action_acceptance.py`
+- `scripts/render_custom_gpt_openapi.py`
 - `scripts/provision_vps.sh`
 - `scripts/register_runner.sh`
 - `scripts/deploy.sh`
@@ -137,15 +132,19 @@ No exchange credentials are used.
 - `docs/SECURITY.md`
 - `docs/PHASE_9_CHECKPOINT.md`
 - `docs/PHASE_9_1_CHECKPOINT.md`
+- `docs/PHASE_10_PREP_CHECKPOINT.md`
+- `docs/PHASE_11A_CHECKPOINT.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
+- `custom_gpt/BUILDER_CHECKLIST.md`
+- `custom_gpt/PRIVACY_POLICY.md`
 - `docs/*_SPEC.md`
 - `docs/PHASE_*_CHECKPOINT.md`
 - `docs/adr/*.md`
 
 ## Current phase
 
-Phase 9.1 repository-side Oracle ARM64 adaptation is **VERIFIED**.
+Repository-side Phase 10 preparation and Phase 11A are **VERIFIED** with the current **106-test** CI baseline.
 
-Next external checkpoint: obtain Oracle A1 capacity, provision the ARM64 host, register the production runner, deploy and pass live REST/WS/runtime/HTTPS acceptance.
+External critical path remains: obtain Oracle A1 capacity, provision the ARM64 host, run Phase 9 live acceptance, configure public HTTPS, then activate and validate the Custom GPT Action.

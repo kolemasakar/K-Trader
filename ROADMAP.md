@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.4
+# K-Trader Roadmap v1.5
 
-Status: APPROVED baseline; repository-side implementation complete and verified through Phase 9.1 Oracle ARM64 preparation, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11A replay/regression hardening, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -109,7 +109,7 @@ Status: IMPLEMENTATION COMPLETE / REPOSITORY-WIDE CI VERIFIED.
 - provider/aggregate/mixed provenance;
 - production ASGI lifespan entrypoint and clean shutdown.
 
-Repository-wide CI result including Phase 8.5: **92 tests passed**.
+Historical Phase 9 baseline including Phase 8.5: **92 tests passed**.
 
 ## Phase 9 - Docker / CI-CD / live deployment
 
@@ -195,17 +195,49 @@ Phase 9 exits only after those live checks pass.
 
 ## Phase 10 - Custom GPT Update
 
-- replace `.invalid` OpenAPI server with the deployed HTTPS host;
-- connect read-only Action/OpenAPI schema;
-- validate source/freshness/NO_TRADE output;
-- add Privacy Policy URL if distribution mode requires it.
+Status: REPOSITORY-SIDE PREPARATION VERIFIED / LIVE ACTIVATION PENDING HTTPS.
+
+Prepared and CI-verified:
+
+- precise read-only OpenAPI schemas for all eight Action operations;
+- Bearer API-key authentication and production secret wiring;
+- public health and privacy endpoints;
+- OpenAPI server-origin render/validation utility;
+- live Phase 10 Action acceptance utility;
+- Builder checklist and privacy-policy baseline;
+- fail-closed Action tests.
+
+Verification:
+
+- PR #4 CI run `32647828382` SUCCESS;
+- integrated repository-wide pytest: **106 passed**;
+- amd64 and arm64 Docker/runtime gates: PASS;
+- squash merge: `a1c578524bbc41afa575b3f4fb6446642a48453d`.
+
+Activation awaits real HTTPS after Phase 9 live deployment.
 
 ## Phase 11 - Hardening
 
-- replay/regression history;
-- signal outcomes;
-- metrics/backup/recovery/rate limiting;
-- stale-data fail-closed validation.
+### Phase 11A - Replay / Regression
+
+Status: VERIFIED.
+
+- deterministic replay harness;
+- level lifecycle replay;
+- causal Trap lifecycle (`BROKEN -> RETURNED -> CONFIRMED` or `BROKEN -> EXPIRED`);
+- gap/cross-provider fail-closed replay validation;
+- ATR no-future-lookahead regression;
+- freshness boundary regression;
+- deterministic replay digest.
+
+Verified in PR #4 CI run `32647828382` as part of the **106-test PASS** baseline.
+
+### Remaining Phase 11 work
+
+- provider-recorded replay/regression history;
+- signal outcomes and calibration dataset;
+- metrics/backup/recovery hardening;
+- extended stale-data/runtime failure validation.
 
 ## Phase 12 - Multi-provider expansion
 

@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-23 - Phase 10 preparation + Phase 11A replay/regression hardening
+
+- Added deterministic replay harness for chronological Trap/level lifecycle regression.
+- Corrected Trap causality so a fresh break remains `BROKEN` while the configured return window is still open; `EXPIRED` is emitted only after that full window elapses without return.
+- Preserved the setup gate: only `confirmed=True` Trap evidence can produce setup candidates.
+- Added replay regression for gaps, provider identity, ATR future-lookahead resistance, freshness boundary and deterministic digesting.
+- Added optional Bearer API-key enforcement for production `/v1/*` endpoints while keeping `/health` and `/privacy` public.
+- Added `KTRADER_ACTION_API_KEY` production secret wiring; no key is committed to the repository.
+- Replaced generic Action response bodies with precise read-only OpenAPI schemas for all eight operations.
+- Added OpenAPI render/validation utility and live Phase 10 Action acceptance utility.
+- Added Builder checklist and privacy-policy baseline.
+- Initial PR #4 gate `32647770969`: compile/shell PASS, 105 tests PASS and 1 new replay-harness test failed; harness event selection was corrected without weakening production rules.
+- Final PR #4 gate `32647828382`: **106 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx build/architecture/runtime PASS.
+- PR #4 squash-merged as `a1c578524bbc41afa575b3f4fb6446642a48453d`.
+- Phase 10 repository-side preparation: VERIFIED; live Action activation still requires real HTTPS after Phase 9 deployment.
+- Phase 11A: VERIFIED.
+
 ## 2026-08-23 - Phase 9.1 Oracle ARM64 / multi-arch
 
 - Selected Oracle Cloud Always Free Ampere A1 in Germany Central (Frankfurt) as the primary K-Trader production hosting path.
@@ -53,7 +70,7 @@
 - Added FastAPI read-only application boundary.
 - Added thread-safe `ApiReadModel` for scanner-published runtime state.
 - Added health/status/universe/market/candles/analysis/candidates/signals endpoints.
-- Added exact Decimal-as-string serialization and UTC ISO-8601 timestamps.
+- Added exact Decimal-as-string and UTC ISO-8601 timestamps.
 - Added provider ambiguity detection with HTTP 409; no silent provider substitution.
 - Added candle source provenance and A/A+ LONG/SHORT-only signal filtering.
 - Added application-level fixed-window rate limiter.

@@ -1,4 +1,4 @@
-# Test Plan v1.9
+# Test Plan v2.0
 
 ## Test layers
 
@@ -28,6 +28,7 @@
 
 6. Trap/VSA replay tests
 - failed-break/return/confirmation
+- causal incomplete Trap states before window expiry
 - ND/NS/T/UT/BC/SC/SV raw detection
 - HTF/location/confirmation hard filters
 
@@ -41,7 +42,7 @@
 - optional RiskContext sizing
 - best-decision ordering
 
-8. API tests
+8. API / Action tests
 - health/readiness and GET-only routes
 - exact Decimal/UTC serialization
 - provider ambiguity -> HTTP 409
@@ -49,20 +50,35 @@
 - TradingDecision/candidate/signal filtering
 - interval/grade validation
 - rate limiting and stable OpenAPI operation IDs
+- optional Bearer key protects `/v1/*`
+- public `/health` and `/privacy`
+- Action OpenAPI YAML parses and remains read-only
+- exactly eight required Action operation IDs
+- precise Action response schemas
+- HTTPS server-origin renderer rejects unsafe origins
 
 9. Runtime coordinator tests - Phase 8.5
 - valid universe publishes explicit NO_SETUP/NO_TRADE analysis when no setup exists
 - one-symbol failure is isolated and cycle becomes DEGRADED
 - provider failure falls back without retaining old-provider snapshot state
 - atomic cycle publication replaces prior provider state
-- future repository integration coverage: real bootstrap/live/analyzer composition and clean shutdown
 
-10. Integration tests
+10. Replay / regression hardening - Phase 11A
+- chronological prefix replay only
+- level BROKEN/MIRROR/INVALIDATED lifecycle
+- Trap `BROKEN -> RETURNED -> CONFIRMED`
+- Trap `BROKEN -> EXPIRED` only after full return window
+- gap and cross-provider replay rejection
+- historical Wilder ATR value unchanged by a future appended bar
+- freshness exact boundary and post-boundary rejection
+- deterministic canonical replay digest
+
+11. Integration tests
 - provider -> validation -> storage -> indicators -> structure -> Trap/VSA -> Trading Engine -> runtime coordinator -> API
 - source/freshness propagation
 - fail-closed NO_TRADE behavior
 
-11. Deployment and architecture tests
+12. Deployment and architecture tests
 - container build/start
 - persistence across restart
 - scanner coordinator + API health
@@ -80,11 +96,13 @@
 - Stale/gapped/open data cannot masquerade as confirmed analysis input.
 - Failed MTF bootstrap writes no partial snapshot.
 - ATR5D cannot replace/duplicate rejected D1 bars.
+- Historical ATR output at bar N must not change when future bar N+1 is appended.
 - MA alone cannot create directional market regime.
 - Session cannot independently permit a trade.
 - FLOATING/BROKEN/INVALIDATED levels cannot validate a primary setup.
 - Primary tradable level must be STRONG.
 - Trap requires break -> return -> confirmation.
+- A Trap break cannot become `EXPIRED` before its configured return window elapses.
 - Context-free/unconfirmed VSA cannot validate a setup.
 - Evidence identity mismatch is rejected.
 - Daily ATR-used context must begin at 00:00 UTC.
@@ -103,6 +121,8 @@
 - Provider fallback must atomically replace the prior provider snapshot.
 - ARM64 CI image must report architecture `arm64` and import the same production ASGI app as amd64.
 - Runner registration must reject unsupported host architectures and checksum-verify the architecture-specific archive.
+- Production Action key must not be committed; configured `/v1/*` auth must reject missing/invalid Bearer credentials.
+- Canonical Action OpenAPI must remain GET-only and retain the `.invalid` server placeholder until real HTTPS is accepted.
 
 ## Current deterministic verification
 
@@ -114,11 +134,11 @@
 - Phase 6 isolated harness: 14 passed; compile validation PASS.
 - Phase 7 exact-module isolated harness: 17 passed; syntax compilation PASS.
 - Phase 8 isolated API harness: 7 passed; FastAPI/OpenAPI generation and syntax validation PASS.
-- Phase 8.5 orchestration code is included in the integrated repository-wide Phase 9 result.
-- Phase 9 integrated repository-wide CI: **92 passed**, compile/Compose/Docker/runtime import PASS.
-- Phase 9.1 CI run `32646869264`: **92 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, ARM64 QEMU/Buildx image build/architecture/runtime import PASS.
+- Phase 9 integrated baseline: **92 passed**, compile/Compose/Docker/runtime PASS.
+- Phase 9.1 CI run `32646869264`: **92 passed**, amd64/arm64 Docker/runtime PASS.
+- Phase 10 preparation + Phase 11A final CI run `32647828382`: **106 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
-Real provider/Oracle-host acceptance remains a separate Phase 9 live gate and cannot be claimed until OCI A1 capacity is available.
+Real provider/Oracle-host acceptance remains a separate Phase 9 live gate. Phase 10 live Action acceptance remains blocked until a real HTTPS endpoint exists.
 
 ## Fixtures
 
