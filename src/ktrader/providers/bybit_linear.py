@@ -6,6 +6,7 @@ from decimal import Decimal
 
 import httpx
 
+from ktrader.market.timeframes import datetime_to_ms, require_utc
 from ktrader.models import (
     NormalizedCandle,
     NormalizedInstrument,
@@ -153,6 +154,37 @@ class BybitLinearProvider(MarketDataProvider):
         *,
         limit: int,
     ) -> list[NormalizedCandle]:
+        return await self._get_candle_page(
+            instrument,
+            interval,
+            limit=limit,
+            end_time=None,
+        )
+
+    async def get_historical_candles(
+        self,
+        instrument: NormalizedInstrument,
+        interval: str,
+        *,
+        limit: int,
+        end_time: datetime,
+    ) -> list[NormalizedCandle]:
+        require_utc(end_time)
+        return await self._get_candle_page(
+            instrument,
+            interval,
+            limit=limit,
+            end_time=end_time,
+        )
+
+    async def _get_candle_page(
+        self,
+        instrument: NormalizedInstrument,
+        interval: str,
+        *,
+        limit: int,
+        end_time: datetime | None,
+    ) -> list[NormalizedCandle]:
         self.validate_interval(interval)
         if instrument.provider_id != self.provider_id:
             raise ValueError(
@@ -164,14 +196,17 @@ class BybitLinearProvider(MarketDataProvider):
             raise ValueError(
                 "Bybit kline limit must be between 1 and 1000"
             )
+        params: dict[str, object] = {
+            "category": "linear",
+            "symbol": provider_symbol,
+            "interval": _INTERVAL_MAP[interval],
+            "limit": limit,
+        }
+        if end_time is not None:
+            params["end"] = datetime_to_ms(end_time)
         payload = await self.http.get_json(
             "/v5/market/kline",
-            {
-                "category": "linear",
-                "symbol": provider_symbol,
-                "interval": _INTERVAL_MAP[interval],
-                "limit": limit,
-            },
+            params,
         )
         data = _result(payload)
         rows = data.get("list", [])

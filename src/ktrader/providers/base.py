@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator, Sequence
+from datetime import datetime
 
 from ktrader.models import (
     NormalizedCandle,
@@ -37,6 +38,25 @@ class MarketDataProvider(ABC):
         *,
         limit: int,
     ) -> list[NormalizedCandle]: ...
+
+    async def get_historical_candles(
+        self,
+        instrument: NormalizedInstrument,
+        interval: str,
+        *,
+        limit: int,
+        end_time: datetime,
+    ) -> list[NormalizedCandle]:
+        """Return one provider-native candle page ending at/before ``end_time``.
+
+        This optional contract is used only by offline/deep-history tooling. Live
+        runtime behavior continues to use ``get_candles``. Providers that do not
+        implement historical pagination fail explicitly rather than silently
+        falling back to latest data.
+        """
+        raise NotImplementedError(
+            f"{self.provider_id} does not implement historical candle pagination"
+        )
 
     async def stream_candles(
         self,
