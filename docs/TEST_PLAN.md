@@ -1,4 +1,4 @@
-# Test Plan v2.0
+# Test Plan v2.1
 
 ## Test layers
 
@@ -73,12 +73,29 @@
 - freshness exact boundary and post-boundary rejection
 - deterministic canonical replay digest
 
-11. Integration tests
+11. Provider history / signal outcomes - Phase 11B
+- `ktrader.history.v1` JSONL roundtrip
+- canonical candle-content SHA-256 integrity verification
+- tampered history dataset rejection
+- closed/contiguous/single-provider history enforcement
+- provider collector drops current open candle and keeps latest requested closed bars
+- provider native page-capacity enforcement
+- WIN and LOSS geometry-touch outcomes
+- same-candle entry/exit ambiguity
+- same-candle Stop+Target ambiguity after entry
+- pending and explicit-horizon expiry states
+- NO_TRADE excluded as `NOT_ELIGIBLE`
+- cross-provider/gapped future outcome history rejected
+- deterministic decision fingerprint
+- SQLite outcome pending-to-resolved upsert
+- binary sample query contains WIN/LOSS only
+
+12. Integration tests
 - provider -> validation -> storage -> indicators -> structure -> Trap/VSA -> Trading Engine -> runtime coordinator -> API
 - source/freshness propagation
 - fail-closed NO_TRADE behavior
 
-12. Deployment and architecture tests
+13. Deployment and architecture tests
 - container build/start
 - persistence across restart
 - scanner coordinator + API health
@@ -123,6 +140,11 @@
 - Runner registration must reject unsupported host architectures and checksum-verify the architecture-specific archive.
 - Production Action key must not be committed; configured `/v1/*` auth must reject missing/invalid Bearer credentials.
 - Canonical Action OpenAPI must remain GET-only and retain the `.invalid` server placeholder until real HTTPS is accepted.
+- Provider-history datasets must be closed, contiguous and single-provider with a verified content digest.
+- Historical outcome bars must start after the decision's last closed bar.
+- Outcome evaluation must never guess OHLC intrabar ordering.
+- `NO_TRADE`, `AMBIGUOUS`, pending and expired outcomes must not enter the WIN/LOSS binary sample set.
+- Phase 11B must not populate `estimated_probability` or reinterpret Setup Score as probability.
 
 ## Current deterministic verification
 
@@ -137,9 +159,12 @@
 - Phase 9 integrated baseline: **92 passed**, compile/Compose/Docker/runtime PASS.
 - Phase 9.1 CI run `32646869264`: **92 passed**, amd64/arm64 Docker/runtime PASS.
 - Phase 10 preparation + Phase 11A final CI run `32647828382`: **106 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- Phase 11B CI run `32650220382`: **121 passed**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 Real provider/Oracle-host acceptance remains a separate Phase 9 live gate. Phase 10 live Action acceptance remains blocked until a real HTTPS endpoint exists.
 
 ## Fixtures
 
 Synthetic fixtures are allowed only inside tests and must be explicitly test data. Production/live outputs may never substitute synthetic data for missing exchange data.
+
+Provider-recorded historical fixtures added later must preserve provider/symbol/timeframe provenance and the `ktrader.history.v1` content digest.
