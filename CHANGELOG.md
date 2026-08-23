@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-23 - Phase 11B provider history / signal outcomes
+
+- Added versioned `ktrader.history.v1` JSONL datasets for provider-recorded closed candles.
+- Added canonical candle-content SHA-256 integrity verification and manifest identity/range validation.
+- Added public provider-history export through the existing Binance USD-M and Bybit Linear adapters without introducing exchange credentials.
+- Kept current capture depth within one provider-native REST page; deep multi-page pagination is deferred without changing the dataset contract.
+- Added conservative no-lookahead outcome evaluation for canonical `TradingDecision` geometry.
+- Added explicit `AMBIGUOUS` handling when OHLC cannot determine entry/SL/TP intrabar ordering; no optimistic/pessimistic ordering assumption is made.
+- Added `PENDING_ENTRY`, `OPEN`, `WIN`, `LOSS`, `AMBIGUOUS`, `EXPIRED_NO_ENTRY`, `EXPIRED_OPEN` and `NOT_ELIGIBLE` outcome states.
+- Added deterministic TradingDecision fingerprints and separate SQLite outcome persistence/upsert.
+- Added WIN/LOSS-only sample extraction for future calibration work without calculating probability.
+- Preserved Setup Score as a deterministic rule score; `estimated_probability` remains null/N/A.
+- PR #5 CI run `32650220382`: **121 tests PASS**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- PR #5 squash-merged as `0b201a5112dca057e3071ef878d8acc6653ab994`.
+- Phase 11B: VERIFIED.
+
 ## 2026-08-23 - Phase 10 preparation + Phase 11A replay/regression hardening
 
 - Added deterministic replay harness for chronological Trap/level lifecycle regression.
