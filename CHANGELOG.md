@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-23 - Phase 6 trap + VSA
+
+- Added provider-independent TrapEvent evidence model.
+- Added confirmed/mirror support-resistance eligibility for trap detection.
+- Added ATR-scaled failed-break detection with return and directional-confirmation windows.
+- Added RETURNED / CONFIRMED / EXPIRED trap states.
+- Added provider-independent VSAEvent evidence model.
+- Added deterministic K-Trader v1 raw heuristics for ND, NS, T, UT, BC, SC and SV.
+- Added previous-20-bar relative-volume / relative-spread baseline and close-location metrics.
+- Added strict HTF directional context and confirmed-level location filters.
+- Added ATR-scaled level proximity and next-two-bar confirmation logic.
+- Added same-level confirmed trap confluence without allowing trap evidence to create a signal independently.
+- Added RAW / IGNORED / VALID_CONTEXT / CONFIRMED VSA states.
+- Added TRAP_SPEC v1.1, VSA_SPEC v1.1, Phase 6 config/test/checkpoint documentation.
+- Verification: local isolated Phase 6 harness 14 tests passed; compile validation PASS.
+- Repository-wide CI remains a Phase 9 gate.
+
 ## 2026-08-23 - Phase 5 market structure
 
 - Added strict swing-high/swing-low detection on validated closed contiguous candles.
