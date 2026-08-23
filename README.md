@@ -4,7 +4,7 @@ K-Trader is a read-only, exchange-agnostic market scanner and analysis backend f
 
 ## v1 objective
 
-Continuously collect confirmed public derivatives market data, normalize it, validate and persist multi-timeframe history, evaluate structure/ATR/levels/traps/VSA, rank only high-quality setups, and expose structured results to K_Trader through a read-only HTTPS API.
+Continuously collect confirmed public derivatives market data, normalize it, validate and persist multi-timeframe history/live state, evaluate structure/ATR/levels/traps/VSA, rank only high-quality setups, and expose structured results to K_Trader through a read-only HTTPS API.
 
 ## Principles
 
@@ -14,12 +14,13 @@ Continuously collect confirmed public derivatives market data, normalize it, val
 - Canonical symbol and native `provider_symbol` are separate concepts.
 - Confirmed data only; stale, gapped or insufficient data fails closed.
 - UTC is canonical for candle storage and aggregation.
+- Open live candles are provisional and never treated as closed confirmations.
 - Capital preservation: quality over quantity; RR >= 3 for a tradable setup.
 - Rule-based Setup Score in v1; statistical probability is deferred until calibrated from outcomes.
 
 ## Target flow
 
-Public Exchange API -> Provider Adapter -> Normalized Market Data -> Validation/SQLite -> Universe/Liquidity -> ATR/MA -> Levels -> Trap -> VSA -> Setup Score -> A/A+ -> Signal -> Read-only API -> Custom GPT K_Trader
+Public Exchange API -> REST/WS Provider Adapter -> Normalized Market Data -> Validation/SQLite -> Universe/Liquidity -> ATR/MA -> Levels -> Trap -> VSA -> Setup Score -> A/A+ -> Signal -> Read-only API -> Custom GPT K_Trader
 
 ## Current implementation
 
@@ -38,19 +39,41 @@ Phase 2 market-data core:
 - UTC boundary/OHLCV/gap/freshness validation;
 - SQLite WAL persistence;
 - Decimal-preserving storage;
-- idempotent candle upsert;
-- atomic MTF snapshot writes;
-- bootstrap SUCCESS/FAILED audit records.
+- atomic MTF snapshot writes and bootstrap audit.
+
+Phase 3 live market data:
+
+- Binance USD-M and Bybit Linear public WebSocket candle streams;
+- canonical live base interval `5m`;
+- open candle held in memory only;
+- provider-confirmed closed 5m persistence;
+- complete UTC aggregation to `15m/1h/4h/1d`;
+- source provenance (`provider` vs `aggregate`);
+- SQLite schema v2 migration;
+- stale detection and exponential reconnect baseline;
+- periodic REST reconciliation and gap-triggered recovery;
+- WebSocket target-VPS smoke utility.
 
 Verification:
 
 - Phase 1 contract suite: 7 tests passed.
-- Phase 2 isolated deterministic harness: 9 tests passed; compileall PASS.
-- Target-VPS live provider/bootstrap acceptance remains pending until the VPS exists.
+- Phase 2 deterministic harness: 9 tests passed; compileall PASS.
+- Phase 3 deterministic harness: 10 tests passed; compileall PASS.
+- Target-VPS REST/bootstrap/WebSocket acceptance remains pending until the VPS exists.
 
-## Provider smoke test
+## Smoke utilities
+
+REST provider:
 
 `PYTHONPATH=src python scripts/provider_smoke.py --providers binance_usdm bybit_linear`
+
+WebSocket:
+
+`PYTHONPATH=src python scripts/ws_smoke.py --provider binance_usdm --symbol BTCUSDT`
+
+or:
+
+`PYTHONPATH=src python scripts/ws_smoke.py --provider bybit_linear --symbol BTCUSDT`
 
 No exchange credentials are used.
 
@@ -64,8 +87,9 @@ No exchange credentials are used.
 - `docs/PROVIDER_ENDPOINTS.md`
 - `docs/PHASE_1_CHECKPOINT.md`
 - `docs/PHASE_2_CHECKPOINT.md`
+- `docs/PHASE_3_CHECKPOINT.md`
 - `docs/adr/*.md`
 
 ## Current phase
 
-Phase 2 - implementation complete; target-VPS live acceptance pending.
+Phase 3 - implementation complete; target-VPS live acceptance pending.
