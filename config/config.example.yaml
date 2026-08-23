@@ -43,7 +43,18 @@ validation:
 live:
   preferred_base_interval: 5m
   local_aggregation: true
+  aggregate_intervals:
+    - 15m
+    - 1h
+    - 4h
+    - 1d
   rest_reconciliation: true
+  reconcile_every_closed_bars: 12
+  reconcile_lookback: 3
+  stale_after_seconds: 90
+  reconnect_initial_seconds: 1
+  reconnect_max_seconds: 30
+  persist_open_candles: false
   fail_on_stale_data: true
 
 risk_rules:
