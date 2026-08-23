@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-23 - Phase 8 read-only API
+
+- Added FastAPI read-only application boundary.
+- Added thread-safe `ApiReadModel` for scanner-published runtime state.
+- Added `/health`, scanner status, universe, market snapshot, candles, analysis, candidates and signals endpoints.
+- Added exact Decimal-as-string serialization and UTC ISO-8601 timestamps.
+- Added provider ambiguity detection with HTTP 409; no silent provider substitution.
+- Added candle source provenance `provider|aggregate`.
+- Added A/A+ LONG/SHORT-only signal filtering.
+- Added application-level fixed-window rate limiter with HTTP 429 and Retry-After.
+- Added FastAPI/Uvicorn runtime dependencies.
+- Added `custom_gpt/openapi.yaml` with stable Action operation IDs.
+- Added Custom GPT Action usage guide.
+- Added API_SPEC v1.1 and Phase 8 config/test/checkpoint documentation.
+- Verification: isolated Phase 8 API harness 7/7 PASS; FastAPI/OpenAPI generation and syntax validation PASS.
+- Repository audit identified a missing autonomous scanner orchestration layer; Phase 8.5 Runtime Scanner Coordinator was inserted before deployment.
+
 ## 2026-08-23 - Phase 7 setup / rating engine
 
 - Added provider-independent Trading Engine package.
@@ -18,9 +35,7 @@
 - Added optional explicit RiskContext position sizing without inferring account state.
 - Added final TradingDecision and best-decision selector.
 - Added SETUP_SPEC v1.0, SCORING_SPEC v1.1, ATR_SPEC v1.2, SIGNAL_SPEC v1.1 and TRADING_ENGINE_SPEC v1.2.
-- Added Phase 7 config/test/checkpoint documentation.
 - Verification: exact Phase 7 module logic 17/17 isolated checks PASS; syntax compilation PASS.
-- Repository-wide pytest/CI remains a Phase 9 gate.
 
 ## 2026-08-23 - Phase 6 trap + VSA
 
