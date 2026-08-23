@@ -76,6 +76,54 @@ indicators:
   atr_used:
     origin: phase7_setup_rule
 
+market_structure:
+  pivots:
+    left: 2
+    right: 2
+    strict: true
+  regime:
+    htf_order:
+      - 1d
+      - 4h
+      - 1h
+    require_structure_ma_alignment_for_direction: true
+  strength:
+    participation_min_relative_volume: 1.0
+  sessions:
+    presentation_timezone: Europe/Kyiv
+    windows:
+      - name: TOKYO
+        timezone: Asia/Tokyo
+        start_local: "09:00"
+        end_local: "18:00"
+      - name: LONDON
+        timezone: Europe/London
+        start_local: "08:00"
+        end_local: "17:00"
+      - name: NEW_YORK
+        timezone: America/New_York
+        start_local: "08:00"
+        end_local: "17:00"
+  levels:
+    intervals:
+      - 1d
+      - 4h
+      - 1h
+      - 15m
+    zone_atr_fraction: 0.15
+    confirm_touches: 2
+    strong_touches: 3
+    break_buffer: 0.0
+    automatic_types:
+      - HISTORICAL
+      - CONSOLIDATION
+    explicit_only_types:
+      - LIMIT
+      - PARANORMAL_BAR
+  consolidation:
+    window: 12
+    max_width_atr: 2.0
+
 risk_rules:
   min_rr: 3.0
   atr_used_strong_max_pct: 40
