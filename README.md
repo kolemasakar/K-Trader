@@ -54,11 +54,22 @@ Phase 3 live market data:
 - periodic REST reconciliation and gap-triggered recovery;
 - WebSocket target-VPS smoke utility.
 
+Phase 4 indicators:
+
+- provider-independent True Range and Wilder ATR14;
+- canonical D1 ATR5D with abnormal-range filtering and no rejected-bar replacement;
+- configurable SMA/EMA with v1 MA50/200 baseline `sma`;
+- 20-bar previous-only volume and VSA candle-spread baselines;
+- relative volume, relative quote volume when confirmed, and relative spread;
+- generic ATR-used calculation with 40/80% classifications;
+- ATR-used move origin reserved for Phase 7 Trading Engine rules.
+
 Verification:
 
 - Phase 1 contract suite: 7 tests passed.
 - Phase 2 deterministic harness: 9 tests passed; compileall PASS.
 - Phase 3 deterministic harness: 10 tests passed; compileall PASS.
+- Phase 4 deterministic harness: 12 tests passed; compileall PASS.
 - Target-VPS REST/bootstrap/WebSocket acceptance remains pending until the VPS exists.
 
 ## Smoke utilities
@@ -88,8 +99,9 @@ No exchange credentials are used.
 - `docs/PHASE_1_CHECKPOINT.md`
 - `docs/PHASE_2_CHECKPOINT.md`
 - `docs/PHASE_3_CHECKPOINT.md`
+- `docs/PHASE_4_CHECKPOINT.md`
 - `docs/adr/*.md`
 
 ## Current phase
 
-Phase 3 - implementation complete; target-VPS live acceptance pending.
+Phase 4 - implementation complete. Target-VPS acceptance for Phases 1-3 remains pending until deployment.
