@@ -1,10 +1,10 @@
-# API Specification v1.1
+# API Specification v1.2
 
 ## Role
 
 Expose scanner state to K_Trader Custom GPT through a read-only HTTPS API.
 
-The API is an integration/read-model layer. It does not recalculate Trading Engine rules and the scanner must remain able to function without OpenAI.
+The API is an integration/read-model layer. It does not recalculate Trading Engine rules and the scanner remains independent of OpenAI.
 
 ## v1 endpoints
 
@@ -19,19 +19,13 @@ The API is an integration/read-model layer. It does not recalculate Trading Engi
 
 No POST/PUT/PATCH/DELETE application endpoints exist in v1.
 
-## Read model
+## Atomic read model
 
-`ApiReadModel` is populated internally by the scanner/runtime coordinator.
+Phase 8.5 runtime publishes complete scanner cycles through `ApiReadModel.publish_cycle()` under one lock.
 
-It stores current read-only snapshots of:
+A provider switch therefore replaces status, universe, candles and decisions atomically. Old-provider market state is not retained beside the new provider snapshot.
 
-- scanner runtime status;
-- universe candidates;
-- candle series and source provenance;
-- per-symbol best TradingDecision;
-- ranked setup candidates/signals.
-
-The API never obtains exchange account credentials and never performs exchange writes.
+On total provider/runtime failure, current publishable market/decision state is cleared and `data_ready=false`.
 
 ## Symbol/provider resolution
 
@@ -42,85 +36,78 @@ If the same canonical symbol is present on multiple providers and `provider_id` 
 - HTTP `409` is returned;
 - the caller must retry with explicit `provider_id`.
 
-The API must never silently choose or substitute a provider.
+The API never silently chooses or substitutes a provider.
 
 ## Candle contract
 
-Supported canonical intervals:
+Supported canonical intervals: `5m`, `15m`, `1h`, `4h`, `1d`.
 
-- `5m`
-- `15m`
-- `1h`
-- `4h`
-- `1d`
+Series `source_kind` may be:
 
-The response carries:
+- `provider` - provider-native history/live bars;
+- `aggregate` - locally aggregated bars;
+- `mixed` - one retained series contains provider-native bootstrap history plus locally aggregated live parent bars.
 
-- provider_id;
-- canonical symbol;
-- interval;
-- `source_kind = provider | aggregate`;
-- requested tail of confirmed normalized candles.
+`mixed` never means cross-provider OHLCV fusion.
 
-Default limit: 100. Maximum: 500.
+Default candle limit: 100. Maximum: 500.
 
 ## Decimal and time serialization
 
-Exchange Decimal values are serialized as JSON strings rather than binary floating-point numbers.
-
-This preserves exact values such as price ticks, prices, volume, ATR and RR.
-
-Timestamps are UTC ISO-8601 strings ending in `Z`.
+Decimal values are serialized as JSON strings, preserving exact exchange/engine values. Timestamps are UTC ISO-8601 strings ending in `Z`.
 
 ## TradingDecision contract
 
-`GET /v1/analysis/{symbol}`, `/v1/candidates` and `/v1/signals` expose the canonical Phase 7 TradingDecision.
-
-The API does not independently modify:
-
-- side;
-- Grade;
-- Setup Score;
-- Entry/Luft/SL/TP;
-- RR;
-- ATR-used;
-- reason codes.
+`GET /v1/analysis/{symbol}`, `/v1/candidates` and `/v1/signals` expose canonical TradingDecision fields without API-side recalculation.
 
 `/v1/signals` includes only A/A+ LONG/SHORT decisions.
 
-`/v1/candidates` may include NO_TRADE/B/C outcomes for audit/explanation.
+`/v1/candidates` may include NO_TRADE/B/C outcomes.
 
-## Freshness
+Phase 8.5 adds the explicit runtime sentinel `setup_type=NO_SETUP` for a valid/fresh symbol with no confirmed setup:
 
-Responses preserve provider/source and data freshness metadata.
+- side `NO_TRADE`;
+- Grade `C`;
+- score 0;
+- Entry/SL/TP/RR null;
+- primary level null;
+- reason `NO_CONFIRMED_SETUP`.
 
-Invalid/stale data is not silently substituted. A stale engine result remains stale/NO_TRADE according to engine rules.
+This sentinel is never a tradable setup and can never appear in `/v1/signals`.
 
-## Health/status
+If mandatory market data is stale/incomplete/invalid, the runtime does not fabricate `NO_SETUP`; that symbol is unavailable for analysis and is reflected in runtime failure status.
 
-`/health` reports API availability plus scanner data readiness.
+## Scanner status
 
-The endpoint may return HTTP 200 with `status=degraded` while the process is alive but scanner data is not ready. This distinguishes process health from market-data readiness.
+`/v1/scanner/status` includes:
+
+- status;
+- provider_id;
+- universe_size;
+- data_ready;
+- cycle_id;
+- symbols_ready;
+- symbols_failed;
+- live_streaming;
+- last_scan_at;
+- last_cycle_duration_seconds;
+- last_error;
+- process started_at.
+
+`/health` may return HTTP 200 with `status=degraded` while the process is alive but scanner data is not ready.
 
 ## Rate limiting
 
-Phase 8 provides a single-process fixed-window application limiter.
+Canonical Phase 8 baseline:
 
-Canonical baseline:
+- 120 requests per 60 seconds per direct client address;
+- HTTP 429 with `Retry-After`.
 
-- 120 requests;
-- per 60 seconds;
-- per direct client address.
-
-HTTP 429 includes `Retry-After`.
-
-The middleware intentionally does not trust `X-Forwarded-For` by itself. Phase 9 deployment may add trusted reverse-proxy enforcement/hardening.
+The application does not trust `X-Forwarded-For` by itself. Phase 9 deployment handles trusted reverse-proxy policy.
 
 ## Custom GPT Action
 
-`custom_gpt/openapi.yaml` is the Action schema.
-
-It contains stable operation IDs:
+`custom_gpt/openapi.yaml` remains the Action schema with stable operation IDs:
 
 - `getHealth`
 - `getScannerStatus`
@@ -131,15 +118,9 @@ It contains stable operation IDs:
 - `listCandidates`
 - `listSignals`
 
-The Phase 8 schema intentionally uses the non-routable placeholder server:
-
-`https://api.k-trader.invalid`
-
-Phase 10 replaces this with the deployed HTTPS API host.
+The schema intentionally uses `https://api.k-trader.invalid` until Phase 10 replaces it with the deployed HTTPS host.
 
 Initial Action authentication may be `None` because the API exposes only public-market-derived read-only analysis. HTTPS remains mandatory.
-
-If the GPT is distributed publicly, deployment documentation must include the OpenAI publication/privacy requirements applicable at that time.
 
 ## Security boundary
 
