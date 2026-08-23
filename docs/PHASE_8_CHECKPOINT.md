@@ -84,6 +84,19 @@ provider selection -> universe -> bootstrap/live state -> indicators -> market s
 
 It must remain read-only and fail closed on stale/incomplete data.
 
+## Canonical documentation synchronized
+
+Phase 8 completion also updated:
+
+- `ARCHITECTURE.md` -> v1.1 with Runtime Scanner Coordinator and ApiReadModel boundaries;
+- `REQUIREMENTS.md` -> v1.1 with runtime/API requirements;
+- `ROADMAP.md` -> v1.1 with required Phase 8.5 inserted before deployment;
+- `API_SPEC.md` -> v1.1;
+- `TEST_PLAN.md` -> v1.7;
+- `README.md`;
+- `CHANGELOG.md`;
+- `config/config.example.yaml`.
+
 ## Acceptance
 
 Phase 8 API implementation exit is satisfied.
