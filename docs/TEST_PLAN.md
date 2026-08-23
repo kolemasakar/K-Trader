@@ -1,4 +1,4 @@
-# Test Plan v1.7
+# Test Plan v1.8
 
 ## Test layers
 
@@ -32,55 +32,33 @@
 - HTF/location/confirmation hard filters
 
 7. Trading Engine tests
-- UTC-day range begins at 00:00 UTC
-- partial-day ATR-used context is rejected
-- setup candidate discovery
-- evidence identity and setup-type consistency
-- strong primary-level hard gate
-- directional HTF hard gate
-- tick-rounded Entry/Luft/SL/TP geometry
-- nearest structural opposing target
-- no structural target rejection
-- canonical ATR-used origin
-- RR >=3 hard gate
-- ATR used <=80 hard gate
-- deterministic component scoring
-- A+/A/B/C thresholds
-- hard-reject score cap / C override
-- explicit RiskContext sizing and N/A without context
-- LONG/SHORT only for A/A+ without rejects
+- UTC-day range starts at 00:00 UTC
+- setup discovery/evidence identity/strong-level/HTF gates
+- Entry/Luft/SL/TP geometry and structural target
+- RR/ATR-used hard gates
+- deterministic scoring and A+/A/B/C
+- hard-reject override
+- optional RiskContext sizing
 - best-decision ordering
 
 8. API tests
-- health and scanner readiness separation
-- all application routes are GET-only
-- Decimal values preserve exact text representation
-- UTC timestamp serialization
-- canonical symbol/provider ambiguity -> HTTP 409
-- explicit provider resolution
-- candle `provider|aggregate` provenance
-- candle tail/limit behavior
-- per-symbol best TradingDecision serialization
-- candidate list includes audit NO_TRADE/B/C outcomes
-- `/v1/signals` exposes only A/A+ LONG/SHORT
-- invalid interval/grade validation
-- rate limit -> HTTP 429 + Retry-After
-- OpenAPI operation IDs remain stable
+- health/readiness and GET-only routes
+- exact Decimal/UTC serialization
+- provider ambiguity -> HTTP 409
+- candle provenance and tail behavior
+- TradingDecision/candidate/signal filtering
+- interval/grade validation
+- rate limiting and stable OpenAPI operation IDs
 
 9. Runtime coordinator tests - Phase 8.5
-- provider selection/fallback without cross-provider fusion
-- universe shortlist publication
-- bootstrap readiness gate before analysis
-- per-symbol exception isolation
-- indicator/structure/Trap/VSA/engine orchestration order
-- no TradingDecision on stale/gapped/incomplete input
-- scanner cycle status transitions
-- candidate/signal publication to `ApiReadModel`
-- repeated cycles replace current snapshots deterministically
-- graceful shutdown/restart boundary
+- valid universe publishes explicit NO_SETUP/NO_TRADE analysis when no setup exists
+- one-symbol failure is isolated and cycle becomes DEGRADED
+- provider failure falls back without retaining old-provider snapshot state
+- atomic cycle publication replaces prior provider state
+- future repository integration coverage: real bootstrap/live/analyzer composition and clean shutdown
 
 10. Integration tests
-- provider -> validation -> storage -> indicators -> structure -> trap/VSA -> Trading Engine -> runtime coordinator -> API
+- provider -> validation -> storage -> indicators -> structure -> Trap/VSA -> Trading Engine -> runtime coordinator -> API
 - source/freshness propagation
 - fail-closed NO_TRADE behavior
 
@@ -115,6 +93,9 @@
 - Ambiguous multi-provider symbol cannot be silently resolved.
 - API must not recalculate/override TradingDecision fields.
 - Autonomous runtime must not publish analysis before data readiness.
+- Valid/fresh symbol with no setup must return explicit NO_SETUP/NO_TRADE rather than a fabricated setup.
+- Total provider/runtime failure must clear current publishable market/decision state.
+- Provider fallback must atomically replace the prior provider snapshot.
 
 ## Current deterministic verification
 
@@ -126,8 +107,9 @@
 - Phase 6 isolated harness: 14 passed; compile validation PASS.
 - Phase 7 exact-module isolated harness: 17 passed; syntax compilation PASS.
 - Phase 8 isolated API harness: 7 passed; FastAPI/OpenAPI generation and syntax validation PASS.
+- Phase 8.5 orchestration tests: committed, execution NOT YET CLAIMED.
 
-Repository-wide pytest/CI and real provider/VPS acceptance remain separate Phase 9 gates.
+Repository-wide pytest/CI is the mandatory first gate of Phase 9. Real provider/VPS acceptance remains a separate Phase 9 gate.
 
 ## Fixtures
 
