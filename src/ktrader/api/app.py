@@ -29,6 +29,7 @@ def create_app(
     *,
     rate_limit_requests: int = 120,
     rate_limit_window_seconds: int = 60,
+    lifespan=None,
 ) -> FastAPI:
     state = read_model or ApiReadModel()
     app = FastAPI(
@@ -38,6 +39,7 @@ def create_app(
             "Read-only market scanner API for K_Trader. "
             "No order, account or exchange-credential endpoints exist in v1."
         ),
+        lifespan=lifespan,
     )
     app.state.read_model = state
     app.add_middleware(
