@@ -1,0 +1,60 @@
+name: k-trader
+
+services:
+  ktrader:
+    image: k-trader:${KTRADER_IMAGE_TAG:-local}
+    build:
+      context: .
+    restart: unless-stopped
+    init: true
+    environment:
+      KTRADER_DB_PATH: /data/ktrader.db
+      KTRADER_PROVIDERS: ${KTRADER_PROVIDERS:-binance_usdm,bybit_linear}
+      KTRADER_QUOTE_ASSET: ${KTRADER_QUOTE_ASSET:-USDT}
+      KTRADER_PRICE_LIMIT_ENABLED: ${KTRADER_PRICE_LIMIT_ENABLED:-true}
+      KTRADER_MAX_PRICE: ${KTRADER_MAX_PRICE:-3}
+      KTRADER_MAX_CANDIDATES: ${KTRADER_MAX_CANDIDATES:-50}
+      KTRADER_ANALYSIS_LIMIT: ${KTRADER_ANALYSIS_LIMIT:-20}
+      KTRADER_SCAN_INTERVAL_SECONDS: ${KTRADER_SCAN_INTERVAL_SECONDS:-60}
+      KTRADER_BOOTSTRAP_CONCURRENCY: ${KTRADER_BOOTSTRAP_CONCURRENCY:-2}
+    volumes:
+      - ${KTRADER_ROOT:-/opt/k-trader}/data:/data
+    ports:
+      - "127.0.0.1:8000:8000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).read()"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["https"]
+    restart: unless-stopped
+    depends_on:
+      ktrader:
+        condition: service_healthy
+    environment:
+      KTRADER_DOMAIN: ${KTRADER_DOMAIN:?set KTRADER_DOMAIN for https profile}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${KTRADER_ROOT:-/opt/k-trader}/caddy_data:/data
+      - ${KTRADER_ROOT:-/opt/k-trader}/caddy_config:/config
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges:true

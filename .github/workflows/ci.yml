@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: python -m pip install --upgrade pip && python -m pip install -e '.[dev]'
+
+      - name: Compile
+        run: python -m compileall -q src tests
+
+      - name: Repository-wide tests
+        run: python -m pytest -q
+
+  docker:
+    name: docker-build
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Compose
+        env:
+          KTRADER_DOMAIN: example.invalid
+          KTRADER_IMAGE_TAG: ci
+        run: docker compose config >/dev/null
+
+      - name: Build image
+        run: docker build --pull --tag k-trader:${{ github.sha }} .
+
+      - name: Import runtime application from image
+        run: >-
+          docker run --rm
+          -e KTRADER_DB_PATH=/tmp/ktrader-ci.db
+          k-trader:${{ github.sha }}
+          python -c "from ktrader.runtime.app import app; assert app.title == 'K-Trader Read-only API'"

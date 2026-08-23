@@ -1,0 +1,28 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: k-trader-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, linux, x64, k-trader-prod]
+    environment: production
+    timeout-minutes: 30
+    env:
+      KTRADER_DOMAIN: ${{ vars.KTRADER_DOMAIN }}
+    steps:
+      - name: Checkout approved main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Deploy immutable release
+        run: ./scripts/deploy.sh

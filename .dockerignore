@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.git/
+.github/
+tests/
+docs/
+custom_gpt/
+data/
+*.db
+*.sqlite*
+.env
+.env.*
+!deploy/.env.example
