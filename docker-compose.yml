@@ -43,7 +43,7 @@ services:
       ktrader:
         condition: service_healthy
     environment:
-      KTRADER_DOMAIN: ${KTRADER_DOMAIN:?set KTRADER_DOMAIN for https profile}
+      KTRADER_DOMAIN: ${KTRADER_DOMAIN:-localhost}
     ports:
       - "80:80"
       - "443:443"
