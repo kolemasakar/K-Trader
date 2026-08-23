@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-23 - Phase 11D full-engine historical replay / outcome studies
+
+- Refactored live `EngineSymbolAnalyzer` to call a shared pure `analyze_candle_snapshot()` path.
+- Reused that exact snapshot path for historical replay so replay cannot silently diverge from live ATR/structure/Trap/VSA/geometry/scoring logic.
+- Added versioned `ktrader.replay_context.v1` for confirmed timestamped historical liquidity score, liquidity rank and universe size.
+- Added fail-closed replay-context freshness and identity rules; missing/stale context is skipped rather than approximated.
+- Added deterministic `ktrader.replay_study.v1` study artifacts and study IDs.
+- Kept exact time-specific `decision_fingerprint()` for audit and added separate stable setup-geometry keys to deduplicate unchanged signals across consecutive 5m cutoffs.
+- Connected unique tradable replay signals to the conservative Phase 11B future-candle outcome evaluator and optional SQLite `OutcomeRepository`.
+- Added explicit optional outcome horizon in setup-timeframe bars; no universal holding period was introduced.
+- Added operator utility `scripts/run_replay_study.py`.
+- Preserved Trading Engine scoring weights, RR/ATR-used gates and `estimated_probability=null`.
+- Initial PR #7 CI run `32653028353`: compile/shell PASS, 135 tests PASS / 5 FAIL because one newly added synthetic OHLC fixture had `low > open`; fixed the fixture only, without weakening production validation.
+- Final PR #7 CI run `32653087172`: **140 tests PASS**, Python compile PASS, shell validation PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- PR #7 squash-merged as `cb2869bc9d5f56496368920e8b7e43faf9ba3bbd`.
+- Phase 11D: VERIFIED.
+
 ## 2026-08-23 - Phase 11C deep history / MTF replay bundles
 
 - Added optional provider historical-page contract with explicit UTC end cursor.
