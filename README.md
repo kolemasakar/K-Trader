@@ -157,6 +157,19 @@ Repository-side implementation is **VERIFIED**:
 - Docker healthcheck requires health JSON `status=ok` rather than HTTP reachability alone;
 - K-Trader/Caddy container logs use bounded json-file rotation.
 
+### Phase 11G - Dataset Catalogue Foundation
+
+Repository-side implementation is **VERIFIED**:
+
+- `ktrader.dataset_catalogue.v1` links one coherent research chain from MTF bundle through universe archive/cohort, replay study/provenance and optional binary outcome sample;
+- every registered artifact keeps both its semantic identity and exact file/tree content SHA-256;
+- `ktrader.study_run_provenance.v1` records the exact bundle, cohort, symbol replay context, full `RuntimeScannerConfig`, `ReplayStudyConfig` and replay-study file hashes;
+- canonical cohort-linked replay mode produces a provenance sidecar;
+- `ktrader.outcome_sample.v1` exports immutable WIN/LOSS-only samples only after exact agreement between the replay-study artifact and `OutcomeRepository`;
+- catalogue verification re-opens source artifacts and fail-closes on provider/symbol/digest/path/relationship mismatches or tampering;
+- catalogue entries and the complete catalogue receive deterministic SHA-256 identities;
+- artifact-root containment and symlink/path-traversal guards are enforced.
+
 Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 
 ## CI evidence
@@ -169,6 +182,7 @@ Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 - CI run `32653087172`: Phase 11D, **140 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - CI run `32654162474`: Phase 11E, **147 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - CI run `32656033224`: Phase 11F, **155 tests PASS**, compile/shell/Compose PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- CI run `32657337221`: Phase 11G, **163 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 ## Runtime entrypoint
 
@@ -191,6 +205,8 @@ API-only entrypoint:
 - `scripts/run_replay_study.py`
 - `scripts/capture_universe_snapshot.py`
 - `scripts/build_study_cohort.py`
+- `scripts/export_outcome_sample.py`
+- `scripts/build_dataset_catalogue.py`
 - `scripts/backup_sqlite.py`
 - `scripts/provision_vps.sh`
 - `scripts/register_runner.sh`
@@ -208,6 +224,7 @@ No exchange credentials are used.
 - `docs/DEPLOYMENT.md`
 - `docs/SECURITY.md`
 - `docs/HISTORICAL_REPLAY_SPEC.md`
+- `docs/DATASET_CATALOGUE_SPEC.md`
 - `docs/PHASE_9_CHECKPOINT.md`
 - `docs/PHASE_9_1_CHECKPOINT.md`
 - `docs/PHASE_10_PREP_CHECKPOINT.md`
@@ -217,6 +234,7 @@ No exchange credentials are used.
 - `docs/PHASE_11D_CHECKPOINT.md`
 - `docs/PHASE_11E_CHECKPOINT.md`
 - `docs/PHASE_11F_CHECKPOINT.md`
+- `docs/PHASE_11G_CHECKPOINT.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
@@ -228,8 +246,8 @@ No exchange credentials are used.
 
 ## Current phase
 
-Repository-side Phase 10 preparation and Phase 11A/11B/11C/11D/11E/11F hardening are **VERIFIED** with the current **155-test** CI baseline.
+Repository-side Phase 10 preparation and Phase 11A/11B/11C/11D/11E/11F/11G hardening are **VERIFIED** with the current **163-test** CI baseline.
 
-Historical full-engine outcome studies require coherent provider-recorded MTF bundles plus timestamped universe/liquidity context captured prospectively. Phase 11F makes that prospective context collection automatic once the production runtime is continuously online. Missing historical ranks are never fabricated from current ticker data.
+Historical full-engine outcome studies require coherent provider-recorded MTF bundles plus timestamped universe/liquidity context captured prospectively. Phase 11F makes prospective context collection automatic once the production runtime is continuously online; Phase 11G makes the resulting bundle/context/config/study/outcome chain reproducible and tamper-evident. Missing historical ranks are never fabricated from current ticker data.
 
 External critical path remains: obtain Oracle A1 capacity, provision the ARM64 host, run Phase 9 live acceptance including real persistence/backup/restart checks, configure public HTTPS, then activate and validate the Custom GPT Action.
