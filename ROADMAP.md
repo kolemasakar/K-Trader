@@ -51,12 +51,23 @@ Exit condition: offline integrity contract is implemented and tested; target-VPS
 
 ## Phase 3 - Live Market Data
 
-- Public WebSocket ingestion.
-- Primary live 5m bars plus local aggregation to 15m/1h/4h/1d where provider semantics allow.
-- Ticker/book-ticker inputs as needed.
-- Automatic reconnect, stale detection and REST reconciliation.
+Status: IMPLEMENTATION COMPLETE / TARGET-VPS LIVE ACCEPTANCE PENDING.
 
-Exit: continuous 24/7 data service with no silent gaps.
+- Provider-independent live candle event contract. DONE.
+- Public WebSocket ingestion for Binance USD-M and Bybit Linear. DONE.
+- Primary live `5m` candle state. DONE.
+- Open candle remains provisional/in-memory; only confirmed closed 5m persists. DONE.
+- Local complete UTC aggregation to `15m/1h/4h/1d`. DONE.
+- Provider-versus-aggregate storage provenance and SQLite schema v2 migration. DONE.
+- Automatic reconnect/stale detection. DONE.
+- Periodic REST reconciliation. DONE.
+- Gap-triggered REST recovery. DONE.
+- Duplicate closed-event idempotency. DONE.
+- Public WebSocket VPS smoke utility. DONE.
+- Deterministic Phase 3 tests. DONE: 10 passed; compileall PASS.
+- Continuous real-provider WebSocket/reconnect/gap-recovery acceptance. PENDING TARGET VPS.
+
+Exit condition: target VPS receives continuous public 5m data from an accessible provider, persists closed bars, builds complete parent bars, survives reconnects and reconciles gaps without silent data loss.
 
 ## Phase 4 - Indicators
 
@@ -111,7 +122,7 @@ Exit: deterministic A+/A/B/C classification; only A/A+ can produce a tradable si
 - Persistent `/opt/k-trader` data/config/logs.
 - Private-repo self-hosted GitHub Runner.
 - Push-to-main test/build/deploy/health-check workflow.
-- Execute pending live provider acceptance from Phases 1 and 2.
+- Execute pending live provider acceptance from Phases 1, 2 and 3.
 
 ## Phase 10 - Custom GPT Update
 
