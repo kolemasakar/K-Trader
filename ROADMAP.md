@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.5
+# K-Trader Roadmap v1.6
 
-Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11A replay/regression hardening, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11B provider-history/outcome hardening, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -232,10 +232,38 @@ Status: VERIFIED.
 
 Verified in PR #4 CI run `32647828382` as part of the **106-test PASS** baseline.
 
+### Phase 11B - Provider History / Signal Outcomes
+
+Status: VERIFIED.
+
+- versioned `ktrader.history.v1` provider-history JSONL contract;
+- SHA-256 candle-content integrity digest;
+- coherent closed/contiguous/single-provider history validation;
+- public provider-native history export through the existing Binance/Bybit adapters;
+- conservative no-lookahead `TradingDecision` outcome tracking;
+- explicit OHLC intrabar ambiguity state instead of guessed ordering;
+- deterministic decision fingerprint;
+- separate SQLite outcome persistence and update path;
+- WIN/LOSS-only extraction for future calibration tooling;
+- Setup Score remains non-probabilistic and `estimated_probability` remains null/N/A.
+
+Verification:
+
+- PR #5 CI run `32650220382` SUCCESS;
+- repository-wide pytest: **121 passed**;
+- compile/shell validation: PASS;
+- linux/amd64 Docker/runtime: PASS;
+- linux/arm64 QEMU/Buildx image/architecture/runtime: PASS;
+- squash merge: `0b201a5112dca057e3071ef878d8acc6653ab994`.
+
+Current provider-history export is intentionally limited to one provider-native REST page. The next historical-hardening step may add deep pagination and reproducible multi-timeframe bundles without changing the `ktrader.history.v1` record contract.
+
 ### Remaining Phase 11 work
 
-- provider-recorded replay/regression history;
-- signal outcomes and calibration dataset;
+- deep multi-page provider history collection;
+- reproducible multi-timeframe historical replay bundles;
+- provider-recorded regression datasets;
+- approved signal-outcome studies and later calibration methodology;
 - metrics/backup/recovery hardening;
 - extended stale-data/runtime failure validation.
 
@@ -249,5 +277,5 @@ Verified in PR #4 CI run `32647828382` as part of the **106-test PASS** baseline
 - exchange credentials/account reads;
 - order execution/automatic trading;
 - PostgreSQL/TimescaleDB/Redis/Kafka/Kubernetes unless measured load justifies them;
-- statistical win probability until calibrated from confirmed outcomes;
+- statistical win probability until calibrated from confirmed outcomes with approved out-of-sample methodology;
 - full order-book storage.
