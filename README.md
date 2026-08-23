@@ -105,8 +105,6 @@ The canonical OpenAPI file deliberately keeps `https://api.k-trader.invalid` unt
 
 ### Phase 11C - Deep History / MTF Replay Bundles
 
-Repository-side implementation is **VERIFIED**:
-
 - backward provider pagination with explicit UTC end cursor;
 - Binance USD-M `endTime` and Bybit Linear `end` support;
 - exact-depth multi-page closed-history collection;
@@ -117,6 +115,20 @@ Repository-side implementation is **VERIFIED**:
 - no-lookahead MTF slicing at explicit replay cutoff;
 - deep single-timeframe and MTF public-data export utilities.
 
+### Phase 11D - Full-engine Historical Replay / Outcome Studies
+
+Repository-side implementation is **VERIFIED**:
+
+- live runtime and historical replay share the same `analyze_candle_snapshot()` analysis path;
+- chronological replay walks 5m cutoffs with MTF `as_of` slicing;
+- versioned `ktrader.replay_context.v1` carries confirmed timestamped liquidity score/rank/universe size;
+- missing or stale historical liquidity context fails closed rather than being approximated;
+- deterministic `ktrader.replay_study.v1` study artifacts;
+- exact decision fingerprints remain audit identities;
+- stable setup-geometry keys deduplicate unchanged signals across consecutive cutoffs;
+- unique tradable signals feed the conservative Phase 11B future-candle outcome evaluator and optional SQLite outcome store;
+- explicit optional outcome horizon; no universal holding period is invented.
+
 Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 
 ## CI evidence
@@ -125,7 +137,8 @@ Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 - CI run `32646869264`: Phase 9.1 multi-arch gate, **92 tests PASS**, amd64/arm64 Docker/runtime PASS.
 - CI run `32647828382`: Phase 10 preparation + Phase 11A, **106 tests PASS**, amd64/arm64 PASS.
 - CI run `32650220382`: Phase 11B, **121 tests PASS**, amd64/arm64 PASS.
-- CI run `32652044967`: Phase 11C, **134 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- CI run `32652044967`: Phase 11C, **134 tests PASS**, amd64/arm64 PASS.
+- CI run `32653087172`: Phase 11D, **140 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 ## Runtime entrypoint
 
@@ -145,6 +158,7 @@ API-only entrypoint:
 - `scripts/render_custom_gpt_openapi.py`
 - `scripts/export_provider_history.py`
 - `scripts/export_mtf_history.py`
+- `scripts/run_replay_study.py`
 - `scripts/provision_vps.sh`
 - `scripts/register_runner.sh`
 - `scripts/deploy.sh`
@@ -167,6 +181,7 @@ No exchange credentials are used.
 - `docs/PHASE_11A_CHECKPOINT.md`
 - `docs/PHASE_11B_CHECKPOINT.md`
 - `docs/PHASE_11C_CHECKPOINT.md`
+- `docs/PHASE_11D_CHECKPOINT.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
@@ -178,6 +193,8 @@ No exchange credentials are used.
 
 ## Current phase
 
-Repository-side Phase 10 preparation and Phase 11A/11B/11C hardening are **VERIFIED** with the current **134-test** CI baseline.
+Repository-side Phase 10 preparation and Phase 11A/11B/11C/11D hardening are **VERIFIED** with the current **140-test** CI baseline.
+
+Historical full-engine outcome studies now require two coherent inputs: a provider-recorded MTF bundle and matching timestamped historical liquidity/universe context. Missing context is not fabricated.
 
 External critical path remains: obtain Oracle A1 capacity, provision the ARM64 host, run Phase 9 live acceptance, configure public HTTPS, then activate and validate the Custom GPT Action.
