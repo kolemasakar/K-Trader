@@ -28,9 +28,10 @@ def make_candles(n, *, interval="1d", ranges=None, volumes=None, quote=True):
         open_time = start + timedelta(seconds=seconds * index)
         candle_range = Decimal(str(ranges[index] if ranges else 3))
         open_price = previous
-        low = open_price - Decimal("1")
-        high = low + candle_range
-        close = low + (candle_range / Decimal("2"))
+        half_range = candle_range / Decimal("2")
+        low = open_price - half_range
+        high = open_price + half_range
+        close = open_price
         volume = Decimal(str(volumes[index] if volumes else 100 + index))
         result.append(
             NormalizedCandle(
