@@ -40,10 +40,21 @@ The deterministic orchestration test file is committed and covers:
 - provider fallback without cross-provider snapshot retention;
 - atomic replacement of old-provider read-model state.
 
-These tests have **not yet been reported as executed** in the repository environment. Repository-wide pytest execution is the first mandatory gate of Phase 9 CI/CD. No PASS count is claimed here before that run exists.
+These tests have **not yet been reported as executed** in the repository environment. Repository-wide pytest execution is the first mandatory gate of Phase 9 CI/CD. No PASS count is claimed before that run exists.
+
+## Canonical documentation synchronized
+
+- `ROADMAP.md` -> v1.2;
+- `ARCHITECTURE.md` -> v1.2;
+- `docs/RUNTIME_SCANNER_SPEC.md` -> v1.0;
+- `docs/API_SPEC.md` -> v1.2;
+- `docs/TEST_PLAN.md` -> v1.8;
+- `config/config.example.yaml` -> runtime section added;
+- `README.md`;
+- `CHANGELOG.md`.
 
 ## Acceptance
 
-The missing application-level orchestration layer identified after Phase 8 is now implemented.
+The application-level orchestration layer identified after Phase 8 is implemented.
 
 Phase 9 must first run the complete repository test suite and resolve any regression before Docker/VPS deployment or live acceptance is claimed.
