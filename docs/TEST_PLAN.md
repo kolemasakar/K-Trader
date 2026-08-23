@@ -1,4 +1,4 @@
-# Test Plan v1.6
+# Test Plan v1.7
 
 ## Test layers
 
@@ -31,10 +31,10 @@
 - ND/NS/T/UT/BC/SC/SV raw detection
 - HTF/location/confirmation hard filters
 
-7. Phase 7 Trading Engine tests
+7. Trading Engine tests
 - UTC-day range begins at 00:00 UTC
 - partial-day ATR-used context is rejected
-- TRAP_VSA/VSA_LEVEL/TRAP_LEVEL candidate discovery
+- setup candidate discovery
 - evidence identity and setup-type consistency
 - strong primary-level hard gate
 - directional HTF hard gate
@@ -51,16 +51,44 @@
 - LONG/SHORT only for A/A+ without rejects
 - best-decision ordering
 
-8. Integration tests
-- provider -> validation -> storage -> indicators -> structure -> trap/VSA -> Trading Engine -> API
+8. API tests
+- health and scanner readiness separation
+- all application routes are GET-only
+- Decimal values preserve exact text representation
+- UTC timestamp serialization
+- canonical symbol/provider ambiguity -> HTTP 409
+- explicit provider resolution
+- candle `provider|aggregate` provenance
+- candle tail/limit behavior
+- per-symbol best TradingDecision serialization
+- candidate list includes audit NO_TRADE/B/C outcomes
+- `/v1/signals` exposes only A/A+ LONG/SHORT
+- invalid interval/grade validation
+- rate limit -> HTTP 429 + Retry-After
+- OpenAPI operation IDs remain stable
+
+9. Runtime coordinator tests - Phase 8.5
+- provider selection/fallback without cross-provider fusion
+- universe shortlist publication
+- bootstrap readiness gate before analysis
+- per-symbol exception isolation
+- indicator/structure/Trap/VSA/engine orchestration order
+- no TradingDecision on stale/gapped/incomplete input
+- scanner cycle status transitions
+- candidate/signal publication to `ApiReadModel`
+- repeated cycles replace current snapshots deterministically
+- graceful shutdown/restart boundary
+
+10. Integration tests
+- provider -> validation -> storage -> indicators -> structure -> trap/VSA -> Trading Engine -> runtime coordinator -> API
 - source/freshness propagation
 - fail-closed NO_TRADE behavior
 
-9. Deployment tests
+11. Deployment tests
 - container build/start
 - persistence across restart
-- API health
-- CI/CD smoke
+- scanner coordinator + API health
+- repository-wide CI/CD smoke
 - target-VPS REST/bootstrap/WebSocket acceptance
 
 ## Mandatory acceptance cases
@@ -83,6 +111,10 @@
 - Hard reject cannot retain A/A+ public grade/score.
 - B/C never emits tradable LONG/SHORT.
 - Missing account/risk inputs produce position size/risk N/A.
+- API cannot expose write/trading operations.
+- Ambiguous multi-provider symbol cannot be silently resolved.
+- API must not recalculate/override TradingDecision fields.
+- Autonomous runtime must not publish analysis before data readiness.
 
 ## Current deterministic verification
 
@@ -93,6 +125,7 @@
 - Phase 5 isolated harness: 12 passed; compile validation PASS.
 - Phase 6 isolated harness: 14 passed; compile validation PASS.
 - Phase 7 exact-module isolated harness: 17 passed; syntax compilation PASS.
+- Phase 8 isolated API harness: 7 passed; FastAPI/OpenAPI generation and syntax validation PASS.
 
 Repository-wide pytest/CI and real provider/VPS acceptance remain separate Phase 9 gates.
 
