@@ -1,6 +1,6 @@
 # K-Trader Roadmap v1.4
 
-Status: APPROVED baseline; repository-side implementation complete through Phase 9.1 Oracle ARM64 preparation, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation complete and verified through Phase 9.1 Oracle ARM64 preparation, 2026-08-23.
 
 ## Phase 0 - Foundation
 
@@ -139,7 +139,7 @@ CI evidence:
 
 ## Phase 9.1 - Oracle ARM64 / Multi-arch
 
-Status: IMPLEMENTATION COMPLETE / PR CI VERIFICATION PENDING.
+Status: VERIFIED.
 
 Primary production host decision:
 
@@ -158,6 +158,16 @@ Repository adaptation:
 - CI has separate amd64 and arm64 Docker gates;
 - ARM64 image is built under QEMU/Buildx, architecture-checked and runtime-imported;
 - amd64 compatibility retained for a potential future fallback host.
+
+Verification:
+
+- PR #3 CI run `32646869264` SUCCESS;
+- repository-wide pytest: **92 passed**;
+- shell validation: PASS;
+- linux/amd64 image build/runtime import: PASS;
+- linux/arm64 image build/architecture assertion/runtime import: PASS;
+- acceptance utility packaged on both architectures: PASS;
+- squash merge: `8e7ef38311e8c92398eb7cf530c92ff773e2a9a1`.
 
 External Oracle status on 2026-08-23:
 
