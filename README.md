@@ -91,37 +91,47 @@ The canonical OpenAPI file deliberately keeps `https://api.k-trader.invalid` unt
 - gap/cross-provider fail-closed replay validation;
 - ATR no-future-lookahead regression;
 - freshness boundary regression;
-- deterministic replay digest for future provider-recorded fixtures.
+- deterministic replay digest.
 
 ### Phase 11B - Provider History / Signal Outcomes
 
-Repository-side implementation is **VERIFIED**:
-
-- versioned `ktrader.history.v1` JSONL dataset for provider-recorded closed candles;
-- canonical SHA-256 candle-content integrity digest;
-- closed/contiguous/single-provider validation;
-- Binance USD-M / Bybit Linear public-history export through the existing provider contract;
-- deterministic `TradingDecision` fingerprints;
-- conservative no-lookahead outcome tracking;
-- `WIN`, `LOSS`, `PENDING_ENTRY`, `OPEN`, `AMBIGUOUS`, `EXPIRED_NO_ENTRY`, `EXPIRED_OPEN`, `NOT_ELIGIBLE` states;
-- same-candle event ordering is never guessed from OHLC data;
-- separate SQLite outcome persistence/upsert;
+- versioned `ktrader.history.v1` JSONL dataset;
+- canonical SHA-256 candle-content digest;
+- closed/contiguous/single-provider history validation;
+- conservative no-lookahead TradingDecision outcome tracking;
+- explicit OHLC ambiguity instead of guessed intrabar ordering;
+- deterministic decision fingerprints and SQLite outcome persistence;
 - WIN/LOSS-only extraction for later statistical research.
 
-Phase 11B does **not** turn Setup Score into probability. `estimated_probability` remains null/N/A. Current history export is bounded to one provider-native page; deep pagination is a later hardening step.
+### Phase 11C - Deep History / MTF Replay Bundles
+
+Repository-side implementation is **VERIFIED**:
+
+- backward provider pagination with explicit UTC end cursor;
+- Binance USD-M `endTime` and Bybit Linear `end` support;
+- exact-depth multi-page closed-history collection;
+- strict cursor progress, page deduplication and fail-closed gap/identity checks;
+- deterministic `ktrader.mtf_bundle.v1` bundle for `1d/4h/1h/15m/5m`;
+- one provider/symbol and one UTC `as_of` cutoff across all timeframes;
+- per-timeframe SHA-256 plus bundle-level SHA-256;
+- no-lookahead MTF slicing at explicit replay cutoff;
+- deep single-timeframe and MTF public-data export utilities.
+
+Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 
 ## CI evidence
 
 - CI run `32636825758`: historical Phase 9 repository baseline, **92 tests PASS**.
 - CI run `32646869264`: Phase 9.1 multi-arch gate, **92 tests PASS**, amd64/arm64 Docker/runtime PASS.
-- CI run `32647828382`: Phase 10 preparation + Phase 11A integrated gate, **106 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
-- CI run `32650220382`: Phase 11B integrated gate, **121 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- CI run `32647828382`: Phase 10 preparation + Phase 11A, **106 tests PASS**, amd64/arm64 PASS.
+- CI run `32650220382`: Phase 11B, **121 tests PASS**, amd64/arm64 PASS.
+- CI run `32652044967`: Phase 11C, **134 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 
 ## Runtime entrypoint
 
 `PYTHONPATH=src uvicorn ktrader.runtime.app:app --host 127.0.0.1 --port 8000`
 
-The API-only entrypoint remains available for isolated API development:
+API-only entrypoint:
 
 `PYTHONPATH=src uvicorn ktrader.api.app:app --host 127.0.0.1 --port 8000`
 
@@ -134,6 +144,7 @@ The API-only entrypoint remains available for isolated API development:
 - `scripts/phase10_action_acceptance.py`
 - `scripts/render_custom_gpt_openapi.py`
 - `scripts/export_provider_history.py`
+- `scripts/export_mtf_history.py`
 - `scripts/provision_vps.sh`
 - `scripts/register_runner.sh`
 - `scripts/deploy.sh`
@@ -155,6 +166,7 @@ No exchange credentials are used.
 - `docs/PHASE_10_PREP_CHECKPOINT.md`
 - `docs/PHASE_11A_CHECKPOINT.md`
 - `docs/PHASE_11B_CHECKPOINT.md`
+- `docs/PHASE_11C_CHECKPOINT.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
@@ -166,6 +178,6 @@ No exchange credentials are used.
 
 ## Current phase
 
-Repository-side Phase 10 preparation and Phase 11A/11B hardening are **VERIFIED** with the current **121-test** CI baseline.
+Repository-side Phase 10 preparation and Phase 11A/11B/11C hardening are **VERIFIED** with the current **134-test** CI baseline.
 
 External critical path remains: obtain Oracle A1 capacity, provision the ARM64 host, run Phase 9 live acceptance, configure public HTTPS, then activate and validate the Custom GPT Action.
