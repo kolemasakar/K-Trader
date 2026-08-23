@@ -2,22 +2,32 @@
 
 Verified against current official provider documentation on 2026-08-23.
 
-This file records the Phase 1 REST contracts. No account credentials are used.
+This file records the public REST and WebSocket contracts used by K-Trader. No account credentials are used.
 
 ## Binance USD-M Futures
 
-Base URL:
+REST base URL:
 
 `https://fapi.binance.com`
 
-Endpoints used by Phase 1:
+REST endpoints:
 
 - `GET /fapi/v1/exchangeInfo` - instrument/exchange metadata.
 - `GET /fapi/v1/ticker/24hr` - 24h ticker statistics and quote/base turnover inputs.
 - `GET /fapi/v1/ticker/bookTicker` - best bid/ask inputs.
-- `GET /fapi/v1/klines` - historical candlesticks.
+- `GET /fapi/v1/klines` - historical candlesticks and reconciliation.
 
-Canonical intervals used by K-Trader:
+Public WebSocket base used by Phase 3:
+
+`wss://fstream.binance.com/market/stream`
+
+Kline stream subscription:
+
+`{symbol}@kline_{interval}`
+
+The provider adapter uses canonical 5m live input and preserves Binance quote volume, trade count and taker-buy fields from kline events.
+
+Canonical REST/WS intervals used by K-Trader:
 
 - 5m -> `5m`
 - 15m -> `15m`
@@ -31,15 +41,25 @@ Official documentation root:
 
 ## Bybit V5 Linear
 
-Base URL:
+REST base URL:
 
 `https://api.bybit.com`
 
-Endpoints used by Phase 1:
+REST endpoints:
 
 - `GET /v5/market/instruments-info?category=linear` - instrument metadata; pagination required because the linear universe can exceed the default page size.
 - `GET /v5/market/tickers?category=linear` - ticker, turnover, volume, bid/ask and supported market fields.
-- `GET /v5/market/kline?category=linear` - historical candlesticks.
+- `GET /v5/market/kline?category=linear` - historical candlesticks and reconciliation.
+
+Public Linear WebSocket:
+
+`wss://stream.bybit.com/v5/public/linear`
+
+Kline topic:
+
+`kline.{interval}.{symbol}`
+
+`confirm=true` is normalized as a closed candle. K-Trader sends an application-level `{"op":"ping"}` approximately every 20 seconds in addition to transport keepalive.
 
 Canonical interval mapping:
 
@@ -54,7 +74,8 @@ Official documentation:
 - `https://bybit-exchange.github.io/docs/v5/market/instrument`
 - `https://bybit-exchange.github.io/docs/v5/market/tickers`
 - `https://bybit-exchange.github.io/docs/v5/market/kline`
+- `https://bybit-exchange.github.io/docs/v5/ws/connect`
 
 ## Operational rule
 
-Endpoint availability from documentation does not prove target-region reachability. Target VPS smoke tests remain mandatory before production use.
+Published endpoint availability does not prove target-region or target-VPS reachability. REST and WebSocket smoke tests on the actual VPS remain mandatory before production use.
