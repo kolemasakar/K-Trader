@@ -76,6 +76,33 @@ if ! ./scripts/phase9_acceptance.sh; then
     exit 1
 fi
 
+if [ -n "${KTRADER_DOMAIN:-}" ]; then
+    if [ -z "${KTRADER_ACTION_API_KEY:-}" ]; then
+        echo "public HTTPS deployment requires KTRADER_ACTION_API_KEY" >&2
+        rollback
+        exit 1
+    fi
+
+    action_url="https://${KTRADER_DOMAIN}"
+    echo "Waiting for public HTTPS and Phase 10 Action acceptance at $action_url"
+    action_ready=0
+    attempt=1
+    while [ "$attempt" -le 24 ]; do
+        if python3 ./scripts/phase10_action_acceptance.py --base-url "$action_url"; then
+            action_ready=1
+            break
+        fi
+        sleep 5
+        attempt=$((attempt + 1))
+    done
+
+    if [ "$action_ready" -ne 1 ]; then
+        echo "new release failed public HTTPS/Action acceptance" >&2
+        rollback
+        exit 1
+    fi
+fi
+
 ln -sfn "$RELEASE" "$CURRENT"
 printf '%s\n' "$SHA" > "$ROOT/DEPLOYED_SHA"
 
