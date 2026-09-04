@@ -106,15 +106,10 @@ def create_app(
                 age = max(0.0, (now - status.last_scan_at.astimezone(timezone.utc)).total_seconds())
                 watchdog_ok = age <= health_max_scan_age_seconds
         return {
-            "status": (
-                "ok"
-                if status.data_ready and not status.last_error and watchdog_ok
-                else "degraded"
-            ),
+            "status": "ok" if status.data_ready and watchdog_ok else "degraded",
             "mode": "read_only",
             "api_version": API_VERSION,
             "data_ready": status.data_ready,
-            "watchdog_ok": watchdog_ok,
             "scanner_status": status.status,
             "provider_id": status.provider_id,
             "action_auth_enabled": secret is not None,
