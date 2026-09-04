@@ -7,12 +7,20 @@ Status: TWO-STAGE rollout.
 This stage may be applied before a real HTTPS K-Trader backend exists.
 
 1. Open the existing K_Trader GPT editor.
-2. Replace the current instruction baseline with `custom_gpt/SYSTEM_K_TRADER_v1_2.md`.
-3. Keep the production Action disabled/unconfigured while `custom_gpt/openapi.yaml` still points to `https://api.k-trader.invalid`.
-4. In Preview verify two fallback cases:
+2. Replace the current Builder Instructions with `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md`. The full `SYSTEM_K_TRADER_v1_2.md` remains the canonical long-form policy; the compact file is the Builder-safe operational baseline under the 8000-character product limit.
+3. Set the GPT description to a non-probabilistic description. Recommended text:
+
+   `Професійний трейдер-аналітик. Відбір і ранжування торгових можливостей за підтвердженими ринковими даними та правилами K-Trader; без виконання угод.`
+
+   Do not use claims such as `сценарії ≥60%` or any other probability threshold until `estimated_probability` is statistically calibrated and explicitly enabled.
+4. Keep the production Action disabled/unconfigured while `custom_gpt/openapi.yaml` still points to `https://api.k-trader.invalid`.
+5. In Preview verify fallback behavior:
    - a broad request such as "find the best crypto setups for the next 4 hours" returns `WATCHLIST ONLY` when canonical data is unavailable but public discovery data is sufficient;
-   - the GPT does not fabricate Grade, Score, Entry, SL, TP, ATR, VSA/Trap or A/A+ status in fallback mode.
-5. Verify insufficient public discovery data produces an explicit insufficient-data response rather than invented candidates.
+   - direct exchange public market endpoints (Binance/Bybit/OKX/KuCoin where available) are preferred over aggregators such as CoinGecko;
+   - aggregator data is clearly labelled aggregated and not exchange-native;
+   - shortlist language is neutral, e.g. `За результатами preliminary screening відібрано...`, not subjective `я б звузив ринок`;
+   - the GPT does not fabricate Grade, Score, probability, Entry, SL, TP, ATR, VSA/Trap or A/A+ status in fallback mode.
+6. Verify insufficient public discovery data produces an explicit insufficient-data response rather than invented candidates.
 
 ## Stage B — canonical Action activation after real HTTPS live acceptance
 
