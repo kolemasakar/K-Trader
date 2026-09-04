@@ -1,38 +1,42 @@
-# K-Trader Builder Checklist v1.2
+# K-Trader — контрольний список GPT Builder v1.2
 
-Status: TWO-STAGE rollout.
+Статус: ДВОЕТАПНЕ впровадження.
 
-## Stage A — immediate GPT behavior update
+## Етап A — негайне оновлення поведінки GPT
 
-This stage may be applied before a real HTTPS K-Trader backend exists.
+Цей етап можна виконати до появи реального HTTPS K-Trader backend.
 
-1. Open the existing K_Trader GPT editor.
-2. Replace the current Builder Instructions with `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md`. The full `SYSTEM_K_TRADER_v1_2.md` remains the canonical long-form policy; the compact file is the Builder-safe operational baseline under the 8000-character product limit.
-3. Set the GPT description to a non-probabilistic description. Recommended text:
+1. Відкрити редактор існуючого K_Trader GPT.
+2. Замінити поточні Instructions на `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md`. Повна `SYSTEM_K_TRADER_v1_2.md` залишається канонічною розширеною політикою; компактний файл є робочою версією в межах ліміту 8000 символів.
+3. Опис GPT встановити без тверджень про ймовірність. Рекомендований текст:
 
    `Професійний трейдер-аналітик. Відбір і ранжування торгових можливостей за підтвердженими ринковими даними та правилами K-Trader; без виконання угод.`
 
-   Do not use claims such as `сценарії ≥60%` or any other probability threshold until `estimated_probability` is statistically calibrated and explicitly enabled.
-4. Keep the production Action disabled/unconfigured while `custom_gpt/openapi.yaml` still points to `https://api.k-trader.invalid`.
-5. In Preview verify fallback behavior:
-   - a broad request such as "find the best crypto setups for the next 4 hours" returns `WATCHLIST ONLY` when canonical data is unavailable but public discovery data is sufficient;
-   - direct exchange public market endpoints (Binance/Bybit/OKX/KuCoin where available) are preferred over aggregators such as CoinGecko;
-   - aggregator data is clearly labelled aggregated and not exchange-native;
-   - shortlist language is neutral, e.g. `За результатами preliminary screening відібрано...`, not subjective `я б звузив ринок`;
-   - the GPT does not fabricate Grade, Score, probability, Entry, SL, TP, ATR, VSA/Trap or A/A+ status in fallback mode.
-6. Verify insufficient public discovery data produces an explicit insufficient-data response rather than invented candidates.
+   Не використовувати `сценарії ≥60%` або будь-який інший поріг ймовірності, доки `estimated_probability` статистично не калібровано й окремо не затверджено.
+4. Поки `custom_gpt/openapi.yaml` містить `https://api.k-trader.invalid`, production Action залишати вимкненим/неналаштованим.
+5. У Preview перевірити резервний режим:
+   - широкий запит на кшталт `знайди найкращі сетапи криптоактивів на найближчі 4 години` повертає `WATCHLIST ONLY`, якщо канонічні дані недоступні, але публічних даних достатньо;
+   - для **кожного кандидата** перед агрегатором реально перевіряється прямий біржовий API на відповідному типі ринку;
+   - якщо перше пряме джерело не дало даних, перевіряється щонайменше ще один підтримуваний провайдер, якщо інструмент там доступний;
+   - CoinGecko або інший агрегатор використовується лише після таких перевірок;
+   - у відповіді коротко зазначено, які прямі джерела перевірялися перед переходом до агрегатора;
+   - агреговані дані явно позначені як агреговані й не видаються за біржову серію;
+   - формулювання нейтральні: `За результатами попереднього відбору відібрано...`;
+   - відсутні суб'єктивні фрази `я б звузив`, `я б використовував`, `я вважаю`;
+   - звичайний текст відповіді переважно українською; англійською залишено лише API-назви, тикери, службові статуси та технічні скорочення;
+   - GPT не вигадує Grade, Score, Probability, Entry, SL, TP, ATR, VSA/Trap або A/A+ у резервному режимі.
+6. Перевірити, що за недостатності навіть публічних даних GPT прямо повідомляє про це, а не вигадує кандидатів.
 
-## Stage B — canonical Action activation after real HTTPS live acceptance
+## Етап B — активація канонічного Action після live acceptance
 
-1. Confirm target host passes `scripts/phase10_action_acceptance.py` with `data_ready=true`.
-2. Generate a high-entropy `KTRADER_ACTION_API_KEY`; store it only in the GitHub `production` Environment secret and in the GPT Action authentication configuration.
-3. Render `custom_gpt/openapi.yaml` with the real HTTPS origin using `scripts/render_custom_gpt_openapi.py`.
-4. Open the existing K_Trader GPT editor and create/update its Action.
-5. Authentication: API key -> Bearer; use the same secret as `KTRADER_ACTION_API_KEY`.
-6. Paste/import the rendered OpenAPI schema.
-7. Verify exactly these operations are detected: getHealth, getScannerStatus, listUniverse, getMarketSnapshot, getCandles, getAnalysis, listCandidates, listSignals.
-8. Privacy Policy URL: `https://REAL_HOST/privacy` if the publishing mode requires it.
-9. In Preview test readiness, signals, candidates, one-symbol analysis, provider ambiguity and NO_TRADE preservation.
-10. Verify automatic mode switching: `data_ready=true` uses canonical Action results; Action unavailable/not-ready uses only `WATCHLIST ONLY` fallback.
-11. Verify the GPT does not use Apps simultaneously with Actions and select a model/mode that supports Actions.
-12. Do not publish broadly until source/freshness/NO_TRADE and fallback-separation behavior pass acceptance.
+1. Підтвердити, що цільовий host проходить `scripts/phase10_action_acceptance.py` з `data_ready=true`.
+2. Створити високoентропійний `KTRADER_ACTION_API_KEY`; зберігати лише у GitHub `production` Environment secret і в налаштуваннях автентифікації GPT Action.
+3. Згенерувати `custom_gpt/openapi.yaml` з реальним HTTPS origin через `scripts/render_custom_gpt_openapi.py`.
+4. Відкрити редактор K_Trader GPT і створити/оновити Action.
+5. Authentication: API key -> Bearer; використати той самий `KTRADER_ACTION_API_KEY`.
+6. Вставити/імпортувати згенеровану OpenAPI schema.
+7. Перевірити операції: `getHealth`, `getScannerStatus`, `listUniverse`, `getMarketSnapshot`, `getCandles`, `getAnalysis`, `listCandidates`, `listSignals`.
+8. Privacy Policy URL: `https://REAL_HOST/privacy`, якщо цього вимагає режим публікації.
+9. У Preview протестувати готовність, сигнали, кандидатів, аналіз одного активу, provider ambiguity і збереження `NO TRADE`.
+10. Перевірити автоперемикання: `data_ready=true` → канонічний Action; Action недоступний/не готовий → лише `WATCHLIST ONLY`.
+11. Не публікувати широко, доки не пройдені перевірки джерел, актуальності, `NO TRADE`, розділення режимів і мовної політики.
