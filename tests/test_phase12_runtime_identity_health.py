@@ -31,13 +31,14 @@ def test_deployment_fails_closed_when_data_directory_is_not_writable() -> None:
     assert "fix production data ownership before deployment" in deploy
 
 
-def test_service_health_allows_fresh_partial_scanner_degradation() -> None:
+def test_service_health_preserves_api_shape_and_allows_fresh_partial_degradation() -> None:
     api = read("src/ktrader/api/app.py")
     compose = read("docker-compose.yml")
     dockerfile = read("Dockerfile")
 
-    assert '"watchdog_ok": watchdog_ok' in api
+    assert '"status": "ok" if status.data_ready and watchdog_ok else "degraded"' in api
+    assert '"watchdog_ok": watchdog_ok' not in api
     for source in (compose, dockerfile):
+        assert "p.get('status') == 'ok'" in source
         assert "p.get('data_ready')" in source
-        assert "p.get('watchdog_ok')" in source
-        assert "p.get('scanner_status') in {'READY','DEGRADED'}" in source
+        assert "p.get('watchdog_ok')" not in source
