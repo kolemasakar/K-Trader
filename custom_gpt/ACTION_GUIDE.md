@@ -1,83 +1,96 @@
-# K-Trader Custom GPT Action Guide v1.2
+# K-Trader — посібник з Custom GPT Action v1.2
 
-## Role
+## Роль
 
-The Action is a read-only bridge from K_Trader Custom GPT to the K-Trader scanner API. It cannot place, modify or cancel orders.
+Action є каналом лише для читання між K_Trader Custom GPT і API сканера K-Trader. Він не може відкривати, змінювати або скасовувати ордери.
 
-K_Trader has two data modes:
+K_Trader має два режими даних:
 
-- **Canonical mode** — Action/backend available and data-ready; TradingDecision comes only from K-Trader scanner outputs.
-- **Discovery fallback** — Action/backend unavailable or not data-ready; public market data may be used only for a preliminary `WATCHLIST ONLY` result.
+- **Канонічний режим** — Action/API доступний і `data_ready=true`; торговий висновок формується лише з результатів K-Trader scanner.
+- **Резервний режим пошуку** — Action/API недоступний або дані не готові; публічні ринкові дані використовуються лише для `WATCHLIST ONLY`.
 
-## Authentication
+## Автентифікація
 
-Production uses a server-side Bearer API key.
+Продакшн використовує серверний Bearer API key.
 
-- Server secret: environment/GitHub Environment secret `KTRADER_ACTION_API_KEY`.
-- GPT editor: Authentication -> API key -> Bearer.
-- The secret is never committed to the repository.
-- `/health` and `/privacy` remain public; `/v1/*` is protected when the server secret is configured.
+- Серверний секрет: `KTRADER_ACTION_API_KEY` у GitHub Environment.
+- GPT Builder: Authentication -> API key -> Bearer.
+- Секрет не зберігати в репозиторії.
+- `/health` і `/privacy` лишаються публічними; `/v1/*` захищені, коли секрет налаштований.
 
-## Preferred operations
+## Пріоритетні операції
 
-For "find the best setups now":
+Для запиту «знайди найкращі сетапи зараз»:
 
-1. `getHealth` or `getScannerStatus` when readiness is unknown.
-2. If `data_ready=true`, use `listSignals` for current A/A+ LONG/SHORT signals.
-3. Use `listCandidates` when the user asks why assets were rejected, wants a wider shortlist, or when no A/A+ signals exist.
+1. `getHealth` або `getScannerStatus`, якщо готовність невідома.
+2. Якщо `data_ready=true` — `listSignals` для поточних A/A+ `LONG`/`SHORT`.
+3. `listCandidates`, якщо потрібен ширший відбір або A/A+ сигналів немає.
 
-For one symbol:
+Для одного активу:
 
-1. `getAnalysis` for the canonical TradingDecision.
-2. `getMarketSnapshot` for latest normalized ticker/liquidity metadata.
-3. `getCandles` only when confirmed raw bars are needed, such as a VSA sequence.
+1. `getAnalysis` — канонічний торговий висновок.
+2. `getMarketSnapshot` — останній нормалізований ринковий стан.
+3. `getCandles` — лише коли потрібні підтверджені свічки, наприклад для VSA.
 
-## Automatic fallback behavior
+## Резервна поведінка
 
-If the Action is unreachable, authentication fails, `data_ready=false`, or required canonical OHLCV/VSA data is stale/insufficient:
+Якщо Action недоступний, автентифікація не проходить, `data_ready=false` або канонічні OHLCV/VSA застарілі/неповні:
 
-- do not fabricate a canonical signal;
-- do not convert public/Web data into A/A+, LONG/SHORT, Setup Score, probability, Entry/SL/TP, ATR or VSA confirmation;
-- if enough public market data exists, perform a preliminary market-discovery pass and return `WATCHLIST ONLY`;
-- use neutral wording such as `За результатами preliminary screening відібрано...`, not subjective wording such as `я б звузив ринок`;
-- if even discovery data is insufficient, return an explicit insufficient-data result rather than inventing candidates.
+- не вигадувати канонічний сигнал;
+- не перетворювати веб-дані на A/A+, `LONG`/`SHORT`, Setup Score, Probability, Entry/SL/TP, ATR або підтвердження VSA;
+- якщо публічних даних достатньо — виконати попередній відбір і повернути `WATCHLIST ONLY`;
+- використовувати нейтральні формулювання: `За результатами попереднього відбору відібрано...`;
+- не використовувати формулювання від першої особи: `я б звузив`, `я б використовував`, `я вважаю` тощо;
+- якщо навіть для попереднього відбору даних недостатньо — прямо повідомити про це.
 
-### Discovery source priority
+## Посилений пріоритет джерел
 
-Use this order whenever technically available:
+Для **кожного окремого кандидата** діє такий порядок:
 
-1. direct public exchange market endpoints: Binance, Bybit, OKX, KuCoin or another supported provider;
-2. official/primary market-data pages from those providers;
-3. aggregators such as CoinGecko only when provider-native endpoints are unavailable, incomplete or do not expose the needed discovery field;
-4. general Web Search as supplementary discovery context.
+1. Перевірити прямий публічний ринковий API на тому самому типі ринку, який просить користувач: ф'ючерси для ф'ючерсного запиту, спот для спотового.
+2. Якщо даних немає або вони неповні — перевірити щонайменше ще одного підтримуваного прямого провайдера, якщо інструмент там доступний.
+3. Лише після цього дозволено використовувати агрегатор на кшталт CoinGecko.
+4. У відповіді вказати, які прямі джерела реально перевірені перед переходом до агрегатора.
+5. Заборонено заявляти про недоступність прямих даних без фактичної перевірки.
 
-When an aggregator is used, label it as aggregated data and never present it as an exchange-native OHLCV/volume series.
+Пріоритет провайдерів: Binance, Bybit, OKX, KuCoin або інший підтримуваний K-Trader провайдер.
 
-Include actual sources, timestamps/freshness where available, and only confirmed discovery metrics such as price, turnover/volume, range, funding/open interest when supported.
+Якщо використано агрегатор:
+- прямо позначити дані як агреговані;
+- не подавати їх як біржову серію конкретного провайдера;
+- не змішувати їх із канонічною OHLCV-серією.
 
-When the Action becomes available again and `data_ready=true`, automatically return to canonical mode. The discovery fallback never overrides canonical K-Trader scanner output.
+Коли Action знову доступний і `data_ready=true`, автоматично повертатися до канонічного режиму. Резервний відбір ніколи не має пріоритету над K-Trader scanner.
 
-## Provider ambiguity
+## Правила даних
 
-If an operation returns HTTP 409, repeat it with explicit `provider_id`. Never silently substitute another provider.
+- Action API має пріоритет над веб-пошуком для поточного OHLCV/VSA аналізу.
+- Не змішувати свічкові серії різних провайдерів.
+- Враховувати час та актуальність даних.
+- Застарілі/неповні канонічні дані не можуть бути підвищені до торгового сигналу.
+- Публічні веб-дані можуть підтримувати лише попередній відбір.
+- Setup Score не є статистичною ймовірністю.
+- `estimated_probability` залишається `null`, доки немає каліброваної історичної моделі.
+- Entry/SL/TP/RR/ATR/grade канонічного торгового висновку не перераховувати у GPT.
 
-## Data rules
+## Мова відповіді
 
-- Action API data has priority over Web Search/public data for current OHLCV/VSA analysis.
-- Never mix candle series from different providers.
-- Respect freshness/data timestamps.
-- Stale/insufficient canonical data cannot be promoted to a trade.
-- Web Search/public data may support discovery but not canonical TradingDecision fields.
-- Decimal market values are strings to preserve exact exchange precision.
-- Setup Score is not statistical probability.
-- `estimated_probability` remains null until calibrated historical evidence exists.
-- Preserve canonical TradingDecision Entry/SL/TP/RR/ATR/grade; do not recalculate them in GPT.
+Основна мова — українська.
 
-## Deployment rendering
+Англійською залишати лише:
+- назви API-операцій і полів;
+- тикери;
+- службові статуси `LONG`, `SHORT`, `NO TRADE`, `WATCHLIST ONLY`;
+- технічні скорочення `VSA`, `ATR`, `MTF`, `RR`;
+- терміни без точного українського відповідника.
 
-Canonical `custom_gpt/openapi.yaml` intentionally contains `https://api.k-trader.invalid`.
+Звичайні пояснення, заголовки, причини відбору, джерела, час та актуальність даних формулювати українською.
 
-After the real HTTPS origin exists:
+## Розгортання
+
+Канонічний `custom_gpt/openapi.yaml` навмисно містить `https://api.k-trader.invalid`.
+
+Після появи реального HTTPS origin:
 
 ```sh
 python scripts/render_custom_gpt_openapi.py \
@@ -85,21 +98,13 @@ python scripts/render_custom_gpt_openapi.py \
   --output /tmp/k-trader-openapi.yaml
 ```
 
-Then run:
+Потім:
 
 ```sh
 python scripts/phase10_action_acceptance.py \
   --base-url https://REAL_HOST
 ```
 
-Use the rendered schema in the existing K_Trader GPT editor. Do not commit a production API key.
+У GPT Builder використовувати `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md` як активну інструкцію. Повна `SYSTEM_K_TRADER_v1_2.md` лишається канонічною розширеною політикою.
 
-## Builder instruction
-
-Use `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md` as the active GPT Builder instruction baseline because the Builder has an 8000-character instruction limit. `custom_gpt/SYSTEM_K_TRADER_v1_2.md` remains the canonical long-form policy.
-
-The GPT description must not contain a probability threshold such as `≥60%`. Setup Score is rule-based and `estimated_probability` remains N/A until a calibrated model is explicitly approved.
-
-## Current OpenAI product constraints to verify at activation
-
-The Action uses the GPT editor's external API Action feature with an OpenAPI schema and API-key authentication. An existing GPT can be edited subject to account/workspace permissions. GPTs use Apps or Actions, not both simultaneously. Public/shared GPT distribution with Actions requires a valid Privacy Policy URL. Re-check these product rules immediately before activation because they can change.
+Опис GPT не повинен містити поріг ймовірності на кшталт `≥60%`. Setup Score є rule-based оцінкою, а `estimated_probability` залишається N/A до затвердження каліброваної моделі.
