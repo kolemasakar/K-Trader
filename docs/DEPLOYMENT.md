@@ -1,4 +1,4 @@
-# Deployment Specification v1.2
+# Deployment Specification v1.3
 
 ## Target
 
@@ -7,6 +7,7 @@
 - Ubuntu VPS.
 - Docker Engine + Docker Compose.
 - Repository-scoped self-hosted GitHub Actions runner for production deployment only.
+- Primary production architecture: Linux ARM64 / Oracle Ampere A1.
 - Caddy HTTPS reverse proxy/TLS when a real domain is configured.
 
 ## Runtime layout
@@ -37,6 +38,7 @@ Mandatory jobs:
 5. Docker image build.
 6. production runtime import from the built image.
 7. verify `vps_acceptance.py` is packaged in the image.
+8. validate both amd64 and arm64 container builds.
 
 The production self-hosted runner never executes PR CI.
 
@@ -47,7 +49,8 @@ The production self-hosted runner never executes PR CI.
 Requirements:
 
 - ref must be `main`;
-- runner labels: `self-hosted`, `linux`, `x64`, `k-trader-prod`;
+- runner labels: `self-hosted`, `linux`, `k-trader-prod-arm64`;
+- host architecture must be `aarch64`/`arm64`;
 - GitHub environment: `production`;
 - checkout credentials are not persisted after checkout.
 
@@ -61,9 +64,10 @@ approved main
 -> localhost process health
 -> provider REST/WS acceptance
 -> scanner/API readiness acceptance
+-> if `KTRADER_DOMAIN` is configured: public HTTPS + Phase 10 Action acceptance
 -> mark release current
 
-If the new release fails acceptance, `deploy.sh` returns to the previous release when available.
+If the new release fails any required acceptance step, `deploy.sh` returns to the previous release when available.
 
 ## Container security baseline
 
@@ -78,11 +82,21 @@ K-Trader container:
 - application port bound to host loopback only;
 - restart policy `unless-stopped`.
 
-## HTTPS
+## HTTPS and Action gate
 
 The optional Caddy Compose profile is enabled only when `KTRADER_DOMAIN` is set.
 
 Caddy terminates TLS and proxies to the internal K-Trader service. The application itself remains bound to host `127.0.0.1:8000`.
+
+When `KTRADER_DOMAIN` is non-empty:
+
+- `KTRADER_ACTION_API_KEY` is mandatory;
+- DNS must resolve to the production host;
+- ports 80/443 must be reachable;
+- deployment waits for `https://<KTRADER_DOMAIN>` and executes `scripts/phase10_action_acceptance.py`;
+- the release is not marked current unless the public Action endpoint passes acceptance.
+
+This prevents a locally healthy release from being promoted while the public HTTPS endpoint or Action authentication is broken.
 
 ## Target-VPS live acceptance
 
@@ -97,6 +111,15 @@ Caddy terminates TLS and proxies to the internal K-Trader service. The applicati
 - scanner `data_ready=true`;
 - at least one published candidate/NO_TRADE analysis;
 - API publication of all five canonical timeframes.
+
+When public HTTPS is enabled, `scripts/phase10_action_acceptance.py` additionally requires:
+
+- HTTPS origin;
+- read-only health mode;
+- `data_ready=true`;
+- Action authentication enabled when the production API key is configured;
+- unauthenticated protected requests rejected;
+- authenticated scanner status/signals/candidates responses with required TradingDecision fields.
 
 Provider failure is recorded and the next provider is tried. Bars from failed and fallback providers are never combined.
 
