@@ -7,7 +7,7 @@ The Action is a read-only bridge from K_Trader Custom GPT to the K-Trader scanne
 K_Trader has two data modes:
 
 - **Canonical mode** — Action/backend available and data-ready; TradingDecision comes only from K-Trader scanner outputs.
-- **Discovery fallback** — Action/backend unavailable or not data-ready; Web Search/public market data may be used only for a preliminary `WATCHLIST ONLY` result.
+- **Discovery fallback** — Action/backend unavailable or not data-ready; public market data may be used only for a preliminary `WATCHLIST ONLY` result.
 
 ## Authentication
 
@@ -37,11 +37,23 @@ For one symbol:
 If the Action is unreachable, authentication fails, `data_ready=false`, or required canonical OHLCV/VSA data is stale/insufficient:
 
 - do not fabricate a canonical signal;
-- do not convert Web Search into A/A+, LONG/SHORT, Setup Score, Entry/SL/TP, ATR or VSA confirmation;
+- do not convert public/Web data into A/A+, LONG/SHORT, Setup Score, probability, Entry/SL/TP, ATR or VSA confirmation;
 - if enough public market data exists, perform a preliminary market-discovery pass and return `WATCHLIST ONLY`;
-- include actual sources, timestamps/freshness where available, and only confirmed discovery metrics such as price, turnover/volume, range, funding/open interest when supported;
-- state clearly: `Not validated by Trading Engine. Entry/SL/TP/Grade/Score: N/A`;
+- use neutral wording such as `За результатами preliminary screening відібрано...`, not subjective wording such as `я б звузив ринок`;
 - if even discovery data is insufficient, return an explicit insufficient-data result rather than inventing candidates.
+
+### Discovery source priority
+
+Use this order whenever technically available:
+
+1. direct public exchange market endpoints: Binance, Bybit, OKX, KuCoin or another supported provider;
+2. official/primary market-data pages from those providers;
+3. aggregators such as CoinGecko only when provider-native endpoints are unavailable, incomplete or do not expose the needed discovery field;
+4. general Web Search as supplementary discovery context.
+
+When an aggregator is used, label it as aggregated data and never present it as an exchange-native OHLCV/volume series.
+
+Include actual sources, timestamps/freshness where available, and only confirmed discovery metrics such as price, turnover/volume, range, funding/open interest when supported.
 
 When the Action becomes available again and `data_ready=true`, automatically return to canonical mode. The discovery fallback never overrides canonical K-Trader scanner output.
 
@@ -51,7 +63,7 @@ If an operation returns HTTP 409, repeat it with explicit `provider_id`. Never s
 
 ## Data rules
 
-- Action API data has priority over Web Search for current OHLCV/VSA analysis.
+- Action API data has priority over Web Search/public data for current OHLCV/VSA analysis.
 - Never mix candle series from different providers.
 - Respect freshness/data timestamps.
 - Stale/insufficient canonical data cannot be promoted to a trade.
@@ -84,7 +96,9 @@ Use the rendered schema in the existing K_Trader GPT editor. Do not commit a pro
 
 ## Builder instruction
 
-Use `custom_gpt/SYSTEM_K_TRADER_v1_2.md` as the current GPT instruction baseline. It preserves fail-closed canonical trading logic while adding the non-trading discovery fallback.
+Use `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md` as the active GPT Builder instruction baseline because the Builder has an 8000-character instruction limit. `custom_gpt/SYSTEM_K_TRADER_v1_2.md` remains the canonical long-form policy.
+
+The GPT description must not contain a probability threshold such as `≥60%`. Setup Score is rule-based and `estimated_probability` remains N/A until a calibrated model is explicitly approved.
 
 ## Current OpenAI product constraints to verify at activation
 
