@@ -26,6 +26,6 @@ USER ktrader
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD python -c "import json,urllib.request; p=json.load(urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)); raise SystemExit(0 if p.get('data_ready') and p.get('watchdog_ok') and p.get('scanner_status') in {'READY','DEGRADED'} else 1)"
+  CMD python -c "import json,urllib.request; p=json.load(urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)); raise SystemExit(0 if p.get('status') == 'ok' and p.get('data_ready') else 1)"
 
 CMD ["uvicorn", "ktrader.runtime.app:app", "--host", "0.0.0.0", "--port", "8000"]
