@@ -114,6 +114,7 @@ def create_app(
             "mode": "read_only",
             "api_version": API_VERSION,
             "data_ready": status.data_ready,
+            "watchdog_ok": watchdog_ok,
             "scanner_status": status.status,
             "provider_id": status.provider_id,
             "action_auth_enabled": secret is not None,
