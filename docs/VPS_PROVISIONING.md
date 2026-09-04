@@ -1,4 +1,4 @@
-# VPS Provisioning v1.1
+# VPS Provisioning v1.2
 
 ## Target
 
@@ -121,11 +121,16 @@ Create/verify GitHub Environment:
 
 `production`
 
-Optional repository/environment variable:
+For localhost-only deployment no public Action settings are required.
 
-`KTRADER_DOMAIN=api.example.com`
+For public Custom GPT Action deployment configure:
 
-If no domain is configured, deployment keeps the API bound to host localhost only. A real HTTPS domain is required before Phase 10 Custom GPT Action activation.
+- Environment variable: `KTRADER_DOMAIN=api.example.com`;
+- Environment secret: `KTRADER_ACTION_API_KEY=<high-entropy secret>`.
+
+Do not commit the Action API key. The same secret is later configured as the Bearer API key in the GPT Action.
+
+If no domain is configured, deployment keeps the API bound to host localhost only. A real HTTPS domain is required before Custom GPT Action activation.
 
 ## 6. Network/security checklist
 
@@ -165,12 +170,16 @@ Deployment performs:
 5. public 5m WebSocket check;
 6. scanner `data_ready` check;
 7. API MTF publication check;
-8. rollback to the previous release if acceptance fails.
+8. if `KTRADER_DOMAIN` is configured, wait for public HTTPS and run Phase 10 Action acceptance;
+9. mark the release current only after all required acceptance checks pass;
+10. rollback to the previous release if any required acceptance check fails.
 
-## 8. HTTPS
+## 8. HTTPS and Custom GPT Action
 
 When `KTRADER_DOMAIN` is non-empty, deployment enables the Caddy `https` profile.
 
-DNS for the domain must already resolve to the host and ports 80/443 must be reachable.
+DNS for the domain must already resolve to the host and ports 80/443 must be reachable. `KTRADER_ACTION_API_KEY` is mandatory for the public Action deployment path.
 
-Do not replace `https://api.k-trader.invalid` in the Custom GPT OpenAPI file until the real HTTPS endpoint passes Phase 9 acceptance.
+`scripts/phase10_action_acceptance.py` verifies the public HTTPS origin, read-only mode, scanner readiness, authentication behavior, and required Action response fields.
+
+Do not replace `https://api.k-trader.invalid` in the Custom GPT OpenAPI file until the real HTTPS endpoint passes Phase 10 Action acceptance. After acceptance, render a deployment-specific OpenAPI schema with `scripts/render_custom_gpt_openapi.py` and import that rendered schema into the GPT Action.
