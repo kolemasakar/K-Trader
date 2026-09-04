@@ -17,6 +17,11 @@ for path in "$ROOT" "$ROOT/releases" "$ROOT/data" "$ROOT/caddy_data" "$ROOT/cadd
     }
 done
 
+if [ ! -w "$ROOT/data" ]; then
+    echo "runner user cannot write $ROOT/data; fix production data ownership before deployment" >&2
+    exit 1
+fi
+
 if [ -L "$CURRENT" ]; then
     PREVIOUS="$(readlink -f "$CURRENT" || true)"
 fi
@@ -28,6 +33,8 @@ git archive --format=tar HEAD | tar -xf - -C "$RELEASE"
 cd "$RELEASE"
 export KTRADER_ROOT="$ROOT"
 export KTRADER_IMAGE_TAG="$SHA"
+export KTRADER_RUNTIME_UID="${KTRADER_RUNTIME_UID:-$(id -u)}"
+export KTRADER_RUNTIME_GID="${KTRADER_RUNTIME_GID:-$(id -g)}"
 
 PROFILE_ARGS=""
 if [ -n "${KTRADER_DOMAIN:-}" ]; then
@@ -47,7 +54,7 @@ rollback() {
     fi
 }
 
-echo "Building K-Trader release $SHA"
+echo "Building K-Trader release $SHA for runtime uid:gid ${KTRADER_RUNTIME_UID}:${KTRADER_RUNTIME_GID}"
 docker compose $PROFILE_ARGS build --pull
 
 echo "Starting K-Trader release $SHA"
