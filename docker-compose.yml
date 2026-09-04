@@ -5,6 +5,9 @@ services:
     image: k-trader:${KTRADER_IMAGE_TAG:-local}
     build:
       context: .
+      args:
+        KTRADER_RUNTIME_UID: ${KTRADER_RUNTIME_UID:-1000}
+        KTRADER_RUNTIME_GID: ${KTRADER_RUNTIME_GID:-1000}
     restart: unless-stopped
     init: true
     environment:
@@ -40,7 +43,7 @@ services:
     security_opt:
       - no-new-privileges:true
     healthcheck:
-      test: ["CMD", "python", "-c", "import json,urllib.request; payload=json.load(urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)); raise SystemExit(0 if payload.get('status') == 'ok' else 1)"]
+      test: ["CMD", "python", "-c", "import json,urllib.request; p=json.load(urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)); raise SystemExit(0 if p.get('data_ready') and p.get('watchdog_ok') and p.get('scanner_status') in {'READY','DEGRADED'} else 1)"]
       interval: 30s
       timeout: 5s
       start_period: 30s
