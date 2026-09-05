@@ -1,4 +1,4 @@
-# K-Trader — посібник з Custom GPT Action v1.2
+# K-Trader — посібник з Custom GPT Action v1.3
 
 ## Роль
 Action — канал лише для читання між K_Trader Custom GPT і API сканера K-Trader. Він не може відкривати, змінювати або скасовувати ордери.
@@ -79,12 +79,20 @@ Action — канал лише для читання між K_Trader Custom GPT 
 Не використовувати англійські загальні слова, якщо є точний український відповідник.
 
 ## Розгортання
-Канонічний `custom_gpt/openapi.yaml` містить `https://api.k-trader.invalid` до появи реального HTTPS вузла.
+Production HTTPS endpoint пройшов Phase 10 live acceptance 2026-09-05:
 
-Після появи вузла:
+`https://ktrader-api.duckdns.org`
+
+Канонічний `custom_gpt/openapi.yaml` вже використовує цей origin. Для перевірки production вузла:
+
+```sh
+python scripts/phase10_action_acceptance.py --base-url https://ktrader-api.duckdns.org
+```
+
+Для іншого майбутнього вузла або тимчасового середовища deployment-specific schema можна згенерувати без зміни канонічного production файлу:
+
 ```sh
 python scripts/render_custom_gpt_openapi.py --server https://REAL_HOST --output /tmp/k-trader-openapi.yaml
-python scripts/phase10_action_acceptance.py --base-url https://REAL_HOST
 ```
 
 У GPT Builder використовувати `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md` як активну інструкцію. Повна `SYSTEM_K_TRADER_v1_2.md` лишається розширеною канонічною політикою.
