@@ -47,9 +47,15 @@ fi
 usermod -aG docker ktrader
 
 install -d -o ktrader -g ktrader /opt/k-trader
-for path in releases data caddy_data caddy_config runner; do
-    install -d -o ktrader -g ktrader "/opt/k-trader/$path"
-done
+install -d -o ktrader -g ktrader -m 0755 /opt/k-trader/releases
+install -d -o ktrader -g ktrader -m 0750 /opt/k-trader/data
+install -d -o ktrader -g ktrader -m 0755 /opt/k-trader/runner
+
+# The Caddy container starts as uid 0 with all Linux capabilities dropped.
+# Without CAP_DAC_OVERRIDE it must own its bind-mounted /data and /config trees
+# to persist ACME accounts/certificates and autosave configuration.
+install -d -o root -g root -m 0700 /opt/k-trader/caddy_data
+install -d -o root -g root -m 0700 /opt/k-trader/caddy_config
 
 printf '%s\n' "PASS Ubuntu/Docker provisioning complete on ${DEB_ARCH}"
 printf '%s\n' "Next: obtain a repository Actions runner registration token and run scripts/register_runner.sh as root."
