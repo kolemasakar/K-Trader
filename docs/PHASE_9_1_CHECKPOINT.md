@@ -1,12 +1,12 @@
 # Phase 9.1 Checkpoint - Oracle ARM64 / Multi-arch
 
-Date: 2026-08-23
+Date: 2026-09-05
 
-Status: VERIFIED / ORACLE LIVE DEPLOYMENT PENDING EXTERNAL A1 CAPACITY.
+Status: VERIFIED / ORACLE ARM64 PRODUCTION HOST ACTIVE.
 
 ## Scope
 
-Phase 9.1 adapts the repository-side deployment baseline for Oracle Cloud Always Free Ampere A1 while retaining amd64 compatibility.
+Phase 9.1 adapts the repository-side deployment baseline for Oracle Cloud Always Free Ampere A1 while retaining amd64 compatibility, and now includes verified live production operation on the Oracle ARM64 target.
 
 ## Implemented
 
@@ -18,36 +18,33 @@ Phase 9.1 adapts the repository-side deployment baseline for Oracle Cloud Always
 - CI split into native `docker-amd64` and emulated `docker-arm64` image gates;
 - ARM64 CI uses QEMU + Buildx, verifies the image reports `arm64`, imports the production ASGI application, and checks that the target-host acceptance utility is packaged;
 - Oracle A1 provisioning documentation added/updated;
-- hosting decision record added: Oracle primary; home PC + Tailscale Funnel potential fallback only; Cloudflare edge/serverless deferred to future projects.
+- production runtime UID/GID is derived from the host runner user and injected into the image build;
+- persistent bind-mounted data ownership is verified before deployment;
+- amd64 compatibility remains available as a fallback architecture.
 
-## Verification evidence
+## Repository verification evidence
 
-PR #3 (`Phase 9.1 Oracle ARM64 and multi-arch CI`) passed GitHub Actions CI run:
+Initial Phase 9.1 verification:
 
-`32646869264`
-
-Result:
-
-- Python compile: PASS;
-- shell script syntax validation: PASS;
-- repository-wide pytest: **92 passed, 1 dependency deprecation warning**;
+- PR #3 CI run `32646869264`: SUCCESS;
+- repository-wide pytest: **92 passed**;
 - Docker Compose validation: PASS;
-- linux/amd64 production image build: PASS;
-- amd64 production ASGI import: PASS;
-- amd64 packaged acceptance utility: PASS;
-- QEMU/Buildx ARM64 environment: PASS;
-- linux/arm64 production image build/load: PASS;
-- image architecture assertion `arm64`: PASS;
-- ARM64 production ASGI import under QEMU: PASS;
-- ARM64 packaged acceptance utility: PASS.
+- linux/amd64 production image build/runtime import: PASS;
+- linux/arm64 QEMU/Buildx build: PASS;
+- ARM64 architecture assertion: PASS;
+- ARM64 production runtime import: PASS;
+- PR #3 squash merge: `8e7ef38311e8c92398eb7cf530c92ff773e2a9a1`.
 
-PR #3 was squash-merged to `main` as:
+Latest production hardening verification:
 
-`8e7ef38311e8c92398eb7cf530c92ff773e2a9a1`
+- PR #17 final CI: **170 tests PASS**;
+- docker-amd64: PASS;
+- docker-arm64: PASS;
+- merge to `main`: `9ed572349ed0195e518f128894a1f187419dbcc1`.
 
 ## Runner checksums
 
-GitHub Actions Runner `2.336.0`:
+GitHub Actions Runner `2.336.0` registration package checksums remain:
 
 ```text
 linux-x64:
@@ -57,33 +54,55 @@ linux-arm64:
 58b758e420b87093fbd4bfddd368074960053e2f1388f01848c82624b90f27d1
 ```
 
-## Oracle external status
+The registered runner auto-updated and reported version `2.337.0` during the successful production workflow.
 
-OCI account/home region preparation is complete for Germany Central (Frankfurt).
+## Oracle production state
 
-Target VM:
+Verified production VM:
 
 ```text
-Canonical Ubuntu 24.04 Minimal aarch64
-VM.Standard.A1.Flex
-2 OCPU / 12 GB RAM
+Name: k-trader-prod
+Region: Germany Central (Frankfurt)
+Image: Canonical Ubuntu 24.04 Minimal aarch64
+Shape: VM.Standard.A1.Flex
+OCPU: 1
+Memory: 6 GB
+Public IPv4: 92.5.56.198
 ```
 
-On 2026-08-23, A1 creation was blocked by external host capacity in AD-1, AD-2, and AD-3. A reduced 1 OCPU / 6 GB A1 request was also unavailable in all three ADs.
+Historical note: on 2026-08-23 A1 creation was blocked by external capacity in Frankfurt AD-1, AD-2 and AD-3, including a reduced 1 OCPU / 6 GB request. Capacity later became available and the production VM was created successfully.
 
-No paid shape is approved as a workaround.
+No paid shape was required.
 
-## Remaining Phase 9 live gate
+## Production runner
 
-Real Oracle VM deployment/live provider acceptance remains pending only because OCI A1 capacity is unavailable.
+The repository-scoped ARM64 runner is registered as a system service under user `ktrader`.
 
-After capacity becomes available:
+```text
+Runner name: k-trader-prod-vnic-k-trader
+Labels: k-trader-prod, k-trader-prod-arm64
+```
 
-1. create the Oracle A1 host;
-2. assign/verify public IPv4 and SSH access;
-3. run Ubuntu/Docker provisioning;
-4. register the ARM64 production runner;
-5. execute `Deploy Production`;
-6. pass REST/WS/scanner/MTF acceptance;
-7. verify persistent SQLite across restart;
-8. configure DNS/TLS and pass public HTTPS acceptance.
+## Live production acceptance
+
+GitHub Actions run `33920829993` completed with `success`.
+
+Verified:
+
+- approved `main` SHA `9ed572349ed0195e518f128894a1f187419dbcc1`;
+- native ARM64 build;
+- runtime UID/GID `1002:1002` matching host `ktrader`;
+- writable `/opt/k-trader/data` persistent tree;
+- Binance USD-M REST acceptance on `5m,15m,1h,4h,1d`;
+- public WebSocket `5m` acceptance;
+- scanner `data_ready=true`;
+- final deployment-cycle scanner state `DEGRADED`, 13 ready / 7 failed;
+- MTF API publication on all five canonical intervals;
+- Docker `healthy`;
+- local `/health` returns `status=ok`, `mode=read_only`, `data_ready=true`.
+
+## Phase 9.1 exit
+
+Phase 9.1 is complete.
+
+Remaining public DNS/TLS and Custom GPT Action activation belong to Phase 10 and are intentionally not part of this checkpoint.

@@ -53,7 +53,9 @@ Public Exchange API -> REST/WS Provider -> Normalized Data -> Validation/SQLite 
 - explicit valid/fresh `NO_SETUP` -> `NO_TRADE`;
 - production ASGI lifespan entrypoint.
 
-### Phase 9-9.1 - Production preparation / Oracle ARM64
+### Phase 9-9.1 - Production / Oracle ARM64
+
+Phase 9 localhost production is **LIVE AND VERIFIED**.
 
 - GitHub-hosted repository-wide CI;
 - hardened non-root/read-only Docker runtime;
@@ -61,17 +63,40 @@ Public Exchange API -> REST/WS Provider -> Normalized Data -> Validation/SQLite 
 - immutable commit-SHA releases and rollback;
 - optional Caddy HTTPS;
 - target-host REST/WebSocket/scanner acceptance utilities;
-- Oracle Cloud Always Free Ampere A1 production target in Frankfurt;
-- Ubuntu 24.04 Minimal aarch64 target, 2 OCPU / 12 GB RAM;
+- Oracle Cloud Always Free Ampere A1 production host in Frankfurt;
+- Ubuntu 24.04 Minimal aarch64;
+- active allocation 1 OCPU / 6 GB RAM;
 - production runner label `k-trader-prod-arm64`;
 - amd64 compatibility retained;
-- multi-arch Docker CI with QEMU/Buildx ARM64 runtime import.
+- multi-arch Docker CI with QEMU/Buildx ARM64 runtime import;
+- dynamic runtime UID/GID alignment between the production runner user and the container bind-mounted SQLite data tree;
+- fail-closed writable-data check before production build;
+- health semantics aligned with partial per-symbol degradation without weakening stale-data protection.
 
-Oracle external status on 2026-08-23: A1 capacity unavailable in Frankfurt AD-1, AD-2 and AD-3, including reduced 1 OCPU / 6 GB attempts. No paid shape is approved as a workaround.
+Verified production deployment on 2026-09-04:
+
+```text
+GitHub Actions run: 33920829993 -> SUCCESS
+Deployed SHA: 9ed572349ed0195e518f128894a1f187419dbcc1
+Runtime uid:gid: 1002:1002
+Data owner: ktrader:ktrader
+API bind: 127.0.0.1:8000
+Provider: binance_usdm
+REST: 5m,15m,1h,4h,1d PASS
+WebSocket: 5m PASS
+Scanner: DEGRADED, data_ready=true, 13 ready / 7 failed
+MTF API: PASS
+Docker: healthy
+/health: status=ok, mode=read_only, data_ready=true
+```
+
+The numeric UID/GID is host-specific. Production deployment derives it dynamically rather than hard-coding an image-system UID.
+
+Historical note: Oracle A1 capacity was unavailable during the original 2026-08-23 provisioning attempts; capacity later became available and the production VM was created successfully.
 
 ### Phase 10 preparation - Custom GPT Action
 
-Repository-side preparation is **VERIFIED**:
+Repository-side preparation is **VERIFIED**; live activation is pending public HTTPS.
 
 - exact read-only OpenAPI schemas for eight Action operations;
 - optional Bearer API-key enforcement for `/v1/*`;
@@ -81,7 +106,7 @@ Repository-side preparation is **VERIFIED**:
 - live Action acceptance script;
 - Builder checklist and privacy-policy baseline.
 
-The canonical OpenAPI file deliberately keeps `https://api.k-trader.invalid` until a real host passes live acceptance.
+The canonical OpenAPI file deliberately keeps `https://api.k-trader.invalid` until a real host passes live Phase 10 acceptance.
 
 ### Phase 11A - Replay / Regression Hardening
 
@@ -144,7 +169,7 @@ Repository-side implementation is **VERIFIED**:
 
 ### Phase 11F - Operations Hardening / Continuous Research Capture
 
-Repository-side implementation is **VERIFIED**:
+Repository-side implementation is **VERIFIED** and production capture can now accumulate prospectively:
 
 - production runtime retains and reuses the exact normalized instruments/tickers from the selected live universe request cycle;
 - provider-coherent universe snapshots are captured automatically at a configurable interval, default 300 seconds;
@@ -154,7 +179,7 @@ Repository-side implementation is **VERIFIED**:
 - backup retention and operator backup utility are implemented;
 - restore regression verifies that a generated backup can be opened as a fresh repository with persisted data intact;
 - scanner-age watchdog can degrade `/health` without changing its public response shape;
-- Docker healthcheck requires health JSON `status=ok` rather than HTTP reachability alone;
+- Docker healthcheck fails on unusable/stale runtime while allowing fresh usable partial scanner degradation;
 - K-Trader/Caddy container logs use bounded json-file rotation.
 
 ### Phase 11G - Dataset Catalogue Foundation
@@ -183,6 +208,8 @@ Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 - CI run `32654162474`: Phase 11E, **147 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - CI run `32656033224`: Phase 11F, **155 tests PASS**, compile/shell/Compose PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - CI run `32657337221`: Phase 11G, **163 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
+- PR #17 final CI: **170 tests PASS**, docker-amd64 PASS, docker-arm64 PASS.
+- Production run `33920829993`: deployment + live Phase 9 acceptance PASS on Oracle ARM64.
 
 ## Runtime entrypoint
 
@@ -235,6 +262,7 @@ No exchange credentials are used.
 - `docs/PHASE_11E_CHECKPOINT.md`
 - `docs/PHASE_11F_CHECKPOINT.md`
 - `docs/PHASE_11G_CHECKPOINT.md`
+- `docs/checkpoints/2026-09-05_PHASE9_PRODUCTION_ACCEPTANCE.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
@@ -246,8 +274,8 @@ No exchange credentials are used.
 
 ## Current phase
 
-Repository-side Phase 10 preparation and Phase 11A/11B/11C/11D/11E/11F/11G hardening are **VERIFIED** with the current **163-test** CI baseline.
+Repository-side Phase 10 preparation and Phase 11A/11B/11C/11D/11E/11F/11G hardening are **VERIFIED**. Phase 9 localhost production is **LIVE AND ACCEPTED** on Oracle ARM64.
 
-Historical full-engine outcome studies require coherent provider-recorded MTF bundles plus timestamped universe/liquidity context captured prospectively. Phase 11F makes prospective context collection automatic once the production runtime is continuously online; Phase 11G makes the resulting bundle/context/config/study/outcome chain reproducible and tamper-evident. Missing historical ranks are never fabricated from current ticker data.
+Historical full-engine outcome studies require coherent provider-recorded MTF bundles plus timestamped universe/liquidity context captured prospectively. Continuous production runtime now provides the basis for that accumulation; missing historical ranks are never fabricated from current ticker data.
 
-External critical path remains: obtain Oracle A1 capacity, provision the ARM64 host, run Phase 9 live acceptance including real persistence/backup/restart checks, configure public HTTPS, then activate and validate the Custom GPT Action.
+The current external critical path is Phase 10 public activation: choose a real API domain, configure DNS to the Oracle production host, allow public 80/443, configure the Action API key, redeploy with Caddy HTTPS, pass public Action acceptance, then render and install the deployment-specific Custom GPT OpenAPI schema.

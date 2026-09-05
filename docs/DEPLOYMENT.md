@@ -1,4 +1,4 @@
-# Deployment Specification v1.3
+# Deployment Specification v1.4
 
 ## Target
 
@@ -9,6 +9,23 @@
 - Repository-scoped self-hosted GitHub Actions runner for production deployment only.
 - Primary production architecture: Linux ARM64 / Oracle Ampere A1.
 - Caddy HTTPS reverse proxy/TLS when a real domain is configured.
+
+## Current production state
+
+Phase 9 localhost production deployment was verified on 2026-09-04.
+
+- Host: Oracle Cloud Ampere A1, Frankfurt, Ubuntu 24.04 Minimal aarch64.
+- Active allocation: 1 OCPU / 6 GB RAM.
+- Production runner: `k-trader-prod-arm64`.
+- Deployed SHA: `9ed572349ed0195e518f128894a1f187419dbcc1`.
+- GitHub Actions deployment run: `33920829993` — SUCCESS.
+- Runtime identity: UID/GID `1002:1002`, aligned with the host `ktrader` user.
+- Persistent data directory: `/opt/k-trader/data`, owner `ktrader:ktrader`, mode `750`.
+- Final local health: `status=ok`, `mode=read_only`, `data_ready=true`.
+- Final Docker state: `healthy`.
+- Application remains localhost-only at `127.0.0.1:8000` until Phase 10 public HTTPS activation.
+
+The canonical public OpenAPI template must continue using `https://api.k-trader.invalid` until Phase 10 live Action acceptance passes.
 
 ## Runtime layout
 
@@ -60,7 +77,9 @@ Flow:
 
 approved main
 -> immutable release export
--> Docker Compose build/start
+-> derive runtime UID/GID from the production runner user
+-> verify persistent data directory is writable
+-> Docker Compose build/start with matching runtime identity
 -> localhost process health
 -> provider REST/WS acceptance
 -> scanner/API readiness acceptance
@@ -69,11 +88,20 @@ approved main
 
 If the new release fails any required acceptance step, `deploy.sh` returns to the previous release when available.
 
+## Runtime identity and persistent data
+
+The container image accepts build arguments `KTRADER_RUNTIME_UID` and `KTRADER_RUNTIME_GID`. Production deployment exports these from the self-hosted runner user with `id -u` / `id -g` before the image is built.
+
+This is required because `/opt/k-trader/data` is a host bind mount. The container process identity must match the host owner of the persistent SQLite/research/backup tree. Deployment fails closed before build if the production data directory is not writable by the deployment user.
+
+Do not hard-code a base-image system UID such as `999` as a production ownership contract. The verified Oracle production identity is currently `1002:1002`, but the deployment mechanism is intentionally dynamic.
+
 ## Container security baseline
 
 K-Trader container:
 
 - non-root user;
+- runtime UID/GID aligned with the deployment host user;
 - read-only root filesystem;
 - writable `/data` persistent volume only;
 - temporary `/tmp` tmpfs;
@@ -81,6 +109,20 @@ K-Trader container:
 - `no-new-privileges`;
 - application port bound to host loopback only;
 - restart policy `unless-stopped`.
+
+## Health semantics
+
+`/health` preserves its public response shape. Scanner partial failures may produce `scanner_status=DEGRADED` while the service remains usable when canonical data is ready and fresh.
+
+The Docker healthcheck therefore evaluates service readiness from the health response without requiring the scanner status string itself to be `READY`. A fresh `data_ready=true` runtime can remain Docker-healthy even when some symbols fail independently. Stale scanner data still degrades health and fails the container health gate.
+
+Verified final Phase 9 deployment evidence:
+
+- provider acceptance: Binance USD-M REST `5m,15m,1h,4h,1d` plus WebSocket `5m` — PASS;
+- scanner: `DEGRADED`, 13 symbols ready / 7 failed in the final deployment cycle;
+- `data_ready=true`;
+- MTF API publication for all five canonical intervals — PASS;
+- container — `healthy`.
 
 ## HTTPS and Action gate
 

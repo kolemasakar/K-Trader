@@ -1,129 +1,181 @@
 # Phase 9 Checkpoint
 
-Date: 2026-08-23
+Date: 2026-09-05
 
-Status: REPOSITORY-SIDE COMPLETE AND VERIFIED THROUGH PHASE 9.1 / ORACLE A1 DEPLOYMENT AND LIVE ACCEPTANCE PENDING.
+Status: COMPLETE / ORACLE ARM64 PRODUCTION DEPLOYMENT AND LIVE ACCEPTANCE VERIFIED.
 
-## Repository-wide CI evidence
+## Repository and CI baseline
 
-A control pull request was used because the available connector exposes PR-triggered workflow runs directly.
+Phase 9 repository preparation, Oracle ARM64 adaptation, runtime hardening and the production UID/health correction have passed repository-wide CI.
 
-Initial real CI found two invalid synthetic fixtures. Production candle validation was not weakened; only the fixtures were corrected.
+Latest production-fix evidence before deployment:
 
-A later Docker gate found a real FastAPI lifecycle compatibility issue. Runtime startup/shutdown was migrated to the ASGI lifespan contract.
+- PR #17: `K-Trader: align production runtime UID and health readiness`;
+- final PR head: `8e68bbfd89dd5f9922b8975af241c16b378102fa`;
+- pytest: **170 passed**;
+- Docker amd64: PASS;
+- Docker arm64: PASS;
+- merge to `main`: `9ed572349ed0195e518f128894a1f187419dbcc1`.
 
-Successful CI run `32636825758` proved the repaired complete repository:
+Earlier Phase 9/9.1 repository verification remains valid, including CI runs `32636825758`, `32637233264`, and `32646869264`.
 
-- Python compile: PASS;
-- repository-wide pytest: **92 passed**;
-- one dependency deprecation warning remains in FastAPI/Starlette TestClient usage;
-- Docker Compose validation: PASS;
-- Docker image build: PASS;
-- production runtime import from built image: PASS.
+## Production host
 
-Those fixes were squash-merged as:
-
-`8ce912903224f6968479650eb0c3f4870bea6269`.
-
-## Production-prep gate
-
-PR #2 validated the deployment/provisioning additions with CI run `32637233264`.
-
-Result:
-
-- repository-wide pytest: PASS;
-- compile source/tests/scripts: PASS;
-- Docker Compose validation: PASS;
-- Docker image build: PASS;
-- production runtime import: PASS;
-- packaged target-host acceptance utility: PASS.
-
-PR #2 was squash-merged as:
-
-`377b4b412afcb85ccb8fa6a0b567482119c21349`.
-
-## Phase 9.1 Oracle ARM64 adaptation
-
-Primary production hosting is Oracle Cloud Always Free Ampere A1 in Germany Central (Frankfurt).
-
-Repository changes:
-
-- production workflow targets custom runner label `k-trader-prod-arm64`;
-- runner installer supports both Linux arm64 and x64;
-- GitHub Actions Runner `2.336.0` official SHA-256 is pinned per architecture;
-- Ubuntu provisioning supports `arm64` and `amd64`;
-- CI contains separate amd64 and arm64 Docker gates;
-- ARM64 image is built under QEMU/Buildx, architecture-checked, runtime-imported, and checked for the packaged acceptance utility;
-- amd64 support is retained as a future fallback host path.
-
-Verification evidence:
-
-- PR #3 CI run `32646869264`: SUCCESS;
-- Python compile: PASS;
-- shell validation: PASS;
-- repository-wide pytest: **92 passed**;
-- linux/amd64 Docker build/runtime import: PASS;
-- linux/arm64 QEMU/Buildx build: PASS;
-- ARM64 architecture assertion: PASS;
-- ARM64 production runtime import: PASS;
-- packaged acceptance utility on both architectures: PASS;
-- PR #3 squash merge: `8e7ef38311e8c92398eb7cf530c92ff773e2a9a1`.
-
-## Runner baseline
-
-GitHub Actions Runner: `2.336.0`.
+Verified Oracle Cloud production VM:
 
 ```text
-linux-x64 SHA-256:
-04cf0be1aff4c3ec3554466c39124ca250e3effd8873bb7e8d68535aa9505d5d
-
-linux-arm64 SHA-256:
-58b758e420b87093fbd4bfddd368074960053e2f1388f01848c82624b90f27d1
+Name: k-trader-prod
+Region: Germany Central (Frankfurt)
+Image: Canonical Ubuntu 24.04 Minimal aarch64
+Shape: VM.Standard.A1.Flex
+OCPU: 1
+Memory: 6 GB
+Public IPv4: 92.5.56.198
+Architecture: aarch64
 ```
 
-Custom labels:
+The production host is isolated from the separate K-Geopolitical Monitor VM.
+
+## GitHub Actions runner
+
+Repository-scoped self-hosted runner is registered and active as a system service under user `ktrader`.
 
 ```text
-k-trader-prod
-k-trader-prod-arm64   # primary Oracle production runner
-k-trader-prod-x64     # retained fallback architecture
+Runner name: k-trader-prod-vnic-k-trader
+Labels: k-trader-prod, k-trader-prod-arm64
+Runner version observed during production deploy: 2.337.0
 ```
 
-## Oracle external infrastructure status
+Production deployment workflow remains manual-only and targets approved `main` on the ARM64 runner.
 
-OCI Free Tier account and Germany Central (Frankfurt) home region are prepared.
+## Runtime identity incident and correction
 
-Target VM:
+The first production attempt exposed a real bind-mount ownership defect:
+
+- host `/opt/k-trader/data` owner was UID/GID `1002:1002`;
+- the original image user was UID/GID `999:999`;
+- SQLite failed with `sqlite3.OperationalError: unable to open database file`.
+
+A temporary ownership change proved the root cause. PR #17 then replaced the fragile fixed-image identity assumption with dynamic production identity alignment:
+
+- deployment derives runtime UID/GID from the self-hosted runner user;
+- Docker build creates the non-root `ktrader` user with that identity;
+- deployment fails closed if `/opt/k-trader/data` is not writable;
+- production host ownership is restored to `ktrader:ktrader`.
+
+Final verified state:
 
 ```text
-Canonical Ubuntu 24.04 Minimal aarch64
-VM.Standard.A1.Flex
-2 OCPU / 12 GB RAM
+container uid:gid = 1002:1002
+/opt/k-trader/data owner = ktrader:ktrader
+/opt/k-trader/data mode = 750
 ```
 
-On 2026-08-23, OCI returned `Out of capacity` for A1 in AD-1, AD-2, and AD-3. A reduced 1 OCPU / 6 GB request was also unavailable in all three ADs.
+The numeric ID is host-specific and is not a hard-coded production contract.
 
-No paid shape is approved as a workaround. Retry the A1 request when capacity becomes available.
+## Health-semantics correction
 
-## Still pending external infrastructure
+Live Phase 9 acceptance also exposed a second mismatch:
 
-The following cannot be claimed before the real Oracle A1 host is available:
+- scanner can validly be `DEGRADED` when some symbols fail independently;
+- `data_ready=true` can still be true with coherent usable canonical data;
+- the old container health rule incorrectly treated any degraded scanner result as container failure.
 
-- Ubuntu ARM64 host provisioning result;
-- registered/online `k-trader-prod-arm64` self-hosted runner;
-- DNS/HTTPS reachability;
-- Binance/Bybit public REST reachability from Oracle;
-- public WebSocket reachability from Oracle;
-- full scanner `data_ready` result on Oracle;
-- persistent SQLite/WAL behavior across a real container restart;
-- public TLS endpoint acceptance.
+PR #17 aligned Docker health with runtime readiness while preserving the existing public `/health` response shape. Stale/incomplete runtime still fails health; partial symbol failures do not take the whole service offline when data remains ready and fresh.
 
-## Hosting decisions
+## Successful production deployment
 
-- Primary: Oracle Cloud Always Free Ampere A1.
-- Potential fallback only, not implemented: home Windows PC + Tailscale Funnel.
-- Cloudflare Workers + Durable Objects: not planned for K-Trader v1; retain only as a future-project architecture idea.
+GitHub Actions run:
+
+```text
+33920829993 -> SUCCESS
+```
+
+Deployed release:
+
+```text
+9ed572349ed0195e518f128894a1f187419dbcc1
+```
+
+Deployment evidence:
+
+- approved `main` checkout: PASS;
+- Oracle production architecture check: PASS;
+- image built natively for ARM64 with runtime UID/GID `1002:1002`;
+- container start: PASS;
+- Binance USD-M REST acceptance on `5m,15m,1h,4h,1d`: PASS;
+- Binance USD-M public WebSocket `5m`: PASS;
+- scanner `data_ready=true`: PASS;
+- final deployment-cycle scanner state: `DEGRADED`, 13 symbols ready / 7 failed;
+- MTF API publication on `5m,15m,1h,4h,1d`: PASS;
+- Docker container: `healthy`;
+- release promotion: PASS.
+
+## Final operator verification
+
+Verified after workflow success:
+
+```text
+DEPLOYED_SHA:
+9ed572349ed0195e518f128894a1f187419dbcc1
+
+HEALTH:
+status=ok
+mode=read_only
+data_ready=true
+scanner_status=DEGRADED
+provider_id=binance_usdm
+action_auth_enabled=false
+
+CONTAINER:
+healthy
+
+UID:
+uid=1002(ktrader) gid=1002(ktrader)
+
+DATA_DIR:
+1002:1002 ktrader:ktrader 750 /opt/k-trader/data
+```
+
+`action_auth_enabled=false` is expected because Phase 10 public HTTPS/Action activation has not started yet.
+
+## Persistence state
+
+Persistent runtime state exists under `/opt/k-trader/data`, including:
+
+- `ktrader.db`;
+- SQLite WAL/SHM files while active;
+- `backups/`;
+- `research/`.
+
+The production runtime can create/open SQLite state with the final non-root identity. Continuous capture and backup evidence can now accumulate prospectively.
 
 ## Phase 9 exit
 
-Phase 9 is not fully complete until Oracle target-host live acceptance passes.
+Phase 9 exit criteria are satisfied for localhost production:
+
+- Oracle ARM64 host available and provisioned;
+- runner online;
+- production deployment successful;
+- target-host provider REST/WebSocket acceptance successful;
+- scanner/API readiness successful;
+- persistent data write path operational;
+- Docker health successful;
+- immutable release promoted and recorded in `DEPLOYED_SHA`.
+
+## Next gate: Phase 10
+
+Public Custom GPT Action activation remains intentionally pending.
+
+Next sequence:
+
+1. choose real API domain/subdomain;
+2. create DNS A record to the production public IPv4;
+3. open OCI inbound TCP 80/443;
+4. configure GitHub `production` variable `KTRADER_DOMAIN`;
+5. configure GitHub `production` secret `KTRADER_ACTION_API_KEY`;
+6. redeploy with the Caddy HTTPS profile;
+7. pass `scripts/phase10_action_acceptance.py` against the real HTTPS origin;
+8. only then render the deployment-specific OpenAPI and replace the `.invalid` server in the GPT Action configuration.
+
+The repository template `custom_gpt/openapi.yaml` must remain on `https://api.k-trader.invalid` until Phase 10 live acceptance passes.

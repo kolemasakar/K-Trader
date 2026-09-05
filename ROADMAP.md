@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.11
+# K-Trader Roadmap v1.12
 
-Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11G dataset catalogue foundation, 2026-08-23.
+Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11G dataset catalogue foundation; Oracle ARM64 production deployment and Phase 9 live acceptance verified 2026-09-04.
 
 ## Phase 0 - Foundation
 
@@ -12,7 +12,7 @@ Status: COMPLETE.
 
 ## Phase 1 - Exchange-Agnostic Market Data Foundation
 
-Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
+Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE VERIFIED.
 
 - provider contract/capabilities;
 - Binance USD-M + Bybit Linear public adapters;
@@ -22,7 +22,7 @@ Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
 
 ## Phase 2 - Market Data Core
 
-Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
+Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE VERIFIED.
 
 - REST MTF bootstrap `1d/4h/1h/15m/5m`;
 - SQLite WAL / Decimal persistence;
@@ -31,7 +31,7 @@ Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
 
 ## Phase 3 - Live Market Data
 
-Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE PENDING.
+Status: IMPLEMENTATION COMPLETE / TARGET-HOST LIVE ACCEPTANCE VERIFIED.
 
 - Binance/Bybit public WebSocket;
 - live 5m base state;
@@ -105,9 +105,9 @@ Historical Phase 9 baseline including Phase 8.5: **92 tests passed**.
 
 ## Phase 9 - Docker / CI-CD / live deployment
 
-Status: REPOSITORY-SIDE COMPLETE / TARGET-HOST DEPLOYMENT AND LIVE ACCEPTANCE PENDING.
+Status: COMPLETE / TARGET-HOST PRODUCTION DEPLOYMENT AND LIVE ACCEPTANCE VERIFIED.
 
-Completed and CI-verified:
+Completed and verified:
 
 - GitHub-hosted repository-wide CI;
 - compile + pytest + Compose + Docker gates;
@@ -117,20 +117,38 @@ Completed and CI-verified:
 - optional Caddy HTTPS profile;
 - Ubuntu/Docker provisioning automation;
 - checksum-verified GitHub runner registration;
-- target-host REST/WebSocket/scanner acceptance utilities.
+- target-host REST/WebSocket/scanner acceptance utilities;
+- Oracle ARM64 host provisioned and production runner registered;
+- runtime UID/GID aligned with host production identity for writable persistent SQLite data;
+- live Binance USD-M REST/WebSocket acceptance passed;
+- scanner `data_ready=true` and MTF API publication passed;
+- production container reached Docker `healthy` state and release was promoted.
 
-CI evidence includes run `32636825758` (92 tests) and production-prep run `32637233264`.
+Production evidence on 2026-09-04:
+
+- PR #17 CI: **170 tests PASS**, amd64 Docker PASS, arm64 Docker PASS;
+- production workflow run `33920829993`: SUCCESS;
+- deployed SHA `9ed572349ed0195e518f128894a1f187419dbcc1`;
+- runtime build identity `uid:gid 1002:1002`;
+- Phase 9 provider acceptance: Binance USD-M REST `5m,15m,1h,4h,1d` + WebSocket `5m` PASS;
+- scanner acceptance: `DEGRADED` with usable data, `data_ready=true`, 13 symbols ready / 7 failed during the final deployment cycle;
+- MTF API acceptance passed for all five canonical intervals;
+- final local `/health`: `status=ok`, `mode=read_only`, `data_ready=true`;
+- application remains bound to `127.0.0.1:8000`.
+
+Earlier repository CI evidence includes run `32636825758` (92 tests) and production-prep run `32637233264`.
 
 ## Phase 9.1 - Oracle ARM64 / Multi-arch
 
-Status: VERIFIED.
+Status: VERIFIED / PRODUCTION HOST ACTIVE.
 
 Primary production target:
 
 - Oracle Cloud Always Free;
 - Germany Central (Frankfurt);
 - Ubuntu 24.04 Minimal aarch64;
-- `VM.Standard.A1.Flex`, target 2 OCPU / 12 GB RAM;
+- `VM.Standard.A1.Flex`;
+- active production allocation: 1 OCPU / 6 GB RAM;
 - Linux ARM64 self-hosted runner label `k-trader-prod-arm64`.
 
 Repository adaptation:
@@ -143,30 +161,25 @@ Repository adaptation:
 
 Verification: PR #3 CI `32646869264`, **92 tests PASS**, amd64/arm64 Docker/runtime PASS; squash merge `8e7ef38311e8c92398eb7cf530c92ff773e2a9a1`.
 
-External Oracle status on 2026-08-23:
-
-- A1 unavailable in Frankfurt AD-1, AD-2 and AD-3;
-- reduced 1 OCPU / 6 GB A1 request also unavailable;
-- no paid shape approved as workaround;
-- retry A1 when capacity becomes available.
-
-Potential fallback, not implemented: home Windows PC + Tailscale Funnel. Cloudflare Workers + Durable Objects are not part of K-Trader v1.
+Historical note: on 2026-08-23 A1 capacity was unavailable in Frankfurt AD-1, AD-2 and AD-3, including a reduced 1 OCPU / 6 GB request. Capacity later became available and `k-trader-prod` was provisioned successfully.
 
 ### Phase 9 live exit
 
-Pending on external infrastructure/capacity:
+Exit criteria completed on 2026-09-04:
 
-- create/provision Oracle A1 host;
-- register `k-trader-prod-arm64` runner;
-- production deploy;
-- target-host REST/WS/runtime acceptance;
-- real persistence/backup/restart validation;
-- continuous research-capture validation;
-- DNS/TLS and public HTTPS.
+- Oracle A1 host created and provisioned;
+- `k-trader-prod-arm64` runner registered as a system service under `ktrader`;
+- production deployment from approved `main` completed;
+- target-host REST/WS/runtime acceptance passed;
+- persistent SQLite database, WAL, backups and research directories created under `/opt/k-trader/data`;
+- runtime identity and data-directory ownership verified as `1002:1002`;
+- Docker health verified `healthy`.
+
+Public DNS/TLS is intentionally not part of the completed localhost Phase 9 gate and remains the next Phase 10 activation step.
 
 ## Phase 10 - Custom GPT Update
 
-Status: REPOSITORY-SIDE PREPARATION VERIFIED / LIVE ACTIVATION PENDING HTTPS.
+Status: REPOSITORY-SIDE PREPARATION VERIFIED / LIVE ACTIVATION PENDING PUBLIC HTTPS.
 
 - exact read-only OpenAPI schemas for eight Action operations;
 - Bearer API-key authentication and production secret wiring;
@@ -177,7 +190,7 @@ Status: REPOSITORY-SIDE PREPARATION VERIFIED / LIVE ACTIVATION PENDING HTTPS.
 
 Verification: PR #4 CI `32647828382`, **106 tests PASS**, amd64/arm64 PASS; squash merge `a1c578524bbc41afa575b3f4fb6446642a48453d`.
 
-Activation awaits a real HTTPS endpoint after Phase 9 live deployment.
+Phase 9 localhost production is live. Activation now awaits a real DNS name resolving to the production host, OCI ingress on 80/443, Caddy TLS, `KTRADER_ACTION_API_KEY`, and successful Phase 10 public Action acceptance. The canonical OpenAPI template remains on `https://api.k-trader.invalid` until that gate passes.
 
 ## Phase 11 - Hardening
 
@@ -300,10 +313,9 @@ Verification: PR #10 CI `32657337221` SUCCESS; repository-wide pytest **163 pass
 
 ### Remaining Phase 11 work
 
-- populate the catalogue with real provider-recorded MTF/universe/cohort/study/outcome artifacts after continuous production capture begins;
+- continue accumulating real provider-recorded universe/research artifacts from production capture and populate the catalogue;
 - optionally automate catalogue registration after scheduled study jobs exist;
-- target-host restart/recovery, backup, disk guard and watchdog acceptance;
-- extended runtime failure/stale-data validation if live evidence exposes gaps;
+- extended target-host backup/restore, restart/recovery, disk-guard and stale-data validation as operational evidence accumulates;
 - later approved statistical calibration methodology with time-separated out-of-sample validation.
 
 ## Phase 12 - Multi-provider expansion
