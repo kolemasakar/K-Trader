@@ -31,6 +31,16 @@ def test_public_https_release_requires_action_key_and_phase10_acceptance() -> No
     assert "rollback" in deploy
 
 
+def test_phase9_acceptance_authenticates_local_v1_checks_when_action_auth_is_enabled() -> None:
+    phase9 = read("scripts/phase9_acceptance.sh")
+
+    assert 'os.environ.get("KTRADER_ACTION_API_KEY", "")' in phase9
+    assert 'headers["Authorization"] = f"Bearer {action_api_key}"' in phase9
+    assert 'request_json(base + "/v1/scanner/status")' in phase9
+    assert 'request_json(base + "/v1/candidates?limit=1")' in phase9
+    assert "payload = request_json(url)" in phase9
+
+
 def test_environment_example_documents_action_and_operational_controls() -> None:
     env_example = read("deploy/.env.example")
 
