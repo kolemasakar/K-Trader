@@ -1,14 +1,14 @@
 openapi: 3.1.0
 info:
   title: K-Trader Read-only API
-  version: phase10-prep-v1
+  version: phase10-production-v1
   description: >-
     Read-only market scanner API for K_Trader. It exposes confirmed public
     market data and canonical Trading Engine results. It cannot place, modify,
     or cancel orders and exposes no exchange-account endpoints.
 servers:
-  - url: https://api.k-trader.invalid
-    description: Replace with the deployed HTTPS origin before enabling the Action.
+  - url: https://ktrader-api.duckdns.org
+    description: Accepted Phase 10 production HTTPS origin.
 security:
   - BearerAuth: []
 paths:
