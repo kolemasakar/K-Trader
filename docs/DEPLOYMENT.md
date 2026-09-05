@@ -1,4 +1,4 @@
-# Deployment Specification v1.4
+# Deployment Specification v1.5
 
 ## Target
 
@@ -8,24 +8,28 @@
 - Docker Engine + Docker Compose.
 - Repository-scoped self-hosted GitHub Actions runner for production deployment only.
 - Primary production architecture: Linux ARM64 / Oracle Ampere A1.
-- Caddy HTTPS reverse proxy/TLS when a real domain is configured.
+- Caddy HTTPS reverse proxy/TLS for the public Action endpoint.
 
 ## Current production state
 
-Phase 9 localhost production deployment was verified on 2026-09-04.
+Phase 10 public HTTPS production deployment was verified on 2026-09-05.
 
 - Host: Oracle Cloud Ampere A1, Frankfurt, Ubuntu 24.04 Minimal aarch64.
 - Active allocation: 1 OCPU / 6 GB RAM.
 - Production runner: `k-trader-prod-arm64`.
-- Deployed SHA: `9ed572349ed0195e518f128894a1f187419dbcc1`.
-- GitHub Actions deployment run: `33920829993` — SUCCESS.
+- Public origin: `https://ktrader-api.duckdns.org`.
+- DNS: `ktrader-api.duckdns.org -> 92.5.56.198`.
+- Deployed SHA: `7c60a77b9773774373ea4a3f095c5ab2ee7767e2`.
+- GitHub Actions deployment: `Deploy Production #4`, run `33945690930`, successful re-run attempt.
 - Runtime identity: UID/GID `1002:1002`, aligned with the host `ktrader` user.
-- Persistent data directory: `/opt/k-trader/data`, owner `ktrader:ktrader`, mode `750`.
+- Persistent application data: `/opt/k-trader/data`, owner `ktrader:ktrader`, mode `750`.
+- Persistent Caddy storage: `/opt/k-trader/caddy_data` and `/opt/k-trader/caddy_config`, owner `root:root`, mode `700`.
 - Final local health: `status=ok`, `mode=read_only`, `data_ready=true`.
-- Final Docker state: `healthy`.
-- Application remains localhost-only at `127.0.0.1:8000` until Phase 10 public HTTPS activation.
+- Final Docker state: K-Trader `healthy`; Caddy active on 80/443.
+- Application remains host-loopback-only at `127.0.0.1:8000`.
+- Phase 10 public HTTPS/Action live acceptance: PASS.
 
-The canonical public OpenAPI template must continue using `https://api.k-trader.invalid` until Phase 10 live Action acceptance passes.
+The canonical OpenAPI file now uses `https://ktrader-api.duckdns.org` because the live Phase 10 Action gate passed.
 
 ## Runtime layout
 
@@ -78,23 +82,32 @@ Flow:
 approved main
 -> immutable release export
 -> derive runtime UID/GID from the production runner user
--> verify persistent data directory is writable
--> Docker Compose build/start with matching runtime identity
+-> verify persistent application data directory is writable
+-> Docker Compose build/start with matching K-Trader runtime identity
 -> localhost process health
 -> provider REST/WS acceptance
 -> scanner/API readiness acceptance
--> if `KTRADER_DOMAIN` is configured: public HTTPS + Phase 10 Action acceptance
+-> public HTTPS + Phase 10 Action acceptance when `KTRADER_DOMAIN` is configured
 -> mark release current
 
 If the new release fails any required acceptance step, `deploy.sh` returns to the previous release when available.
 
-## Runtime identity and persistent data
+## Runtime identity and persistent storage
 
-The container image accepts build arguments `KTRADER_RUNTIME_UID` and `KTRADER_RUNTIME_GID`. Production deployment exports these from the self-hosted runner user with `id -u` / `id -g` before the image is built.
+The K-Trader container image accepts build arguments `KTRADER_RUNTIME_UID` and `KTRADER_RUNTIME_GID`. Production deployment exports these from the self-hosted runner user with `id -u` / `id -g` before the image is built.
 
-This is required because `/opt/k-trader/data` is a host bind mount. The container process identity must match the host owner of the persistent SQLite/research/backup tree. Deployment fails closed before build if the production data directory is not writable by the deployment user.
+This is required because `/opt/k-trader/data` is a host bind mount. The K-Trader process identity must match the host owner of the persistent SQLite/research/backup tree. Deployment fails closed before build if the production data directory is not writable by the deployment user.
 
 Do not hard-code a base-image system UID such as `999` as a production ownership contract. The verified Oracle production identity is currently `1002:1002`, but the deployment mechanism is intentionally dynamic.
+
+Caddy has a different storage requirement. The Caddy container runs as uid 0 with all Linux capabilities dropped. Because `CAP_DAC_OVERRIDE` is absent, its bind-mounted `/data` and `/config` trees must be writable through ordinary DAC ownership/mode bits. The verified production contract is:
+
+```text
+/opt/k-trader/caddy_data   root:root 0700
+/opt/k-trader/caddy_config root:root 0700
+```
+
+`scripts/provision_vps.sh` creates these directories with that ownership. Do not change them to the `ktrader` user while the current Caddy security profile remains capability-dropped.
 
 ## Container security baseline
 
@@ -110,25 +123,44 @@ K-Trader container:
 - application port bound to host loopback only;
 - restart policy `unless-stopped`.
 
+Caddy container:
+
+- reverse-proxy/TLS role only;
+- all capabilities dropped, then only `NET_BIND_SERVICE` added;
+- `no-new-privileges`;
+- persistent `/data` and `/config` bind mounts;
+- public host ports 80/443 only.
+
 ## Health semantics
 
 `/health` preserves its public response shape. Scanner partial failures may produce `scanner_status=DEGRADED` while the service remains usable when canonical data is ready and fresh.
 
 The Docker healthcheck therefore evaluates service readiness from the health response without requiring the scanner status string itself to be `READY`. A fresh `data_ready=true` runtime can remain Docker-healthy even when some symbols fail independently. Stale scanner data still degrades health and fails the container health gate.
 
-Verified final Phase 9 deployment evidence:
+Verified final Phase 10 deployment evidence:
 
 - provider acceptance: Binance USD-M REST `5m,15m,1h,4h,1d` plus WebSocket `5m` — PASS;
-- scanner: `DEGRADED`, 13 symbols ready / 7 failed in the final deployment cycle;
+- scanner: `DEGRADED`, 17 symbols ready / 3 failed in the accepted deployment cycle;
 - `data_ready=true`;
 - MTF API publication for all five canonical intervals — PASS;
-- container — `healthy`.
+- K-Trader container — `healthy`;
+- Caddy HTTPS — PASS;
+- Phase 10 Action live acceptance — PASS.
 
 ## HTTPS and Action gate
 
-The optional Caddy Compose profile is enabled only when `KTRADER_DOMAIN` is set.
+The Caddy Compose profile is enabled when `KTRADER_DOMAIN` is set.
 
 Caddy terminates TLS and proxies to the internal K-Trader service. The application itself remains bound to host `127.0.0.1:8000`.
+
+Current production configuration:
+
+- `KTRADER_DOMAIN=ktrader-api.duckdns.org` as a GitHub `production` Environment variable;
+- `KTRADER_ACTION_API_KEY` as a GitHub `production` Environment secret;
+- DNS A record to `92.5.56.198`;
+- OCI stateful ingress TCP 80/443;
+- host firewall explicitly allows TCP 80/443 before its terminal reject;
+- host firewall rules persisted through `netfilter-persistent`.
 
 When `KTRADER_DOMAIN` is non-empty:
 
@@ -139,6 +171,17 @@ When `KTRADER_DOMAIN` is non-empty:
 - the release is not marked current unless the public Action endpoint passes acceptance.
 
 This prevents a locally healthy release from being promoted while the public HTTPS endpoint or Action authentication is broken.
+
+## Phase 10 incident evidence
+
+Two fail-closed deployment attempts proved rollback behavior before final success:
+
+1. the first public deployment exposed that Phase 9 local `/v1/*` acceptance requests lacked Bearer authentication once Action auth was enabled; PR #19 fixed that integration defect;
+2. the next attempt reached HTTPS but Caddy could not persist ACME state because the capability-dropped root process did not own the host bind mounts; ownership was corrected and the provisioning contract was hardened.
+
+Both failed attempts rolled back to the previous accepted release. The successful re-run then passed all Phase 9 and Phase 10 gates and promoted SHA `7c60a77b9773774373ea4a3f095c5ab2ee7767e2`.
+
+Detailed evidence is in `docs/PHASE_10_CHECKPOINT.md`.
 
 ## Target-VPS live acceptance
 
@@ -152,7 +195,8 @@ This prevents a locally healthy release from being promoted while the public HTT
 
 - scanner `data_ready=true`;
 - at least one published candidate/NO_TRADE analysis;
-- API publication of all five canonical timeframes.
+- API publication of all five canonical timeframes;
+- Bearer authentication on local `/v1/*` checks when `KTRADER_ACTION_API_KEY` is configured.
 
 When public HTTPS is enabled, `scripts/phase10_action_acceptance.py` additionally requires:
 

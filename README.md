@@ -20,7 +20,7 @@ Collect confirmed public derivatives market data, normalize and validate it, mai
 
 ## Target flow
 
-Public Exchange API -> REST/WS Provider -> Normalized Data -> Validation/SQLite -> Universe/Liquidity -> ATR/MA -> Structure/Levels -> Trap -> VSA -> Setup Geometry -> Setup Score -> TradingDecision -> Runtime Coordinator -> Read-only API -> Custom GPT
+Public Exchange API -> REST/WS Provider -> Normalized Data -> Validation/SQLite -> Universe/Liquidity -> ATR/MA -> Structure/Levels -> Trap -> VSA -> Setup Geometry -> Setup Score -> TradingDecision -> Runtime Coordinator -> Read-only API -> Caddy HTTPS -> Custom GPT Action -> K_Trader
 
 ## Implemented
 
@@ -61,7 +61,7 @@ Phase 9 localhost production is **LIVE AND VERIFIED**.
 - hardened non-root/read-only Docker runtime;
 - manual-only production deployment on `main`;
 - immutable commit-SHA releases and rollback;
-- optional Caddy HTTPS;
+- Caddy HTTPS profile;
 - target-host REST/WebSocket/scanner acceptance utilities;
 - Oracle Cloud Always Free Ampere A1 production host in Frankfurt;
 - Ubuntu 24.04 Minimal aarch64;
@@ -73,7 +73,7 @@ Phase 9 localhost production is **LIVE AND VERIFIED**.
 - fail-closed writable-data check before production build;
 - health semantics aligned with partial per-symbol degradation without weakening stale-data protection.
 
-Verified production deployment on 2026-09-04:
+Historical Phase 9 production deployment on 2026-09-04:
 
 ```text
 GitHub Actions run: 33920829993 -> SUCCESS
@@ -94,19 +94,43 @@ The numeric UID/GID is host-specific. Production deployment derives it dynamical
 
 Historical note: Oracle A1 capacity was unavailable during the original 2026-08-23 provisioning attempts; capacity later became available and the production VM was created successfully.
 
-### Phase 10 preparation - Custom GPT Action
+### Phase 10 - Custom GPT Action production activation
 
-Repository-side preparation is **VERIFIED**; live activation is pending public HTTPS.
+Phase 10 backend/API activation is **LIVE AND VERIFIED** as of 2026-09-05.
 
 - exact read-only OpenAPI schemas for eight Action operations;
-- optional Bearer API-key enforcement for `/v1/*`;
-- `KTRADER_ACTION_API_KEY` production secret wiring;
+- Bearer API-key enforcement for `/v1/*`;
 - public `/health` and `/privacy`;
-- OpenAPI render/validation script for the eventual real HTTPS origin;
-- live Action acceptance script;
-- Builder checklist and privacy-policy baseline.
+- production DNS `ktrader-api.duckdns.org -> 92.5.56.198`;
+- OCI stateful TCP 80/443 ingress;
+- persistent host firewall allowances for 80/443 before terminal reject;
+- Caddy automatic Let's Encrypt TLS;
+- production Action key stored only in GitHub Environment `production` and not in repository files;
+- local Phase 9 acceptance authenticates `/v1/*` probes when Action auth is enabled;
+- Caddy persistent storage ownership hardened for the capability-dropped root container;
+- live public Phase 10 Action acceptance passed;
+- canonical `custom_gpt/openapi.yaml` now points to `https://ktrader-api.duckdns.org`.
 
-The canonical OpenAPI file deliberately keeps `https://api.k-trader.invalid` until a real host passes live Phase 10 acceptance.
+Verified production activation:
+
+```text
+GitHub Actions: Deploy Production #4, run 33945690930, successful re-run
+Deployed SHA: 7c60a77b9773774373ea4a3f095c5ab2ee7767e2
+Public origin: https://ktrader-api.duckdns.org
+Provider: binance_usdm
+REST: 5m,15m,1h,4h,1d PASS
+WebSocket: 5m PASS
+Scanner: DEGRADED, data_ready=true, 17 ready / 3 failed
+MTF API: PASS
+K-Trader container: healthy
+HTTPS/TLS: PASS
+Action auth enabled: true
+Phase 10 Action live acceptance: PASS
+```
+
+Two earlier activation attempts failed closed and rolled back: one exposed missing Bearer auth in the Phase 9 local acceptance path, and one exposed Caddy persistent storage permission mismatch. Both are now fixed and documented in `docs/PHASE_10_CHECKPOINT.md`.
+
+Remaining product-side work is to import/configure the Action in the existing K_Trader GPT Builder, use Bearer authentication, and complete Preview/publishing checks.
 
 ### Phase 11A - Replay / Regression Hardening
 
@@ -169,7 +193,7 @@ Repository-side implementation is **VERIFIED**:
 
 ### Phase 11F - Operations Hardening / Continuous Research Capture
 
-Repository-side implementation is **VERIFIED** and production capture can now accumulate prospectively:
+Repository-side implementation is **VERIFIED** and production capture can accumulate prospectively:
 
 - production runtime retains and reuses the exact normalized instruments/tickers from the selected live universe request cycle;
 - provider-coherent universe snapshots are captured automatically at a configurable interval, default 300 seconds;
@@ -210,6 +234,8 @@ Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 - CI run `32657337221`: Phase 11G, **163 tests PASS**, compile/shell PASS, amd64 Docker/runtime PASS, arm64 QEMU/Buildx image/architecture/runtime PASS.
 - PR #17 final CI: **170 tests PASS**, docker-amd64 PASS, docker-arm64 PASS.
 - Production run `33920829993`: deployment + live Phase 9 acceptance PASS on Oracle ARM64.
+- PR #19: authenticated Phase 9 acceptance fix, CI/Tests PASS before merge.
+- Production run `33945690930` re-run: Phase 9 + public HTTPS + Phase 10 Action acceptance PASS.
 
 ## Runtime entrypoint
 
@@ -255,6 +281,7 @@ No exchange credentials are used.
 - `docs/PHASE_9_CHECKPOINT.md`
 - `docs/PHASE_9_1_CHECKPOINT.md`
 - `docs/PHASE_10_PREP_CHECKPOINT.md`
+- `docs/PHASE_10_CHECKPOINT.md`
 - `docs/PHASE_11A_CHECKPOINT.md`
 - `docs/PHASE_11B_CHECKPOINT.md`
 - `docs/PHASE_11C_CHECKPOINT.md`
@@ -274,8 +301,10 @@ No exchange credentials are used.
 
 ## Current phase
 
-Repository-side Phase 10 preparation and Phase 11A/11B/11C/11D/11E/11F/11G hardening are **VERIFIED**. Phase 9 localhost production is **LIVE AND ACCEPTED** on Oracle ARM64.
+Phase 9 production and Phase 10 public HTTPS/Action backend activation are **LIVE AND ACCEPTED** on Oracle ARM64. Repository-side Phase 11A/11B/11C/11D/11E/11F/11G hardening remains **VERIFIED**.
 
-Historical full-engine outcome studies require coherent provider-recorded MTF bundles plus timestamped universe/liquidity context captured prospectively. Continuous production runtime now provides the basis for that accumulation; missing historical ranks are never fabricated from current ticker data.
+The canonical public API origin is `https://ktrader-api.duckdns.org`; application port `8000` remains localhost-only and `/v1/*` is Bearer-protected in production.
 
-The current external critical path is Phase 10 public activation: choose a real API domain, configure DNS to the Oracle production host, allow public 80/443, configure the Action API key, redeploy with Caddy HTTPS, pass public Action acceptance, then render and install the deployment-specific Custom GPT OpenAPI schema.
+Historical full-engine outcome studies still require coherent provider-recorded MTF bundles plus timestamped universe/liquidity context captured prospectively. Continuous production runtime provides the basis for that accumulation; missing historical ranks are never fabricated from current ticker data.
+
+The next immediate product-side step is to configure/import the now-production `custom_gpt/openapi.yaml` into the existing K_Trader GPT Builder, set Bearer authentication using the existing secret, run Preview validation, and complete any publishing/privacy checks required by the selected distribution mode.

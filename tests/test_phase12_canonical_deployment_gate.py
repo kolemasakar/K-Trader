@@ -51,6 +51,15 @@ def test_environment_example_documents_action_and_operational_controls() -> None
     assert "Do not commit populated secrets" in env_example
 
 
-def test_openapi_stays_placeholder_until_real_https_acceptance() -> None:
+def test_caddy_storage_is_provisioned_for_capability_dropped_root() -> None:
+    provision = read("scripts/provision_vps.sh")
+
+    assert "install -d -o root -g root -m 0700 /opt/k-trader/caddy_data" in provision
+    assert "install -d -o root -g root -m 0700 /opt/k-trader/caddy_config" in provision
+
+
+def test_openapi_uses_accepted_phase10_production_https_origin() -> None:
     openapi = read("custom_gpt/openapi.yaml")
-    assert "https://api.k-trader.invalid" in openapi
+
+    assert "https://ktrader-api.duckdns.org" in openapi
+    assert "https://api.k-trader.invalid" not in openapi

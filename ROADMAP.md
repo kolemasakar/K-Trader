@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.12
+# K-Trader Roadmap v1.13
 
-Status: APPROVED baseline; repository-side implementation verified through Phase 10 preparation and Phase 11G dataset catalogue foundation; Oracle ARM64 production deployment and Phase 9 live acceptance verified 2026-09-04.
+Status: APPROVED baseline; repository-side implementation verified through Phase 11G dataset catalogue foundation; Oracle ARM64 production deployment, Phase 9 live acceptance and Phase 10 public HTTPS/Action activation verified through 2026-09-05.
 
 ## Phase 0 - Foundation
 
@@ -175,11 +175,13 @@ Exit criteria completed on 2026-09-04:
 - runtime identity and data-directory ownership verified as `1002:1002`;
 - Docker health verified `healthy`.
 
-Public DNS/TLS is intentionally not part of the completed localhost Phase 9 gate and remains the next Phase 10 activation step.
+Public DNS/TLS was intentionally deferred from the Phase 9 localhost gate and completed in Phase 10.
 
 ## Phase 10 - Custom GPT Update
 
-Status: REPOSITORY-SIDE PREPARATION VERIFIED / LIVE ACTIVATION PENDING PUBLIC HTTPS.
+Status: BACKEND/API ACTIVATION COMPLETE / PUBLIC HTTPS + LIVE ACTION ACCEPTANCE VERIFIED.
+
+Repository-side preparation:
 
 - exact read-only OpenAPI schemas for eight Action operations;
 - Bearer API-key authentication and production secret wiring;
@@ -188,9 +190,30 @@ Status: REPOSITORY-SIDE PREPARATION VERIFIED / LIVE ACTIVATION PENDING PUBLIC HT
 - live Action acceptance utility;
 - Builder checklist and privacy-policy baseline.
 
-Verification: PR #4 CI `32647828382`, **106 tests PASS**, amd64/arm64 PASS; squash merge `a1c578524bbc41afa575b3f4fb6446642a48453d`.
+Preparation verification: PR #4 CI `32647828382`, **106 tests PASS**, amd64/arm64 PASS; squash merge `a1c578524bbc41afa575b3f4fb6446642a48453d`.
 
-Phase 9 localhost production is live. Activation now awaits a real DNS name resolving to the production host, OCI ingress on 80/443, Caddy TLS, `KTRADER_ACTION_API_KEY`, and successful Phase 10 public Action acceptance. The canonical OpenAPI template remains on `https://api.k-trader.invalid` until that gate passes.
+Production activation completed on 2026-09-05:
+
+- public DNS: `ktrader-api.duckdns.org -> 92.5.56.198`;
+- OCI stateful ingress TCP 80/443 enabled;
+- host iptables allows 80/443 before terminal reject and is persisted with `netfilter-persistent`;
+- GitHub Environment variable `KTRADER_DOMAIN=ktrader-api.duckdns.org` configured;
+- high-entropy `KTRADER_ACTION_API_KEY` configured only as a GitHub `production` Environment secret;
+- PR #19 fixed authenticated Phase 9 local `/v1/*` acceptance after Action auth activation;
+- Caddy persistent storage contract corrected to `root:root 0700` for `caddy_data` and `caddy_config` under the capability-dropped root profile;
+- Let's Encrypt HTTP-01 validation and certificate issuance succeeded;
+- direct public HTTPS `/health` returned `status=ok`, `data_ready=true`, `action_auth_enabled=true`;
+- final `Deploy Production #4` run `33945690930` re-run succeeded;
+- accepted production SHA: `7c60a77b9773774373ea4a3f095c5ab2ee7767e2`;
+- provider REST/WS acceptance PASS;
+- scanner `DEGRADED`, `data_ready=true`, 17 ready / 3 failed in the accepted cycle;
+- MTF API PASS;
+- `PASS Phase 10 Action live acceptance`;
+- canonical `custom_gpt/openapi.yaml` now points to `https://ktrader-api.duckdns.org`.
+
+Detailed evidence: `docs/PHASE_10_CHECKPOINT.md`.
+
+Remaining product-side work is limited to configuring/importing the Action in the existing K_Trader GPT Builder with Bearer authentication, Preview validation and any required publishing/privacy checks. The production backend/API gate itself is complete.
 
 ## Phase 11 - Hardening
 
