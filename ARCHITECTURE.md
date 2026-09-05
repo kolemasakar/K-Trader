@@ -1,4 +1,4 @@
-# Architecture v1.2
+# Architecture v1.3
 
 ## Context
 
@@ -21,8 +21,9 @@ Public Exchange APIs
   -> Setup Scoring / Rating
   -> Runtime Scanner Coordinator
   -> ApiReadModel
-  -> Read-only FastAPI HTTPS API
-  -> Custom GPT Action
+  -> Read-only FastAPI API on 127.0.0.1:8000
+  -> Caddy HTTPS at ktrader-api.duckdns.org
+  -> Bearer-authenticated Custom GPT Action
   -> K_Trader
 
 ## Provider abstraction
@@ -69,6 +70,8 @@ Live design:
 v1 uses SQLite WAL for canonical market/history state. Persistent deployment data lives outside the GitHub runner workspace.
 
 Current API-facing universe/candidate/signal state is an in-process read projection, not a second source of truth.
+
+Production persistent trees include application data under `/opt/k-trader/data` and Caddy TLS/config state under `/opt/k-trader/caddy_data` and `/opt/k-trader/caddy_config`.
 
 ## Engine boundaries
 
@@ -117,11 +120,15 @@ The API never recalculates Entry/SL/TP/RR/ATR-used/Grade/Score.
 
 ## API boundary
 
-The Custom GPT calls a public HTTPS read-only API. v1 application endpoints are GET-only; no account/order/mutation endpoints exist.
+The Custom GPT calls the production read-only API through `https://ktrader-api.duckdns.org`.
 
-Decimal market values are serialized as strings and timestamps as UTC ISO-8601.
+- `/health` remains public for readiness checks.
+- `/v1/*` is Bearer-protected when the production Action key is configured.
+- v1 application endpoints are GET-only; no account/order/mutation endpoints exist.
+- Decimal market values are serialized as strings and timestamps as UTC ISO-8601.
+- A fixed-window application rate limiter exists; reverse-proxy/TLS hardening belongs to deployment.
 
-A fixed-window application rate limiter exists; reverse-proxy hardening belongs to deployment.
+The FastAPI application itself remains bound to host loopback at `127.0.0.1:8000`; Caddy is the only public ingress path.
 
 ## Runtime process
 
@@ -133,19 +140,26 @@ It creates the SQLite repository, provider instances, `ApiReadModel`, scanner co
 
 ## Custom GPT Action
 
-`custom_gpt/openapi.yaml` defines stable read-only operation IDs. Before deployment it intentionally points to `https://api.k-trader.invalid`; Phase 10 replaces this with the real HTTPS API host.
+`custom_gpt/openapi.yaml` defines stable read-only operation IDs and now points to the Phase 10 accepted production origin `https://ktrader-api.duckdns.org`.
+
+The same high-entropy API key is configured only in GitHub Environment `production` and in GPT Action Bearer authentication. Secret values are outside the repository.
 
 ## Deployment
 
 GitHub private repository
-  -> push to main
-  -> self-hosted GitHub Runner on Ubuntu VPS
-  -> repository-wide tests
+  -> GitHub-hosted CI on PR/main
+  -> manual `Deploy Production` from approved main
+  -> self-hosted ARM64 GitHub Runner on Oracle Ubuntu VPS
   -> Docker Compose build
   -> runtime scanner + API process
-  -> health/readiness/live-provider checks
+  -> provider/runtime acceptance
+  -> Caddy HTTPS
+  -> Phase 10 Action acceptance
+  -> immutable release promotion
 
 Persistent runtime data/config/logs live under `/opt/k-trader`.
+
+Production deployment fails closed and rolls back if any required acceptance gate fails.
 
 ## Security boundary
 
