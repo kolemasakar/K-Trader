@@ -1,6 +1,6 @@
-# K-Trader — контрольний список GPT Builder v1.2
+# K-Trader — контрольний список GPT Builder v1.3
 
-Статус: ДВОЕТАПНЕ впровадження.
+Статус: серверна частина Phase 10 LIVE / налаштування Action у GPT Builder ще потрібно завершити окремо.
 
 ## Етап A — оновлення поведінки GPT
 1. Відкрити редактор K_Trader GPT.
@@ -10,7 +10,7 @@
    `Професійний трейдер-аналітик. Відбір і ранжування торгових можливостей за підтвердженими ринковими даними та правилами K-Trader; без виконання угод.`
 
    Не використовувати `сценарії ≥60%` або інші пороги ймовірності, доки модель не калібрована.
-4. Поки `custom_gpt/openapi.yaml` містить `https://api.k-trader.invalid`, робочу Action не активувати.
+4. Канонічний `custom_gpt/openapi.yaml` вже вказує на прийнятий production origin `https://ktrader-api.duckdns.org` після успішного Phase 10 live acceptance 2026-09-05.
 5. У попередньому перегляді перевірити резервний режим:
    - запит `знайди найкращі сетапи криптоактивів на найближчі 4 години` повертає `WATCHLIST ONLY`, якщо канонічні дані недоступні, але публічних достатньо;
    - для **кожного кандидата** перед агрегатором перевіряється прямий біржовий API на відповідному типі ринку;
@@ -27,12 +27,12 @@
 6. Якщо навіть публічних даних недостатньо, GPT прямо повідомляє про це.
 
 ## Етап B — активація канонічної Action
-1. Підтвердити, що вузол проходить `scripts/phase10_action_acceptance.py` з `data_ready=true`.
-2. Створити `KTRADER_ACTION_API_KEY`; зберігати лише у GitHub Environment і налаштуваннях автентифікації GPT Action.
-3. Згенерувати `custom_gpt/openapi.yaml` з реальним HTTPS вузлом через `scripts/render_custom_gpt_openapi.py`.
+1. Серверний вузол уже пройшов `scripts/phase10_action_acceptance.py` з `data_ready=true` на `https://ktrader-api.duckdns.org` 2026-09-05.
+2. `KTRADER_ACTION_API_KEY` створено і зберігається в GitHub Environment `production`; те саме значення потрібно ввести лише в налаштування автентифікації GPT Action. Не зберігати ключ у репозиторії або документації.
+3. Використати канонічний `custom_gpt/openapi.yaml`; він уже містить прийнятий production HTTPS origin.
 4. Створити/оновити Action у редакторі K_Trader GPT.
 5. Автентифікація: API key → Bearer.
-6. Імпортувати згенеровану OpenAPI-схему.
+6. Імпортувати канонічну OpenAPI-схему.
 7. Перевірити операції: `getHealth`, `getScannerStatus`, `listUniverse`, `getMarketSnapshot`, `getCandles`, `getAnalysis`, `listCandidates`, `listSignals`.
 8. У попередньому перегляді перевірити готовність, сигнали, кандидатів, один актив, неоднозначність провайдера і збереження `NO TRADE`.
 9. Перевірити автоперемикання: `data_ready=true` → канонічний режим; Action недоступна/не готова → лише `WATCHLIST ONLY`.
