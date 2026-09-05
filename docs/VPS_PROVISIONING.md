@@ -1,4 +1,4 @@
-# VPS Provisioning v1.2
+# VPS Provisioning v1.3
 
 ## Target
 
@@ -8,26 +8,45 @@ Primary production target for K-Trader v1:
 - Germany Central (Frankfurt) home region;
 - Ubuntu 24.04 LTS Minimal aarch64;
 - `VM.Standard.A1.Flex`;
-- target allocation: 2 OCPU / 12 GB RAM within the account's Always Free allocation;
+- active production allocation: 1 OCPU / 6 GB RAM;
 - Docker Engine + Compose plugin;
 - repository-scoped GitHub Actions self-hosted runner on Linux ARM64;
 - optional public DNS name for Caddy HTTPS.
 
 The deployment tooling also keeps Linux amd64 compatibility as a fallback path. K-Trader v1 uses no exchange API credentials.
 
-## 1. Oracle instance baseline
+## Current verified production host
 
-Use only resources explicitly marked Always Free-eligible in the OCI console.
-
-Canonical VM target:
+Phase 9 production deployment was verified on 2026-09-04.
 
 ```text
 Name: k-trader-prod
 Region: Germany Central (Frankfurt)
 Image: Canonical Ubuntu 24.04 Minimal aarch64
 Shape: VM.Standard.A1.Flex
-OCPU: 2
-Memory: 12 GB
+OCPU: 1
+Memory: 6 GB
+Public IPv4: 92.5.56.198
+Runner label: k-trader-prod-arm64
+Deployment run: 33920829993
+Deployed SHA: 9ed572349ed0195e518f128894a1f187419dbcc1
+```
+
+The application is currently localhost-only at `127.0.0.1:8000`. Public DNS/TLS remains a Phase 10 activation step.
+
+## 1. Oracle instance baseline
+
+Use only resources explicitly marked Always Free-eligible in the OCI console.
+
+Canonical VM baseline matching the active production host:
+
+```text
+Name: k-trader-prod
+Region: Germany Central (Frankfurt)
+Image: Canonical Ubuntu 24.04 Minimal aarch64
+Shape: VM.Standard.A1.Flex
+OCPU: 1
+Memory: 6 GB
 Capacity: on-demand
 Fault domain: let Oracle choose
 ```
@@ -44,7 +63,7 @@ IPv6: optional; not required in v1
 
 Use SSH public-key authentication. Never commit or upload the private SSH key to this repository.
 
-If OCI reports `Out of capacity` for A1, do not switch to a non-Always-Free shape. Try another availability domain or retry later.
+If OCI reports `Out of capacity` for A1, do not switch to a non-Always-Free shape without an explicit architecture/cost decision. Historical capacity shortage on 2026-08-23 was later resolved and the production A1 instance was provisioned successfully.
 
 ## 2. Obtain the repository on the host
 
@@ -76,6 +95,14 @@ The script:
 
 It deliberately does not alter SSH or firewall policy automatically.
 
+The host `ktrader` user must own the persistent K-Trader data tree before normal production deployment. Current verified production ownership is:
+
+```text
+/opt/k-trader/data -> uid:gid 1002:1002, owner ktrader:ktrader, mode 750
+```
+
+The numeric identity is host-specific. Do not treat `1002` as a universal constant. `scripts/deploy.sh` derives the production runtime UID/GID dynamically from the self-hosted runner user and builds the container with matching ownership.
+
 ## 4. Register the repository runner
 
 In GitHub repository settings open Actions -> Runners -> New self-hosted runner and obtain a short-lived repository registration token.
@@ -89,7 +116,7 @@ sudo env \
   ./scripts/register_runner.sh
 ```
 
-The registration script pins GitHub Actions Runner `2.336.0`, auto-detects the host architecture, and verifies the official release archive SHA-256.
+The registration script pins GitHub Actions Runner `2.336.0`; the runner may auto-update after registration. The active production runner reported version `2.337.0` during the successful deployment. The script auto-detects the host architecture and verifies the official release archive SHA-256.
 
 Checksums:
 
@@ -121,7 +148,7 @@ Create/verify GitHub Environment:
 
 `production`
 
-For localhost-only deployment no public Action settings are required.
+For localhost-only deployment no public Action settings are required. This is the current verified Phase 9 state.
 
 For public Custom GPT Action deployment configure:
 
@@ -153,7 +180,7 @@ Recommended host controls:
 - least-privilege operator accounts;
 - no unrelated workloads on the production runner if avoidable.
 
-## 7. First deployment
+## 7. Production deployment
 
 After the ARM64 runner is online, start GitHub Action:
 
@@ -164,15 +191,33 @@ It is manual-only and accepts `main` only.
 Deployment performs:
 
 1. immutable release build under `/opt/k-trader/releases/<commit-sha>`;
-2. native ARM64 Docker Compose build/start on Oracle A1;
-3. local process health check;
-4. public-provider REST checks on 5m/15m/1h/4h/1d;
-5. public 5m WebSocket check;
-6. scanner `data_ready` check;
-7. API MTF publication check;
-8. if `KTRADER_DOMAIN` is configured, wait for public HTTPS and run Phase 10 Action acceptance;
-9. mark the release current only after all required acceptance checks pass;
-10. rollback to the previous release if any required acceptance check fails.
+2. derive runner-user UID/GID and verify `/opt/k-trader/data` is writable;
+3. native ARM64 Docker Compose build/start with matching container runtime identity;
+4. local process health check;
+5. public-provider REST checks on 5m/15m/1h/4h/1d;
+6. public 5m WebSocket check;
+7. scanner `data_ready` check;
+8. API MTF publication check;
+9. if `KTRADER_DOMAIN` is configured, wait for public HTTPS and run Phase 10 Action acceptance;
+10. mark the release current only after all required acceptance checks pass;
+11. rollback to the previous release if any required acceptance check fails.
+
+Verified Phase 9 production result on 2026-09-04:
+
+```text
+GitHub Actions run: 33920829993 -> SUCCESS
+Release: 9ed572349ed0195e518f128894a1f187419dbcc1
+Runtime uid:gid: 1002:1002
+Provider acceptance: binance_usdm PASS
+REST intervals: 5m,15m,1h,4h,1d
+WebSocket: 5m PASS
+Scanner: DEGRADED, data_ready=true, symbols_ready=13, symbols_failed=7
+MTF API: PASS on all five canonical intervals
+Docker: healthy
+/health: status=ok, mode=read_only, data_ready=true
+```
+
+`DEGRADED` scanner state is allowed when usable canonical data remains ready and fresh; per-symbol failures are isolated rather than forcing the entire service offline.
 
 ## 8. HTTPS and Custom GPT Action
 
