@@ -59,9 +59,9 @@ def validate_action_schema_text(text: str, *, allow_placeholder: bool = True) ->
 
 def render_action_schema(text: str, server_url: str) -> str:
     server = validate_server_url(server_url)
-    if text.count(PLACEHOLDER_SERVER) != 1:
-        raise ValueError("canonical schema must contain exactly one server placeholder")
     validate_action_schema_text(text, allow_placeholder=True)
-    rendered = text.replace(PLACEHOLDER_SERVER, server)
+    servers = _SERVER_RE.findall(text)
+    current_server = servers[0]
+    rendered = text.replace(current_server, server, 1)
     validate_action_schema_text(rendered, allow_placeholder=False)
     return rendered
