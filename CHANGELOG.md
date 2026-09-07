@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-07 - Phase 10 Custom GPT product acceptance
+
+- Completed configuration of the existing K_Trader GPT with `SYSTEM_K_TRADER_v1_2_COMPACT.md` and the production read-only K-Trader Action.
+- Configured Action authentication as API key / Bearer using the existing production secret without storing the secret in repository files or acceptance evidence.
+- Added public one-click Action schema endpoint `https://ktrader-api.duckdns.org/action-openapi.yaml` returning the packaged canonical `custom_gpt/openapi.yaml`.
+- PR #24 exposed the canonical schema endpoint and packaged the schema in production; post-merge CI/Tests passed and Deploy Production #5 succeeded on SHA `322055f09346b309c9d477890715738036402393`.
+- GPT Builder exposed a parser incompatibility with OpenAPI parameter `$ref`; PR #25 inlined Action parameters while preserving operation IDs and the read-only API contract.
+- PR #25 post-merge CI run `34110324230` succeeded: pytest, Docker amd64 and Docker arm64 PASS; Tests run `34110324210` PASS.
+- Deploy Production #6 run `34111173939` succeeded on SHA `470531500566b1dc7b6e5d7296caf57403aacaf4`; production container healthy and Phase 10 Action live acceptance PASS.
+- GPT Builder recognized all eight required operations: `getHealth`, `getScannerStatus`, `listUniverse`, `getMarketSnapshot`, `getCandles`, `getAnalysis`, `listCandidates`, `listSignals`.
+- All eight operations passed Builder Preview validation against production.
+- Canonical-mode query preserved `NO TRADE` when no A/A+ signals were available and did not invent Entry/SL/TP or statistical probability.
+- Provider ambiguity HTTP 409 remains covered by backend regression; the live 409 path was not reproducible in the current single-provider production state.
+- Fail-closed fallback switched to `WATCHLIST ONLY` when canonical analysis/OHLCV was unavailable and did not fabricate class, Setup Score, Estimated Probability, Entry, SL, TP, ATR or VSA.
+- Strict fallback verified direct official REST API priority Binance USD-M -> Bybit Linear, rejected stale/partially unavailable public responses, did not mix provider series, and did not use an aggregator.
+- Privacy Policy URL `https://ktrader-api.duckdns.org/privacy` accepted in the Action and the existing link-access GPT was updated after Preview acceptance.
+- Added `docs/PHASE_10_PRODUCT_ACCEPTANCE.md` as the final product-side closure evidence.
+- Phase 10: COMPLETE for the read-only K-Trader v1 product boundary.
+
 ## 2026-08-23 - Phase 11G dataset catalogue foundation
 
 - Added deterministic audit catalogue schema `ktrader.dataset_catalogue.v1` for fully linked research chains.
