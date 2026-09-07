@@ -122,19 +122,20 @@ Phase 10 is **COMPLETE** as of 2026-09-07: production backend/API activation, GP
 Latest accepted production deployment:
 
 ```text
-Deploy Production #6: run 34111173939 -> SUCCESS
-Deployed SHA: 470531500566b1dc7b6e5d7296caf57403aacaf4
+Deploy Production #7: run 34139956047 -> SUCCESS
+Deployed SHA: b75b1e3d74b5834e7c404555caa6bdf34f87fe12
 Public origin: https://ktrader-api.duckdns.org
 Provider: binance_usdm
 REST/WebSocket acceptance: PASS
-Scanner: DEGRADED, data_ready=true, 17 ready / 3 failed
+Scanner: DEGRADED, data_ready=true
 MTF API: PASS
 K-Trader container: healthy
 HTTPS/TLS: PASS
 Action auth enabled: true
 Phase 10 Action live acceptance: PASS
-GPT Builder 8-operation Preview acceptance: PASS
 ```
+
+The Phase 10 GPT Builder eight-operation Preview acceptance remains the accepted product-side baseline; Deploy Production #7 changed the runtime to the approved Phase 11G tooling build without changing the read-only Action contract.
 
 The Builder initially rejected valid OpenAPI parameter `$ref` objects. PR #25 inlined the Action parameters while preserving the API contract and operation IDs; the corrected schema passed Builder parsing, multi-arch CI and production deployment.
 
@@ -217,7 +218,7 @@ Repository-side implementation is **VERIFIED** and production capture can accumu
 
 ### Phase 11G - Dataset Catalogue Foundation
 
-Repository-side implementation is **VERIFIED**:
+Repository-side implementation is **VERIFIED**, and the first provider-recorded production evidence chain is **COMPLETE / VERIFIED / CATALOGUED**:
 
 - `ktrader.dataset_catalogue.v1` links one coherent research chain from MTF bundle through universe archive/cohort, replay study/provenance and optional binary outcome sample;
 - every registered artifact keeps both its semantic identity and exact file/tree content SHA-256;
@@ -226,7 +227,9 @@ Repository-side implementation is **VERIFIED**:
 - `ktrader.outcome_sample.v1` exports immutable WIN/LOSS-only samples only after exact agreement between the replay-study artifact and `OutcomeRepository`;
 - catalogue verification re-opens source artifacts and fail-closes on provider/symbol/digest/path/relationship mismatches or tampering;
 - catalogue entries and the complete catalogue receive deterministic SHA-256 identities;
-- artifact-root containment and symlink/path-traversal guards are enforced.
+- artifact-root containment and symlink/path-traversal guards are enforced;
+- first accepted production chain: `binance_usdm` / `SUIUSDT`, catalogue SHA `749c3aa20d02788b1c75b48e3325d854d7182f5b0729fea39dcf888af367b864`;
+- final `load_dataset_catalogue(..., verify_artifacts=True)` passed on production.
 
 Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 
@@ -248,6 +251,9 @@ Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 - PR #24: public canonical Action schema endpoint; CI/Tests PASS; production run `34108005942` PASS.
 - PR #25: GPT Builder inline-parameter compatibility; post-merge CI `34110324230` and Tests `34110324210` PASS.
 - Production run `34111173939`: final Phase 10 schema deployment + live acceptance PASS on SHA `470531500566b1dc7b6e5d7296caf57403aacaf4`.
+- Main CI run `34139445282`: pytest PASS, Docker amd64 PASS, Docker arm64 PASS on SHA `b75b1e3d74b5834e7c404555caa6bdf34f87fe12`.
+- Main Tests run `34139445313`: PASS on SHA `b75b1e3d74b5834e7c404555caa6bdf34f87fe12`.
+- Deploy Production #7 run `34139956047`: SUCCESS on SHA `b75b1e3d74b5834e7c404555caa6bdf34f87fe12`; first canonical Phase 11G production chain subsequently materialized and catalogue-verified.
 
 ## Runtime entrypoint
 
@@ -303,6 +309,7 @@ No exchange credentials are used.
 - `docs/PHASE_11F_CHECKPOINT.md`
 - `docs/PHASE_11G_CHECKPOINT.md`
 - `docs/checkpoints/2026-09-05_PHASE9_PRODUCTION_ACCEPTANCE.md`
+- `docs/checkpoints/2026-09-07_PHASE11G_FIRST_PRODUCTION_CHAIN.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
@@ -314,10 +321,10 @@ No exchange credentials are used.
 
 ## Current phase
 
-Phase 9 production and **Phase 10 Custom GPT product integration are COMPLETE and accepted** on Oracle ARM64 / the existing K_Trader GPT. Repository-side Phase 11A/11B/11C/11D/11E/11F/11G hardening remains **VERIFIED**.
+Phase 9 production and **Phase 10 Custom GPT product integration are COMPLETE and accepted** on Oracle ARM64 / the existing K_Trader GPT. Repository-side Phase 11A/11B/11C/11D/11E/11F/11G hardening remains **VERIFIED**, and the first real provider-recorded Phase 11G evidence chain is **COMPLETE / VERIFIED / CATALOGUED**.
 
 The canonical public API origin is `https://ktrader-api.duckdns.org`; application port `8000` remains localhost-only and `/v1/*` is Bearer-protected in production.
 
-Historical full-engine outcome studies still require coherent provider-recorded MTF bundles plus timestamped universe/liquidity context captured prospectively. Continuous production runtime provides the basis for that accumulation; missing historical ranks are never fabricated from current ticker data.
+Continuous Phase 11F capture remains active. Phase 11G research can now extend the verified catalogue with additional provider-recorded coherent chains; missing historical ranks are never fabricated from current ticker data.
 
-The immediate roadmap focus is now Phase 11 operational evidence and prospective research-data accumulation/catalogue population. Phase 12 multi-provider expansion (OKX/KuCoin/other adapters) remains later work. Statistical win probability remains deferred until calibrated on adequate time-separated confirmed outcomes.
+The immediate roadmap focus remains Phase 11 operational evidence and prospective research-data accumulation/catalogue expansion. Phase 12 multi-provider expansion (OKX/KuCoin/other adapters) remains later work. Statistical win probability remains deferred until calibrated on adequate time-separated confirmed outcomes.
