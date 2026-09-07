@@ -1,9 +1,8 @@
-# Deployment Specification v1.5
+# Deployment Specification v1.6
 
 ## Target
 
-- Private GitHub repository.
-- GitHub-hosted CI for pull requests/main validation.
+- GitHub repository with GitHub-hosted CI for pull requests/main validation.
 - Ubuntu VPS.
 - Docker Engine + Docker Compose.
 - Repository-scoped self-hosted GitHub Actions runner for production deployment only.
@@ -12,24 +11,30 @@
 
 ## Current production state
 
-Phase 10 public HTTPS production deployment was verified on 2026-09-05.
+Latest accepted production runtime was verified on 2026-09-07.
 
 - Host: Oracle Cloud Ampere A1, Frankfurt, Ubuntu 24.04 Minimal aarch64.
 - Active allocation: 1 OCPU / 6 GB RAM.
 - Production runner: `k-trader-prod-arm64`.
 - Public origin: `https://ktrader-api.duckdns.org`.
 - DNS: `ktrader-api.duckdns.org -> 92.5.56.198`.
-- Deployed SHA: `7c60a77b9773774373ea4a3f095c5ab2ee7767e2`.
-- GitHub Actions deployment: `Deploy Production #4`, run `33945690930`, successful re-run attempt.
+- Deployed SHA: `b75b1e3d74b5834e7c404555caa6bdf34f87fe12`.
+- GitHub Actions deployment: `Deploy Production #7`, run `34139956047`, SUCCESS.
 - Runtime identity: UID/GID `1002:1002`, aligned with the host `ktrader` user.
-- Persistent application data: `/opt/k-trader/data`, owner `ktrader:ktrader`, mode `750`.
+- Persistent application data: `/opt/k-trader/data`, owner `ktrader:ktrader`.
 - Persistent Caddy storage: `/opt/k-trader/caddy_data` and `/opt/k-trader/caddy_config`, owner `root:root`, mode `700`.
-- Final local health: `status=ok`, `mode=read_only`, `data_ready=true`.
-- Final Docker state: K-Trader `healthy`; Caddy active on 80/443.
+- Final local health observed after Deploy #7: `status=ok`, `mode=read_only`, `data_ready=true`.
+- Scanner may be `DEGRADED` while service health remains `ok` when canonical data is ready/fresh.
+- Final Docker state: K-Trader healthy; Caddy active on 80/443.
 - Application remains host-loopback-only at `127.0.0.1:8000`.
+- Production provider: `binance_usdm`.
 - Phase 10 public HTTPS/Action live acceptance: PASS.
+- Fresh-process Phase 11G replay imports: PASS.
+- Canonical replay `--start`/`--end` and universe-archive builder tooling are present in the deployed runtime.
 
-The canonical OpenAPI file now uses `https://ktrader-api.duckdns.org` because the live Phase 10 Action gate passed.
+Repository documentation HEAD may be newer than the deployed SHA when changes are documentation-only. This does not imply an undeployed runtime behavior change and does not require a production redeploy.
+
+The canonical OpenAPI file uses `https://ktrader-api.duckdns.org` because the live Phase 10 Action gate passed.
 
 ## Runtime layout
 
@@ -45,6 +50,11 @@ Persistent runtime state lives outside the runner workspace:
 - `DEPLOYED_SHA`
 
 The GitHub runner `_work` directory is not a persistence location.
+
+Research persistence currently includes:
+
+- immutable Phase 11F universe captures under `/opt/k-trader/data/research/universe` on the host (`/data/research/universe` in the container);
+- Phase 11G materialized chains and dataset catalogue under `/opt/k-trader/data/research/phase11g` on the host (`/data/research/phase11g` in the container).
 
 ## CI gate
 
@@ -62,6 +72,12 @@ Mandatory jobs:
 8. validate both amd64 and arm64 container builds.
 
 The production self-hosted runner never executes PR CI.
+
+Latest repository documentation checkpoint evidence before the current docs branch:
+
+- main SHA `40cee9b17aa74ad45be1894d566ddb79f8a81ef4`;
+- Tests run `34144783877`: PASS;
+- CI run `34144783943`: pytest PASS, Docker amd64 PASS, Docker arm64 PASS.
 
 ## Production deploy
 
@@ -137,15 +153,16 @@ Caddy container:
 
 The Docker healthcheck therefore evaluates service readiness from the health response without requiring the scanner status string itself to be `READY`. A fresh `data_ready=true` runtime can remain Docker-healthy even when some symbols fail independently. Stale scanner data still degrades health and fails the container health gate.
 
-Verified final Phase 10 deployment evidence:
+Accepted Deploy #7 evidence:
 
-- provider acceptance: Binance USD-M REST `5m,15m,1h,4h,1d` plus WebSocket `5m` — PASS;
-- scanner: `DEGRADED`, 17 symbols ready / 3 failed in the accepted deployment cycle;
+- provider: `binance_usdm`;
+- provider REST/WebSocket acceptance: PASS;
 - `data_ready=true`;
-- MTF API publication for all five canonical intervals — PASS;
-- K-Trader container — `healthy`;
-- Caddy HTTPS — PASS;
-- Phase 10 Action live acceptance — PASS.
+- MTF API publication for all five canonical intervals: PASS;
+- K-Trader container: healthy;
+- Caddy HTTPS/TLS: PASS;
+- Action authentication enabled: true;
+- Phase 10 Action live acceptance: PASS.
 
 ## HTTPS and Action gate
 
@@ -172,16 +189,16 @@ When `KTRADER_DOMAIN` is non-empty:
 
 This prevents a locally healthy release from being promoted while the public HTTPS endpoint or Action authentication is broken.
 
-## Phase 10 incident evidence
+## Historical Phase 10 incident evidence
 
 Two fail-closed deployment attempts proved rollback behavior before final success:
 
 1. the first public deployment exposed that Phase 9 local `/v1/*` acceptance requests lacked Bearer authentication once Action auth was enabled; PR #19 fixed that integration defect;
 2. the next attempt reached HTTPS but Caddy could not persist ACME state because the capability-dropped root process did not own the host bind mounts; ownership was corrected and the provisioning contract was hardened.
 
-Both failed attempts rolled back to the previous accepted release. The successful re-run then passed all Phase 9 and Phase 10 gates and promoted SHA `7c60a77b9773774373ea4a3f095c5ab2ee7767e2`.
+Both failed attempts rolled back to the previous accepted release. The successful Phase 10 activation then passed all Phase 9 and Phase 10 gates. Later accepted deployments culminated in Deploy Production #7 on `b75b1e3d74b5834e7c404555caa6bdf34f87fe12`.
 
-Detailed evidence is in `docs/PHASE_10_CHECKPOINT.md`.
+Detailed Phase 10 evidence is in `docs/PHASE_10_CHECKPOINT.md` and `docs/PHASE_10_PRODUCT_ACCEPTANCE.md`.
 
 ## Target-VPS live acceptance
 
