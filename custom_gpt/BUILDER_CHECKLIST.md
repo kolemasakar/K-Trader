@@ -1,6 +1,6 @@
 # K-Trader — контрольний список GPT Builder v1.4
 
-Статус: Phase 10 COMPLETE — production Action, GPT Builder configuration, Preview acceptance і вибраний режим поширення перевірені 2026-09-07.
+Статус: Phase 10 COMPLETE для поточного single-provider production scope — production Action, GPT Builder configuration, reachable Preview acceptance і вибраний режим поширення перевірені 2026-09-07.
 
 ## Етап A — поведінка GPT
 1. Відкрити редактор існуючого K_Trader GPT.
@@ -49,8 +49,11 @@
    - `getAnalysis`;
    - `listCandidates`;
    - `listSignals`.
-8. Усі вісім операцій пройшли Preview acceptance 2026-09-07.
-9. Provider ambiguity HTTP 409 покритий backend regression test; live 409 не відтворено через поточний single-provider production state.
+8. Усі вісім reachable production operations пройшли Preview acceptance 2026-09-07.
+9. Provider ambiguity HTTP 409:
+   - backend contract покритий regression test;
+   - GPT-side live 409 retry у Phase 10 має статус **N/A**, бо поточний runtime публікує один selected provider і не може створити same-symbol multi-provider ambiguity;
+   - цей GPT Preview gate є **обов'язковим перед Phase 12 multi-provider activation** і не може бути зарахований як PASS лише backend-тестом.
 10. Автоперемикання перевірено: канонічні дані доступні → canonical mode; канонічний analysis/OHLCV недоступний → `WATCHLIST ONLY`.
 
 ## Етап C — publishing/privacy
@@ -62,4 +65,4 @@
 
 Канонічний checkpoint: `docs/PHASE_10_PRODUCT_ACCEPTANCE.md`.
 
-Phase 10 вважається завершеним лише для read-only K-Trader v1. Автоматичне виконання угод, exchange-account access і statistical win probability не входять у цей acceptance.
+Phase 10 вважається завершеним для поточного read-only single-provider K-Trader v1 scope. Автоматичне виконання угод, exchange-account access, multi-provider ambiguity activation і statistical win probability не входять у цей acceptance; ambiguity Preview стає blocking gate перед Phase 12.
