@@ -94,13 +94,13 @@ The numeric UID/GID is host-specific. Production deployment derives it dynamical
 
 Historical note: Oracle A1 capacity was unavailable during the original 2026-08-23 provisioning attempts; capacity later became available and the production VM was created successfully.
 
-### Phase 10 - Custom GPT Action production activation
+### Phase 10 - Custom GPT Action
 
-Phase 10 backend/API activation is **LIVE AND VERIFIED** as of 2026-09-05.
+Phase 10 is **COMPLETE** as of 2026-09-07: production backend/API activation, GPT Builder configuration, Preview acceptance and the selected link-access publishing update have all passed.
 
 - exact read-only OpenAPI schemas for eight Action operations;
 - Bearer API-key enforcement for `/v1/*`;
-- public `/health` and `/privacy`;
+- public `/health`, `/privacy` and `/action-openapi.yaml`;
 - production DNS `ktrader-api.duckdns.org -> 92.5.56.198`;
 - OCI stateful TCP 80/443 ingress;
 - persistent host firewall allowances for 80/443 before terminal reject;
@@ -108,29 +108,38 @@ Phase 10 backend/API activation is **LIVE AND VERIFIED** as of 2026-09-05.
 - production Action key stored only in GitHub Environment `production` and not in repository files;
 - local Phase 9 acceptance authenticates `/v1/*` probes when Action auth is enabled;
 - Caddy persistent storage ownership hardened for the capability-dropped root container;
-- live public Phase 10 Action acceptance passed;
-- canonical `custom_gpt/openapi.yaml` now points to `https://ktrader-api.duckdns.org`.
+- canonical `custom_gpt/openapi.yaml` points to `https://ktrader-api.duckdns.org`;
+- one-click Builder schema URL: `https://ktrader-api.duckdns.org/action-openapi.yaml`;
+- active Builder instructions: `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md`;
+- Action authentication configured as API key / Bearer;
+- Action Privacy Policy URL: `https://ktrader-api.duckdns.org/privacy`;
+- all eight Action operations passed GPT Builder Preview;
+- canonical-mode `NO TRADE` preservation passed;
+- fail-closed `WATCHLIST ONLY` fallback passed;
+- strict direct-source fallback order Binance USD-M -> Bybit Linear passed without provider-series mixing or fabricated trading fields;
+- current link-access GPT distribution was updated after acceptance.
 
-Verified production activation:
+Latest accepted production deployment:
 
 ```text
-GitHub Actions: Deploy Production #4, run 33945690930, successful re-run
-Deployed SHA: 7c60a77b9773774373ea4a3f095c5ab2ee7767e2
+Deploy Production #6: run 34111173939 -> SUCCESS
+Deployed SHA: 470531500566b1dc7b6e5d7296caf57403aacaf4
 Public origin: https://ktrader-api.duckdns.org
 Provider: binance_usdm
-REST: 5m,15m,1h,4h,1d PASS
-WebSocket: 5m PASS
+REST/WebSocket acceptance: PASS
 Scanner: DEGRADED, data_ready=true, 17 ready / 3 failed
 MTF API: PASS
 K-Trader container: healthy
 HTTPS/TLS: PASS
 Action auth enabled: true
 Phase 10 Action live acceptance: PASS
+GPT Builder 8-operation Preview acceptance: PASS
 ```
 
-Two earlier activation attempts failed closed and rolled back: one exposed missing Bearer auth in the Phase 9 local acceptance path, and one exposed Caddy persistent storage permission mismatch. Both are now fixed and documented in `docs/PHASE_10_CHECKPOINT.md`.
+The Builder initially rejected valid OpenAPI parameter `$ref` objects. PR #25 inlined the Action parameters while preserving the API contract and operation IDs; the corrected schema passed Builder parsing, multi-arch CI and production deployment.
 
-Remaining product-side work is to import/configure the Action in the existing K_Trader GPT Builder, use Bearer authentication, and complete Preview/publishing checks.
+Detailed backend activation evidence: `docs/PHASE_10_CHECKPOINT.md`.
+Final product-side acceptance evidence: `docs/PHASE_10_PRODUCT_ACCEPTANCE.md`.
 
 ### Phase 11A - Replay / Regression Hardening
 
@@ -235,7 +244,10 @@ Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 - PR #17 final CI: **170 tests PASS**, docker-amd64 PASS, docker-arm64 PASS.
 - Production run `33920829993`: deployment + live Phase 9 acceptance PASS on Oracle ARM64.
 - PR #19: authenticated Phase 9 acceptance fix, CI/Tests PASS before merge.
-- Production run `33945690930` re-run: Phase 9 + public HTTPS + Phase 10 Action acceptance PASS.
+- Production run `33945690930` re-run: Phase 9 + public HTTPS + Phase 10 Action backend acceptance PASS.
+- PR #24: public canonical Action schema endpoint; CI/Tests PASS; production run `34108005942` PASS.
+- PR #25: GPT Builder inline-parameter compatibility; post-merge CI `34110324230` and Tests `34110324210` PASS.
+- Production run `34111173939`: final Phase 10 schema deployment + live acceptance PASS on SHA `470531500566b1dc7b6e5d7296caf57403aacaf4`.
 
 ## Runtime entrypoint
 
@@ -282,6 +294,7 @@ No exchange credentials are used.
 - `docs/PHASE_9_1_CHECKPOINT.md`
 - `docs/PHASE_10_PREP_CHECKPOINT.md`
 - `docs/PHASE_10_CHECKPOINT.md`
+- `docs/PHASE_10_PRODUCT_ACCEPTANCE.md`
 - `docs/PHASE_11A_CHECKPOINT.md`
 - `docs/PHASE_11B_CHECKPOINT.md`
 - `docs/PHASE_11C_CHECKPOINT.md`
@@ -290,7 +303,7 @@ No exchange credentials are used.
 - `docs/PHASE_11F_CHECKPOINT.md`
 - `docs/PHASE_11G_CHECKPOINT.md`
 - `docs/checkpoints/2026-09-05_PHASE9_PRODUCTION_ACCEPTANCE.md`
-- `custom_gpt/SYSTEM_K_TRADER_v1_1.md`
+- `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
 - `custom_gpt/BUILDER_CHECKLIST.md`
@@ -301,10 +314,10 @@ No exchange credentials are used.
 
 ## Current phase
 
-Phase 9 production and Phase 10 public HTTPS/Action backend activation are **LIVE AND ACCEPTED** on Oracle ARM64. Repository-side Phase 11A/11B/11C/11D/11E/11F/11G hardening remains **VERIFIED**.
+Phase 9 production and **Phase 10 Custom GPT product integration are COMPLETE and accepted** on Oracle ARM64 / the existing K_Trader GPT. Repository-side Phase 11A/11B/11C/11D/11E/11F/11G hardening remains **VERIFIED**.
 
 The canonical public API origin is `https://ktrader-api.duckdns.org`; application port `8000` remains localhost-only and `/v1/*` is Bearer-protected in production.
 
 Historical full-engine outcome studies still require coherent provider-recorded MTF bundles plus timestamped universe/liquidity context captured prospectively. Continuous production runtime provides the basis for that accumulation; missing historical ranks are never fabricated from current ticker data.
 
-The next immediate product-side step is to configure/import the now-production `custom_gpt/openapi.yaml` into the existing K_Trader GPT Builder, set Bearer authentication using the existing secret, run Preview validation, and complete any publishing/privacy checks required by the selected distribution mode.
+The immediate roadmap focus is now Phase 11 operational evidence and prospective research-data accumulation/catalogue population. Phase 12 multi-provider expansion (OKX/KuCoin/other adapters) remains later work. Statistical win probability remains deferred until calibrated on adequate time-separated confirmed outcomes.
