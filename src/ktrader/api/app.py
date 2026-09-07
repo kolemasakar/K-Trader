@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import hmac
+import os
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse, Response
 
 from ktrader.api.rate_limit import FixedWindowRateLimitMiddleware
 from ktrader.api.serialization import (
@@ -35,6 +37,13 @@ Contact and policy-owner details should be added before public GPT distribution 
 """
 
 
+def _default_action_openapi_path() -> Path:
+    configured = os.environ.get("KTRADER_ACTION_OPENAPI_PATH", "").strip()
+    if configured:
+        return Path(configured)
+    return Path(__file__).resolve().parents[3] / "custom_gpt" / "openapi.yaml"
+
+
 def create_app(
     read_model: ApiReadModel | None = None,
     *,
@@ -43,9 +52,13 @@ def create_app(
     lifespan=None,
     action_api_key: str | None = None,
     health_max_scan_age_seconds: float | None = None,
+    action_openapi_path: str | Path | None = None,
 ) -> FastAPI:
     state = read_model or ApiReadModel()
     secret = action_api_key.strip() if action_api_key and action_api_key.strip() else None
+    canonical_action_openapi_path = (
+        Path(action_openapi_path) if action_openapi_path is not None else _default_action_openapi_path()
+    )
     if health_max_scan_age_seconds is not None and health_max_scan_age_seconds <= 0:
         raise ValueError("health_max_scan_age_seconds must be positive when configured")
     app = FastAPI(
@@ -119,6 +132,14 @@ def create_app(
     @app.get("/privacy", include_in_schema=False)
     def privacy_policy():
         return PlainTextResponse(PRIVACY_POLICY_TEXT)
+
+    @app.get("/action-openapi.yaml", include_in_schema=False)
+    def action_openapi_schema():
+        try:
+            payload = canonical_action_openapi_path.read_bytes()
+        except OSError as exc:
+            raise HTTPException(status_code=503, detail="canonical Action OpenAPI schema unavailable") from exc
+        return Response(content=payload, media_type="application/yaml")
 
     @app.get("/v1/scanner/status", operation_id="getScannerStatus")
     def scanner_status() -> dict:

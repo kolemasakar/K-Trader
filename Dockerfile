@@ -6,7 +6,8 @@ ARG KTRADER_RUNTIME_GID=1000
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    KTRADER_DB_PATH=/data/ktrader.db
+    KTRADER_DB_PATH=/data/ktrader.db \
+    KTRADER_ACTION_OPENAPI_PATH=/app/custom_gpt/openapi.yaml
 
 WORKDIR /app
 
@@ -18,6 +19,7 @@ RUN groupadd --gid "${KTRADER_RUNTIME_GID}" ktrader \
 COPY pyproject.toml README.md ./
 COPY src ./src
 COPY scripts ./scripts
+COPY custom_gpt/openapi.yaml ./custom_gpt/openapi.yaml
 
 RUN python -m pip install --no-cache-dir .
 

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from fastapi.testclient import TestClient
 import pytest
 import yaml
 
@@ -9,6 +10,7 @@ from ktrader.action_package import (
     validate_action_schema_text,
     validate_server_url,
 )
+from ktrader.api.app import create_app
 
 
 SCHEMA_PATH = Path("custom_gpt/openapi.yaml")
@@ -24,6 +26,15 @@ def test_canonical_action_schema_is_valid_yaml_read_only_and_complete():
     assert operation_ids == REQUIRED_OPERATION_IDS
     for operations in schema["paths"].values():
         assert set(operations).issubset({"get", "parameters"})
+
+
+def test_public_action_schema_endpoint_returns_exact_canonical_bytes_without_auth():
+    app = create_app(action_api_key="test-secret", action_openapi_path=SCHEMA_PATH)
+    response = TestClient(app).get("/action-openapi.yaml")
+
+    assert response.status_code == 200
+    assert response.content == SCHEMA_PATH.read_bytes()
+    assert response.headers["content-type"].startswith("application/yaml")
 
 
 def test_render_action_schema_replaces_current_server_origin():
