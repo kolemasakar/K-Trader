@@ -2,13 +2,15 @@
 
 Date: 2026-09-07
 
-Status: COMPLETE.
+Status: COMPLETE FOR CURRENT SINGLE-PROVIDER PRODUCTION SCOPE.
 
 ## Scope
 
 This checkpoint records completion of the product-side Phase 10 Custom GPT Builder configuration and Preview acceptance for the existing K_Trader GPT.
 
 It does not change the v1 read-only boundary: K-Trader exposes public market data and deterministic Trading Engine results only; it does not access exchange accounts and cannot place, modify, or cancel orders.
+
+The current production scanner publishes one selected provider at a time. Therefore the live multi-provider ambiguity path cannot currently occur in production. That conditional path is recorded as N/A for the current Phase 10 product scope and becomes a mandatory Preview gate before Phase 12 enables simultaneous multi-provider exposure for the same canonical symbol.
 
 ## Accepted production identity
 
@@ -74,11 +76,13 @@ Setup Score was presented as deterministic quality score; `estimated_probability
 
 ### Provider ambiguity
 
-LIVE 409 path: NOT REPRODUCED IN CURRENT SINGLE-PROVIDER LIVE DATA.
+Current production live Preview status: **N/A — path not reachable in the current single-provider runtime state**.
 
 Backend contract coverage: PASS.
 
 `tests/test_api.py::test_symbol_ambiguity_requires_provider_id` constructs the same canonical symbol under two providers, asserts HTTP 409 without `provider_id`, requires the response resolution to repeat with `provider_id`, and verifies the explicit-provider retry succeeds.
+
+This backend regression does **not** count as a GPT Builder Preview PASS for the retry behavior. The GPT-side 409 retry remains an explicit deferred acceptance gate and must be staged and passed before Phase 12 or any other deployment exposes the same canonical symbol from multiple providers simultaneously. Until then, the production product cannot enter that ambiguity state, so the gate is N/A rather than PASS for Phase 10.
 
 ### Fail-closed fallback
 
@@ -116,8 +120,10 @@ Before any future broader GPT Store/public distribution, re-check whether operat
 
 ## Final Phase 10 result
 
-Phase 10 product acceptance is COMPLETE.
+Phase 10 product acceptance is COMPLETE **for the currently deployed single-provider product scope**.
 
-The production backend/API gate, Builder schema/auth configuration, all eight Action operations, canonical-mode behavior, NO TRADE preservation, fail-closed fallback, direct-source fallback ordering, privacy URL and selected distribution update have all passed.
+The production backend/API gate, Builder schema/auth configuration, all eight reachable production Action operations, canonical-mode behavior, NO TRADE preservation, fail-closed fallback, direct-source fallback ordering, privacy URL and selected distribution update have passed.
 
-Remaining work belongs to Phase 11 operational/research accumulation and later Phase 12 provider expansion; statistical win probability remains deferred until calibrated on adequate time-separated data.
+The only conditional behavior not Preview-tested is HTTP 409 provider ambiguity, because current production does not expose a multi-provider ambiguity state. That gate is explicitly deferred and becomes mandatory before Phase 12 multi-provider exposure can be accepted.
+
+Remaining active work belongs to Phase 11 operational/research accumulation and later Phase 12 provider expansion; statistical win probability remains deferred until calibrated on adequate time-separated data.
