@@ -171,7 +171,7 @@ For broad dataset expansion, a read-only eligibility/deep-history/replay preflig
 
 Accepted on 2026-09-07 for `binance_usdm` / `SUIUSDT`.
 
-- universe archive SHA: `3c830d8410b913aa4b39afd8cb5be57e96a18b4b39afd8cb5be57e96a18b4b`;
+- universe archive SHA: `3c830d8410b913aa4b39afd8cb5be57e96a18b4a1ae4d46fa709fc11f70ccdda`;
 - cohort SHA: `c63b90a1905149462e1eb31a842fff7c5f15290a7f4963107d7c8c4cf2273686`;
 - MTF bundle SHA: `c0112c0d3688cddb86cabc54ae1c9da05e04ff2cef63f395b438448e3070d344`;
 - replay study ID: `ebfd16b0b9059c5bd51f948d4c1b0086f4a2966a610e58dd7a6fb0d8ee474f5e`;
