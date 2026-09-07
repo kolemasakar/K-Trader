@@ -203,7 +203,7 @@ Repository-side implementation is **VERIFIED**:
 
 ### Phase 11F - Operations Hardening / Continuous Research Capture
 
-Repository-side implementation is **VERIFIED** and production capture can accumulate prospectively:
+Repository-side implementation is **VERIFIED** and production capture is accumulating prospectively:
 
 - production runtime retains and reuses the exact normalized instruments/tickers from the selected live universe request cycle;
 - provider-coherent universe snapshots are captured automatically at a configurable interval, default 300 seconds;
@@ -216,9 +216,9 @@ Repository-side implementation is **VERIFIED** and production capture can accumu
 - Docker healthcheck fails on unusable/stale runtime while allowing fresh usable partial scanner degradation;
 - K-Trader/Caddy container logs use bounded json-file rotation.
 
-### Phase 11G - Dataset Catalogue Foundation
+### Phase 11G - Dataset Catalogue Foundation and Expansion
 
-Repository-side implementation is **VERIFIED**, and the first provider-recorded production evidence chain is **COMPLETE / VERIFIED / CATALOGUED**:
+Repository-side implementation is **VERIFIED**, and two provider-recorded production evidence chains are now **COMPLETE / VERIFIED / CATALOGUED**:
 
 - `ktrader.dataset_catalogue.v1` links one coherent research chain from MTF bundle through universe archive/cohort, replay study/provenance and optional binary outcome sample;
 - every registered artifact keeps both its semantic identity and exact file/tree content SHA-256;
@@ -228,8 +228,14 @@ Repository-side implementation is **VERIFIED**, and the first provider-recorded 
 - catalogue verification re-opens source artifacts and fail-closes on provider/symbol/digest/path/relationship mismatches or tampering;
 - catalogue entries and the complete catalogue receive deterministic SHA-256 identities;
 - artifact-root containment and symlink/path-traversal guards are enforced;
-- first accepted production chain: `binance_usdm` / `SUIUSDT`, catalogue SHA `749c3aa20d02788b1c75b48e3325d854d7182f5b0729fea39dcf888af367b864`;
-- final `load_dataset_catalogue(..., verify_artifacts=True)` passed on production.
+- accepted production chains: `binance_usdm` / `SUIUSDT` and `binance_usdm` / `XRPUSDT`;
+- both chains use strict `max_context_age_seconds=300` and the same coherent 16-capture context window;
+- current catalogue entry count: `2`;
+- current catalogue SHA: `057ff750966d2bc5043fffd7fdc37583dd0133480452c131b51f84109d2fb4b6`;
+- final `load_dataset_catalogue(..., verify_artifacts=True)` passed on production with both entries;
+- both accepted replay windows produced zero tradable signals naturally, so both `outcome_sample` references remain `null`.
+
+Read-only dataset-expansion discovery found 45 strict-policy eligible symbols (44 excluding SUI). `MARSCOINUSDT` failed deep-history preflight with only 4 daily bars versus 300 required; `XRPUSDT` passed full MTF depth and became the second canonical chain.
 
 Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 
@@ -253,7 +259,10 @@ Setup Score remains non-probabilistic. `estimated_probability` remains null/N/A.
 - Production run `34111173939`: final Phase 10 schema deployment + live acceptance PASS on SHA `470531500566b1dc7b6e5d7296caf57403aacaf4`.
 - Main CI run `34139445282`: pytest PASS, Docker amd64 PASS, Docker arm64 PASS on SHA `b75b1e3d74b5834e7c404555caa6bdf34f87fe12`.
 - Main Tests run `34139445313`: PASS on SHA `b75b1e3d74b5834e7c404555caa6bdf34f87fe12`.
-- Deploy Production #7 run `34139956047`: SUCCESS on SHA `b75b1e3d74b5834e7c404555caa6bdf34f87fe12`; first canonical Phase 11G production chain subsequently materialized and catalogue-verified.
+- Deploy Production #7 run `34139956047`: SUCCESS on SHA `b75b1e3d74b5834e7c404555caa6bdf34f87fe12`.
+- PR #30 docs checkpoint squash merge: `40cee9b17aa74ad45be1894d566ddb79f8a81ef4`.
+- Post-PR-#30 main Tests run `34144783877`: PASS.
+- Post-PR-#30 main CI run `34144783943`: pytest PASS, Docker amd64 PASS, Docker arm64 PASS.
 
 ## Runtime entrypoint
 
@@ -275,6 +284,7 @@ API-only entrypoint:
 - `scripts/export_mtf_history.py`
 - `scripts/run_replay_study.py`
 - `scripts/capture_universe_snapshot.py`
+- `scripts/build_universe_archive.py`
 - `scripts/build_study_cohort.py`
 - `scripts/export_outcome_sample.py`
 - `scripts/build_dataset_catalogue.py`
@@ -310,6 +320,7 @@ No exchange credentials are used.
 - `docs/PHASE_11G_CHECKPOINT.md`
 - `docs/checkpoints/2026-09-05_PHASE9_PRODUCTION_ACCEPTANCE.md`
 - `docs/checkpoints/2026-09-07_PHASE11G_FIRST_PRODUCTION_CHAIN.md`
+- `docs/checkpoints/2026-09-07_PHASE11G_TWO_CHAIN_DATASET_CHECKPOINT.md`
 - `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
@@ -321,10 +332,10 @@ No exchange credentials are used.
 
 ## Current phase
 
-Phase 9 production and **Phase 10 Custom GPT product integration are COMPLETE and accepted** on Oracle ARM64 / the existing K_Trader GPT. Repository-side Phase 11A/11B/11C/11D/11E/11F/11G hardening remains **VERIFIED**, and the first real provider-recorded Phase 11G evidence chain is **COMPLETE / VERIFIED / CATALOGUED**.
+Phase 9 production and **Phase 10 Custom GPT product integration are COMPLETE and accepted** on Oracle ARM64 / the existing K_Trader GPT. Repository-side Phase 11A/11B/11C/11D/11E/11F/11G hardening remains **VERIFIED**, and two real provider-recorded Phase 11G evidence chains are **COMPLETE / VERIFIED / CATALOGUED**.
 
 The canonical public API origin is `https://ktrader-api.duckdns.org`; application port `8000` remains localhost-only and `/v1/*` is Bearer-protected in production.
 
-Continuous Phase 11F capture remains active. Phase 11G research can now extend the verified catalogue with additional provider-recorded coherent chains; missing historical ranks are never fabricated from current ticker data.
+Continuous Phase 11F capture remains active. The current Phase 11G catalogue contains two verified entries (`SUIUSDT`, `XRPUSDT`) with catalogue SHA `057ff750966d2bc5043fffd7fdc37583dd0133480452c131b51f84109d2fb4b6`.
 
-The immediate roadmap focus remains Phase 11 operational evidence and prospective research-data accumulation/catalogue expansion. Phase 12 multi-provider expansion (OKX/KuCoin/other adapters) remains later work. Statistical win probability remains deferred until calibrated on adequate time-separated confirmed outcomes.
+The immediate roadmap focus is read-only batch signal/outcome discovery across strict-policy eligible provider-recorded candidates, then selective canonical materialization and catalogue expansion. Phase 12 multi-provider expansion remains later work. Statistical win probability remains deferred until calibrated on adequate time-separated confirmed outcomes.

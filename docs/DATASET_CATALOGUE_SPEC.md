@@ -1,4 +1,4 @@
-# Dataset Catalogue Spec v1.1
+# Dataset Catalogue Spec v1.2
 
 Updated: 2026-09-07
 
@@ -37,6 +37,8 @@ Each artifact reference stores:
 - exact file/tree content SHA-256.
 
 The catalogue entry itself has a deterministic SHA-256 `entry_id`. The catalogue has a deterministic `catalogue_sha256` over all sorted entries.
+
+Adding a new valid entry changes the catalogue SHA while preserving the semantic identity of already-registered immutable entries.
 
 ## Relationship validation
 
@@ -97,6 +99,8 @@ The builder:
 - reloads the written archive before reporting success.
 
 Provider/config mixing remains invalid. `max_context_age_seconds` is a cohort/replay policy and must not be widened merely to manufacture more eligible historical windows.
+
+Multiple symbol studies may legitimately reference/materialize the same universe archive SHA when they use the exact same provider, universe configuration and capture time window. Their symbol-specific cohort, bundle, replay, provenance and entry identities remain distinct.
 
 ## Replay-study artifact inspection
 
@@ -159,11 +163,13 @@ scripts/export_outcome_sample.py
 scripts/build_dataset_catalogue.py
 ```
 
-## First production acceptance reference
+For broad dataset expansion, a read-only eligibility/deep-history/replay preflight should be used before physical materialization so the operator does not create large numbers of zero-value or history-incomplete chain directories unnecessarily. Preflight does not replace canonical materialization or catalogue verification.
 
-The first fully materialized production-host chain was accepted on 2026-09-07 for `binance_usdm` / `SUIUSDT`.
+## Production acceptance references
 
-Canonical identities:
+### First accepted chain — SUIUSDT
+
+Accepted on 2026-09-07 for `binance_usdm` / `SUIUSDT`.
 
 - universe archive SHA: `3c830d8410b913aa4b39afd8cb5be57e96a18b4a1ae4d46fa709fc11f70ccdda`;
 - cohort SHA: `c63b90a1905149462e1eb31a842fff7c5f15290a7f4963107d7c8c4cf2273686`;
@@ -171,12 +177,32 @@ Canonical identities:
 - replay study ID: `ebfd16b0b9059c5bd51f948d4c1b0086f4a2966a610e58dd7a6fb0d8ee474f5e`;
 - provenance SHA: `08ba2378253dfa744ffbfc2fc74cae2ab6ff02264a9b60e6170d1992f6297c35`;
 - catalogue entry ID: `f056dadd63c2283c07b0b2aa37b3bb2236d15e916d6fa3cf5a11fc71b38b814a`;
-- catalogue SHA: `749c3aa20d02788b1c75b48e3325d854d7182f5b0729fea39dcf888af367b864`;
-- outcome sample: null because the study produced zero tradable/binary-resolved signals.
+- outcome sample: `null`.
 
-Final acceptance used `load_dataset_catalogue(..., verify_artifacts=True)` and passed full artifact/cross-link reconstruction.
+### Second accepted chain — XRPUSDT
 
-Detailed evidence: `docs/checkpoints/2026-09-07_PHASE11G_FIRST_PRODUCTION_CHAIN.md`.
+Accepted on 2026-09-07 for `binance_usdm` / `XRPUSDT` using the same strict universe/context window as SUI.
+
+- universe archive SHA: `3c830d8410b913aa4b39afd8cb5be57e96a18b4a1ae4d46fa709fc11f70ccdda`;
+- cohort SHA: `f417e64f9c2a31916564037709554971035adbb14054a3f83b2b76261e2ee58c`;
+- MTF bundle SHA: `8b276ab7d8ffa5614c38759a7fbccdf3fdf27c855e4460b04f8e4693b8b090af`;
+- replay study ID: `886d2a5c136af427657d005655d3b654b046dd9ede19b922390bb403fbe60c80`;
+- provenance SHA: `6397ce7c1786d1ebb5d1e11f297995c3b3c68abb2a44476a29c994164bfcff65`;
+- catalogue entry ID: `4788384b5268ae8062eaa1a225de8d54cbd12e59e17ea3905d702ed5545a8eef`;
+- outcome sample: `null`.
+
+Current production catalogue after the second registration:
+
+- entry count: `2`;
+- catalogue SHA: `057ff750966d2bc5043fffd7fdc37583dd0133480452c131b51f84109d2fb4b6`;
+- final `load_dataset_catalogue(..., verify_artifacts=True)`: PASS.
+
+The historical one-entry catalogue SHA `749c3aa20d02788b1c75b48e3325d854d7182f5b0729fea39dcf888af367b864` remains the identity of the first-chain checkpoint only; it is not the current two-entry catalogue SHA.
+
+Detailed evidence:
+
+- first chain: `docs/checkpoints/2026-09-07_PHASE11G_FIRST_PRODUCTION_CHAIN.md`;
+- current two-chain state: `docs/checkpoints/2026-09-07_PHASE11G_TWO_CHAIN_DATASET_CHECKPOINT.md`.
 
 ## Tamper model
 
