@@ -42,8 +42,22 @@ paths:
       operationId: listUniverse
       summary: List the current ranked tradable universe
       parameters:
-        - $ref: '#/components/parameters/ProviderId'
-        - $ref: '#/components/parameters/ListLimit'
+        - name: provider_id
+          in: query
+          required: false
+          description: >-
+            Provider identifier such as binance_usdm or bybit_linear. Required when
+            the same canonical symbol is available from more than one provider.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
       responses:
         '200':
           description: Ranked universe with market metadata and freshness
@@ -58,8 +72,20 @@ paths:
       operationId: getMarketSnapshot
       summary: Get the latest normalized market snapshot for a symbol
       parameters:
-        - $ref: '#/components/parameters/Symbol'
-        - $ref: '#/components/parameters/ProviderId'
+        - name: symbol
+          in: path
+          required: true
+          description: Canonical K-Trader symbol, for example SUIUSDT.
+          schema:
+            type: string
+        - name: provider_id
+          in: query
+          required: false
+          description: >-
+            Provider identifier such as binance_usdm or bybit_linear. Required when
+            the same canonical symbol is available from more than one provider.
+          schema:
+            type: string
       responses:
         '200':
           description: Latest market snapshot
@@ -78,8 +104,20 @@ paths:
       operationId: getCandles
       summary: Get confirmed normalized candles for a symbol and timeframe
       parameters:
-        - $ref: '#/components/parameters/Symbol'
-        - $ref: '#/components/parameters/ProviderId'
+        - name: symbol
+          in: path
+          required: true
+          description: Canonical K-Trader symbol, for example SUIUSDT.
+          schema:
+            type: string
+        - name: provider_id
+          in: query
+          required: false
+          description: >-
+            Provider identifier such as binance_usdm or bybit_linear. Required when
+            the same canonical symbol is available from more than one provider.
+          schema:
+            type: string
         - name: interval
           in: query
           required: false
@@ -118,8 +156,20 @@ paths:
         RR, ATR, evidence, reason codes and freshness. Setup Score is not a
         statistical probability. Preserve the returned TradingDecision fields.
       parameters:
-        - $ref: '#/components/parameters/Symbol'
-        - $ref: '#/components/parameters/ProviderId'
+        - name: symbol
+          in: path
+          required: true
+          description: Canonical K-Trader symbol, for example SUIUSDT.
+          schema:
+            type: string
+        - name: provider_id
+          in: query
+          required: false
+          description: >-
+            Provider identifier such as binance_usdm or bybit_linear. Required when
+            the same canonical symbol is available from more than one provider.
+          schema:
+            type: string
       responses:
         '200':
           description: Canonical TradingDecision
@@ -138,14 +188,28 @@ paths:
       operationId: listCandidates
       summary: List ranked current setup candidates, including NO_TRADE results
       parameters:
-        - $ref: '#/components/parameters/ProviderId'
+        - name: provider_id
+          in: query
+          required: false
+          description: >-
+            Provider identifier such as binance_usdm or bybit_linear. Required when
+            the same canonical symbol is available from more than one provider.
+          schema:
+            type: string
         - name: grade
           in: query
           required: false
           schema:
             type: string
             enum: [A+, A, B, C]
-        - $ref: '#/components/parameters/ListLimit'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
       responses:
         '200':
           description: Ranked candidate decisions
@@ -160,8 +224,22 @@ paths:
       operationId: listSignals
       summary: List only currently tradable A or A+ LONG/SHORT signals
       parameters:
-        - $ref: '#/components/parameters/ProviderId'
-        - $ref: '#/components/parameters/ListLimit'
+        - name: provider_id
+          in: query
+          required: false
+          description: >-
+            Provider identifier such as binance_usdm or bybit_linear. Required when
+            the same canonical symbol is available from more than one provider.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
       responses:
         '200':
           description: Current tradable signals only
@@ -177,32 +255,6 @@ components:
       type: http
       scheme: bearer
       description: Configure the GPT Action with the same API key stored as KTRADER_ACTION_API_KEY on the server.
-  parameters:
-    Symbol:
-      name: symbol
-      in: path
-      required: true
-      description: Canonical K-Trader symbol, for example SUIUSDT.
-      schema:
-        type: string
-    ProviderId:
-      name: provider_id
-      in: query
-      required: false
-      description: >-
-        Provider identifier such as binance_usdm or bybit_linear. Required when
-        the same canonical symbol is available from more than one provider.
-      schema:
-        type: string
-    ListLimit:
-      name: limit
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 200
-        default: 50
   responses:
     Unauthorized:
       description: Missing or invalid Bearer API key

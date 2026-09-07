@@ -28,6 +28,19 @@ def test_canonical_action_schema_is_valid_yaml_read_only_and_complete():
         assert set(operations).issubset({"get", "parameters"})
 
 
+def test_gpt_builder_operation_parameters_are_inline_and_named():
+    schema = yaml.safe_load(SCHEMA_PATH.read_text(encoding="utf-8"))
+    for path_item in schema["paths"].values():
+        operation = path_item.get("get")
+        if not operation:
+            continue
+        for parameter in operation.get("parameters", []):
+            assert "$ref" not in parameter
+            assert isinstance(parameter.get("name"), str)
+            assert parameter["name"]
+            assert parameter.get("in") in {"path", "query"}
+
+
 def test_public_action_schema_endpoint_returns_exact_canonical_bytes_without_auth():
     app = create_app(action_api_key="test-secret", action_openapi_path=SCHEMA_PATH)
     response = TestClient(app).get("/action-openapi.yaml")
