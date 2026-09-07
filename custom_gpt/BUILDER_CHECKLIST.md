@@ -1,39 +1,65 @@
-# K-Trader — контрольний список GPT Builder v1.3
+# K-Trader — контрольний список GPT Builder v1.4
 
-Статус: серверна частина Phase 10 LIVE / налаштування Action у GPT Builder ще потрібно завершити окремо.
+Статус: Phase 10 COMPLETE — production Action, GPT Builder configuration, Preview acceptance і вибраний режим поширення перевірені 2026-09-07.
 
-## Етап A — оновлення поведінки GPT
-1. Відкрити редактор K_Trader GPT.
-2. Замінити поточні Instructions на `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md`. Повна `SYSTEM_K_TRADER_v1_2.md` залишається розширеною канонічною політикою.
+## Етап A — поведінка GPT
+1. Відкрити редактор існуючого K_Trader GPT.
+2. Активні Instructions: `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md`. Повна `SYSTEM_K_TRADER_v1_2.md` залишається розширеною канонічною політикою.
 3. Опис GPT:
 
    `Професійний трейдер-аналітик. Відбір і ранжування торгових можливостей за підтвердженими ринковими даними та правилами K-Trader; без виконання угод.`
 
    Не використовувати `сценарії ≥60%` або інші пороги ймовірності, доки модель не калібрована.
-4. Канонічний `custom_gpt/openapi.yaml` вже вказує на прийнятий production origin `https://ktrader-api.duckdns.org` після успішного Phase 10 live acceptance 2026-09-05.
-5. У попередньому перегляді перевірити резервний режим:
-   - запит `знайди найкращі сетапи криптоактивів на найближчі 4 години` повертає `WATCHLIST ONLY`, якщо канонічні дані недоступні, але публічних достатньо;
-   - для **кожного кандидата** перед агрегатором перевіряється прямий біржовий API на відповідному типі ринку;
-   - якщо перше пряме джерело не дало даних, перевіряється ще один підтримуваний провайдер, якщо актив там доступний;
+4. Канонічний `custom_gpt/openapi.yaml` вказує на production origin `https://ktrader-api.duckdns.org`.
+5. Канонічний режим перевірено в Preview:
+   - `data_ready=true` → K-Trader Action має пріоритет;
+   - `listSignals=0` не перетворюється на вигадані A/A+ сигнали;
+   - `NO_TRADE` зберігається;
+   - Entry/SL/TP не вигадуються;
+   - Setup Score не трактується як statistical probability.
+6. Резервний режим перевірено в Preview:
+   - якщо канонічний `getAnalysis`/OHLCV недоступний, повертається `WATCHLIST ONLY`;
+   - для кожного кандидата перед агрегатором перевіряється прямий біржовий REST API на відповідному типі ринку;
+   - якщо перше пряме джерело не дає придатних даних, перевіряється другий підтримуваний прямий провайдер, якщо актив там доступний;
    - агрегатор використовується лише після таких перевірок;
-   - у відповіді зазначено фактично перевірені прямі джерела;
-   - агреговані дані явно позначені як агреговані;
+   - у відповіді зазначаються фактично перевірені прямі джерела;
+   - агреговані дані, якщо вони колись використовуються, мають бути явно позначені як агреговані;
+   - не змішувати серії різних провайдерів;
    - формулювання нейтральні: `За результатами попереднього відбору відібрано...`;
    - немає фраз `я б звузив`, `я б використовував`, `я вважаю`;
    - користувацький текст українською, крім технічних назв, тикерів, службових статусів і скорочень;
    - використовуються назви **Оцінка сетапу**, **Оцінена ймовірність**, **Вхід**, **24-годинний мінімум/максимум**, **ринковий знімок**, **ставка фінансування**, **відкритий інтерес**, **напрямок ринку**, **список спостереження**, **актуальність даних**;
    - не використовуються без потреби англійські `snapshot`, `screening`, `watch`, `high-beta`, `momentum`, `weakness`, `reclaim`, `range`, `volume`, `direction`, `validation`, `setup score`, `probability`;
    - GPT не вигадує клас, Оцінку сетапу, Оцінену ймовірність, Вхід, SL, TP, ATR, VSA або A/A+ у резервному режимі.
-6. Якщо навіть публічних даних недостатньо, GPT прямо повідомляє про це.
+7. Якщо навіть публічних даних недостатньо або вони застарілі, GPT прямо повідомляє про це і не формує торговий сигнал.
 
-## Етап B — активація канонічної Action
-1. Серверний вузол уже пройшов `scripts/phase10_action_acceptance.py` з `data_ready=true` на `https://ktrader-api.duckdns.org` 2026-09-05.
-2. `KTRADER_ACTION_API_KEY` створено і зберігається в GitHub Environment `production`; те саме значення потрібно ввести лише в налаштування автентифікації GPT Action. Не зберігати ключ у репозиторії або документації.
-3. Використати канонічний `custom_gpt/openapi.yaml`; він уже містить прийнятий production HTTPS origin.
-4. Створити/оновити Action у редакторі K_Trader GPT.
+## Етап B — канонічна Action
+1. Production server пройшов `scripts/phase10_action_acceptance.py` з `data_ready=true` на `https://ktrader-api.duckdns.org`.
+2. `KTRADER_ACTION_API_KEY` зберігається в GitHub Environment `production`; те саме значення введено лише в налаштування автентифікації GPT Action. Не зберігати ключ у репозиторії або документації.
+3. Використовується канонічний `custom_gpt/openapi.yaml`.
+4. Production one-click schema endpoint: `https://ktrader-api.duckdns.org/action-openapi.yaml`.
 5. Автентифікація: API key → Bearer.
-6. Імпортувати канонічну OpenAPI-схему.
-7. Перевірити операції: `getHealth`, `getScannerStatus`, `listUniverse`, `getMarketSnapshot`, `getCandles`, `getAnalysis`, `listCandidates`, `listSignals`.
-8. У попередньому перегляді перевірити готовність, сигнали, кандидатів, один актив, неоднозначність провайдера і збереження `NO TRADE`.
-9. Перевірити автоперемикання: `data_ready=true` → канонічний режим; Action недоступна/не готова → лише `WATCHLIST ONLY`.
-10. Не публікувати широко, доки не пройдені перевірки джерел, актуальності, `NO TRADE`, розділення режимів та мовної політики.
+6. Privacy Policy URL: `https://ktrader-api.duckdns.org/privacy`.
+7. GPT Builder розпізнає всі вісім операцій:
+   - `getHealth`;
+   - `getScannerStatus`;
+   - `listUniverse`;
+   - `getMarketSnapshot`;
+   - `getCandles`;
+   - `getAnalysis`;
+   - `listCandidates`;
+   - `listSignals`.
+8. Усі вісім операцій пройшли Preview acceptance 2026-09-07.
+9. Provider ambiguity HTTP 409 покритий backend regression test; live 409 не відтворено через поточний single-provider production state.
+10. Автоперемикання перевірено: канонічні дані доступні → canonical mode; канонічний analysis/OHLCV недоступний → `WATCHLIST ONLY`.
+
+## Етап C — publishing/privacy
+1. Для поточного режиму поширення `Усі, хто має посилання` Action має чинний Privacy Policy URL.
+2. Після Builder/Preview acceptance GPT оновлено через `Оновити`.
+3. Перед майбутнім широким GPT Store/public distribution повторно перевірити актуальні publishing requirements та, якщо потрібно, додати operator/contact details і звірити privacy policy з фактичним logging/retention.
+
+## Acceptance evidence
+
+Канонічний checkpoint: `docs/PHASE_10_PRODUCT_ACCEPTANCE.md`.
+
+Phase 10 вважається завершеним лише для read-only K-Trader v1. Автоматичне виконання угод, exchange-account access і statistical win probability не входять у цей acceptance.
