@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 
@@ -16,6 +17,25 @@ from ktrader.replay import (
     write_study_run_provenance,
 )
 from ktrader.runtime.models import RuntimeScannerConfig
+
+
+def _utc(value: str | None) -> datetime | None:
+    if value is None:
+        return None
+    text = value.strip()
+    parsed = datetime.fromisoformat(text[:-1] + "+00:00" if text.endswith("Z") else text)
+    if parsed.tzinfo is None or parsed.utcoffset() is None or parsed.utcoffset().total_seconds() != 0:
+        raise argparse.ArgumentTypeError("timestamp must be timezone-aware UTC")
+    return parsed.astimezone(timezone.utc)
+
+
+def _build_study_config(args: argparse.Namespace) -> ReplayStudyConfig:
+    return ReplayStudyConfig(
+        step_bars=args.step_bars,
+        horizon_bars=args.horizon_bars,
+        start=args.start,
+        end=args.end,
+    )
 
 
 def main() -> None:
@@ -45,6 +65,18 @@ def main() -> None:
         default=None,
         help="Explicit 5m outcome horizon. Omit to leave the horizon unbounded by this study.",
     )
+    parser.add_argument(
+        "--start",
+        type=_utc,
+        default=None,
+        help="Optional inclusive UTC replay cutoff lower bound.",
+    )
+    parser.add_argument(
+        "--end",
+        type=_utc,
+        default=None,
+        help="Optional inclusive UTC replay cutoff upper bound.",
+    )
     args = parser.parse_args()
 
     if args.provenance_output is not None and args.cohort is None:
@@ -66,10 +98,7 @@ def main() -> None:
         context = load_replay_context(args.context)
 
     scanner_config = RuntimeScannerConfig()
-    study_config = ReplayStudyConfig(
-        step_bars=args.step_bars,
-        horizon_bars=args.horizon_bars,
-    )
+    study_config = _build_study_config(args)
     repository = OutcomeRepository(args.outcome_db)
     try:
         result = run_replay_study(
