@@ -1,4 +1,6 @@
-# Dataset Catalogue Spec v1.0
+# Dataset Catalogue Spec v1.1
+
+Updated: 2026-09-07
 
 ## Purpose
 
@@ -23,6 +25,8 @@ Required references:
 Optional reference:
 
 - immutable binary outcome sample (`ktrader.outcome_sample.v1`).
+
+The outcome sample is optional by design. A study with zero binary-resolved WIN/LOSS outcomes must not fabricate one merely to satisfy catalogue registration.
 
 Each artifact reference stores:
 
@@ -71,6 +75,29 @@ The scanner configuration is canonicalized from the complete dataclass configura
 
 Canonical replay studies should use `scripts/run_replay_study.py --cohort ...`. Legacy standalone `--context` remains supported but does not produce canonical cohort-linked provenance unless the cohort relationship is known.
 
+When an explicit study time window is intended, use UTC-only inclusive `--start` and `--end` bounds. These fields are part of `ReplayStudyConfig` and therefore part of deterministic study identity. Changing them creates a different canonical study configuration even when the selected analyzed cutoffs happen to overlap an earlier ad-hoc preflight.
+
+## Universe archive materialization
+
+Continuous Phase 11F capture stores immutable one-snapshot `ktrader.universe_archive.v1` files prospectively. Phase 11G study materialization may assemble a selected coherent subset into one deterministic study archive using:
+
+```text
+scripts/build_universe_archive.py
+```
+
+The builder:
+
+- loads every source through the canonical universe-archive verifier;
+- accepts one or more files/directories;
+- filters by one explicit provider and optional UTC start/end bounds;
+- sorts selected snapshots chronologically;
+- rejects duplicate snapshot digests;
+- rebuilds the combined archive with the existing canonical digest function;
+- writes a new artifact without modifying Phase 11F source captures;
+- reloads the written archive before reporting success.
+
+Provider/config mixing remains invalid. `max_context_age_seconds` is a cohort/replay policy and must not be widened merely to manufacture more eligible historical windows.
+
 ## Replay-study artifact inspection
 
 Before registration, replay-study JSONL is checked for:
@@ -105,26 +132,51 @@ The sample manifest records:
 
 No probability is calculated by the outcome-sample or catalogue layers.
 
+If a study has zero eligible binary outcomes, omit `--outcome-sample` during catalogue registration and record the catalogue entry with `outcome_sample=null`.
+
 ## Operator workflow
 
 Canonical sequence after provider-recorded data and prospective universe captures exist:
 
 ```text
-1. Build/verify an MTF bundle.
-2. Build/verify a universe archive and study cohort.
-3. Run replay using the cohort context and produce study provenance.
-4. Export an immutable WIN/LOSS outcome sample from OutcomeRepository.
-5. Register the chain in the dataset catalogue.
-6. Re-load the catalogue with artifact verification before using the study in later research/calibration.
+1. Select and canonically assemble verified Phase 11F universe captures into one study archive.
+2. Build/verify the study cohort from that archive with the approved context-age policy.
+3. Build/verify a provider-recorded MTF bundle at one explicit UTC as_of.
+4. Run canonical cohort-linked replay with explicit UTC start/end bounds when a bounded window is intended; emit provenance.
+5. Export an immutable WIN/LOSS outcome sample only when binary-resolved outcomes actually exist.
+6. Register the fully linked chain in the dataset catalogue.
+7. Re-load the catalogue with artifact verification before accepting the study for later research/calibration.
 ```
 
 Relevant utilities:
 
 ```text
+scripts/build_universe_archive.py
+scripts/build_study_cohort.py
+scripts/export_mtf_history.py
 scripts/run_replay_study.py
 scripts/export_outcome_sample.py
 scripts/build_dataset_catalogue.py
 ```
+
+## First production acceptance reference
+
+The first fully materialized production-host chain was accepted on 2026-09-07 for `binance_usdm` / `SUIUSDT`.
+
+Canonical identities:
+
+- universe archive SHA: `3c830d8410b913aa4b39afd8cb5be57e96a18b4a1ae4d46fa709fc11f70ccdda`;
+- cohort SHA: `c63b90a1905149462e1eb31a842fff7c5f15290a7f4963107d7c8c4cf2273686`;
+- MTF bundle SHA: `c0112c0d3688cddb86cabc54ae1c9da05e04ff2cef63f395b438448e3070d344`;
+- replay study ID: `ebfd16b0b9059c5bd51f948d4c1b0086f4a2966a610e58dd7a6fb0d8ee474f5e`;
+- provenance SHA: `08ba2378253dfa744ffbfc2fc74cae2ab6ff02264a9b60e6170d1992f6297c35`;
+- catalogue entry ID: `f056dadd63c2283c07b0b2aa37b3bb2236d15e916d6fa3cf5a11fc71b38b814a`;
+- catalogue SHA: `749c3aa20d02788b1c75b48e3325d854d7182f5b0729fea39dcf888af367b864`;
+- outcome sample: null because the study produced zero tradable/binary-resolved signals.
+
+Final acceptance used `load_dataset_catalogue(..., verify_artifacts=True)` and passed full artifact/cross-link reconstruction.
+
+Detailed evidence: `docs/checkpoints/2026-09-07_PHASE11G_FIRST_PRODUCTION_CHAIN.md`.
 
 ## Tamper model
 
