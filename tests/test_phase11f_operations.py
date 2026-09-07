@@ -172,6 +172,45 @@ def test_continuous_research_capture_is_immutable_and_interval_bounded(tmp_path:
     repository.close()
 
 
+def test_research_capture_uses_utc_slots_without_accumulating_scanner_drift(tmp_path: Path):
+    repository = CandleRepository(tmp_path / "ktrader.db")
+    universe_config = UniverseConfig(max_price=Decimal("3"), max_candidates=2)
+    maintenance = RuntimeMaintenance(
+        repository,
+        universe_config,
+        config=RuntimeMaintenanceConfig(
+            research_capture_interval_seconds=300,
+            research_root=tmp_path / "research",
+            backup_enabled=False,
+            backup_root=tmp_path / "backups",
+            disk_min_free_bytes=0,
+            disk_min_free_percent=0,
+        ),
+    )
+    snapshot = _live_snapshot(universe_config)
+    first_at = datetime(2026, 9, 7, 6, 44, 15, 733036, tzinfo=UTC)
+    first = maintenance.capture_universe_if_due(snapshot, captured_at=first_at)
+    assert first is not None and first.is_file()
+
+    # A scanner cycle inside the same UTC 5-minute slot must not duplicate the capture.
+    assert maintenance.capture_universe_if_due(
+        snapshot,
+        captured_at=datetime(2026, 9, 7, 6, 44, 45, tzinfo=UTC),
+    ) is None
+
+    # Crossing the 06:45 UTC slot is due even though fewer than 300 elapsed seconds
+    # passed since the previous capture. This prevents relative-scheduler drift from
+    # skipping the context needed by the 06:50 replay cutoff.
+    second_at = datetime(2026, 9, 7, 6, 45, 15, 277620, tzinfo=UTC)
+    second = maintenance.capture_universe_if_due(snapshot, captured_at=second_at)
+    assert second is not None and second.is_file() and second != first
+    assert (datetime(2026, 9, 7, 6, 50, tzinfo=UTC) - second_at).total_seconds() < 300
+
+    archive = load_universe_archive(second)
+    assert archive.snapshots[0].captured_at == second_at
+    repository.close()
+
+
 def test_periodic_backup_retention_keeps_latest_verified_files(tmp_path: Path):
     repository = CandleRepository(tmp_path / "ktrader.db")
     repository.upsert_many([_candle()])

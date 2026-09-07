@@ -115,7 +115,11 @@ class RuntimeMaintenance:
         require_utc(captured_at)
         if not self.config.research_capture_enabled:
             return None
-        if not self._due(self._last_capture_at, captured_at, self.config.research_capture_interval_seconds):
+        if not self._capture_due(
+            self._last_capture_at,
+            captured_at,
+            self.config.research_capture_interval_seconds,
+        ):
             return None
         if not live_snapshot.instruments or not live_snapshot.tickers:
             raise RuntimeError("live universe snapshot does not retain source instruments/tickers")
@@ -186,6 +190,14 @@ class RuntimeMaintenance:
         )
         for stale in backups[self.config.backup_retention :]:
             stale.unlink(missing_ok=True)
+
+    @staticmethod
+    def _capture_due(last: datetime | None, now: datetime, interval_seconds: float) -> bool:
+        if last is None:
+            return True
+        last_slot = int(last.timestamp() // interval_seconds)
+        current_slot = int(now.timestamp() // interval_seconds)
+        return current_slot > last_slot
 
     @staticmethod
     def _due(last: datetime | None, now: datetime, interval_seconds: float) -> bool:
