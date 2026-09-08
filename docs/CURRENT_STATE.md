@@ -1,64 +1,72 @@
 # K-Trader Current State
 
-Updated: 2026-09-07
+Updated: 2026-09-08
 
 Canonical operational checkpoint:
 
+`docs/checkpoints/2026-09-08_PHASE11G_CORRECTED_REPLAY_RR_GEOMETRY_GATE.md`
+
+Prior dataset checkpoint:
+
 `docs/checkpoints/2026-09-07_PHASE11G_TWO_CHAIN_DATASET_CHECKPOINT.md`
-
-Prior production-chain checkpoint:
-
-`docs/checkpoints/2026-09-07_PHASE11G_FIRST_PRODUCTION_CHAIN.md`
-
-Prior transition snapshot:
-
-`docs/checkpoints/2026-09-07_PROJECT_STATE_PHASE11_HANDOFF.md`
 
 Current phase boundary:
 
 - Phase 10: COMPLETE / product accepted for the current single-provider read-only v1 scope;
-- Phase 11A–11G: repository-side implementation VERIFIED;
-- Phase 11F production accumulation: VERIFIED on real provider-recorded captures and still accumulating;
-- Phase 11G physical production evidence: TWO canonical chains COMPLETE / VERIFIED / CATALOGUED;
-- current catalogue entry count: `2`;
-- active work: read-only batch signal/outcome discovery across eligible provider-recorded study candidates, followed by selective canonical materialization;
-- Phase 12: future multi-provider expansion, not active.
+- Phase 11A–11G repository-side foundation: VERIFIED;
+- Phase 11F production accumulation: active and provider-coherent;
+- Phase 11G physical catalogue: two canonical chains COMPLETE / VERIFIED / CATALOGUED;
+- Phase 11G discovery: ACTIVE;
+- current research gate: RR-geometry audit of 142 otherwise surviving Window #4 candidates;
+- Phase 12 multi-provider expansion: future work, not active.
 
-Repository/documentation baseline before this new documentation-only checkpoint:
+## Repository and production identity
 
-- `main` SHA: `40cee9b17aa74ad45be1894d566ddb79f8a81ef4`;
-- post-merge Tests run `34144783877`: PASS;
-- post-merge CI run `34144783943`: pytest PASS, Docker amd64 PASS, Docker arm64 PASS.
+Accepted code/runtime baseline before this documentation-only checkpoint:
 
-Accepted production runtime baseline:
+- canonical `main` SHA: `7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`;
+- PR #33: `Fix Phase 11G side-to-regime scoring contract`;
+- post-merge Tests run `34177001398`: PASS;
+- post-merge CI run `34177001482`: pytest PASS, Docker amd64 PASS, Docker arm64 PASS;
+- Deploy Production #9 run `34177978988`: SUCCESS;
+- deployed image: `k-trader:7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`;
+- production container: healthy;
+- provider REST/WebSocket acceptance: PASS;
+- MTF API acceptance: PASS;
+- Phase 10 Action live acceptance: PASS.
 
-- deployed production SHA: `b75b1e3d74b5834e7c404555caa6bdf34f87fe12`;
-- Deploy Production #7 run `34139956047`: SUCCESS;
-- production provider: `binance_usdm`;
-- runtime: healthy, read-only, `data_ready=true`;
-- no redeploy is required for documentation-only commits.
+Deploy acceptance observed scanner `status=DEGRADED`, `symbols_ready=18`, `symbols_failed=2`; this did not fail service health or deployment acceptance.
 
-Strict Phase 11G context/replay policy remains:
+## Strict Phase 11G policy
 
+Unchanged controls:
+
+- provider: `binance_usdm` for the current production research scope;
 - `max_context_age_seconds=300`;
+- canonical context membership uses the newest snapshot at/before each replay cutoff;
 - no historical rank/context fabrication;
-- no freshness widening merely to manufacture eligible history;
-- outcome samples are created only when real binary WIN/LOSS outcomes exist;
-- `estimated_probability` remains null/N/A.
+- no freshness widening to manufacture eligible history;
+- canonical MTF depths: `1d=300`, `4h=300`, `1h=300`, `15m=300`, `5m=400`;
+- full-engine replay before any materialization decision;
+- outcome samples only from actual binary WIN/LOSS outcomes;
+- no synthetic outcomes;
+- no probability calibration;
+- `estimated_probability` remains null/N/A;
+- no Phase 12 expansion while the current Phase 11G gate is unresolved.
 
-Current canonical Phase 11G catalogue:
+## Current dataset catalogue
 
 - path: `/data/research/phase11g/catalogue.json`;
 - schema: `ktrader.dataset_catalogue.v1`;
 - entry count: `2`;
-- current catalogue SHA: `057ff750966d2bc5043fffd7fdc37583dd0133480452c131b51f84109d2fb4b6`;
-- final reload with `verify_artifacts=True`: PASS.
+- catalogue SHA: `057ff750966d2bc5043fffd7fdc37583dd0133480452c131b51f84109d2fb4b6`;
+- final prior reload with `verify_artifacts=True`: PASS;
+- no new entries were added during corrected discovery.
 
-## Entry 1 — SUIUSDT
+### Entry 1 — SUIUSDT
 
 - provider: `binance_usdm`;
-- replay window: `2026-09-05T14:45:00Z` through `2026-09-05T16:00:00Z` inclusive;
-- archive SHA: `3c830d8410b913aa4b39afd8cb5be57e96a18b4a1ae4d46fa709fc11f70ccdda`;
+- replay window: `2026-09-05T14:45:00Z` through `2026-09-05T16:00:00Z`;
 - cohort SHA: `c63b90a1905149462e1eb31a842fff7c5f15290a7f4963107d7c8c4cf2273686`;
 - bundle SHA: `c0112c0d3688cddb86cabc54ae1c9da05e04ff2cef63f395b438448e3070d344`;
 - study ID: `ebfd16b0b9059c5bd51f948d4c1b0086f4a2966a610e58dd7a6fb0d8ee474f5e`;
@@ -67,11 +75,10 @@ Current canonical Phase 11G catalogue:
 - unique tradable signals: `0`;
 - outcome sample: `null`.
 
-## Entry 2 — XRPUSDT
+### Entry 2 — XRPUSDT
 
 - provider: `binance_usdm`;
-- replay window: `2026-09-05T14:45:00Z` through `2026-09-05T16:00:00Z` inclusive;
-- archive SHA: `3c830d8410b913aa4b39afd8cb5be57e96a18b4a1ae4d46fa709fc11f70ccdda`;
+- replay window: `2026-09-05T14:45:00Z` through `2026-09-05T16:00:00Z`;
 - cohort SHA: `f417e64f9c2a31916564037709554971035adbb14054a3f83b2b76261e2ee58c`;
 - bundle SHA: `8b276ab7d8ffa5614c38759a7fbccdf3fdf27c855e4460b04f8e4693b8b090af`;
 - study ID: `886d2a5c136af427657d005655d3b654b046dd9ede19b922390bb403fbe60c80`;
@@ -80,10 +87,44 @@ Current canonical Phase 11G catalogue:
 - unique tradable signals: `0`;
 - outcome sample: `null`.
 
-Read-only eligibility scan found `45` eligible symbols under the strict 300-second context policy (`44` excluding SUI). `MARSCOINUSDT` was the highest-ranked next candidate but failed canonical deep-history preflight because only 4 daily bars were available versus the required 300; `XRPUSDT` then passed full MTF preflight and became the second accepted chain.
+## Phase 11G discovery correction
 
-The successful two-entry catalogue reload with `verify_artifacts=True` confirms the physical-artifact and cross-link contract for both registered chains.
+The original Window #4 rejection funnel showed `7596/7596` candidates rejected with `HTF_CONTEXT_MISMATCH`. The defect was a vocabulary mismatch between setup sides (`LONG`/`SHORT`) and MTF regimes (`BULLISH`/`BEARISH`). PR #33 introduced the explicit mapping and aligned `context_strength()` D1 fallback semantics with canonical MTF classification.
 
-This checkpoint branch is documentation-only. After it is merged, repository HEAD may again be newer than the deployed runtime SHA without implying an undeployed runtime behavior change.
+Corrected Window #4 replay:
 
-For exact recovery details and next work, read the canonical operational checkpoint above.
+- window: `2026-09-07T22:55Z` through `2026-09-08T00:10Z`;
+- archive SHA: `bed603828a997570149f01d42e7a979d96eb6ff0247c68f045b7e65bbe2c0477`;
+- strict symbols: `45`;
+- MTF passed: `40`;
+- MTF rejected: `5`;
+- analyzed cutoffs: `600`;
+- total candidate decisions: `7596`;
+- HTF rejected: `7161`;
+- HTF aligned: `435`;
+- tradable decisions: `0`;
+- unique tradable signals: `0`.
+
+The conditional audit reproduced `435` aligned candidates exactly and found all `435` were `LONG -> BULLISH`.
+
+Sequential downstream funnel:
+
+```text
+435 HTF aligned
+  -> 202 after primary-level strength
+  -> 168 after geometry
+  -> 142 after ATR <= 80%
+  ->   0 after RR >= 3
+```
+
+All 142 final survivors were rejected only by `RR_BELOW_3`. No unexpected hard reasons were present.
+
+## Current interpretation and next action
+
+PR #33 is historically replay-validated. Window #4 still has no tradable setup under unchanged production rules, but the current terminal blocker is now localized to RR geometry rather than the fixed side/regime contract.
+
+Do not lower the RR threshold based on this result. The next task is a read-only RR-geometry audit of the 142 RR-only candidates covering entry, stop, structural target, risk/reward distances, target identity/timeframe, RR distribution and deduplication of repeated unchanged setup geometry across neighboring cutoffs.
+
+Pre-fix zero-signal results from Windows #1–#3 must not be treated as canonical evidence of natural signal absence until rerun with the corrected engine.
+
+No dataset materialization or catalogue registration should occur before the geometry audit is understood and a useful natural candidate is confirmed deterministically.
