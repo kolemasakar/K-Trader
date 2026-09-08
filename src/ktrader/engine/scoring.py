@@ -19,6 +19,27 @@ WEIGHTS = {
     "rr": 5,
 }
 
+SIDE_TO_REGIME = {
+    "LONG": "BULLISH",
+    "SHORT": "BEARISH",
+}
+
+DIRECTIONAL_REGIMES = {"BULLISH", "BEARISH", "LONG", "SHORT"}
+
+
+def _regime_matches_side(regime_value: str, side: str) -> bool:
+    """Match canonical market-regime vocabulary to trading-side vocabulary.
+
+    Production structure classification emits BULLISH/BEARISH while setup
+    evidence emits LONG/SHORT. Accept the legacy side-shaped value as well so
+    existing test doubles and callers remain compatible during the contract
+    correction.
+    """
+    expected = SIDE_TO_REGIME.get(side)
+    if expected is None:
+        return regime_value == side
+    return regime_value in {expected, side}
+
 
 def context_strength(regime: MTFRegimeSnapshot, direction: str) -> str:
     by_tf = regime.by_interval
@@ -29,14 +50,15 @@ def context_strength(regime: MTFRegimeSnapshot, direction: str) -> str:
 
     if (
         "1d" in by_tf and "4h" in by_tf
-        and by_tf["1d"].regime == direction
-        and by_tf["4h"].regime == direction
+        and _regime_matches_side(by_tf["1d"].regime, direction)
+        and _regime_matches_side(by_tf["4h"].regime, direction)
     ):
         evidence = min(count("1d"), count("4h"))
     elif (
         "4h" in by_tf and "1h" in by_tf
-        and by_tf["4h"].regime == direction
-        and by_tf["1h"].regime == direction
+        and ("1d" not in by_tf or by_tf["1d"].regime not in DIRECTIONAL_REGIMES)
+        and _regime_matches_side(by_tf["4h"].regime, direction)
+        and _regime_matches_side(by_tf["1h"].regime, direction)
     ):
         evidence = min(count("4h"), count("1h"))
     else:
@@ -73,7 +95,7 @@ def score_setup(
         hard.append("STALE_DATA")
     if liquidity_score <= 0 or liquidity_rank <= 0 or universe_size <= 0 or liquidity_rank > universe_size:
         hard.append("INVALID_LIQUIDITY_CONTEXT")
-    if regime.regime != direction:
+    if not _regime_matches_side(regime.regime, direction):
         hard.append("HTF_CONTEXT_MISMATCH")
     if candidate.primary_level.status not in {"CONFIRMED", "MIRROR"}:
         hard.append("PRIMARY_LEVEL_NOT_CONFIRMED")
@@ -121,7 +143,7 @@ def score_setup(
         hard.append("RR_BELOW_3")
 
     components: dict[str, int] = {}
-    components["market_regime"] = WEIGHTS["market_regime"] if regime.regime == direction else 0
+    components["market_regime"] = WEIGHTS["market_regime"] if _regime_matches_side(regime.regime, direction) else 0
 
     if liquidity_rank > 0 and universe_size > 0 and liquidity_rank <= universe_size:
         fraction = Decimal(liquidity_rank) / Decimal(universe_size)
