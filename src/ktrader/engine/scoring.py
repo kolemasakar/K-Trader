@@ -24,6 +24,8 @@ SIDE_TO_REGIME = {
     "SHORT": "BEARISH",
 }
 
+DIRECTIONAL_REGIMES = {"BULLISH", "BEARISH", "LONG", "SHORT"}
+
 
 def _regime_matches_side(regime_value: str, side: str) -> bool:
     """Match canonical market-regime vocabulary to trading-side vocabulary.
@@ -54,6 +56,7 @@ def context_strength(regime: MTFRegimeSnapshot, direction: str) -> str:
         evidence = min(count("1d"), count("4h"))
     elif (
         "4h" in by_tf and "1h" in by_tf
+        and ("1d" not in by_tf or by_tf["1d"].regime not in DIRECTIONAL_REGIMES)
         and _regime_matches_side(by_tf["4h"].regime, direction)
         and _regime_matches_side(by_tf["1h"].regime, direction)
     ):
