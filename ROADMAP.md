@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.14
+# K-Trader Roadmap v1.15
 
-Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete and accepted through 2026-09-07; repository-side implementation is verified through Phase 11G dataset catalogue foundation.
+Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, and corrected historical discovery is active at the RR-geometry gate as of 2026-09-08.
 
 ## Phase 0 - Foundation
 
@@ -337,9 +337,9 @@ Status: VERIFIED.
 
 Verification: PR #9 CI `32656033224` SUCCESS; repository-wide pytest **155 passed**, compile/shell/Compose PASS, linux/amd64 Docker/runtime PASS, linux/arm64 QEMU/Buildx image/architecture/runtime PASS; squash merge `ae3620f7ce4bb6b857098ba470a5f2ddbfe374d5`.
 
-### Phase 11G - Dataset Catalogue Foundation
+### Phase 11G - Dataset Catalogue Foundation and Discovery
 
-Status: VERIFIED.
+Status: VERIFIED FOUNDATION / ACTIVE CORRECTED DATASET DISCOVERY.
 
 - `ktrader.dataset_catalogue.v1` deterministic research audit catalogue;
 - one entry links one coherent provider/symbol chain: MTF bundle -> universe archive -> study cohort -> replay study -> study provenance -> optional outcome sample;
@@ -353,16 +353,46 @@ Status: VERIFIED.
 - `ktrader.outcome_sample.v1` is an immutable WIN/LOSS-only study sample that must exactly match both the replay-study artifact and `OutcomeRepository`;
 - utilities: `export_outcome_sample.py`, `build_dataset_catalogue.py`.
 
-Verification: PR #10 CI `32657337221` SUCCESS; repository-wide pytest **163 passed**, compile/shell PASS, linux/amd64 Docker/runtime PASS, linux/arm64 QEMU/Buildx image/architecture/runtime PASS; squash merge `96de78d503432122d98e1c9ad1f01299802862a8`.
+Foundation verification: PR #10 CI `32657337221` SUCCESS; repository-wide pytest **163 passed**, compile/shell PASS, linux/amd64 Docker/runtime PASS, linux/arm64 QEMU/Buildx image/architecture/runtime PASS; squash merge `96de78d503432122d98e1c9ad1f01299802862a8`.
+
+Current production/research checkpoint:
+
+- canonical catalogue contains 2 verified chains: SUIUSDT and XRPUSDT;
+- catalogue SHA: `057ff750966d2bc5043fffd7fdc37583dd0133480452c131b51f84109d2fb4b6`;
+- strict context policy remains `max_context_age_seconds=300` with newest snapshot at/before cutoff;
+- PR #32 aligned research capture cadence to UTC slots;
+- PR #33 fixed the side/regime contract (`LONG -> BULLISH`, `SHORT -> BEARISH`) and aligned D1 fallback semantics;
+- PR #33 main SHA `7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab` passed post-merge Tests/CI and Deploy Production #9 `34177978988`;
+- corrected Window #4 replay produced 7596 candidate decisions: 7161 HTF-rejected and 435 HTF-aligned;
+- conditional audit reproduced all 435 aligned candidates as `LONG -> BULLISH`;
+- sequential downstream funnel: `435 -> 202 -> 168 -> 142 -> 0` at HTF -> primary-level strength -> geometry -> ATR -> RR;
+- all 142 final survivors were blocked only by `RR_BELOW_3`;
+- no threshold/freshness/catalogue/probability rule was relaxed;
+- no new chain was materialized during discovery.
+
+Canonical current checkpoint: `docs/checkpoints/2026-09-08_PHASE11G_CORRECTED_REPLAY_RR_GEOMETRY_GATE.md`.
 
 ### Remaining Phase 11 work
 
-- continue accumulating real provider-recorded universe/research artifacts from production capture and populate the catalogue;
-- optionally automate catalogue registration after scheduled study jobs exist;
-- extended target-host backup/restore, restart/recovery, disk-guard and stale-data validation as operational evidence accumulates;
-- later approved statistical calibration methodology with time-separated out-of-sample validation.
+Immediate Phase 11G gate:
+
+- run a read-only RR-geometry audit of the 142 RR-only Window #4 candidates;
+- inspect entry, stop, structural target, risk/reward distances, target level identity/type/timeframe and RR distribution;
+- deduplicate unchanged setup geometry across neighboring cutoffs before interpreting the RR distribution;
+- do not lower `RR >= 3` merely to manufacture signals.
+
+After geometry is understood:
+
+- rerun corrected historical discovery for Windows #1–#4;
+- materialize only naturally useful deterministic chains;
+- register future catalogue entries only after full artifact verification;
+- export immutable WIN/LOSS samples only when real binary outcomes exist;
+- continue provider-recorded production accumulation and target-host operational evidence;
+- consider statistical calibration only under a separately approved methodology with sufficient sample size and time-separated out-of-sample validation.
 
 ## Phase 12 - Multi-provider expansion
+
+Status: FUTURE / NOT ACTIVE.
 
 - add OKX/KuCoin/other public adapters through the same provider contract;
 - keep Trading Engine provider-independent.
