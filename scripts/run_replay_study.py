@@ -77,6 +77,18 @@ def main() -> None:
         default=None,
         help="Optional inclusive UTC replay cutoff upper bound.",
     )
+    parser.add_argument(
+        "--setup-interval",
+        choices=("5m", "15m", "1h"),
+        default="5m",
+        help="Setup/evidence timeframe used by the canonical analyzer.",
+    )
+    parser.add_argument(
+        "--setup-max-age-bars",
+        type=int,
+        default=12,
+        help="Maximum setup age in bars of --setup-interval; expiry is strictly greater than this boundary.",
+    )
     args = parser.parse_args()
 
     if args.provenance_output is not None and args.cohort is None:
@@ -97,7 +109,10 @@ def main() -> None:
         assert args.context is not None
         context = load_replay_context(args.context)
 
-    scanner_config = RuntimeScannerConfig()
+    scanner_config = RuntimeScannerConfig(
+        setup_interval=args.setup_interval,
+        setup_max_age_bars=args.setup_max_age_bars,
+    )
     study_config = _build_study_config(args)
     repository = OutcomeRepository(args.outcome_db)
     try:
@@ -134,6 +149,9 @@ def main() -> None:
                     "bundle_sha256": result.bundle_sha256,
                     "provider_id": result.provider_id,
                     "symbol": result.canonical_symbol,
+                    "setup_interval": scanner_config.setup_interval,
+                    "setup_max_age_bars": scanner_config.setup_max_age_bars,
+                    "setup_max_age_seconds": scanner_config.setup_max_age_seconds,
                     "analyzed_cutoffs": result.analyzed_cutoffs,
                     "skipped_insufficient_history": result.skipped_insufficient_history,
                     "skipped_missing_context": result.skipped_missing_context,
