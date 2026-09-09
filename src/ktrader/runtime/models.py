@@ -19,6 +19,7 @@ class RuntimeScannerConfig:
     scan_interval_seconds: float = 60.0
     bootstrap_concurrency: int = 2
     setup_interval: str = "5m"
+    setup_max_age_bars: int = 12
     ma_method: str = "sma"
     volume_window: int = 20
     min_relative_volume: Decimal = Decimal("1")
@@ -47,6 +48,8 @@ class RuntimeScannerConfig:
             raise ValueError("bootstrap_concurrency must be positive")
         if self.setup_interval != "5m":
             raise ValueError("phase8.5 canonical setup_interval is 5m")
+        if self.setup_max_age_bars <= 0:
+            raise ValueError("setup_max_age_bars must be positive")
 
 
 @dataclass(frozen=True, slots=True)
