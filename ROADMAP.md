@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.16
+# K-Trader Roadmap v1.17
 
-Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, the RR-geometry audit is complete, and the 60-minute Setup Lifecycle / Expiry gate is repository- and replay-validated as of 2026-09-09. Production rollout of the TTL implementation remains pending.
+Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, the RR-geometry audit is complete, and the FAST 60-minute Setup Lifecycle / Expiry gate is repository-, replay-, and production-validated as of 2026-09-09. Corrected historical Windows #1-#4 have been rerun under the accepted lifecycle with zero tradable signals.
 
 ## Phase 0 - Foundation
 
@@ -339,7 +339,7 @@ Verification: PR #9 CI `32656033224` SUCCESS; repository-wide pytest **155 passe
 
 ### Phase 11G - Dataset Catalogue Foundation and Discovery
 
-Status: VERIFIED FOUNDATION / ACTIVE CORRECTED DATASET DISCOVERY / SETUP LIFECYCLE GATE VALIDATED.
+Status: VERIFIED FOUNDATION / FAST TTL60 PRODUCTION + HISTORICAL W1-W4 CLOSURE COMPLETE / CONTINUOUS DISCOVERY ACTIVE.
 
 - `ktrader.dataset_catalogue.v1` deterministic research audit catalogue;
 - one entry links one coherent provider/symbol chain: MTF bundle -> universe archive -> study cohort -> replay study -> study provenance -> optional outcome sample;
@@ -370,22 +370,25 @@ Current production/research checkpoint:
 - control replay on merged-main logic succeeded with `8874` decisions, `6563 SETUP_EXPIRED`, only `3` exact RR-only survivors, all `NEARUSDT`, and `0` RR>=3/tradable decisions;
 - `RR >= 3`, ATR threshold, context freshness, stop geometry and structural-target rules were not relaxed;
 - no new chain was materialized during the RR/lifecycle investigation;
-- production still runs image `k-trader:7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`; rollout of PR #36 remains pending.
+- production rollout completed on canonical SHA/image `9a257957e033f6265b9e746cb9f15e755ff87b72`; Deploy Production #10 and target-host acceptance passed;
+- live FAST boundary verified: exactly 60m valid, 60m+1s expired;
+- corrected W1-W4 rerun completed with `29508` candidate decisions, `23952 SETUP_EXPIRED` reason occurrences, `1987` HTF-aligned decisions, `944` strong-level decisions, and `0` tradable decisions;
+- W4 reproduced the historical high-level population exactly through the strong-level stage (`45 / 40 / 600 / 7596 / 435 / 202`);
+- corrected W4 conditional funnel is `435 -> 202 -> 168 -> 142 -> 0 -> 0` (HTF -> strong -> geometry -> ATR -> TTL60 -> RR>=3), reproducing the historical pre-TTL funnel exactly before lifecycle expiry;
+- no new chain was materialized; catalogue remains SUIUSDT + XRPUSDT.
 
-Canonical current checkpoint: `docs/checkpoints/2026-09-09_PHASE11G_SETUP_LIFECYCLE_60M_GATE.md`.
+Canonical current checkpoint: `docs/checkpoints/2026-09-09_PHASE11G_PROD_TTL_AND_CORRECTED_WINDOWS_1_4.md`.
 
 ### Remaining Phase 11 work
 
 Immediate Phase 11G sequence:
 
-- deploy the approved canonical `main` baseline through the standard production workflow when rollout is authorized;
-- verify production health and runtime `setup_max_age_bars=12` after deployment;
-- rerun corrected historical discovery for Windows #1-#4 with the explicit 60m setup lifecycle;
+- continue provider-recorded production accumulation and target-host operational evidence;
 - preserve exact per-run provenance and do not force reconstructed runs to match superseded historical populations;
 - materialize only naturally useful deterministic chains that survive every unchanged hard gate;
 - register future catalogue entries only after full artifact verification;
 - export immutable WIN/LOSS samples only when real binary outcomes exist;
-- continue provider-recorded production accumulation and target-host operational evidence;
+- continue INTRADAY/M15 and MEDIUM/H1 lifecycle research as non-production profiles and require an explicit activation gate before runtime use;
 - consider statistical calibration only under a separately approved methodology with sufficient sample size and time-separated out-of-sample validation.
 
 Do not lower `RR >= 3`, widen context freshness, synthesize targets, or relax probability/catalogue integrity rules merely to manufacture signals.

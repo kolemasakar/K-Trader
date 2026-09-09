@@ -1,4 +1,4 @@
-# Deployment Specification v1.8
+# Deployment Specification v1.9
 
 Updated: 2026-09-09
 
@@ -14,16 +14,16 @@ Updated: 2026-09-09
 
 ## Current production state
 
-Latest accepted production runtime was verified on 2026-09-08.
+Latest accepted production runtime was verified on 2026-09-09.
 
 - Host: Oracle Cloud Ampere A1, Frankfurt, Ubuntu 24.04 Minimal aarch64.
 - Active allocation: 1 OCPU / 6 GB RAM.
 - Production runner: `k-trader-prod-arm64`.
 - Public origin: `https://ktrader-api.duckdns.org`.
 - DNS: `ktrader-api.duckdns.org -> 92.5.56.198`.
-- Deployed SHA: `7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`.
-- Deployed image: `k-trader:7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`.
-- GitHub Actions deployment: `Deploy Production #9`, run `34177978988`, SUCCESS.
+- Deployed SHA: `9a257957e033f6265b9e746cb9f15e755ff87b72`.
+- Deployed image: `k-trader:9a257957e033f6265b9e746cb9f15e755ff87b72`.
+- GitHub Actions deployment: `Deploy Production #10`, SUCCESS.
 - Runtime identity: UID/GID `1002:1002`, aligned with the host `ktrader` user.
 - Persistent application data: `/opt/k-trader/data`, owner `ktrader:ktrader`.
 - Persistent Caddy storage: `/opt/k-trader/caddy_data` and `/opt/k-trader/caddy_config`, owner `root:root`, mode `700`.
@@ -31,10 +31,12 @@ Latest accepted production runtime was verified on 2026-09-08.
 - Provider REST/WebSocket acceptance: PASS.
 - MTF API acceptance: PASS.
 - Phase 10 Action live acceptance: PASS.
-- Runtime scanner acceptance during Deploy #9: `status=DEGRADED`, `symbols_ready=18`, `symbols_failed=2`; this did not fail service health or release acceptance.
+- Runtime scanner acceptance during Deploy #10: `status=DEGRADED`, `symbols_ready=3`, `symbols_failed=17`; usable provider/MTF data remained available and this did not fail service health or release acceptance.
 - Application remains host-loopback-only at `127.0.0.1:8000`.
 - Production provider: `binance_usdm`.
 - PR #33 side-to-regime scoring contract correction is present in the deployed runtime.
+- FAST setup lifecycle is present in the deployed runtime: `setup_interval=5m`, `setup_max_age_bars=12`, TTL `3600s`; exactly 60m is valid and 60m+1s is expired.
+- Horizon-aware M15/H1 lifecycle support remains research-only; production default remains FAST/M5.
 
 Repository documentation HEAD may be newer than the deployed SHA when changes are documentation-only. This does not imply an undeployed runtime behavior change and does not require a production redeploy.
 
@@ -106,9 +108,13 @@ The production self-hosted runner never executes PR CI.
 
 Latest accepted code validation before this documentation branch:
 
-- canonical main SHA `7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`;
-- post-merge Tests run `34177001398`: PASS;
-- post-merge CI run `34177001482`: pytest PASS, Docker amd64 PASS, Docker arm64 PASS.
+- canonical/deployed main SHA `9a257957e033f6265b9e746cb9f15e755ff87b72`;
+- canonical merge gate: PASS;
+- Python 3.12 tests: PASS;
+- Python 3.14 tests: PASS;
+- Docker amd64: PASS;
+- Docker arm64: PASS;
+- Deploy Production #10: SUCCESS.
 
 ## Production deploy
 
@@ -192,16 +198,17 @@ The read-only root filesystem is intentional. Operator diagnostics that need to 
 
 The Docker healthcheck evaluates service readiness, not a requirement that scanner status itself equal `READY`. Stale scanner data still fails the health gate.
 
-Accepted Deploy #9 evidence:
+Accepted Deploy #10 evidence:
 
 - provider: `binance_usdm`;
 - provider REST/WebSocket acceptance: PASS;
-- scanner readiness acceptance: PASS with 18 ready / 2 failed and DEGRADED status;
+- scanner readiness acceptance: PASS with 3 ready / 17 failed and DEGRADED status;
 - MTF API publication: PASS;
 - K-Trader container: healthy;
 - Caddy HTTPS/TLS: PASS;
 - Phase 10 Action live acceptance: PASS;
-- final deployed SHA: `7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`.
+- final deployed SHA: `9a257957e033f6265b9e746cb9f15e755ff87b72`;
+- live FAST TTL boundary: 60m valid / 60m+1s expired.
 
 ## HTTPS and Action gate
 
@@ -239,7 +246,7 @@ Earlier Phase 10 deployment incidents validated rollback behavior:
 - local acceptance initially lacked Bearer authentication after Action auth activation; PR #19 fixed the integration defect;
 - Caddy initially could not persist ACME state under incorrect host bind-mount ownership; ownership/provisioning were corrected.
 
-Subsequent accepted deployments culminated in Deploy Production #9 on `7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`.
+Subsequent accepted deployments continued through Deploy Production #10 on `9a257957e033f6265b9e746cb9f15e755ff87b72`.
 
 ## Provisioning
 

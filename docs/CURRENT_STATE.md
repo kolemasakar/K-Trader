@@ -4,7 +4,7 @@ Updated: 2026-09-09
 
 Canonical operational checkpoint:
 
-`docs/checkpoints/2026-09-09_PHASE11G_SETUP_LIFECYCLE_60M_GATE.md`
+`docs/checkpoints/2026-09-09_PHASE11G_PROD_TTL_AND_CORRECTED_WINDOWS_1_4.md`
 
 Prior research checkpoint:
 
@@ -20,31 +20,30 @@ Prior dataset checkpoint:
 - Phase 11A-11G repository-side foundation: VERIFIED;
 - Phase 11F production accumulation: active and provider-coherent;
 - Phase 11G physical catalogue: two canonical chains COMPLETE / VERIFIED / CATALOGUED;
-- Phase 11G corrected discovery: ACTIVE;
+- Phase 11G corrected historical Windows #1-#4 under FAST TTL60: COMPLETE / zero tradable signals;
+- Phase 11G prospective/provider-recorded discovery: ACTIVE;
 - RR-geometry audit: COMPLETE / no geometry defect found;
-- Setup Lifecycle / Expiry gate: REPOSITORY + REPLAY VALIDATED;
-- approved canonical setup TTL: `60 minutes = 12 x M5 bars`;
-- production deployment of the TTL implementation: PENDING;
+- Setup Lifecycle / Expiry gate: REPOSITORY + REPLAY + PRODUCTION VALIDATED;
+- approved canonical FAST setup TTL: `60 minutes = 12 x M5 bars`;
+- production deployment of the TTL implementation: COMPLETE / accepted on canonical `main`;
 - Phase 12 multi-provider expansion: FUTURE / NOT ACTIVE.
 
 ## Repository and production identity
 
-Canonical repository baseline after PR #36:
+Current accepted production baseline:
 
-- canonical `main` SHA: `1dbc41d8521daab42b3edb7ef10d3ccfdb8b68bf`;
-- PR #36: `Phase 11G: enforce 60m setup expiry`;
-- Tests workflow #67: PASS;
-- CI workflow #138: PASS;
-- CI pytest: PASS;
-- CI Docker amd64: PASS;
-- CI Docker arm64: PASS.
-
-Production has not yet been rolled forward to PR #36:
-
-- deployed implementation image: `k-trader:7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`;
-- production container: healthy at the last accepted runtime validation;
-- PR #36 production rollout is a separate subsequent operational task;
+- canonical/deployed `main` SHA: `9a257957e033f6265b9e746cb9f15e755ff87b72`;
+- deployed image: `k-trader:9a257957e033f6265b9e746cb9f15e755ff87b72`;
+- GitHub `Deploy Production #10`: SUCCESS;
+- production container: healthy;
+- provider REST/WebSocket acceptance: PASS;
+- MTF API acceptance: PASS;
+- public HTTPS / Phase 10 Action acceptance: PASS;
+- live FAST lifecycle: `setup_interval=5m`, `setup_max_age_bars=12`, `setup_max_age_seconds=3600`;
+- exact 60m age remains valid; 60m+1s is `SETUP_EXPIRED`;
 - GitHub `main` + PR/CI/deploy remains canonical; no direct source mutation on PROD is permitted.
+
+The current `main` also contains the horizon-aware research foundation. M15/H1 lifecycle profiles remain research-only; production defaults remain FAST/M5 unless a later explicit activation gate changes that contract.
 
 ## Direct production operator access
 
@@ -239,23 +238,40 @@ Result:
 
 The old stage counters still show `81` before expiry because those helper counters are evaluated before the new lifecycle reason is applied. The operational post-expiry result is the exact RR-only population of `3`.
 
+## Production TTL rollout and corrected Windows #1-#4 closure
+
+Canonical checkpoint: `docs/checkpoints/2026-09-09_PHASE11G_PROD_TTL_AND_CORRECTED_WINDOWS_1_4.md`.
+
+The accepted production rollout and historical rerun produced:
+
+- deployed SHA/image: `9a257957e033f6265b9e746cb9f15e755ff87b72`;
+- corrected W1-W4 analyzed cutoffs: `2445`;
+- candidate decisions: `29508`;
+- `SETUP_EXPIRED` reason occurrences: `23952`;
+- HTF-aligned decisions: `1987`;
+- strong primary-level stage: `944`;
+- tradable decisions: `0`;
+- skipped selected context after strict selection: `0`;
+- skipped replay history after symbol-level qualification: `0`;
+- W4 reproduced the historical high-level population exactly: `45` strict symbols, `40` history pass, `600` analyzed cutoffs, `7596` decisions, `435` HTF aligned, `202` strong-level stage.
+- corrected W4 conditional funnel: `435 -> 202 -> 168 -> 142 -> 0 -> 0` for HTF -> strong -> geometry -> ATR -> TTL60 -> RR>=3; the first four stages exactly reproduce the historical pre-TTL audit.
+
+The `SETUP_EXPIRED` count overlaps other rejection reasons and is not a disjoint funnel stage. Public `TradingDecision` masks entry/stop/target for `NO_TRADE`, so conditional geometry audits must not infer geometry absence from those masked fields.
+
+No new dataset chain was materialized. Catalogue remains SUIUSDT + XRPUSDT.
+
 ## Current interpretation
 
-The RR-geometry question and the setup-lifecycle gap are now understood separately:
-
 - RR geometry is behaving as designed under the structural-target contract;
-- the missing setup TTL was a lifecycle/specification gap;
-- TTL 60m removes systematic reuse of old confirmed setups without manufacturing signals;
+- the setup-lifecycle gap is closed for the FAST/M5 production profile;
+- TTL60 removes systematic reuse of old confirmed setups without manufacturing signals;
+- corrected W1-W4 yielded zero natural tradable signals under unchanged hard gates;
 - no change to RR, stop, target, freshness, probability or catalogue standards is justified by this work.
 
 ## Next action
 
-The Setup Lifecycle / Expiry gate is closed at repository/specification/replay level.
-
-Next Phase 11G sequence:
-
-1. deploy canonical `main` through the standard production deployment workflow when rollout is authorized;
-2. verify production health and runtime TTL configuration after deployment;
-3. rerun corrected discovery for Windows #1-#4 under the explicit 60m lifecycle;
-4. preserve exact provenance for every replay and do not force reconstructed runs to match superseded historical populations;
-5. materialize/register only naturally useful deterministic chains that survive every unchanged hard gate.
+1. keep provider-recorded production research capture active;
+2. materialize/register a new Phase 11G chain only when a naturally useful deterministic setup survives every unchanged hard gate;
+3. continue INTRADAY/M15 and MEDIUM/H1 lifecycle work as research profiles only, with an explicit replay/activation gate before any production use;
+4. keep probability calibration inactive until sufficient real binary outcomes and a separately approved out-of-sample methodology exist;
+5. keep Phase 12 multi-provider expansion inactive until the current Phase 11G research boundary is explicitly closed.
