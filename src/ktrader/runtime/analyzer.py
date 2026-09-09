@@ -119,7 +119,7 @@ def analyze_candle_snapshot(
     day_start = now.astimezone(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     day_bars = [
         candle
-        for candle in setup_candles
+        for candle in normalized["5m"]
         if candle.open_time >= day_start and candle.open_time.date() == day_start.date()
     ]
     day_range = build_daily_range_context(day_bars)
