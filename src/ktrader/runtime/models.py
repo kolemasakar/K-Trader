@@ -9,6 +9,20 @@ from ktrader.market.validation import FreshnessPolicy
 from ktrader.market.live import LiveConfig
 
 
+SETUP_INTERVAL_SECONDS: dict[str, int] = {
+    "5m": 5 * 60,
+    "15m": 15 * 60,
+    "1h": 60 * 60,
+}
+
+
+def setup_interval_seconds(interval: str) -> int:
+    try:
+        return SETUP_INTERVAL_SECONDS[interval]
+    except KeyError as exc:
+        raise ValueError(f"unsupported setup_interval: {interval}") from exc
+
+
 @dataclass(frozen=True, slots=True)
 class RuntimeScannerConfig:
     universe: UniverseConfig = field(default_factory=UniverseConfig)
@@ -46,10 +60,15 @@ class RuntimeScannerConfig:
             raise ValueError("scan_interval_seconds must be positive")
         if self.bootstrap_concurrency <= 0:
             raise ValueError("bootstrap_concurrency must be positive")
-        if self.setup_interval != "5m":
-            raise ValueError("phase8.5 canonical setup_interval is 5m")
+        setup_interval_seconds(self.setup_interval)
+        if self.setup_interval not in self.history.interval_counts:
+            raise ValueError("setup_interval must be present in history plan")
         if self.setup_max_age_bars <= 0:
             raise ValueError("setup_max_age_bars must be positive")
+
+    @property
+    def setup_max_age_seconds(self) -> int:
+        return self.setup_max_age_bars * setup_interval_seconds(self.setup_interval)
 
 
 @dataclass(frozen=True, slots=True)

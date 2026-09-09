@@ -119,7 +119,7 @@ def analyze_candle_snapshot(
     day_start = now.astimezone(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     day_bars = [
         candle
-        for candle in setup_candles
+        for candle in normalized["5m"]
         if candle.open_time >= day_start and candle.open_time.date() == day_start.date()
     ]
     day_range = build_daily_range_context(day_bars)
@@ -139,7 +139,7 @@ def analyze_candle_snapshot(
             atr5d=atr5d_value,
             generated_at=now,
             luft_atr_fraction=config.luft_atr_fraction,
-            setup_max_age_seconds=config.setup_max_age_bars * 5 * 60,
+            setup_max_age_seconds=config.setup_max_age_seconds,
         )
         for candidate in candidates
     )
