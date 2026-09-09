@@ -2,7 +2,7 @@
 
 Updated: 2026-09-09
 
-Status: FAST CANONICAL / INTRADAY + MEDIUM RESEARCH-VALIDATED, NOT PRODUCTION-ACTIVE
+Status: FAST CANONICAL / INTRADAY M15 UNIVERSAL TTL UNRESOLVED / MEDIUM H1 8-12H TIME-SPLIT VALIDATED / NON-FAST NOT PRODUCTION-ACTIVE
 
 ## Purpose
 
@@ -48,7 +48,7 @@ Lifecycle sensitivity band tested:
 - 360m = 24 bars;
 - 480m = 32 bars.
 
-Current evidence supports a provisional research band of `4–6 hours` (`16–24 x M15 bars`). This is not yet a production default because the current sample contains no valid tradable signals or resolved outcome basis for profitability optimization.
+The first sample suggested a provisional `4–6 hours` band (`16–24 x M15 bars`). A later eight-symbol time-separated validation did not reproduce that band as a universal M15 lifecycle rule: 4h retained 37.0% of geometry, 6h 45.4%, and 8h 58.4%. Evidence-type and primary-level-timeframe stratification did not yield a stable replacement rule across time samples. Therefore no single M15 production TTL is currently approved. Geometry-survival share alone is not used to optimize TTL; additional time-separated evidence plus naturally tradable setups and real outcomes are required.
 
 ## MEDIUM profile — research state
 
@@ -65,7 +65,7 @@ Lifecycle sensitivity band tested:
 - 720m = 12 bars;
 - 1440m = 24 bars.
 
-Current evidence supports a provisional research band of `8–12 hours` (`8–12 x H1 bars`). This is not yet a production default because the current sample contains no valid tradable signals or resolved outcome basis for profitability optimization.
+The provisional `8–12 hours` band (`8–12 x H1 bars`) is now time-split validated as a lifecycle design band. Exact first-study geometry survival was 66.7% at 8h and 88.9% at 12h; a later eight-symbol time-split sample produced 55.9% at 8h and 84.7% at 12h. This remains research-only: both samples produced zero tradable signals, so the band is not a profitability optimum and is not a production default.
 
 ## Shared invariants
 
@@ -89,3 +89,7 @@ The UTC-day range used by ATR-used remains derived from canonical `5m` candles e
 - INTRADAY and MEDIUM are research profiles only.
 - A profile may become production-active only after repository CI, replay provenance, target-host acceptance and explicit owner approval.
 - Profile TTL must be stored and reported as both `setup_interval` and `setup_max_age_bars`; derived wall-clock TTL must be computed from the interval rather than hard-coded to five minutes.
+
+## Latest validation checkpoint
+
+`docs/checkpoints/2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md` records the exact first-study reconstruction, the new eight-symbol time-separated panel, M15 stratification, and H1 cross-sample validation.
