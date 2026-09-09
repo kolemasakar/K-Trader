@@ -6,6 +6,10 @@ Canonical operational checkpoint:
 
 `docs/checkpoints/2026-09-09_PHASE11G_PROD_TTL_AND_CORRECTED_WINDOWS_1_4.md`
 
+Latest horizon research checkpoint:
+
+`docs/checkpoints/2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md`
+
 Prior research checkpoint:
 
 `docs/checkpoints/2026-09-08_PHASE11G_CORRECTED_REPLAY_RR_GEOMETRY_GATE.md`
@@ -22,6 +26,8 @@ Prior dataset checkpoint:
 - Phase 11G physical catalogue: two canonical chains COMPLETE / VERIFIED / CATALOGUED;
 - Phase 11G corrected historical Windows #1-#4 under FAST TTL60: COMPLETE / zero tradable signals;
 - Phase 11G prospective/provider-recorded discovery: ACTIVE;
+- INTRADAY/M15 lifecycle: RESEARCH ONLY / universal TTL unresolved after broader time-split validation;
+- MEDIUM/H1 lifecycle: RESEARCH ONLY / 8-12h lifecycle design band time-split validated;
 - RR-geometry audit: COMPLETE / no geometry defect found;
 - Setup Lifecycle / Expiry gate: REPOSITORY + REPLAY + PRODUCTION VALIDATED;
 - approved canonical FAST setup TTL: `60 minutes = 12 x M5 bars`;
@@ -93,7 +99,7 @@ Canonical lifecycle:
 - canonical confirmation time is the latest confirmed evidence bar that activates the selected setup;
 - exactly `60 minutes` old remains valid;
 - `setup_age > 60 minutes` -> hard reject `SETUP_EXPIRED`;
-- fresh market candles do not refresh an old confirmed setup;
+- fresh market candles do not refresh or extend the life of an already-confirmed setup;
 - Trap/VSA evidence-local confirmation windows are unchanged;
 - stop, structural target and RR calculation are unchanged.
 
@@ -260,6 +266,29 @@ The `SETUP_EXPIRED` count overlaps other rejection reasons and is not a disjoint
 
 No new dataset chain was materialized. Catalogue remains SUIUSDT + XRPUSDT.
 
+## Horizon time-split validation
+
+Canonical research checkpoint: `docs/checkpoints/2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md`.
+
+A new provider-recorded sample (`46` snapshots, eight-symbol panel, cohort SHA `5c23efe9f9749a48857e0fcd89521b923e2da6f780d29ae141b45db010b002bb`) was replayed without changing hard gates.
+
+INTRADAY/M15:
+
+- `2754` candidate records / `1415` geometry records / `0` tradable;
+- geometry survivors: 4h `37.0%`, 6h `45.4%`, 8h `58.4%`;
+- longer-TTL RR-only survivors were entirely concentrated in NEARUSDT;
+- setup-type stratification was dominated by `TRAP_LEVEL_CONFIRMATION` (`1400/1415` geometry records);
+- primary-level-timeframe stratification varied materially between the exact first sample and the new time-split sample;
+- result: the earlier 4-6h band is not validated as a universal M15 TTL and no adaptive TTL table is approved.
+
+MEDIUM/H1:
+
+- exact first sample: 8h `66.7%`, 12h `88.9%`;
+- new eight-symbol sample: 8h `55.9%`, 12h `84.7%`;
+- result: 8-12h is time-split validated as a lifecycle design band, but remains research-only because tradable/outcome evidence is still zero.
+
+The exact first-study archive, cohort and all three bundle SHA identities were reproduced, so this cross-sample comparison is provenance-grounded rather than approximate.
+
 ## Current interpretation
 
 - RR geometry is behaving as designed under the structural-target contract;
@@ -272,6 +301,6 @@ No new dataset chain was materialized. Catalogue remains SUIUSDT + XRPUSDT.
 
 1. keep provider-recorded production research capture active;
 2. materialize/register a new Phase 11G chain only when a naturally useful deterministic setup survives every unchanged hard gate;
-3. continue INTRADAY/M15 and MEDIUM/H1 lifecycle work as research profiles only, with an explicit replay/activation gate before any production use;
+3. keep INTRADAY/M15 unresolved and MEDIUM/H1 8-12h research-only; do not add adaptive TTL dimensions until additional time-separated evidence and naturally tradable setups/outcomes exist;
 4. keep probability calibration inactive until sufficient real binary outcomes and a separately approved out-of-sample methodology exist;
 5. keep Phase 12 multi-provider expansion inactive until the current Phase 11G research boundary is explicitly closed.
