@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.15
+# K-Trader Roadmap v1.16
 
-Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, and corrected historical discovery is active at the RR-geometry gate as of 2026-09-08.
+Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, the RR-geometry audit is complete, and the 60-minute Setup Lifecycle / Expiry gate is repository- and replay-validated as of 2026-09-09. Production rollout of the TTL implementation remains pending.
 
 ## Phase 0 - Foundation
 
@@ -339,7 +339,7 @@ Verification: PR #9 CI `32656033224` SUCCESS; repository-wide pytest **155 passe
 
 ### Phase 11G - Dataset Catalogue Foundation and Discovery
 
-Status: VERIFIED FOUNDATION / ACTIVE CORRECTED DATASET DISCOVERY.
+Status: VERIFIED FOUNDATION / ACTIVE CORRECTED DATASET DISCOVERY / SETUP LIFECYCLE GATE VALIDATED.
 
 - `ktrader.dataset_catalogue.v1` deterministic research audit catalogue;
 - one entry links one coherent provider/symbol chain: MTF bundle -> universe archive -> study cohort -> replay study -> study provenance -> optional outcome sample;
@@ -358,37 +358,37 @@ Foundation verification: PR #10 CI `32657337221` SUCCESS; repository-wide pytest
 Current production/research checkpoint:
 
 - canonical catalogue contains 2 verified chains: SUIUSDT and XRPUSDT;
-- catalogue SHA: `057ff750966d2bc5043fffd7fdc37583dd0133480452c131b51f84109d2fb4b6`;
 - strict context policy remains `max_context_age_seconds=300` with newest snapshot at/before cutoff;
 - PR #32 aligned research capture cadence to UTC slots;
 - PR #33 fixed the side/regime contract (`LONG -> BULLISH`, `SHORT -> BEARISH`) and aligned D1 fallback semantics;
-- PR #33 main SHA `7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab` passed post-merge Tests/CI and Deploy Production #9 `34177978988`;
-- corrected Window #4 replay produced 7596 candidate decisions: 7161 HTF-rejected and 435 HTF-aligned;
-- conditional audit reproduced all 435 aligned candidates as `LONG -> BULLISH`;
-- sequential downstream funnel: `435 -> 202 -> 168 -> 142 -> 0` at HTF -> primary-level strength -> geometry -> ATR -> RR;
-- all 142 final survivors were blocked only by `RR_BELOW_3`;
-- no threshold/freshness/catalogue/probability rule was relaxed;
-- no new chain was materialized during discovery.
+- historical corrected Window #4 checkpoint produced `7596` candidate decisions with funnel `435 -> 202 -> 168 -> 142 -> 0` after HTF alignment;
+- later V2 reconstruction on currently available inputs produced `8874` decisions and a pre-expiry funnel `8874 -> 454 -> 166 -> 133 -> 81 -> 0`;
+- RR geometry audit traced `81/81` V2 RR-only decisions to real structural geometry, found `21` unique geometries, RR approximately `0.026..1.0`, and no arithmetic/structural-target defect;
+- Setup Recency audit found RR-only setup-age median `545m`, maximum `1295m`, with `53/81` older than 6h;
+- PR #36 introduced Setup Spec v1.1 and canonical `setup_max_age_bars=12` (`60m`), with hard reject `SETUP_EXPIRED` only when setup age is strictly greater than 60m;
+- PR #36 merged as `1dbc41d8521daab42b3edb7ef10d3ccfdb8b68bf` after Tests #67 PASS and CI #138 PASS including amd64/arm64 Docker gates;
+- control replay on merged-main logic succeeded with `8874` decisions, `6563 SETUP_EXPIRED`, only `3` exact RR-only survivors, all `NEARUSDT`, and `0` RR>=3/tradable decisions;
+- `RR >= 3`, ATR threshold, context freshness, stop geometry and structural-target rules were not relaxed;
+- no new chain was materialized during the RR/lifecycle investigation;
+- production still runs image `k-trader:7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`; rollout of PR #36 remains pending.
 
-Canonical current checkpoint: `docs/checkpoints/2026-09-08_PHASE11G_CORRECTED_REPLAY_RR_GEOMETRY_GATE.md`.
+Canonical current checkpoint: `docs/checkpoints/2026-09-09_PHASE11G_SETUP_LIFECYCLE_60M_GATE.md`.
 
 ### Remaining Phase 11 work
 
-Immediate Phase 11G gate:
+Immediate Phase 11G sequence:
 
-- run a read-only RR-geometry audit of the 142 RR-only Window #4 candidates;
-- inspect entry, stop, structural target, risk/reward distances, target level identity/type/timeframe and RR distribution;
-- deduplicate unchanged setup geometry across neighboring cutoffs before interpreting the RR distribution;
-- do not lower `RR >= 3` merely to manufacture signals.
-
-After geometry is understood:
-
-- rerun corrected historical discovery for Windows #1–#4;
-- materialize only naturally useful deterministic chains;
+- deploy the approved canonical `main` baseline through the standard production workflow when rollout is authorized;
+- verify production health and runtime `setup_max_age_bars=12` after deployment;
+- rerun corrected historical discovery for Windows #1-#4 with the explicit 60m setup lifecycle;
+- preserve exact per-run provenance and do not force reconstructed runs to match superseded historical populations;
+- materialize only naturally useful deterministic chains that survive every unchanged hard gate;
 - register future catalogue entries only after full artifact verification;
 - export immutable WIN/LOSS samples only when real binary outcomes exist;
 - continue provider-recorded production accumulation and target-host operational evidence;
 - consider statistical calibration only under a separately approved methodology with sufficient sample size and time-separated out-of-sample validation.
+
+Do not lower `RR >= 3`, widen context freshness, synthesize targets, or relax probability/catalogue integrity rules merely to manufacture signals.
 
 ## Phase 12 - Multi-provider expansion
 
