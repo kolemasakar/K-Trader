@@ -47,20 +47,49 @@ The active `main` ruleset requires:
 - deletion protection;
 - non-fast-forward / force-push protection.
 
-Auto-merge may be enabled on a PR, but it does not bypass the ruleset. It completes only after `canonical-merge-gate` succeeds on the up-to-date PR head.
+## Merge execution
+
+The ruleset and `canonical-merge-gate` are the merge authority. The mechanism that performs the final squash is secondary.
+
+Preferred path:
+
+`feature branch -> pull request -> canonical CI -> canonical-merge-gate -> native auto-merge -> main`
+
+Deterministic fallback:
+
+`feature branch -> pull request -> canonical CI -> canonical-merge-gate -> connector-triggered squash merge -> main`
+
+The connector-triggered merge must:
+
+- run only after `canonical-merge-gate` is `success`;
+- use squash merge;
+- pin the expected PR head SHA;
+- rely on GitHub to enforce the active ruleset;
+- never use an administrator or ruleset bypass for routine work.
+
+A connector merge request is therefore not a substitute for CI. If a required rule is not satisfied, GitHub must reject the merge.
 
 ## Completed transition
 
-The repository previously required a status check named `pytest` plus one approving review. The migration was completed in two controlled stages:
+The repository previously required a status check named `pytest` plus one approving review. The migration was completed in controlled stages:
 
 1. PR #39 introduced unique Python and Docker jobs plus `canonical-merge-gate`, while retaining the legacy `tests.yml` long enough to satisfy the previous ruleset.
-2. After the canonical gate was proven and the ruleset was changed to `0 approvals + canonical-merge-gate`, the legacy `.github/workflows/tests.yml` was removed by the acceptance cleanup PR.
+2. The `main` ruleset was changed to `0 approvals + canonical-merge-gate`, with strict up-to-date checks retained.
+3. PR #40 removed the transitional `.github/workflows/tests.yml` with no requested reviewer and no approving review.
+4. On PR #40, native auto-squash was enabled and the canonical gate succeeded. GitHub reported the PR as clean and mergeable but did not complete native auto-merge within the observed acceptance interval. The connector then issued a squash merge pinned to the exact head SHA after the gate was green; GitHub accepted it under the active ruleset.
 
-The cleanup PR itself is the end-to-end acceptance test: it must merge without human approval and only after the canonical gate succeeds.
+This proves the operational requirement: routine development no longer depends on the `Lingvorm` approval workaround, while the canonical CI gate remains mandatory.
 
 ## Routine development path
 
-`feature branch -> pull request -> canonical CI -> canonical-merge-gate -> auto-merge -> main`
+For every routine PR:
+
+1. create/update a feature branch;
+2. open a PR to `main`;
+3. wait for `canonical-merge-gate`;
+4. if the gate fails, do not merge;
+5. if the gate succeeds, prefer native auto-merge;
+6. if native auto-merge does not complete despite an enabled auto-merge state and a clean, up-to-date PR, use connector-triggered squash merge pinned to the expected head SHA.
 
 No second-account approval is required for routine work.
 
