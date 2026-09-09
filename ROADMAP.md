@@ -1,6 +1,6 @@
-# K-Trader Roadmap v1.17
+# K-Trader Roadmap v1.18
 
-Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, the RR-geometry audit is complete, and the FAST 60-minute Setup Lifecycle / Expiry gate is repository-, replay-, and production-validated as of 2026-09-09. Corrected historical Windows #1-#4 have been rerun under the accepted lifecycle with zero tradable signals.
+Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, FAST M5/60m is production-validated, corrected historical Windows #1-#4 are closed, INTRADAY/M15 universal TTL remains unresolved after broader time-split validation, and MEDIUM/H1 8-12h is time-split validated as a research-only lifecycle design band.
 
 ## Phase 0 - Foundation
 
@@ -375,9 +375,13 @@ Current production/research checkpoint:
 - corrected W1-W4 rerun completed with `29508` candidate decisions, `23952 SETUP_EXPIRED` reason occurrences, `1987` HTF-aligned decisions, `944` strong-level decisions, and `0` tradable decisions;
 - W4 reproduced the historical high-level population exactly through the strong-level stage (`45 / 40 / 600 / 7596 / 435 / 202`);
 - corrected W4 conditional funnel is `435 -> 202 -> 168 -> 142 -> 0 -> 0` (HTF -> strong -> geometry -> ATR -> TTL60 -> RR>=3), reproducing the historical pre-TTL funnel exactly before lifecycle expiry;
-- no new chain was materialized; catalogue remains SUIUSDT + XRPUSDT.
+- no new chain was materialized; catalogue remains SUIUSDT + XRPUSDT;
+- horizon time-split validation used a new 46-snapshot/eight-symbol cohort and exact reconstruction of the first horizon-study provenance;
+- INTRADAY/M15 4-6h did not generalize as a universal TTL on the broader panel; evidence-type and primary-level-timeframe stratification did not justify an adaptive TTL table;
+- MEDIUM/H1 cross-sample geometry survival remained comparatively stable (first/new: 8h 66.7%/55.9%, 12h 88.9%/84.7%), validating 8-12h as a research-only lifecycle design band;
+- all horizon validation samples still produced zero tradable signals, so no profitability-optimal non-FAST TTL is claimed.
 
-Canonical current checkpoint: `docs/checkpoints/2026-09-09_PHASE11G_PROD_TTL_AND_CORRECTED_WINDOWS_1_4.md`.
+Canonical current checkpoint: `docs/checkpoints/2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md`.
 
 ### Remaining Phase 11 work
 
@@ -388,7 +392,7 @@ Immediate Phase 11G sequence:
 - materialize only naturally useful deterministic chains that survive every unchanged hard gate;
 - register future catalogue entries only after full artifact verification;
 - export immutable WIN/LOSS samples only when real binary outcomes exist;
-- continue INTRADAY/M15 and MEDIUM/H1 lifecycle research as non-production profiles and require an explicit activation gate before runtime use;
+- keep INTRADAY/M15 unresolved and MEDIUM/H1 8-12h research-only; continue accumulation rather than fitting more TTL dimensions to geometry age;
 - consider statistical calibration only under a separately approved methodology with sufficient sample size and time-separated out-of-sample validation.
 
 Do not lower `RR >= 3`, widen context freshness, synthesize targets, or relax probability/catalogue integrity rules merely to manufacture signals.
