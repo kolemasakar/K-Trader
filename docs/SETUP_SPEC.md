@@ -1,4 +1,4 @@
-# Setup Specification v1.0
+# Setup Specification v1.1
 
 ## Scope
 
@@ -43,6 +43,32 @@ VSA confirmation retains the Phase 6 rule:
 Trap confirmation uses the Phase 6 `confirmation_time`.
 
 If no confirmed trigger bar exists, setup is rejected.
+
+## Setup lifecycle / expiry
+
+The canonical setup age is measured from the confirmation trigger that actually activates the setup:
+
+`setup_age = evaluation_time - canonical_confirmation_time`
+
+For the canonical 5m setup interval, the maximum setup age is:
+
+`setup_max_age_bars = 12`
+
+which is exactly:
+
+`12 * 5 minutes = 60 minutes`
+
+A setup remains eligible through exactly 60 minutes after its canonical confirmation time. When:
+
+`setup_age > 60 minutes`
+
+it is a hard reject with reason code:
+
+`SETUP_EXPIRED`
+
+The expiry clock is based on the canonical confirmation trigger, not on the age of every component evidence event independently. A combined Trap/VSA setup therefore uses the latest confirmed evidence bar selected by the canonical setup geometry.
+
+Setup expiry is independent of candle-data freshness. Fresh market data does not refresh or extend the life of an already-confirmed setup.
 
 ## Luft
 

@@ -139,6 +139,7 @@ def analyze_candle_snapshot(
             atr5d=atr5d_value,
             generated_at=now,
             luft_atr_fraction=config.luft_atr_fraction,
+            setup_max_age_seconds=config.setup_max_age_bars * 5 * 60,
         )
         for candidate in candidates
     )

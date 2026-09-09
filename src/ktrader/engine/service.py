@@ -74,6 +74,20 @@ def discover_setup_candidates(
     return tuple(candidates)
 
 
+def setup_is_expired(
+    confirmation_time: datetime,
+    *,
+    generated_at: datetime,
+    max_age_seconds: float,
+) -> bool:
+    if max_age_seconds <= 0:
+        raise ValueError("max_age_seconds must be positive")
+    age_seconds = (generated_at - confirmation_time).total_seconds()
+    if age_seconds < 0:
+        raise ValueError("setup confirmation cannot be in the future")
+    return age_seconds > max_age_seconds
+
+
 def calculate_position_risk(
     geometry: SetupGeometry,
     risk_context: RiskContext | None,
@@ -115,12 +129,15 @@ def evaluate_candidate(
     risk_context: RiskContext | None = None,
     generated_at: datetime | None = None,
     luft_atr_fraction: Decimal = Decimal("0.02"),
+    setup_max_age_seconds: float | None = None,
 ) -> TradingDecision:
     now = generated_at or datetime.now(timezone.utc)
     if instrument.provider_id != candidate.primary_level.provider_id or instrument.symbol != candidate.primary_level.symbol:
         raise ValueError("instrument/candidate identity mismatch")
     if universe_candidate.instrument.instrument_id != instrument.instrument_id:
         raise ValueError("universe candidate identity mismatch")
+    if setup_max_age_seconds is not None and setup_max_age_seconds <= 0:
+        raise ValueError("setup_max_age_seconds must be positive")
 
     geometry: SetupGeometry | None = None
     geometry_error: str | None = None
@@ -159,6 +176,13 @@ def evaluate_candidate(
 
     position = PositionRisk(None, None, None)
     reason_codes = list(score.hard_rejects)
+    if geometry is not None and setup_max_age_seconds is not None:
+        if setup_is_expired(
+            geometry.confirmation_time,
+            generated_at=now,
+            max_age_seconds=setup_max_age_seconds,
+        ):
+            reason_codes.append("SETUP_EXPIRED")
     if geometry is not None:
         try:
             position = calculate_position_risk(geometry, risk_context)
