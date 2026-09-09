@@ -1,6 +1,6 @@
 # K-Trader Current State
 
-Updated: 2026-09-08
+Updated: 2026-09-09
 
 Canonical operational checkpoint:
 
@@ -36,6 +36,22 @@ Accepted code/runtime baseline before this documentation-only checkpoint:
 - Phase 10 Action live acceptance: PASS.
 
 Deploy acceptance observed scanner `status=DEGRADED`, `symbols_ready=18`, `symbols_failed=2`; this did not fail service health or deployment acceptance.
+
+## Direct production operator access
+
+A policy-constrained SentinelX management channel from ChatGPT to the production VM was accepted on 2026-09-09.
+
+- host: `k-trader-prod-vnic`;
+- platform: Oracle Cloud Ampere A1 / Ubuntu 24.04 / ARM64;
+- SentinelX agent version at acceptance: `0.11.18`;
+- purpose: direct production diagnostics and controlled maintenance without requiring the operator to relay every command through SSH;
+- available operations include allowlisted command execution, one-off Bash/Python scripts, selected file/log inspection, Docker/K-Trader diagnostics, approved container exec, and selected service inspection/restart;
+- SSH remains the out-of-band bootstrap/recovery path;
+- SentinelX does not replace GitHub PR/CI/deploy controls.
+
+The initial unrestricted `NOPASSWD: ALL` bootstrap sudo rule was removed and replaced with a narrow operational sudo policy. Arbitrary root execution is denied. Structured filesystem access is read-only, excludes sensitive SentinelX/GitHub-runner credential files, and currently exposes only `/opt/k-trader/releases` and `/opt/k-trader/data`. No writable filesystem subtree is exposed.
+
+Canonical details and operating rules: `docs/SENTINELX_REMOTE_ACCESS.md`.
 
 ## Strict Phase 11G policy
 

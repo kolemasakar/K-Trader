@@ -1,6 +1,6 @@
-# Deployment Specification v1.7
+# Deployment Specification v1.8
 
-Updated: 2026-09-08
+Updated: 2026-09-09
 
 ## Target
 
@@ -10,6 +10,7 @@ Updated: 2026-09-08
 - Repository-scoped self-hosted GitHub Actions runner for production deployment only.
 - Primary production architecture: Linux ARM64 / Oracle Ampere A1.
 - Caddy HTTPS reverse proxy/TLS for the public Action endpoint.
+- Policy-constrained SentinelX channel for direct ChatGPT-to-production diagnostics and controlled maintenance.
 
 ## Current production state
 
@@ -36,6 +37,33 @@ Latest accepted production runtime was verified on 2026-09-08.
 - PR #33 side-to-regime scoring contract correction is present in the deployed runtime.
 
 Repository documentation HEAD may be newer than the deployed SHA when changes are documentation-only. This does not imply an undeployed runtime behavior change and does not require a production redeploy.
+
+## SentinelX direct operator channel
+
+A direct ChatGPT-to-VM management channel was accepted on 2026-09-09 through SentinelX.
+
+Purpose:
+
+- remove the need for the operator to relay every diagnostic command manually through SSH;
+- permit fast production inspection and controlled maintenance from ChatGPT;
+- preserve SSH as the independent recovery/bootstrap path;
+- preserve GitHub PR, CI, and deployment workflows as the only canonical source/deployment path.
+
+Accepted capabilities, subject to host policy, include allowlisted command execution, one-off Bash/Python scripts, selected file/log inspection, Docker and K-Trader health diagnostics, approved `docker exec` operations, and selected systemd inspection/restart actions.
+
+Security posture after hardening:
+
+- agent runs as dedicated unprivileged user `sentinelx`;
+- bootstrap `NOPASSWD: ALL` was removed;
+- sudo is constrained to a narrow K-Trader/SentinelX operational set;
+- arbitrary root execution is denied;
+- structured filesystem access is read-only;
+- current readable K-Trader paths are `/opt/k-trader/releases` and `/opt/k-trader/data`;
+- no structured writable paths are exposed;
+- SentinelX identity and GitHub runner credential files are outside the structured read policy;
+- `/etc/sentinelx/config.yaml` is not writable by the agent through SentinelX filesystem tools.
+
+Canonical operating/security details: `docs/SENTINELX_REMOTE_ACCESS.md`.
 
 ## Runtime layout
 
