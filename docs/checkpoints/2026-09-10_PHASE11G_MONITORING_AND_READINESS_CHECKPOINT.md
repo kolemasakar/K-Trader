@@ -41,6 +41,15 @@ At the checkpoint inspection:
 - universe size: `50` ranked Binance USD-M perpetual instruments;
 - capture accumulation remains active and is not affected by disabling the ChatGPT scheduled signal-watch task.
 
+Cross-day continuity audit over `2026-09-09T00:00:46Z` through `2026-09-10T03:00:35Z` found:
+
+- captures: `327`;
+- median interval: approximately `300.005s`;
+- maximum observed interval: approximately `301.608s`;
+- gaps greater than `420s`: `0`.
+
+Capture continuity is therefore accepted for this interval.
+
 ## Runtime data integrity
 
 Direct read-only checks at the checkpoint:
@@ -48,8 +57,10 @@ Direct read-only checks at the checkpoint:
 - SQLite database: `/data/ktrader.db`;
 - `PRAGMA integrity_check`: `ok`;
 - observed database size: `28,422,144` bytes;
+- WAL size observed: `5,454,912` bytes;
 - completed `.db` backups observed: `7`;
-- latest completed backup observed: `/data/backups/ktrader_20260909T230747121442Z.db`.
+- latest completed backup observed: `/data/backups/ktrader_20260909T230747121442Z.db`;
+- root filesystem: `45G` total, approximately `6.6G` used, `38G` available (`15%` used).
 
 No database mutation was performed by this checkpoint.
 
@@ -62,11 +73,14 @@ Canonical materialized catalogue remains:
 - symbols: `SUIUSDT`, `XRPUSDT`;
 - canonical loader with `verify_artifacts=True`: `PASS`.
 
-Observed catalogue file SHA-256 remains:
+Two different SHA-256 values were previously compared as though they represented the same identity. The audit resolved that distinction:
 
-`d1b1c42b51a2f54c865d03e21bae3faa2a0e58166baa46c7a01a241b47eed250`
+- canonical semantic catalogue digest stored in `catalogue_sha256`: `057ff750966d2bc5043fffd7fdc37583dd0133480452c131b51f84109d2fb4b6`;
+- raw SHA-256 of the serialized `catalogue.json` file: `d1b1c42b51a2f54c865d03e21bae3faa2a0e58166baa46c7a01a241b47eed250`.
 
-This differs from an earlier recorded catalogue SHA. Because full loader/artifact verification passes, the drift is an unresolved provenance question, not evidence of corruption. Root-cause closure is explicitly included in the parallel readiness work.
+This difference is **by design, not drift**. `catalogue_sha256` is calculated over the canonical payload `{schema_version, entries}`. The serialized file additionally contains the `catalogue_sha256` field itself, so its raw file-content SHA is a separate content identity and is not expected to equal the semantic catalogue digest.
+
+The earlier corruption concern is closed. Full loader/artifact verification remains PASS.
 
 ## Current top-20 bootstrap eligibility observation
 
@@ -82,6 +96,16 @@ Latest bootstrap state was successful for the mature-history members except the 
 - `MARSCOINUSDT`: insufficient D1 history, observed `9/250`.
 
 These failures do not justify reducing the canonical D1 history requirement.
+
+A 24-hour bootstrap telemetry audit found that the failure volume is an operational retry issue rather than broad provider/data failure:
+
+- approximately `5,081` bootstrap-run records in the inspected rolling interval;
+- approximately `4,907` failures;
+- all inspected failures were `BootstrapError: Insufficient closed 1d bars`;
+- failing symbols were only `MARSCOINUSDT`, `PONSUSDT`, `牛来USDT`, and `KATUSDT`;
+- mature-history symbols continued to produce successful bootstrap results.
+
+The current runtime retries known history-incomplete contracts too frequently. This is operational inefficiency/noise; eligibility remains correctly fail-closed. A retry/backoff hardening change may be implemented only if it preserves all history requirements and does not convert an ineligible symbol into READY.
 
 ## Signal monitoring decision
 
@@ -110,8 +134,8 @@ Unchanged:
 The following work can proceed without waiting for the first tradable signal:
 
 1. operational integrity audit: capture continuity, database/WAL, backups, disk and scanner-cycle behavior;
-2. scanner `DEGRADED` / M5 reconciliation audit and fail-closed validation;
-3. catalogue integrity and catalogue-SHA drift root-cause audit;
+2. scanner `DEGRADED` / M5 reconciliation and known-insufficient-history retry audit;
+3. catalogue integrity and catalogue-SHA identity audit;
 4. deterministic prospective discovery-report design so a manual 24-hour review yields a full rejection funnel instead of only `signals=0`;
 5. outcome-pipeline readiness validation using existing deterministic contracts/tests without fabricating a real outcome;
 6. documentation/provenance hardening for the above results.
@@ -140,6 +164,6 @@ No parallel-readiness task may:
 
 Proceed immediately with read-only/non-signal-dependent work in this order:
 
-`Operational integrity -> scanner reconciliation -> catalogue SHA root cause -> deterministic daily discovery report -> outcome-pipeline readiness -> control checkpoint`.
+`Operational integrity -> scanner retry/reconciliation hardening -> deterministic daily discovery report -> outcome-pipeline readiness -> control checkpoint`.
 
-The next approximately 24-hour prospective signal review remains manual.
+The catalogue SHA identity question is closed. The next approximately 24-hour prospective signal review remains manual.
