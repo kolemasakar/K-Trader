@@ -14,10 +14,12 @@ Current accepted state at the checkpoint:
 - provider-recorded Binance USD-M universe capture remains active;
 - next prospective signal/discovery review is manual after approximately 24 hours; the temporary automated ChatGPT signal-watch task is disabled;
 - no natural tradable LONG/SHORT signal has yet been accepted and no new catalogue chain has been materialized;
-- SQLite integrity check is `ok` and completed backups are present;
-- canonical dataset catalogue still verifies successfully with two entries: SUIUSDT + XRPUSDT;
-- observed catalogue file SHA drift remains an unresolved provenance question, not evidence of corruption, because `verify_artifacts=True` passes;
-- parallel work now proceeds through operational integrity, scanner-reconciliation, catalogue-provenance, deterministic discovery-report and outcome-readiness audits;
+- SQLite integrity check is `ok`, completed backups are present, and storage headroom is healthy;
+- canonical dataset catalogue verifies successfully with two entries: SUIUSDT + XRPUSDT;
+- catalogue SHA identity question is closed: `catalogue_sha256` is the semantic digest of `{schema_version, entries}`, while the raw serialized `catalogue.json` file has a separate content SHA by design;
+- operational audit found continuous ~5-minute capture with no >7-minute gap across the inspected cross-day interval;
+- bootstrap failure volume is concentrated only in four young contracts with insufficient D1 history; eligibility remains fail-closed, while retry-frequency hardening is the next scanner operations task;
+- parallel work proceeds through scanner retry/reconciliation hardening, deterministic discovery-report and outcome-readiness audits;
 - INTRADAY/M15 universal TTL remains unresolved; MEDIUM/H1 8-12h remains a research-only time-split validated lifecycle band;
 - no RR, ATR, structural-target, freshness, history, catalogue or probability rule is relaxed.
 
