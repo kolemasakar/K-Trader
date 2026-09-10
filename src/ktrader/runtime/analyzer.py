@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, time, timedelta, timezone
 from decimal import Decimal
 from collections.abc import Mapping, Sequence
 
@@ -212,7 +212,30 @@ class EngineSymbolAnalyzer:
                 needs_bootstrap = True
                 break
         if needs_bootstrap:
-            await self.bootstrap.bootstrap(provider, instrument, plan=self.config.history, now=now)
+            latest_run = self.repository.latest_bootstrap_run(
+                provider.provider_id, instrument.symbol
+            )
+            if latest_run is not None:
+                error = str(latest_run.get("error") or "")
+                completed_at = latest_run.get("completed_at")
+                if (
+                    latest_run.get("status") == "FAILED"
+                    and "Insufficient closed 1d bars" in error
+                    and isinstance(completed_at, datetime)
+                ):
+                    completed_utc = completed_at.astimezone(timezone.utc)
+                    retry_date = completed_utc.date() + timedelta(days=1)
+                    retry_after = datetime.combine(
+                        retry_date, time.min, tzinfo=timezone.utc
+                    )
+                    if now < retry_after:
+                        raise BootstrapError(
+                            "insufficient closed 1d history retry deferred until "
+                            f"{retry_after.isoformat()}"
+                        )
+            await self.bootstrap.bootstrap(
+                provider, instrument, plan=self.config.history, now=now
+            )
 
     @staticmethod
     def _no_setup_decision(item: UniverseCandidate, *, liquidity_rank: int, structure, atr5d_value: Decimal, freshness, now: datetime) -> TradingDecision:
