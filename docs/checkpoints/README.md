@@ -4,22 +4,26 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md`
+`2026-09-10_PHASE11G_MONITORING_AND_READINESS_CHECKPOINT.md`
 
 Current accepted state at the checkpoint:
 
-- FAST/M5 TTL60 is production-validated and remains the only production-active profile;
-- corrected historical Windows #1-#4 are closed with zero tradable signals under unchanged hard gates;
-- canonical catalogue remains two verified chains: SUIUSDT + XRPUSDT;
-- INTRADAY/M15 universal TTL is unresolved after an eight-symbol time-separated validation;
-- the earlier 4-6h M15 band is not approved as a universal production rule;
-- MEDIUM/H1 8-12h is time-split validated as a lifecycle design band, research-only;
-- no non-FAST profitability optimum is claimed because tradable/outcome evidence remains insufficient;
-- no symbol/evidence/primary-level adaptive TTL table is approved;
-- no RR, ATR, structural-target, freshness, catalogue or probability rule was relaxed.
+- canonical repository `main`: `1e6e20fb5d0e74aaf620f3aebf69429e0c0f3198`, GitHub-verified;
+- accepted production runtime remains `9a257957e033f6265b9e746cb9f15e755ff87b72` because PR #43 was docs/research-only;
+- FAST/M5 TTL60 remains the only production-active profile;
+- provider-recorded Binance USD-M universe capture remains active;
+- next prospective signal/discovery review is manual after approximately 24 hours; the temporary automated ChatGPT signal-watch task is disabled;
+- no natural tradable LONG/SHORT signal has yet been accepted and no new catalogue chain has been materialized;
+- SQLite integrity check is `ok` and completed backups are present;
+- canonical dataset catalogue still verifies successfully with two entries: SUIUSDT + XRPUSDT;
+- observed catalogue file SHA drift remains an unresolved provenance question, not evidence of corruption, because `verify_artifacts=True` passes;
+- parallel work now proceeds through operational integrity, scanner-reconciliation, catalogue-provenance, deterministic discovery-report and outcome-readiness audits;
+- INTRADAY/M15 universal TTL remains unresolved; MEDIUM/H1 8-12h remains a research-only time-split validated lifecycle band;
+- no RR, ATR, structural-target, freshness, history, catalogue or probability rule is relaxed.
 
 Historical checkpoints include:
 
+- `2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md` — horizon time-split validation;
 - `2026-09-09_PHASE11G_PROD_TTL_AND_CORRECTED_WINDOWS_1_4.md` — FAST production rollout + corrected W1-W4 closure;
 - `2026-09-09_PHASE11G_HORIZON_PROFILE_LIFECYCLE_STUDY.md` — first horizon lifecycle sensitivity study;
 - `2026-09-09_PHASE11G_SETUP_LIFECYCLE_60M_GATE.md` — canonical FAST TTL60 gate;
