@@ -1,6 +1,6 @@
 # Dataset Catalogue Spec v1.2
 
-Updated: 2026-09-07
+Updated: 2026-09-10
 
 ## Purpose
 
@@ -37,6 +37,8 @@ Each artifact reference stores:
 - exact file/tree content SHA-256.
 
 The catalogue entry itself has a deterministic SHA-256 `entry_id`. The catalogue has a deterministic `catalogue_sha256` over all sorted entries.
+
+`catalogue_sha256` is the **semantic catalogue digest**, not the raw SHA-256 of the serialized `catalogue.json` file. It is computed over the canonical payload containing `schema_version` and the sorted entry payloads. The serialized file additionally contains the `catalogue_sha256` field itself, so the raw file-content SHA is a separate content identity and is not expected to equal `catalogue_sha256`. A comparison between those two different digest domains must not be reported as catalogue drift or corruption.
 
 Adding a new valid entry changes the catalogue SHA while preserving the semantic identity of already-registered immutable entries.
 
