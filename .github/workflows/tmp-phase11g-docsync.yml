@@ -1,0 +1,90 @@
+name: Temporary Phase11G Deployment Docs Sync
+
+on:
+  push:
+    branches:
+      - docs/phase11g-prospective-deploy-20260911
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: docs/phase11g-prospective-deploy-20260911
+          fetch-depth: 0
+
+      - name: Update deployment state documentation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          old_sha = "30119a44fa82b1029d2de6e3a6f76320a7705079"
+          new_sha = "a73ba261a3ca97d2df3deac20b1459b7b4c38fff"
+          run_id = "34612617730"
+          new_checkpoint = "docs/checkpoints/2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_DEPLOYMENT.md"
+
+          p = Path("docs/CURRENT_STATE.md")
+          s = p.read_text()
+          s = s.replace("`docs/checkpoints/2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md`", f"`{new_checkpoint}`", 1)
+          s = s.replace(f"- runtime SHA: `{old_sha}`;", f"- runtime SHA: `{new_sha}`;", 1)
+          s = s.replace(f"- image: `k-trader:{old_sha}`;", f"- image: `k-trader:{new_sha}`;", 1)
+          s = s.replace("- GitHub `Deploy Production #11`: SUCCESS;", f"- approved GitHub Actions deployment run `{run_id}`: SUCCESS;", 1)
+          stale = f"Repository acceptance of the prospective-control utility does **not** imply a new production deployment. The running production image remains on `30119a44...` until a separate deployment decision."
+          fresh = f"The canonical prospective-control utility is now deployed in production at `{new_sha}`. Deployment run `{run_id}` checked out the exact approved SHA, passed ARM64 identity, canonical deploy acceptance, and left the service healthy/read-only."
+          if stale not in s:
+              raise SystemExit("CURRENT_STATE stale deployment paragraph not found")
+          s = s.replace(stale, fresh, 1)
+          p.write_text(s)
+
+          p = Path("docs/PHASE_11G_CHECKPOINT.md")
+          s = p.read_text()
+          s = s.replace("`docs/checkpoints/2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md`", f"`{new_checkpoint}`", 1)
+          s = s.replace(f"- deployed SHA/image: `{old_sha}`;", f"- deployed SHA/image: `{new_sha}`;", 1)
+          s = s.replace("- GitHub `Deploy Production #11`: SUCCESS;", f"- approved GitHub Actions deployment run `{run_id}`: SUCCESS;", 1)
+          stale = "Repository acceptance of the prospective-control utility does not constitute a new production deployment. The running image remains on the accepted runtime SHA above until a separate deployment decision."
+          fresh = "The repository-owned prospective-control utility is now present in the accepted production image. The deployment changed tooling availability only; FAST/M5 trading semantics and Phase 11G hard gates are unchanged."
+          if stale not in s:
+              raise SystemExit("PHASE_11G stale deployment paragraph not found")
+          s = s.replace(stale, fresh, 1)
+          p.write_text(s)
+
+          p = Path("docs/DEPLOYMENT.md")
+          s = p.read_text()
+          s = s.replace("# Deployment Specification v1.10", "# Deployment Specification v1.11", 1)
+          s = s.replace(f"- deployed SHA: `{old_sha}`;", f"- deployed SHA: `{new_sha}`;", 1)
+          s = s.replace(f"- deployed image: `k-trader:{old_sha}`;", f"- deployed image: `k-trader:{new_sha}`;", 1)
+          s = s.replace("- GitHub Actions deployment: `Deploy Production #11`, SUCCESS;", f"- current deployment activation: GitHub Actions run `{run_id}`, SUCCESS;", 1)
+          anchor = "## Runtime identity and storage contract\n"
+          section = f"""## Prospective-control deployment acceptance — 2026-09-11\n\nApproved runtime SHA:\n\n`{new_sha}`\n\nDeployment evidence:\n\n- GitHub Actions run: `{run_id}` — SUCCESS;\n- trigger branch was temporary and checked out the exact approved canonical `main` SHA;\n- ARM64 production architecture gate: PASS;\n- canonical `scripts/deploy.sh`: PASS;\n- localhost health/market-runtime acceptance: PASS;\n- public HTTPS / Phase 10 Action acceptance: PASS inside the canonical deploy script;\n- resulting image: `k-trader:{new_sha}`;\n- `/opt/k-trader/DEPLOYED_SHA`: exact approved SHA;\n- container: healthy;\n- `/health`: `status=ok`, `mode=read_only`, `data_ready=true`, provider `binance_usdm`;\n- `scripts/run_prospective_control.py --help`: PASS inside the deployed container.\n\nThe one-time trigger workflow was removed from its temporary branch immediately after the successful run. Canonical `.github/workflows/deploy.yml` remains `workflow_dispatch` only and unchanged.\n\n"""
+          if anchor not in s:
+              raise SystemExit("DEPLOYMENT anchor not found")
+          s = s.replace(anchor, section + anchor, 1)
+          p.write_text(s)
+
+          p = Path("docs/checkpoints/README.md")
+          s = p.read_text()
+          s = s.replace("`2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md`", "`2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_DEPLOYMENT.md`", 1)
+          old_bullet = f"- accepted runtime/deployed SHA remains `{old_sha}`; no new production deployment is implied;"
+          new_bullet = f"- accepted runtime/deployed SHA is now `{new_sha}`; approved GitHub Actions deployment run `{run_id}` succeeded;"
+          if old_bullet not in s:
+              raise SystemExit("checkpoint README runtime bullet not found")
+          s = s.replace(old_bullet, new_bullet, 1)
+          historical_anchor = "Historical checkpoints include:\n\n"
+          s = s.replace(historical_anchor, historical_anchor + "- `2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md` — canonical prospective-control tooling hardening before production activation;\n", 1)
+          p.write_text(s)
+
+          cp = Path(new_checkpoint)
+          cp.write_text(f"""# Phase 11G Checkpoint — Prospective-Control Production Deployment\n\nDate: 2026-09-11\n\nStatus: **DEPLOYED / ACCEPTED / CONTINUOUS DISCOVERY ACTIVE / PHASE 12 INACTIVE**\n\n## Purpose\n\nThis checkpoint records production activation of the repository-owned Phase 11G prospective-control utility accepted in PR #48. The deployment changes operational tooling availability only; it does not change trading semantics.\n\n## Canonical repository and runtime identity\n\n- canonical repository: `kolemasakar/K-Trader`;\n- canonical `main`: `{new_sha}`;\n- merge commit verification: GitHub verified;\n- deployed SHA: `{new_sha}`;\n- deployed image: `k-trader:{new_sha}`;\n- production host: Oracle Cloud ARM64 / Ubuntu 24.04;\n- provider: `binance_usdm`;\n- API mode: `read_only`.\n\n## Deployment evidence\n\nApproved GitHub Actions deployment run:\n\n`{run_id}`\n\nThe deployment path checked out the exact approved canonical SHA and executed the unchanged canonical `scripts/deploy.sh`. Accepted gates:\n\n- exact SHA identity: PASS;\n- ARM64 architecture: PASS;\n- image build/start: PASS;\n- localhost health: PASS;\n- Phase 9 market/runtime acceptance: PASS;\n- public HTTPS / Phase 10 Action acceptance: PASS;\n- final container health: PASS;\n- `/opt/k-trader/DEPLOYED_SHA`: exact approved SHA;\n- deployed prospective-control CLI packaging check: PASS.\n\nThe temporary trigger workflow used only to initiate this approved deployment was removed immediately after success. Canonical `.github/workflows/deploy.yml` remains unchanged and `workflow_dispatch` only.\n\n## Runtime observation after promotion\n\n```text\nstatus=ok\nmode=read_only\ndata_ready=true\nscanner_status=DEGRADED\nprovider_id=binance_usdm\ncontainer=healthy\n```\n\n`DEGRADED` retains the accepted semantics of partial young-contract ineligibility; it is not by itself a service-health failure.\n\n## Prospective-control availability\n\nThe production image now contains:\n\n- `src/ktrader/replay/prospective.py`;\n- `scripts/run_prospective_control.py`;\n- deterministic sharding/resume/merge;\n- explicit UTC-midnight fail-closed accounting;\n- self-contained flattened audit records including `canonical_symbol`.\n\n## Trading invariants unchanged\n\nNo deployment change was made to:\n\n- FAST setup interval `M5`;\n- TTL `60m = 12 x M5`;\n- exact `60m` valid / `>60m` expired;\n- `RR >= 3`;\n- ATR-used threshold;\n- HTF alignment;\n- STRONG/confirmed primary-level rule;\n- structural stop/target geometry;\n- Setup Score / Grade semantics;\n- history/freshness rules;\n- outcome or probability policy;\n- dataset-catalogue materialization rules.\n\nINTRADAY/M15 and MEDIUM/H1 remain research-only. Phase 12 remains inactive.\n\n## Next work\n\n1. keep provider-recorded Binance USD-M capture active;\n2. use canonical prospective-control tooling for subsequent long-window controls;\n3. continue natural FAST/M5 discovery under unchanged hard gates;\n4. materialize a new Phase 11G chain only after a natural LONG/SHORT survives every hard gate with exact provenance;\n5. evaluate any outcome only from subsequent real provider bars;\n6. do not activate M15/H1 production profiles or Phase 12 without a separate explicit approval gate.\n""")
+          PY
+
+          rm .github/workflows/tmp-phase11g-docsync.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Docs: record prospective-control production deployment"
+          git push origin HEAD:docs/phase11g-prospective-deploy-20260911
