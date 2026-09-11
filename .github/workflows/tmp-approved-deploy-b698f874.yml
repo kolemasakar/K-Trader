@@ -1,0 +1,38 @@
+name: Temporary Approved Deploy b698f874
+
+on:
+  push:
+    branches:
+      - ops/deploy-b698f874
+
+permissions:
+  contents: read
+
+concurrency:
+  group: k-trader-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, k-trader-prod-arm64]
+    environment: production
+    timeout-minutes: 30
+    env:
+      KTRADER_DOMAIN: ${{ vars.KTRADER_DOMAIN }}
+      KTRADER_ACTION_API_KEY: ${{ secrets.KTRADER_ACTION_API_KEY }}
+    steps:
+      - name: Checkout exact approved merge SHA
+        uses: actions/checkout@v6
+        with:
+          ref: b698f8744f631a1a704d40cc3b2b66cfd31a6199
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify exact approved SHA
+        run: test "$(git rev-parse HEAD)" = "b698f8744f631a1a704d40cc3b2b66cfd31a6199"
+
+      - name: Verify Oracle production architecture
+        run: test "$(uname -m)" = "aarch64" -o "$(uname -m)" = "arm64"
+
+      - name: Deploy and run canonical live acceptance
+        run: ./scripts/deploy.sh
