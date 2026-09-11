@@ -14,7 +14,7 @@ from ktrader.evidence.vsa import detect_vsa_events, validate_vsa_context
 from ktrader.indicators.atr import atr, atr5d
 from ktrader.market.bootstrap import BootstrapError, MTFBootstrapService
 from ktrader.market.universe import UniverseCandidate
-from ktrader.market.validation import assess_freshness, validate_sequence
+from ktrader.market.validation import CandleValidationError, assess_freshness, validate_sequence
 from ktrader.models import NormalizedCandle, NormalizedInstrument
 from ktrader.providers.base import MarketDataProvider
 from ktrader.storage.sqlite import CandleRepository
@@ -204,11 +204,30 @@ class EngineSymbolAnalyzer:
     async def _ensure_ready(self, provider, instrument, *, now: datetime) -> None:
         needs_bootstrap = False
         for interval, count in self.config.history.interval_counts.items():
-            if self.repository.count(provider.provider_id, instrument.symbol, interval) < count:
+            candles = tuple(
+                self.repository.load_recent(
+                    provider.provider_id, instrument.symbol, interval, limit=count
+                )
+            )
+            if len(candles) < count:
                 needs_bootstrap = True
                 break
-            latest = self.repository.latest(provider.provider_id, instrument.symbol, interval)
-            if latest is None or assess_freshness(latest, policy=self.config.freshness, now=now).stale:
+            try:
+                validate_sequence(
+                    candles,
+                    provider_id=provider.provider_id,
+                    symbol=instrument.symbol,
+                    interval=interval,
+                    require_closed=True,
+                    require_contiguous=True,
+                )
+            except CandleValidationError:
+                needs_bootstrap = True
+                break
+            latest = candles[-1]
+            if assess_freshness(
+                latest, policy=self.config.freshness, now=now
+            ).stale:
                 needs_bootstrap = True
                 break
         if needs_bootstrap:
