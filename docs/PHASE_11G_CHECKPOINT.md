@@ -1,237 +1,197 @@
-# Phase 11G Checkpoint - Dataset Catalogue Expansion and Corrected Historical Discovery
+# Phase 11G Checkpoint — Dataset Catalogue and Continuous Discovery
 
-Updated: 2026-09-08
+Updated: 2026-09-11
 
-Status: VERIFIED FOUNDATION / TWO PRODUCTION CHAINS CATALOGUED / CORRECTED DISCOVERY ACTIVE / RR-GEOMETRY AUDIT NEXT.
+Status: **VERIFIED FOUNDATION / TWO CHAINS CATALOGUED / FAST TTL60 PRODUCTION / 24H PROSPECTIVE CONTROL COMPLETE / CONTINUOUS DISCOVERY ACTIVE**.
 
-## Foundation
+Detailed current transition evidence:
 
-Phase 11G retains the deterministic `ktrader.dataset_catalogue.v1` research audit chain linking one coherent provider/symbol dataset through:
+`docs/checkpoints/2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md`
 
-- `ktrader.mtf_bundle.v1`;
-- `ktrader.universe_archive.v1`;
-- `ktrader.study_cohort.v1`;
-- `ktrader.replay_study.v1`;
-- `ktrader.study_run_provenance.v1`;
-- optional immutable `ktrader.outcome_sample.v1`.
+## Canonical research chain
 
-Catalogue verification reopens and validates source artifacts and relationships rather than trusting stored hashes alone. Paths remain constrained to the artifact root; provider/symbol/context/study identities are cross-checked fail-closed.
+Phase 11G retains the deterministic `ktrader.dataset_catalogue.v1` audit chain:
 
-`Setup Score` remains deterministic and non-probabilistic. `estimated_probability` remains null/N/A. Immutable outcome samples remain WIN/LOSS-only and are not created when no binary outcomes exist.
+```text
+MTF bundle
+-> universe archive
+-> study cohort
+-> replay study
+-> study provenance
+-> optional real WIN/LOSS outcome sample
+-> dataset catalogue
+```
 
-## Canonical operator tooling
+All references remain fail-closed on provider/symbol/context identity, content hashes and artifact-root containment. `Setup Score` remains deterministic, not statistical probability. `estimated_probability` remains null/N/A.
 
-Current utilities include:
-
-- `scripts/build_universe_archive.py`;
-- `scripts/build_study_cohort.py`;
-- `scripts/export_mtf_history.py`;
-- `scripts/run_replay_study.py`;
-- `scripts/export_outcome_sample.py`;
-- `scripts/build_dataset_catalogue.py`.
-
-Replay bounds are part of canonical `ReplayStudyConfig` and therefore part of deterministic study identity.
-
-## Repository verification history
-
-Original Phase 11G foundation:
-
-- PR #10 CI run `32657337221`: repository-wide pytest 163 PASS, compile/shell PASS, amd64/arm64 Docker/runtime PASS;
-- squash merge `96de78d503432122d98e1c9ad1f01299802862a8`.
-
-Production-readiness work completed on 2026-09-07:
-
-- PR #27 fixed the fresh-process replay import cycle;
-- PR #28 exposed canonical inclusive UTC replay `--start` / `--end` bounds;
-- PR #29 added the reproducible universe-archive builder CLI;
-- PR #30 documented the first production chain.
-
-Capture cadence hardening:
-
-- PR #32 changed research-capture scheduling from elapsed-time drift to UTC-slot semantics;
-- accepted pre-contract-fix main SHA: `095610463a500c711f1cdaa6cf91bdcdfc333cbd`.
-
-Side/regime contract correction:
-
-- PR #33: `Fix Phase 11G side-to-regime scoring contract`;
-- canonical main SHA before this documentation checkpoint: `7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`;
-- post-merge Tests run `34177001398`: PASS;
-- post-merge CI run `34177001482`: pytest PASS, Docker amd64 PASS, Docker arm64 PASS;
-- Deploy Production #9 run `34177978988`: SUCCESS;
-- deployed image: `k-trader:7fa20c3d7f0d89ae628eb2bf21e4c50164eb3eab`;
-- container health, provider REST/WS, MTF API and Phase 10 Action live acceptance: PASS.
-
-## Strict research policy
-
-The active Phase 11G policy remains:
-
-- production provider scope: `binance_usdm`;
-- `max_context_age_seconds=300`;
-- historical context membership uses the newest snapshot at or before each cutoff;
-- no historical rank/context reconstruction from current data;
-- no freshness widening merely to create eligible samples;
-- MTF depths: `1d=300`, `4h=300`, `1h=300`, `15m=300`, `5m=400`;
-- full-engine replay before writes;
-- no zero-signal materialization merely to grow the catalogue;
-- no synthetic outcomes;
-- outcome samples only when actual binary WIN/LOSS outcomes exist;
-- no probability calibration;
-- no Phase 12 expansion while the current discovery/geometry gate is unresolved.
-
-## Current canonical dataset catalogue
+## Current dataset catalogue
 
 Path:
 
 `/data/research/phase11g/catalogue.json`
 
-State:
+Accepted state:
 
 - schema: `ktrader.dataset_catalogue.v1`;
 - entry count: `2`;
-- catalogue SHA: `057ff750966d2bc5043fffd7fdc37583dd0133480452c131b51f84109d2fb4b6`;
-- prior final `load_dataset_catalogue(..., verify_artifacts=True)`: PASS.
+- symbols: `SUIUSDT`, `XRPUSDT`;
+- no additional chain has been materialized;
+- no binary outcome sample has been created without a real binary outcome.
 
-No catalogue writes occurred during the corrected historical-discovery work.
+Catalogue digest semantics are now explicitly resolved: `catalogue_sha256` is the semantic digest over `{schema_version, entries}`; the raw serialized file has its own content hash. The two are not expected to match.
 
-### Chain #1 — SUIUSDT
+## Production research boundary
 
+Current production runtime:
+
+- deployed SHA/image: `30119a44fa82b1029d2de6e3a6f76320a7705079`;
+- GitHub `Deploy Production #11`: SUCCESS;
 - provider: `binance_usdm`;
-- root: `/data/research/phase11g/binance_usdm/SUIUSDT/20260905T144500Z_160000Z`;
-- replay: `2026-09-05T14:45Z` through `16:00Z`;
-- universe archive SHA: `3c830d8410b913aa4b39afd8cb5be57e96a18b4a1ae4d46fa709fc11f70ccdda`;
-- cohort SHA: `c63b90a1905149462e1eb31a842fff7c5f15290a7f4963107d7c8c4cf2273686`;
-- bundle SHA: `c0112c0d3688cddb86cabc54ae1c9da05e04ff2cef63f395b438448e3070d344`;
-- study ID: `ebfd16b0b9059c5bd51f948d4c1b0086f4a2966a610e58dd7a6fb0d8ee474f5e`;
-- provenance SHA: `08ba2378253dfa744ffbfc2fc74cae2ab6ff02264a9b60e6170d1992f6297c35`;
-- catalogue entry ID: `f056dadd63c2283c07b0b2aa37b3bb2236d15e916d6fa3cf5a11fc71b38b814a`;
-- analyzed cutoffs: `15`;
-- unique tradable signals: `0`;
-- binary outcomes: `0`;
-- outcome sample: `null`.
+- public/read-only runtime: healthy;
+- provider REST/WebSocket: PASS;
+- MTF API: PASS;
+- Phase 10 public Action acceptance: PASS.
 
-### Chain #2 — XRPUSDT
+FAST lifecycle is the only active production profile:
 
-- provider: `binance_usdm`;
-- root: `/data/research/phase11g/binance_usdm/XRPUSDT/20260905T144500Z_160000Z`;
-- replay: `2026-09-05T14:45Z` through `16:00Z`;
-- universe archive SHA: `3c830d8410b913aa4b39afd8cb5be57e96a18b4a1ae4d46fa709fc11f70ccdda`;
-- cohort SHA: `f417e64f9c2a31916564037709554971035adbb14054a3f83b2b76261e2ee58c`;
-- bundle SHA: `8b276ab7d8ffa5614c38759a7fbccdf3fdf27c855e4460b04f8e4693b8b090af`;
-- study ID: `886d2a5c136af427657d005655d3b654b046dd9ede19b922390bb403fbe60c80`;
-- provenance SHA: `6397ce7c1786d1ebb5d1e11f297995c3b3c68abb2a44476a29c994164bfcff65`;
-- catalogue entry ID: `4788384b5268ae8062eaa1a225de8d54cbd12e59e17ea3905d702ed5545a8eef`;
-- analyzed cutoffs: `15`;
-- unique tradable signals: `0`;
-- binary outcomes: `0`;
-- outcome sample: `null`.
+- setup interval: `5m`;
+- `setup_max_age_bars=12`;
+- TTL: `3600s`;
+- exactly 60m remains valid;
+- age strictly greater than 60m is rejected as `SETUP_EXPIRED`.
 
-## Historical discovery windows
+Research-only profiles remain inactive in production:
 
-Four read-only provider-recorded windows were scanned before the side/regime defect was corrected:
+- INTRADAY/M15: universal TTL unresolved;
+- MEDIUM/H1: `8-12h` is only a time-split validated lifecycle design band, not a profitability optimum;
+- adaptive TTL tables are not approved.
 
-- Window #1: `2026-09-07T18:55Z` through `20:10Z`, 40 MTF-passing symbol-window runs;
-- Window #2: `20:15Z` through `21:30Z`, 42 MTF-passing runs;
-- Window #3: `21:35Z` through `22:50Z`, archive SHA `b511599cce4116aa1cd93f07e1836ab5a4ce19e2750b07f27b372cf4c9b002ff`, 41 MTF-passing runs;
-- Window #4: `22:55Z` through `00:10Z`, archive SHA `bed603828a997570149f01d42e7a979d96eb6ff0247c68f045b7e65bbe2c0477`, 40 MTF-passing runs.
+## Runtime hardening now deployed
 
-The original aggregate zero-signal conclusion across these windows is compromised as evidence of natural signal absence because the rejection funnel found a deterministic scoring vocabulary mismatch.
+### D1 retry backoff
 
-The windows remain useful evidence for provider-recorded context, deep-history and deterministic replay mechanics.
+Young contracts with insufficient D1 history remain ineligible. Repeated bootstrap is deferred until the next UTC day boundary rather than being retried every scanner cycle.
 
-## PR #33 root cause and fix
+This does not change D1 minimum history, shortlist ranking or any trading gate.
 
-Pre-fix Window #4 funnel:
+### Recent MTF contiguity heal
 
-- analyzed cutoffs: `600`;
-- candidate decisions: `7596`;
-- `NO_TRADE`: `7596`;
-- grade C: `7596`;
-- `HTF_CONTEXT_MISMATCH`: `7596/7596` = 100%.
+Recent required MTF windows are validated for contiguity during readiness. A recent gap triggers canonical bootstrap repair and the symbol remains fail-closed until valid.
 
-Root cause:
+Production verification after Deploy #11:
 
-- candidate direction vocabulary: `LONG` / `SHORT`;
-- canonical MTF regime vocabulary: `BULLISH` / `BEARISH` / `RANGE` / `MIXED`;
-- direct equality made valid directional alignment impossible.
+- `IOSTUSDT 15m`: contiguous 250-bar recent window;
+- `DOTUSDT 15m`: contiguous 250-bar recent window;
+- both repair bootstraps succeeded.
 
-PR #33 introduced:
+Current scanner observation:
 
-- `LONG -> BULLISH`;
-- `SHORT -> BEARISH`;
-- aligned `context_strength()` fallback with canonical MTF semantics so 4h+1h cannot override directionally opposite D1; lower-timeframe fallback applies only when D1 is non-directional.
+- `DEGRADED` but usable;
+- `17 ready / 3 failed`;
+- only current failures: `牛来USDT`, `MARSCOINUSDT`, `PONSUSDT` with insufficient D1 history and deferred retry;
+- `live_streaming=true`;
+- `/v1/signals = 0`.
 
-## Corrected Window #4 validation
+## Strict Phase 11G research policy
 
-The corrected read-only replay used the deployed `7fa20c3...` engine and newest-snapshot-at/before-cutoff semantics.
+Unchanged:
 
-Preflight/result:
+- production research provider: `binance_usdm`;
+- `max_context_age_seconds=300`;
+- newest recorded universe snapshot at/before cutoff;
+- no retroactive historical rank fabrication;
+- no context-freshness widening merely to create samples;
+- full canonical analyzer for live and replay;
+- structural target only;
+- no synthetic 3R target;
+- `RR >= 3` hard gate;
+- canonical ATR-used hard gate;
+- HTF directional-alignment hard gate;
+- STRONG/confirmed primary-level hard gate;
+- no synthetic outcomes;
+- WIN/LOSS sample only from real future bars;
+- no probability calibration without separately approved methodology and sufficient out-of-sample evidence;
+- no Phase 12 activation while continuous Phase 11G discovery remains open.
 
-- archive SHA: `bed603828a997570149f01d42e7a979d96eb6ff0247c68f045b7e65bbe2c0477`;
-- selected snapshots: `16`;
-- context ages: approximately 259–260 seconds, within the 300-second policy;
-- strict symbols: `45`;
-- MTF passed: `40`;
-- MTF rejected: `5`;
-- analyzed cutoffs: `600`;
-- total candidate decisions: `7596`;
-- HTF rejected: `7161`;
-- HTF aligned: `435`;
-- tradable decisions: `0`;
+## Corrected historical FAST baseline
+
+The accepted corrected W1-W4 FAST replay remains historical reference evidence:
+
+- analyzed symbol-cutoffs: `2445`;
+- decision records: `29508`;
+- `SETUP_EXPIRED` reason occurrences: `23952`;
+- HTF-aligned decisions: `1987`;
+- strong primary-level stage: `944`;
+- tradable decisions: `0`.
+
+Corrected W4 reproduced the historical pre-TTL population through the strong-level stage and produced the conditional funnel:
+
+```text
+435 -> 202 -> 168 -> 142 -> 0 -> 0
+HTF -> strong -> geometry -> ATR -> TTL60 -> RR>=3
+```
+
+No hard threshold was relaxed.
+
+## Horizon validation state
+
+Time-separated research established:
+
+- M15 4-6h does not generalize as a universal TTL across the broader panel;
+- setup/evidence type and primary-level timeframe do not currently justify adaptive TTL;
+- H1 8-12h geometry survival is comparatively stable across the tested time split, but this is lifecycle-design evidence only;
+- all horizon samples still produced zero tradable signals.
+
+Therefore no non-FAST profile is production-approved.
+
+## 2026-09-10→11 prospective control
+
+Causal control interval:
+
+- `2026-09-10T04:15:00Z` through `2026-09-11T07:20:00Z`;
+- 326 logical M5 cutoffs;
+- 326/326 causal recorded context selections;
+- production top-20 analysis semantics;
+- provider deep history;
+- unchanged FAST hard gates.
+
+Artifact identities:
+
+- universe archive SHA: `3048d9129a9667b1cb97124f25c7c9deccc082cc8a5a7d4cd975081c45676a57`;
+- scanner config SHA: `2ad4b4369f3276eb081b02fe44c9b05bec49bf05a7ae4f146dcbe66ff594bff0`;
+- prospective report SHA: `dcbacc311c722ce1dea7313b80df38271f0ba1404cd0bd2f166a8399f8b14e7d`.
+
+Coverage:
+
+- symbol slots: `6520`;
+- history-pass/analyzed slots: `5448`;
+- history-fail slots: `1055`;
+- explicit analysis errors: `17` (`5m day sequence is empty` control-utility edge);
+- decision records: `67822`;
 - unique tradable signals: `0`.
-
-Deep-history rejects:
-
-- CFGUSDT: 176/300 daily bars;
-- MARSCOINUSDT: 7/300;
-- PIEVERSEUSDT: 298/300;
-- PONSUSDT: 2/300;
-- 牛来USDT: 9/300.
-
-PR #33 is therefore historically replay-validated: 435 candidates now pass the formerly impossible HTF direction gate.
-
-## Conditional 435-candidate audit
-
-Reference reproduction:
-
-- `htf_aligned_candidates=435`;
-- `reference_aligned_candidates=435`;
-- `reference_match=true`;
-- all aligned candidates: `LONG -> BULLISH`;
-- no aligned SHORT sample in this window.
-
-Independent aligned hard reasons:
-
-- `PRIMARY_LEVEL_NOT_STRONG`: 233;
-- `RR_BELOW_3`: 271;
-- `INVALID_GEOMETRY`: 87;
-- `ATR_USED_OVER_80`: 68.
 
 Sequential funnel:
 
 ```text
-435 HTF aligned
-  -> 202 after primary level strength
-  -> 168 after valid geometry
-  -> 142 after ATR <= 80%
-  ->   0 after RR >= 3
+HTF aligned               1522
+-> STRONG confirmed level  431
+-> valid geometry           311
+-> ATR <= 80%               189
+-> TTL60 pass                10
+-> RR >= 3                    0
+-> grade A/A+                  0
+-> tradable LONG/SHORT         0
 ```
 
-All 142 candidates reaching the final RR gate were rejected only by `RR_BELOW_3`. No unexpected hard-reject reason remained.
+This is positive evidence that the engine does not fail exclusively at one early gate: natural setups reached the TTL-valid stage. The final 10 still failed structural `RR >= 3`, so no threshold reduction is justified.
 
-Examples show high raw scores can still be correctly blocked by hard geometry/RR rules, including WLDUSDT raw score 90 with only `RR_BELOW_3` and RR 0.225. This is not evidence for lowering the threshold.
+## Next Phase 11G work
 
-## Current gate
-
-The next task is a read-only RR-geometry audit of the 142 RR-only candidates.
-
-Audit entry/stop/target construction, risk and reward distances, target level identity/type/timeframe, RR distribution and repeated unchanged setup geometry across neighboring cutoffs. Deduplicate geometry-equivalent observations before interpreting the distribution.
-
-Do not change the `RR >= 3` threshold until this audit distinguishes genuine market conditions from any target-selection or geometry-construction bias.
-
-After geometry is understood, rerun corrected discovery for historical Windows #1–#4 and materialize only naturally useful deterministic chains. Catalogue verification remains mandatory after any future registration.
-
-Detailed current recovery state:
-
-`docs/checkpoints/2026-09-08_PHASE11G_CORRECTED_REPLAY_RR_GEOMETRY_GATE.md`
-
-Phase 12 multi-provider expansion remains future work.
+- keep provider-recorded production capture active;
+- continue natural prospective discovery under unchanged FAST rules;
+- materialize a new chain only after a natural LONG/SHORT setup survives every hard gate;
+- capture exact provider/context/config/bundle/replay provenance for any such signal;
+- evaluate outcome only from later real bars;
+- harden the long-run prospective report utility for explicit midnight/day-sequence handling plus resumable/sharded execution;
+- keep M15/H1 research-only;
+- keep Phase 12 inactive until an explicit later gate.
