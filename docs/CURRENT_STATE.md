@@ -2,245 +2,329 @@
 
 Updated: 2026-09-11
 
-Canonical transition checkpoint:
+## Canonical references
 
-`docs/checkpoints/2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_DEPLOYMENT.md`
+Latest production/runtime continuity is governed by the Phase 11G deployment/checkpoint chain in `docs/checkpoints/`.
 
-Previous operational checkpoint:
+Latest independent strategy-research checkpoint:
 
-`docs/checkpoints/2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md`
+`docs/checkpoints/2026-09-11_STRATEGY_V2_2_PREHOLDOUT_CHECKPOINT.md`
 
-Latest horizon research checkpoint:
+Current strategy-research handoff:
 
-`docs/checkpoints/2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md`
+`docs/handoffs/BOOTSTRAP_PACKAGE_2026-09-11_K_TRADER_V2_2_LEVEL_CONTEXT_V2_HANDOFF.md`
+
+Current parallel research plan:
+
+`docs/research/LEVEL_CONTEXT_V2_MFE_MAE_RESEARCH_PLAN.md`
 
 ## Current phase boundary
 
-- Phase 10: COMPLETE / current single-provider read-only product accepted;
+- Phase 10: COMPLETE / read-only product accepted;
 - Phase 11A-11F: VERIFIED;
-- Phase 11G dataset-catalogue foundation: VERIFIED;
-- Phase 11G catalogue: two canonical chains, `SUIUSDT` + `XRPUSDT`;
-- Phase 11G prospective-control tooling: CANONICAL / deterministic sharding+resume / explicit midnight fail-closed handling;
-- FAST/M5 lifecycle: PRODUCTION, TTL `60m = 12 x M5 bars`;
-- corrected FAST W1-W4 historical closure: COMPLETE / zero tradable signals;
-- 2026-09-10→11 prospective 24h control: COMPLETE / zero tradable signals;
-- provider-recorded prospective discovery: ACTIVE;
-- INTRADAY/M15 lifecycle: RESEARCH ONLY / universal TTL unresolved;
-- MEDIUM/H1 lifecycle: RESEARCH ONLY / `8-12h` lifecycle design band time-split validated, not profitability-optimal;
-- Phase 12 multi-provider expansion: FUTURE / NOT ACTIVE.
-
-## Production identity
-
-Accepted runtime/deployment baseline:
-
-- runtime SHA: `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
-- image: `k-trader:a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
-- approved GitHub Actions deployment run `34612617730`: SUCCESS;
-- host: Oracle Cloud Ampere A1 / Ubuntu 24.04 ARM64;
+- Phase 11G production capture / prospective-control tooling: ACTIVE and accepted;
 - production provider: `binance_usdm`;
+- FAST/M5 production lifecycle remains governed by the canonical deployed rules;
+- INTRADAY/M15 strategy redesign remains RESEARCH ONLY;
+- independent strategy benchmark/research branch: ACTIVE;
+- frozen INTRADAY research candidate: `candidate_rule_set_v2_2`;
+- v2.2 promotion: FAILED PREHOLDOUT GATE;
+- v2.2 holdout: UNTOUCHED / NOT AUTHORIZED;
+- prospective v2.2 shadow observation: ACTIVE under frozen rules;
+- Level Context Layer v2 + MFE/MAE diagnostics: APPROVED NEXT RESEARCH;
+- Phase 12 multi-provider expansion: not activated by this strategy work.
+
+## Repository identities
+
+Canonical main at the beginning of this strategy-research checkpoint:
+
+`f3ddbfddb37847f63234960855afa287ec9eb9ce`
+
+Research branch:
+
+`research-strategy-benchmark-v1`
+
+Frozen executable v2.2 harness commit:
+
+`9abb05d88912293cee3c254dd427a7127ce5bcc7`
+
+Prospective shadow protocol commit:
+
+`0aba55432dc084181651b5f254c25800f309a754`
+
+The research branch is intentionally separate from production activation. Research commits do not imply deployment.
+
+## Production identity — verified 2026-09-11
+
+Direct host audit confirms:
+
+- deployed SHA: `81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
+- image: `k-trader:81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
 - container: healthy;
-- `/health`: `status=ok`, `data_ready=true`;
-- provider REST/WebSocket acceptance: PASS;
-- MTF API acceptance: PASS;
-- public HTTPS / Phase 10 Action acceptance: PASS;
-- application remains read-only;
-- GitHub PR/CI/manual deployment remains the canonical source/activation path.
-
-The canonical prospective-control utility is now deployed in production at `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`. Deployment run `34612617730` checked out the exact approved SHA, passed ARM64 identity, canonical deploy acceptance, and left the service healthy/read-only.
-
-## Runtime hardening accepted on 2026-09-11
-
-Two operational defects were closed without changing trading semantics.
-
-### D1 retry backoff — PR #45
-
-Young contracts with insufficient D1 history are still rejected fail-closed, but the scanner no longer re-fetches the same impossible D1 requirement every cycle. Retry is deferred until the next UTC day boundary.
-
-Unchanged:
-
-- D1 minimum remains `250` for runtime readiness;
-- universe ranking/analysis-limit semantics remain unchanged;
-- no substitute symbol is promoted to manufacture a full eligible shortlist;
-- RR, ATR, TTL, structure, target and scoring rules remain unchanged.
-
-### Recent MTF gap heal — PR #46
-
-The manual 24h control found recent persisted `15m` gaps for mature symbols `IOSTUSDT` and `DOTUSDT`, even though Binance deep history was contiguous.
-
-Root cause: recent count/freshness could pass even when the required window was non-contiguous. PR #46 added recent-sequence contiguity validation to `_ensure_ready()` and routes failures through the existing canonical bootstrap-heal path.
-
-Production acceptance after Deploy #11:
-
-- `IOSTUSDT 15m`: 250 required recent bars, contiguous, gaps `[]`;
-- `DOTUSDT 15m`: 250 required recent bars, contiguous, gaps `[]`;
-- both bootstrap-healed successfully;
-- no mature-symbol MTF gap remained in the accepted observation.
-
-## Current scanner state
-
-Post-deploy observation:
-
-- scanner status: `DEGRADED`;
-- `symbols_ready=17`;
-- `symbols_failed=3`;
-- `live_streaming=true`;
-- current failures: `牛来USDT`, `MARSCOINUSDT`, `PONSUSDT`;
-- reason: insufficient closed D1 history;
-- retries correctly deferred until the next UTC day boundary;
-- `/v1/signals`: `count=0`.
-
-`DEGRADED` currently reflects expected young-contract ineligibility rather than a mature-symbol data-integrity defect.
-
-## 24h prospective control
-
-Control interval:
-
-- start: `2026-09-10T04:15:00Z`;
-- end: `2026-09-11T07:20:00Z`;
-- logical M5 cutoffs: `326`;
-- selected context cutoffs: `326/326`;
-- unique selected snapshots: `326`;
-- production analysis limit: top-20;
+- `/health`: `status=ok`;
+- mode: `read_only`;
+- `data_ready=true`;
+- `scanner_status=DEGRADED`;
 - provider: `binance_usdm`;
-- context rule: newest recorded snapshot at/before cutoff, age `<=300s`.
+- Action authentication enabled.
 
-Universe archive SHA:
+`DEGRADED` does not by itself mean the whole runtime is unusable; current health remains OK and data-ready. Young/insufficient-history contracts continue to fail closed rather than being substituted to manufacture eligibility.
 
-`3048d9129a9667b1cb97124f25c7c9deccc082cc8a5a7d4cd975081c45676a57`
+No production deployment, risk, execution or trading-semantics change was made by the independent strategy-research work below.
 
-Scanner-config SHA:
+## Production research/control policy
 
-`2ad4b4369f3276eb081b02fe44c9b05bec49bf05a7ae4f146dcbe66ff594bff0`
+Production and the existing Phase 11G canonical analyzer remain distinct from the independent candidate-strategy benchmark.
 
-Prospective report SHA:
-
-`dcbacc311c722ce1dea7313b80df38271f0ba1404cd0bd2f166a8399f8b14e7d`
-
-Coverage:
-
-- symbol slots: `6520`;
-- fully analyzed/history-pass slots: `5448`;
-- history-fail slots: `1055`;
-- analysis-error slots: `17`;
-- decision records: `67822`;
-- unique tradable signals: `0`.
-
-History failures were concentrated in insufficient-history young contracts:
-
-- `MARSCOINUSDT`: `326`;
-- `PONSUSDT`: `326`;
-- `牛来USDT`: `326`;
-- `KATUSDT`: `77`.
-
-The 17 analysis errors were explicit `ValueError: 5m day sequence is empty` records at the UTC-day boundary. They were not converted into decisions.
-
-## Canonical prospective-control hardening
-
-PR #48 converts the temporary long-run control methodology into repository-owned tooling:
-
-- core: `src/ktrader/replay/prospective.py`;
-- CLI: `scripts/run_prospective_control.py`;
-- contract: `docs/PROSPECTIVE_CONTROL_SPEC.md`;
-- focused tests: `tests/test_phase11g_prospective_control.py`.
-
-Canonical behavior:
-
-- logical cutoffs are deterministic and interval-aligned;
-- context is newest recorded universe snapshot `<= cutoff`, exact `300s` still valid, `>300s` stale;
-- recorded top-N ranking is preserved with no lower-ranked substitution for history failures;
-- candles come only from `slice_datasets_asof()` and therefore cannot include future closes;
-- the same `analyze_candle_snapshot()` remains the analysis implementation;
-- empty current-UTC-day M5 state is recorded as `ANALYSIS_ERROR` before analyzer invocation, with no synthetic range/candle/decision;
-- slot accounting is explicit as `ANALYZED`, `HISTORY_FAIL`, or `ANALYSIS_ERROR`;
-- deterministic modulo sharding supports atomic checkpoints and strict-provenance resume;
-- merge requires complete coherent shard coverage and yields the same final report/hash as equivalent monolithic execution.
-
-Focused acceptance evidence: `4 passed`; repository-wide Python 3.12 regression: `208 passed`; Python 3.14 regression: PASS. Canonical merge remains governed by `canonical-merge-gate`, including amd64/arm64 image validation.
-
-## 24h sequential hard-gate funnel
-
-```text
-HTF aligned               1522
--> STRONG confirmed level  431
--> valid geometry           311
--> ATR <= 80%               189
--> TTL60 pass                10
--> RR >= 3                    0
--> grade A/A+                  0
--> tradable LONG/SHORT         0
-```
-
-Interpretation:
-
-- natural deterministic setups did survive through TTL during the window;
-- none of the 10 final TTL-valid survivors had structural `RR >= 3`;
-- no evidence supports weakening RR, ATR, TTL, HTF, level-strength or structural-target rules;
-- no signal was materialized.
-
-## Strict Phase 11G policy
-
-Unchanged controls:
-
-- current production research provider: `binance_usdm`;
-- `max_context_age_seconds=300`;
-- historical context uses newest recorded snapshot at/before cutoff;
-- no historical rank/context fabrication;
-- no freshness widening to manufacture samples;
-- live and replay use the same canonical analyzer;
-- structural target only; no synthetic 3R target;
-- `RR >= 3` hard gate;
-- canonical ATR-used hard gate;
-- HTF directional-alignment hard gate;
-- STRONG/confirmed primary-level gate;
-- FAST TTL: `60m`, hard reject only when age is strictly greater than 60m;
-- outcome samples only from real binary WIN/LOSS outcomes;
+Production safeguards remain:
+- read-only application behavior;
+- provider-recorded data;
+- causal/as-of replay requirements;
+- no fabricated historical context;
 - no synthetic outcomes;
-- no probability calibration;
-- `estimated_probability` remains null/N/A;
-- no Phase 12 activation while Phase 11G continuous discovery is open.
+- no probability calibration without evidence;
+- explicit fail-closed handling of insufficient history/data errors;
+- canonical deployment through GitHub PR/CI/deploy, not direct host code mutation.
 
-## Dataset catalogue
+The independent strategy research must not silently redefine current production behavior.
 
-Canonical persisted catalogue remains:
+## Independent strategy benchmark — current result
 
-- `/data/research/phase11g/catalogue.json`;
-- schema: `ktrader.dataset_catalogue.v1`;
-- entries: `2`;
-- symbols: `SUIUSDT`, `XRPUSDT`;
-- no new chain from the 24h control;
-- no new outcome sample.
+The benchmark programme compared multiple simple trend, breakout, momentum and mean-reversion families under realistic costs.
 
-Catalogue SHA semantics are resolved: `catalogue_sha256` is the semantic digest of `{schema_version, entries}`. The serialized `catalogue.json` file has a separate raw content hash by design; the difference is not corruption.
+Benchmark v1 found no strategy meeting the full promotion gate.
 
-## Horizon profiles
+Subsequent combined-rule development produced:
+- v2: failed preholdout economics;
+- v2.1: improved quality gating but validation remained weak;
+- v2.2: current strongest frozen research candidate, adding structural-space filtering.
 
-| Profile | Setup interval | Lifecycle | State |
-| --- | --- | --- | --- |
-| FAST | M5 | 60m | PRODUCTION |
-| INTRADAY | M15 | unresolved | RESEARCH ONLY |
-| MEDIUM | H1 | 8-12h design band | RESEARCH ONLY |
+### Frozen v2.2 construction
 
-No adaptive TTL table by symbol/evidence/primary-level timeframe is approved.
+Current INTRADAY research path:
 
-## Operational access
+`H1 directional context -> M15 pullback -> M15 reclaim/continuation -> structural SL -> H1 structural-space gate -> 3R target`
 
-Policy-constrained SentinelX access to `k-trader-prod-vnic` remains the accepted direct diagnostic/maintenance channel.
+Inherited v2.1 quality gates:
+- `abs(EMA20_H1 - EMA50_H1) / ATR14_H1 >= 0.20`;
+- M15 signal candle body/range <= `0.60`;
+- executed structural risk distance >= `1.25%` of entry.
 
-Security boundary remains:
+v2.2 structural-space layer:
+- causal H1 swing radius `2`;
+- level clustering tolerance `0.20 * ATR14_H1`;
+- confirmed cluster requires >=2 pivots;
+- entry requires no confirmed obstacle ahead or nearest confirmed obstacle >=`3R`.
 
-- no arbitrary root execution;
-- no unrestricted `NOPASSWD: ALL`;
-- structured K-Trader filesystem access is read-only;
-- SSH remains independent recovery/bootstrap;
-- repository source mutation and production activation continue through GitHub PR/CI/deploy rather than direct host edits.
+Frozen max hold for this exact INTRADAY candidate:
 
-Canonical details: `docs/SENTINELX_REMOTE_ACCESS.md`.
+`32 x M15 = 8h`
 
-## Next action
+This is not a universal max-hold rule for other profiles.
 
-1. keep provider-recorded production capture active;
-2. use the canonical prospective-control utility for future long-window controls instead of temporary ad-hoc scripts;
-3. continue natural prospective discovery under unchanged FAST/M5 hard gates;
-4. materialize/register a new Phase 11G chain only after a natural LONG/SHORT signal survives every hard gate and exact provenance is captured;
-5. evaluate outcomes only from subsequent real bars;
-6. keep M15/H1 research-only and Phase 12 inactive until a later explicit approval gate.
+## v2.2 reproducibility
+
+Executable harness:
+
+`research/strategy_benchmark_v1/candidate_v2_2_backtest.py`
+
+Harness SHA256:
+
+`b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`
+
+Preholdout report:
+
+`/data/research/phase11g/strategy_benchmark_v1/combined_rules/v2_2_preholdout_report.json`
+
+Report SHA256:
+
+`577debe6e6a8a4f1954ffd5b27e872ce971d2de2074783a0abe2e69e79747f8a`
+
+Machine-readable candidate:
+
+`/data/research/phase11g/strategy_benchmark_v1/combined_rules/candidate_rule_set_v2_2.json`
+
+Candidate SHA256:
+
+`85e96f699e54d08a4795d50034fc40b2f69aea535ecf4b22b56ddfbb9417179b`
+
+## v2.2 preholdout metrics
+
+| Segment | Trades | WR | expectancy_R | PF_R |
+|---|---:|---:|---:|---:|
+| Development | 23 | 47.83% | +0.1003R | 1.1818 |
+| Validation | 10 | 30.00% | +0.2507R | 1.3941 |
+| Non-holdout | 37 | 45.95% | +0.2888R | 1.5592 |
+| Stress non-holdout | 37 | 43.24% | +0.2741R | 1.5235 |
+
+Promotion gate: **FAIL**.
+
+Reasons:
+- non-holdout sample <100;
+- validation sample <30;
+- non-holdout WR <50%;
+- validation WR <50%.
+
+Therefore:
+- `production_approved=false`;
+- `holdout_authorized=false`;
+- holdout remains untouched.
+
+Positive expectancy/PF is encouraging but does not override the preregistered sample/WR gates.
+
+## v2.2 diagnostic state
+
+Non-holdout exit composition:
+- STOP: 18;
+- TARGET: 8;
+- TIME_EXIT: 11.
+
+TIME_EXIT:
+- 9/11 positive;
+- average approximately +0.55R.
+
+Current evidence does not justify changing the frozen 8h INTRADAY time exit merely to improve historical performance.
+
+Direction concentration:
+- LONG: 34;
+- SHORT: 3.
+
+This is a diagnostic concentration warning only; it is not evidence to disable SHORT or promote LONG-only logic.
+
+Structural context:
+- 35/37 non-holdout v2.2 trades were classified `open_space` by `h1_pivot_cluster_v1`.
+
+Interpretation: the current detector is too sparse to represent the complete structural environment. This motivates **Level Context Layer v2** as a new feature-research track, not an in-place v2.2 change.
+
+## Prospective v2.2 boundary
+
+First fully prospective M15 signal-bar boundary after the executable freeze:
+
+`2026-09-11T20:00:00Z`
+
+All prospective observations must preserve the exact frozen v2.2 rules.
+
+Later research ideas must not be projected backwards as if they existed at this boundary.
+
+## Knowledge governance
+
+Legacy strategy Knowledge files are intentionally retained as:
+
+`HISTORICAL / RESEARCH REFERENCE`
+
+Files:
+- `01_levels_rules.pdf`;
+- `02_ATR_and_range.pdf`;
+- `03_money_management.pdf`;
+- `04_position_sizing.pdf`;
+- `K_Trader_KB_VSA_ATR_SysInstrAddition1.md`.
+
+They may generate hypotheses/features but do not automatically override canonical or current research evidence.
+
+Do not automatically import as hard gates:
+- historical ATR-used 60/80% thresholds;
+- fixed stop percentages/pips/cents;
+- old risk percentages;
+- mandatory VSA/volume conditions;
+- old timeframe/holding assumptions.
+
+Useful retained concepts:
+- fixed vs floating/forming levels;
+- trend-break / first-pullback levels;
+- mirror levels;
+- repeated-touch/limit levels;
+- consolidation boundaries;
+- false breaks;
+- rejection tails;
+- structural invalidation stops;
+- technical room to target.
+
+## Horizon/profile research architecture
+
+Provisional research envelopes:
+
+| Profile | Context | Trigger | Research horizon |
+|---|---|---|---|
+| FAST | H1/M15 | M5 | up to ~4h |
+| INTRADAY | H4/H1 | M15 | ~8-12h envelope; frozen v2.2 uses 8h |
+| SWING | D1/H4 | H1 | ~2-4 days |
+| POSITION | W1/D1 | H4 | ~7-21 days |
+
+These are research envelopes, not universal production limits.
+
+TTL before entry and max-hold after entry are separate parameters.
+
+## Evidence governance
+
+Primary evidence unit = unique resolved setup family.
+
+- <30 families: observation only;
+- 30-49: diagnostics only;
+- 50-99: hypotheses/ablation proposals, no automatic promotion;
+- >=100 diverse families: versioned recalibration proposal may be considered.
+
+Every strategy rule change requires:
+- a new strategy version;
+- preregistration;
+- causal full-path backtest/walk-forward;
+- fresh OOS/prospective evidence;
+- holdout only after a predefined gate;
+- explicit promotion decision.
+
+Validation/holdout must not be repeatedly mined to tune the same version.
+
+## Next approved work — parallel tracks
+
+### A. Level Context Layer v2
+
+Develop deterministic causal feature extraction for:
+- trend-break/first-pullback levels;
+- mirror levels;
+- repeated-touch/limit levels;
+- consolidation boundaries;
+- false breaks;
+- rejection tails;
+- level age/strength/role changes;
+- floating/forming-zone score;
+- nearest obstacle distance in ATR/R.
+
+This starts as a feature layer only and must not change frozen v2.2 eligibility.
+
+### B. MFE/MAE diagnostics
+
+For frozen v2.2 completed trades compute:
+- MFE_R;
+- MAE_R;
+- time-to-MFE/MAE;
+- time-to-0.5R/1R/2R/3R;
+- positive excursion before STOP;
+- adverse excursion before TARGET;
+- TIME_EXIT path state;
+- costs in R;
+- cuts by exit reason, side, symbol, structural context and duration.
+
+Actual in-trade path metrics must be separated from any post-exit counterfactual study.
+
+Detailed plan:
+
+`docs/research/LEVEL_CONTEXT_V2_MFE_MAE_RESEARCH_PLAN.md`
+
+## Performance objective
+
+For nominal `RR=1:3`:
+- OOS WR target >=50%;
+- expectancy_R >0 after all costs;
+- PF_R >1 mandatory, target >=1.5;
+- stress-slippage survival;
+- adequate diverse unique-family sample;
+- no single-symbol/single-regime domination;
+- acceptable drawdown.
+
+v2.2 has not yet met this complete target.
+
+## Immediate next action
+
+Implement and test **Level Context Layer v2** and **MFE/MAE diagnostics** in parallel while:
+- v2.2 remains frozen;
+- holdout remains closed;
+- production remains unchanged.
