@@ -37,6 +37,9 @@ jobs:
       - name: Validate shell scripts
         run: sh -n scripts/deploy.sh scripts/provision_vps.sh scripts/register_runner.sh scripts/phase9_acceptance.sh
 
+      - name: Phase 11G prospective-control focused tests
+        run: python -m pytest -q tests/test_phase11g_prospective_control.py
+
       - name: Repository-wide tests
         run: python -m pytest -q
 
