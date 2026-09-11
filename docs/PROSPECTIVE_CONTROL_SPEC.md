@@ -121,6 +121,23 @@ Partial shards are valid checkpoints. Resume requires exact provenance/configura
 
 Resume never reinterprets or silently rewrites completed cutoff records. New cutoffs are appended by deterministic cutoff identity. Checkpoints are written atomically.
 
+## Single-writer contract
+
+Each prospective-control output path has exactly one active writer at a time.
+
+The operator CLI acquires a non-blocking OS advisory lock on a persistent sidecar path `<output>.lock` before reading, resuming, checkpointing, or writing the target output. The same contract applies to both `run` and `merge`.
+
+Rules:
+
+- lock ownership is determined by the operating-system lock, not by sidecar-file existence;
+- the sidecar file may remain after normal exit, crash, or process termination and is not itself a stale lock;
+- when the owning process exits or is terminated, the OS releases the lock automatically;
+- a second process targeting the same output while the first writer is active must fail fast;
+- `--resume` never bypasses an active writer;
+- checkpoint atomicity remains required, but atomic file replacement is not a substitute for single-writer exclusion.
+
+This contract prevents transport timeouts or duplicate operator retries from creating concurrent writers against the same shard/report output while preserving crash-safe resume behavior.
+
 ## Merge contract
 
 A full report may be produced only when:
