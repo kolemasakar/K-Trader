@@ -28,6 +28,7 @@ UTC_DAY_5M_EMPTY_ERROR = "ValueError: 5m day sequence is empty"
 @dataclass(frozen=True, slots=True)
 class ProspectiveDecisionAudit:
     decision_id: str
+    canonical_symbol: str
     signal_key: str | None
     side: str
     grade: str
@@ -514,6 +515,7 @@ def _audit_decision(decision: TradingDecision) -> ProspectiveDecisionAudit:
     signal_key = stable_signal_key(decision) if decision.side in {"LONG", "SHORT"} else None
     return ProspectiveDecisionAudit(
         decision_id=decision_fingerprint(decision),
+        canonical_symbol=decision.canonical_symbol,
         signal_key=signal_key,
         side=decision.side,
         grade=decision.grade,
@@ -825,6 +827,7 @@ def _best_audit(decisions: Sequence[ProspectiveDecisionAudit]) -> ProspectiveDec
 def _audit_summary(decision: ProspectiveDecisionAudit) -> Mapping[str, object]:
     return {
         "decision_id": decision.decision_id,
+        "canonical_symbol": decision.canonical_symbol,
         "signal_key": decision.signal_key,
         "side": decision.side,
         "grade": decision.grade,
@@ -934,6 +937,7 @@ def _deserialize_audit(payload: Mapping[str, object]) -> ProspectiveDecisionAudi
         raise ValueError("prospective-control audit reason_codes must be a list")
     return ProspectiveDecisionAudit(
         decision_id=str(payload.get("decision_id")),
+        canonical_symbol=str(payload.get("canonical_symbol")),
         signal_key=str(payload["signal_key"]) if payload.get("signal_key") is not None else None,
         side=str(payload.get("side")),
         grade=str(payload.get("grade")),

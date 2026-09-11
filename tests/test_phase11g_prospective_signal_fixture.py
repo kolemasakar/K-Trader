@@ -21,6 +21,7 @@ def test_synthetic_tradable_signal_fixture_reaches_report_without_probability_or
     cutoff = datetime(2026, 9, 11, 12, 0, tzinfo=UTC)
     decision = ProspectiveDecisionAudit(
         decision_id="decision-1",
+        canonical_symbol="SUIUSDT",
         signal_key="signal-1",
         side="LONG",
         grade="A",
@@ -92,6 +93,7 @@ def test_synthetic_tradable_signal_fixture_reaches_report_without_probability_or
     assert report.unique_tradable_signal_count == 1
     assert len(report.tradable_records) == 1
     record = report.tradable_records[0]
+    assert record["canonical_symbol"] == "SUIUSDT"
     assert record["signal_key"] == "signal-1"
     assert "estimated_probability" not in record
     assert "outcome" not in record
