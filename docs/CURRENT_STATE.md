@@ -4,7 +4,7 @@ Updated: 2026-09-11
 
 Canonical transition checkpoint:
 
-`docs/checkpoints/2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md`
+`docs/checkpoints/2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_DEPLOYMENT.md`
 
 Previous operational checkpoint:
 
@@ -33,9 +33,9 @@ Latest horizon research checkpoint:
 
 Accepted runtime/deployment baseline:
 
-- runtime SHA: `30119a44fa82b1029d2de6e3a6f76320a7705079`;
-- image: `k-trader:30119a44fa82b1029d2de6e3a6f76320a7705079`;
-- GitHub `Deploy Production #11`: SUCCESS;
+- runtime SHA: `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
+- image: `k-trader:a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
+- approved GitHub Actions deployment run `34612617730`: SUCCESS;
 - host: Oracle Cloud Ampere A1 / Ubuntu 24.04 ARM64;
 - production provider: `binance_usdm`;
 - container: healthy;
@@ -46,7 +46,7 @@ Accepted runtime/deployment baseline:
 - application remains read-only;
 - GitHub PR/CI/manual deployment remains the canonical source/activation path.
 
-Repository acceptance of the prospective-control utility does **not** imply a new production deployment. The running production image remains on `30119a44...` until a separate deployment decision.
+The canonical prospective-control utility is now deployed in production at `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`. Deployment run `34612617730` checked out the exact approved SHA, passed ARM64 identity, canonical deploy acceptance, and left the service healthy/read-only.
 
 ## Runtime hardening accepted on 2026-09-11
 

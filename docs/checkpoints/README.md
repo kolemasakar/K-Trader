@@ -4,11 +4,11 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md`
+`2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_DEPLOYMENT.md`
 
 Current accepted state at this checkpoint:
 
-- accepted runtime/deployed SHA remains `30119a44fa82b1029d2de6e3a6f76320a7705079`; no new production deployment is implied;
+- accepted runtime/deployed SHA is now `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`; approved GitHub Actions deployment run `34612617730` succeeded;
 - `Deploy Production #11`: SUCCESS;
 - K-Trader container healthy; provider REST/WebSocket, MTF API and public Phase 10 Action acceptance PASS;
 - FAST/M5 TTL60 remains the only production-active lifecycle profile;
@@ -30,6 +30,7 @@ Current accepted state at this checkpoint:
 
 Historical checkpoints include:
 
+- `2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md` — canonical prospective-control tooling hardening before production activation;
 - `2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md` — 24h control, D1 backoff and recent-MTF production hardening;
 - `2026-09-10_PHASE11G_MONITORING_AND_READINESS_CHECKPOINT.md` — pre-24h accumulation/readiness state;
 - `2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md` — horizon time-split validation;
