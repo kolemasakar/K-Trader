@@ -2,9 +2,13 @@
 
 Updated: 2026-09-11
 
-Status: **VERIFIED FOUNDATION / TWO CHAINS CATALOGUED / FAST TTL60 PRODUCTION / 24H PROSPECTIVE CONTROL COMPLETE / CONTINUOUS DISCOVERY ACTIVE**.
+Status: **VERIFIED FOUNDATION / TWO CHAINS CATALOGUED / FAST TTL60 PRODUCTION / 24H PROSPECTIVE CONTROL COMPLETE / PROSPECTIVE TOOLING HARDENED / CONTINUOUS DISCOVERY ACTIVE**.
 
 Detailed current transition evidence:
+
+`docs/checkpoints/2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md`
+
+Previous operational evidence:
 
 `docs/checkpoints/2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md`
 
@@ -38,7 +42,7 @@ Accepted state:
 - no additional chain has been materialized;
 - no binary outcome sample has been created without a real binary outcome.
 
-Catalogue digest semantics are now explicitly resolved: `catalogue_sha256` is the semantic digest over `{schema_version, entries}`; the raw serialized file has its own content hash. The two are not expected to match.
+Catalogue digest semantics are explicitly resolved: `catalogue_sha256` is the semantic digest over `{schema_version, entries}`; the raw serialized file has its own content hash. The two are not expected to match.
 
 ## Production research boundary
 
@@ -51,6 +55,8 @@ Current production runtime:
 - provider REST/WebSocket: PASS;
 - MTF API: PASS;
 - Phase 10 public Action acceptance: PASS.
+
+Repository acceptance of the prospective-control utility does not constitute a new production deployment. The running image remains on the accepted runtime SHA above until a separate deployment decision.
 
 FAST lifecycle is the only active production profile:
 
@@ -66,7 +72,7 @@ Research-only profiles remain inactive in production:
 - MEDIUM/H1: `8-12h` is only a time-split validated lifecycle design band, not a profitability optimum;
 - adaptive TTL tables are not approved.
 
-## Runtime hardening now deployed
+## Runtime hardening deployed before this checkpoint
 
 ### D1 retry backoff
 
@@ -166,7 +172,7 @@ Coverage:
 - symbol slots: `6520`;
 - history-pass/analyzed slots: `5448`;
 - history-fail slots: `1055`;
-- explicit analysis errors: `17` (`5m day sequence is empty` control-utility edge);
+- explicit analysis errors: `17` (`5m day sequence is empty` UTC-midnight edge);
 - decision records: `67822`;
 - unique tradable signals: `0`.
 
@@ -185,13 +191,39 @@ HTF aligned               1522
 
 This is positive evidence that the engine does not fail exclusively at one early gate: natural setups reached the TTL-valid stage. The final 10 still failed structural `RR >= 3`, so no threshold reduction is justified.
 
+## Canonical prospective-control tooling
+
+PR #48 moves the long-run prospective-control methodology from temporary scripts into repository-owned code.
+
+Canonical components:
+
+- `src/ktrader/replay/prospective.py`;
+- `scripts/run_prospective_control.py`;
+- `docs/PROSPECTIVE_CONTROL_SPEC.md`;
+- `tests/test_phase11g_prospective_control.py`.
+
+Accepted behavior:
+
+- deterministic interval-aligned logical cutoffs;
+- newest recorded snapshot at/before cutoff, with exact `300s` accepted and `>300s` stale;
+- exact recorded top-N selection with no history-failure substitution;
+- causal `slice_datasets_asof()` candle snapshots;
+- same canonical `analyze_candle_snapshot()` analyzer;
+- UTC-midnight empty-current-day-M5 slots become explicit `ANALYSIS_ERROR` without analyzer invocation or synthetic day-range/decision;
+- deterministic modulo sharding;
+- atomic checkpoint/resume with strict provenance equality;
+- merge requires complete coherent shard coverage;
+- equivalent monolithic and sharded/resumed execution yields the same report/hash.
+
+Focused regression: `4 passed`. Repository-wide Python 3.12 regression: `208 passed`; Python 3.14: PASS. Final acceptance remains subject to the active `canonical-merge-gate` including amd64/arm64 image checks.
+
 ## Next Phase 11G work
 
 - keep provider-recorded production capture active;
+- use the canonical prospective-control utility for future long-window controls instead of temporary ad-hoc scripts;
 - continue natural prospective discovery under unchanged FAST rules;
 - materialize a new chain only after a natural LONG/SHORT setup survives every hard gate;
 - capture exact provider/context/config/bundle/replay provenance for any such signal;
 - evaluate outcome only from later real bars;
-- harden the long-run prospective report utility for explicit midnight/day-sequence handling plus resumable/sharded execution;
 - keep M15/H1 research-only;
 - keep Phase 12 inactive until an explicit later gate.
