@@ -13,6 +13,7 @@ from ktrader.replay import (
     write_prospective_control_report,
     write_prospective_control_shard,
 )
+from ktrader.replay.output_lock import OutputLockError, exclusive_output_lock
 from ktrader.runtime.models import RuntimeScannerConfig
 
 
@@ -40,87 +41,89 @@ def _discover_bundles(root: Path) -> dict[str, object]:
 
 
 def _run(args: argparse.Namespace) -> None:
-    archive = load_universe_archive(args.archive)
-    bundles = _discover_bundles(args.bundle_root)
-    scanner = RuntimeScannerConfig(
-        setup_interval=args.setup_interval,
-        setup_max_age_bars=args.setup_max_age_bars,
-    )
-
-    resume = None
-    if args.resume:
-        if args.output.exists():
-            resume = load_prospective_control_shard(args.output)
-    elif args.output.exists():
-        raise SystemExit(f"output already exists; use --resume or choose another path: {args.output}")
-
-    checkpoint_counter = 0
-
-    def checkpoint(shard):
-        nonlocal checkpoint_counter
-        checkpoint_counter += 1
-        if checkpoint_counter % args.checkpoint_every == 0:
-            write_prospective_control_shard(args.output, shard)
-
-    shard = run_prospective_control_shard(
-        archive,
-        bundles,
-        scanner_config=scanner,
-        start=args.start,
-        end=args.end,
-        analysis_limit=args.analysis_limit,
-        max_context_age_seconds=args.max_context_age_seconds,
-        shard_index=args.shard_index,
-        shard_count=args.shard_count,
-        resume=resume,
-        max_new_cutoffs=args.max_new_cutoffs,
-        checkpoint_function=checkpoint,
-        checkpoint_every=1,
-    )
-    write_prospective_control_shard(args.output, shard)
-    print(
-        json.dumps(
-            {
-                "output": str(args.output),
-                "schema_version": shard.schema_version,
-                "provider_id": shard.provider_id,
-                "archive_sha256": shard.archive_sha256,
-                "scanner_config_sha256": shard.scanner_config_sha256,
-                "shard_index": shard.shard_index,
-                "shard_count": shard.shard_count,
-                "processed_cutoffs": len(shard.cutoffs),
-                "expected_cutoffs": shard.expected_cutoff_count,
-                "complete": shard.complete,
-                "shard_sha256": shard.shard_sha256,
-            },
-            sort_keys=True,
+    with exclusive_output_lock(args.output):
+        archive = load_universe_archive(args.archive)
+        bundles = _discover_bundles(args.bundle_root)
+        scanner = RuntimeScannerConfig(
+            setup_interval=args.setup_interval,
+            setup_max_age_bars=args.setup_max_age_bars,
         )
-    )
+
+        resume = None
+        if args.resume:
+            if args.output.exists():
+                resume = load_prospective_control_shard(args.output)
+        elif args.output.exists():
+            raise SystemExit(f"output already exists; use --resume or choose another path: {args.output}")
+
+        checkpoint_counter = 0
+
+        def checkpoint(shard):
+            nonlocal checkpoint_counter
+            checkpoint_counter += 1
+            if checkpoint_counter % args.checkpoint_every == 0:
+                write_prospective_control_shard(args.output, shard)
+
+        shard = run_prospective_control_shard(
+            archive,
+            bundles,
+            scanner_config=scanner,
+            start=args.start,
+            end=args.end,
+            analysis_limit=args.analysis_limit,
+            max_context_age_seconds=args.max_context_age_seconds,
+            shard_index=args.shard_index,
+            shard_count=args.shard_count,
+            resume=resume,
+            max_new_cutoffs=args.max_new_cutoffs,
+            checkpoint_function=checkpoint,
+            checkpoint_every=1,
+        )
+        write_prospective_control_shard(args.output, shard)
+        print(
+            json.dumps(
+                {
+                    "output": str(args.output),
+                    "schema_version": shard.schema_version,
+                    "provider_id": shard.provider_id,
+                    "archive_sha256": shard.archive_sha256,
+                    "scanner_config_sha256": shard.scanner_config_sha256,
+                    "shard_index": shard.shard_index,
+                    "shard_count": shard.shard_count,
+                    "processed_cutoffs": len(shard.cutoffs),
+                    "expected_cutoffs": shard.expected_cutoff_count,
+                    "complete": shard.complete,
+                    "shard_sha256": shard.shard_sha256,
+                },
+                sort_keys=True,
+            )
+        )
 
 
 def _merge(args: argparse.Namespace) -> None:
-    shards = [load_prospective_control_shard(path) for path in args.shard]
-    report = merge_prospective_control_shards(shards)
-    write_prospective_control_report(args.output, report)
-    print(
-        json.dumps(
-            {
-                "output": str(args.output),
-                "schema_version": report.schema_version,
-                "provider_id": report.provider_id,
-                "logical_cutoffs": report.logical_cutoffs,
-                "selected_context_cutoffs": report.selected_context_cutoffs,
-                "symbol_slots": report.symbol_slots,
-                "history_pass_slots": report.history_pass_slots,
-                "history_fail_slots": report.history_fail_slots,
-                "analysis_error_slots": report.analysis_error_slots,
-                "decision_records": report.decision_records,
-                "unique_tradable_signal_count": report.unique_tradable_signal_count,
-                "report_sha256": report.report_sha256,
-            },
-            sort_keys=True,
+    with exclusive_output_lock(args.output):
+        shards = [load_prospective_control_shard(path) for path in args.shard]
+        report = merge_prospective_control_shards(shards)
+        write_prospective_control_report(args.output, report)
+        print(
+            json.dumps(
+                {
+                    "output": str(args.output),
+                    "schema_version": report.schema_version,
+                    "provider_id": report.provider_id,
+                    "logical_cutoffs": report.logical_cutoffs,
+                    "selected_context_cutoffs": report.selected_context_cutoffs,
+                    "symbol_slots": report.symbol_slots,
+                    "history_pass_slots": report.history_pass_slots,
+                    "history_fail_slots": report.history_fail_slots,
+                    "analysis_error_slots": report.analysis_error_slots,
+                    "decision_records": report.decision_records,
+                    "unique_tradable_signal_count": report.unique_tradable_signal_count,
+                    "report_sha256": report.report_sha256,
+                },
+                sort_keys=True,
+            )
         )
-    )
 
 
 def main() -> None:
@@ -159,7 +162,10 @@ def main() -> None:
     args = parser.parse_args()
     if args.command == "run" and args.checkpoint_every <= 0:
         parser.error("--checkpoint-every must be positive")
-    args.func(args)
+    try:
+        args.func(args)
+    except OutputLockError as exc:
+        parser.error(str(exc))
 
 
 if __name__ == "__main__":
