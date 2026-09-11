@@ -1,75 +1,102 @@
-# Deployment Specification v1.9
+# Deployment Specification v1.10
 
-Updated: 2026-09-09
+Updated: 2026-09-11
 
 ## Target
 
-- GitHub repository with GitHub-hosted CI for pull requests/main validation.
-- Ubuntu VPS.
-- Docker Engine + Docker Compose.
-- Repository-scoped self-hosted GitHub Actions runner for production deployment only.
-- Primary production architecture: Linux ARM64 / Oracle Ampere A1.
-- Caddy HTTPS reverse proxy/TLS for the public Action endpoint.
-- Policy-constrained SentinelX channel for direct ChatGPT-to-production diagnostics and controlled maintenance.
+- GitHub repository with GitHub-hosted CI for pull requests/main validation;
+- Ubuntu production VPS;
+- Docker Engine + Docker Compose;
+- repository-scoped self-hosted GitHub Actions runner for production deployment only;
+- primary production architecture: Linux ARM64 / Oracle Ampere A1;
+- Caddy HTTPS reverse proxy/TLS for the public Action endpoint;
+- policy-constrained SentinelX channel for diagnostics and controlled maintenance.
 
 ## Current production state
 
-Latest accepted production runtime was verified on 2026-09-09.
+Latest accepted production runtime was verified on 2026-09-11.
 
-- Host: Oracle Cloud Ampere A1, Frankfurt, Ubuntu 24.04 Minimal aarch64.
-- Active allocation: 1 OCPU / 6 GB RAM.
-- Production runner: `k-trader-prod-arm64`.
-- Public origin: `https://ktrader-api.duckdns.org`.
-- DNS: `ktrader-api.duckdns.org -> 92.5.56.198`.
-- Deployed SHA: `9a257957e033f6265b9e746cb9f15e755ff87b72`.
-- Deployed image: `k-trader:9a257957e033f6265b9e746cb9f15e755ff87b72`.
-- GitHub Actions deployment: `Deploy Production #10`, SUCCESS.
-- Runtime identity: UID/GID `1002:1002`, aligned with the host `ktrader` user.
-- Persistent application data: `/opt/k-trader/data`, owner `ktrader:ktrader`.
-- Persistent Caddy storage: `/opt/k-trader/caddy_data` and `/opt/k-trader/caddy_config`, owner `root:root`, mode `700`.
-- K-Trader container: healthy.
-- Provider REST/WebSocket acceptance: PASS.
-- MTF API acceptance: PASS.
-- Phase 10 Action live acceptance: PASS.
-- Runtime scanner acceptance during Deploy #10: `status=DEGRADED`, `symbols_ready=3`, `symbols_failed=17`; usable provider/MTF data remained available and this did not fail service health or release acceptance.
-- Application remains host-loopback-only at `127.0.0.1:8000`.
-- Production provider: `binance_usdm`.
-- PR #33 side-to-regime scoring contract correction is present in the deployed runtime.
-- FAST setup lifecycle is present in the deployed runtime: `setup_interval=5m`, `setup_max_age_bars=12`, TTL `3600s`; exactly 60m is valid and 60m+1s is expired.
-- Horizon-aware M15/H1 lifecycle support remains research-only; production default remains FAST/M5.
+- host: Oracle Cloud Ampere A1, Ubuntu 24.04 aarch64;
+- active allocation: 1 OCPU / 6 GB RAM;
+- production runner label: `k-trader-prod-arm64`;
+- public origin: `https://ktrader-api.duckdns.org`;
+- deployed SHA: `30119a44fa82b1029d2de6e3a6f76320a7705079`;
+- deployed image: `k-trader:30119a44fa82b1029d2de6e3a6f76320a7705079`;
+- GitHub Actions deployment: `Deploy Production #11`, SUCCESS;
+- runtime identity: UID/GID `1002:1002` aligned with host user `ktrader`;
+- persistent application data: `/opt/k-trader/data`;
+- persistent Caddy storage: `/opt/k-trader/caddy_data`, `/opt/k-trader/caddy_config`;
+- application container: healthy;
+- `/health`: `status=ok`, `data_ready=true`;
+- provider: `binance_usdm`;
+- provider REST/WebSocket acceptance: PASS;
+- MTF API acceptance: PASS;
+- public HTTPS / Phase 10 Action acceptance: PASS;
+- application API remains host-loopback-only at `127.0.0.1:8000` behind Caddy;
+- Action authentication remains enabled;
+- FAST production lifecycle: `setup_interval=5m`, `setup_max_age_bars=12`, TTL `3600s`;
+- M15/H1 lifecycle profiles remain research-only.
 
-Repository documentation HEAD may be newer than the deployed SHA when changes are documentation-only. This does not imply an undeployed runtime behavior change and does not require a production redeploy.
+Documentation-only commits may make repository `main` newer than the deployed runtime SHA without requiring a production redeploy.
 
-## SentinelX direct operator channel
+## 2026-09-11 runtime hardening acceptance
 
-A direct ChatGPT-to-VM management channel was accepted on 2026-09-09 through SentinelX.
+The deployed runtime includes two operational hardening changes with no trading-rule changes.
 
-Purpose:
+### D1 history retry backoff
 
-- remove the need for the operator to relay every diagnostic command manually through SSH;
-- permit fast production inspection and controlled maintenance from ChatGPT;
-- preserve SSH as the independent recovery/bootstrap path;
-- preserve GitHub PR, CI, and deployment workflows as the only canonical source/deployment path.
+Young contracts that cannot satisfy the mandatory D1 history requirement remain fail-closed but no longer trigger the same impossible provider bootstrap every scanner cycle.
 
-Accepted capabilities, subject to host policy, include allowlisted command execution, one-off Bash/Python scripts, selected file/log inspection, Docker and K-Trader health diagnostics, approved `docker exec` operations, and selected systemd inspection/restart actions.
+Accepted behavior:
 
-Security posture after hardening:
+- D1 minimum remains unchanged;
+- insufficient-history symbols remain ineligible;
+- retry is deferred until the next UTC day boundary;
+- no alternate symbol is promoted merely to fill the analysis shortlist;
+- RR, ATR, TTL, target, scoring and structure logic are unchanged.
 
-- agent runs as dedicated unprivileged user `sentinelx`;
-- bootstrap `NOPASSWD: ALL` was removed;
-- sudo is constrained to a narrow K-Trader/SentinelX operational set;
-- arbitrary root execution is denied;
-- structured filesystem access is read-only;
-- current readable K-Trader paths are `/opt/k-trader/releases` and `/opt/k-trader/data`;
-- no structured writable paths are exposed;
-- SentinelX identity and GitHub runner credential files are outside the structured read policy;
-- `/etc/sentinelx/config.yaml` is not writable by the agent through SentinelX filesystem tools.
+### Recent MTF contiguity heal
 
-Canonical operating/security details: `docs/SENTINELX_REMOTE_ACCESS.md`.
+Runtime readiness now validates contiguity of the recent required MTF window in addition to count and freshness.
+
+If a recent sequence has a gap:
+
+```text
+recent MTF gap
+-> readiness fails
+-> canonical bootstrap repair
+-> symbol remains fail-closed
+-> analysis resumes only on valid contiguous history
+```
+
+Production verification after Deploy #11:
+
+- `IOSTUSDT 15m`: required recent 250-bar window contiguous, gaps `[]`;
+- `DOTUSDT 15m`: required recent 250-bar window contiguous, gaps `[]`;
+- both repair bootstraps succeeded.
+
+## Scanner health semantics
+
+Scanner partial failures may produce `scanner_status=DEGRADED` while service health remains `ok` when canonical usable data is ready and fresh.
+
+Accepted post-deploy observation:
+
+- scanner: `DEGRADED`;
+- `symbols_ready=17`;
+- `symbols_failed=3`;
+- `live_streaming=true`;
+- current failed symbols: `牛来USDT`, `MARSCOINUSDT`, `PONSUSDT`;
+- reason: insufficient closed D1 history;
+- retries deferred to the next UTC day boundary;
+- `/v1/signals`: `0`.
+
+This DEGRADED state is expected young-contract ineligibility, not evidence of the prior mature-symbol `15m` gap defect.
+
+The Docker healthcheck evaluates service readiness, not a requirement that scanner status equal `READY`. Stale or unusable scanner state still fails the health gate.
 
 ## Runtime layout
 
-Persistent runtime state lives outside the runner workspace:
+Persistent state lives outside the GitHub runner workspace:
 
 ```text
 /opt/k-trader/
@@ -82,174 +109,149 @@ Persistent runtime state lives outside the runner workspace:
   DEPLOYED_SHA
 ```
 
-The GitHub runner `_work` directory is not a persistence location.
+The runner `_work` directory is not a persistence location.
 
 Research persistence includes:
 
-- immutable Phase 11F universe captures under `/opt/k-trader/data/research/universe` on the host (`/data/research/universe` in the container);
-- Phase 11G materialized chains and dataset catalogue under `/opt/k-trader/data/research/phase11g` on the host (`/data/research/phase11g` in the container).
+- immutable universe captures under `/opt/k-trader/data/research/universe` on the host (`/data/research/universe` in the container);
+- Phase 11G artefacts/catalogue under `/opt/k-trader/data/research/phase11g` (`/data/research/phase11g` in the container).
 
 ## CI gate
 
-`.github/workflows/ci.yml` executes on GitHub-hosted `ubuntu-latest` for PRs and pushes to main.
+`.github/workflows/ci.yml` runs on GitHub-hosted runners for pull requests/main validation.
 
-Mandatory validation includes:
+Canonical required jobs:
 
-1. Python 3.12 install.
-2. `compileall` over source/tests/scripts.
-3. repository-wide `pytest`.
-4. Docker Compose configuration validation.
-5. Docker image build.
-6. production runtime import from the built image.
-7. `vps_acceptance.py` packaging check.
-8. amd64 and arm64 container validation.
+- Python 3.12 repository-wide validation;
+- Python 3.14 repository-wide validation;
+- Docker amd64 build/runtime validation;
+- Docker arm64 build/runtime validation;
+- `canonical-merge-gate` requiring all canonical jobs to succeed.
 
-The production self-hosted runner never executes PR CI.
+The production self-hosted runner does not execute pull-request CI.
 
-Latest accepted code validation before this documentation branch:
+PR #46 acceptance immediately before Deploy #11:
 
-- canonical/deployed main SHA `9a257957e033f6265b9e746cb9f15e755ff87b72`;
-- canonical merge gate: PASS;
-- Python 3.12 tests: PASS;
-- Python 3.14 tests: PASS;
+- Python 3.12: PASS;
+- Python 3.14: PASS;
 - Docker amd64: PASS;
 - Docker arm64: PASS;
-- Deploy Production #10: SUCCESS.
+- `canonical-merge-gate`: PASS;
+- squash merge produced runtime SHA `30119a44fa82b1029d2de6e3a6f76320a7705079`.
 
 ## Production deploy
 
-`.github/workflows/deploy.yml` is `workflow_dispatch` only.
+`.github/workflows/deploy.yml` remains `workflow_dispatch` only.
 
 Requirements:
 
-- ref must be `main`;
-- runner labels: `self-hosted`, `linux`, `k-trader-prod-arm64`;
-- host architecture must be `aarch64`/`arm64`;
+- ref: `main`;
+- runner labels include `self-hosted`, `linux`, `k-trader-prod-arm64`;
+- host architecture must be ARM64;
 - GitHub environment: `production`;
 - checkout credentials are not persisted after checkout.
 
-Deployment uses `scripts/deploy.sh`.
+Deployment uses `scripts/deploy.sh` and immutable releases.
 
-Flow:
+Canonical flow:
 
 ```text
 approved main
+-> exact checkout
+-> architecture gate
 -> immutable release export
--> derive runtime UID/GID from production runner user
--> verify persistent data directory is writable
--> Docker Compose build/start
--> localhost process health
+-> derive runtime UID/GID
+-> build image
+-> start candidate release
+-> localhost health
 -> provider REST/WS acceptance
--> scanner/API readiness acceptance
+-> scanner/MTF readiness acceptance
 -> public HTTPS + Phase 10 Action acceptance
--> mark release current
+-> promote current symlink + DEPLOYED_SHA
 ```
 
-If a required acceptance step fails, deployment fails closed and returns to the previous release when available.
+If required acceptance fails, deployment fails closed and rolls back to the previous accepted release when available.
+
+## Deploy Production #11 evidence
+
+Run #11 was manually dispatched on `main` and checked out exact SHA:
+
+`30119a44fa82b1029d2de6e3a6f76320a7705079`
+
+Acceptance log recorded:
+
+- ARM64 architecture gate: PASS;
+- image build: PASS;
+- application container healthy;
+- public provider REST/WebSocket acceptance: PASS;
+- scanner data readiness: PASS;
+- MTF API: PASS;
+- public HTTPS / Phase 10 Action live acceptance: PASS;
+- release promoted;
+- `/opt/k-trader/DEPLOYED_SHA` updated to exact SHA;
+- `/opt/k-trader/current` points to exact release directory.
 
 ## Runtime identity and storage contract
 
-The K-Trader image accepts `KTRADER_RUNTIME_UID` and `KTRADER_RUNTIME_GID`; deployment derives these from the self-hosted runner user with `id -u` / `id -g`.
+The image accepts `KTRADER_RUNTIME_UID` and `KTRADER_RUNTIME_GID`; deployment derives these from the self-hosted runner account.
 
-This is required because `/opt/k-trader/data` is a host bind mount. The container process identity must match host ownership. Do not hard-code a base-image system UID such as `999` as a production contract.
-
-Current verified application identity:
+Current application identity remains:
 
 ```text
 /opt/k-trader/data  ktrader:ktrader  uid:gid 1002:1002
 ```
 
-Caddy storage uses a different ownership contract because the capability-dropped root process must have ordinary DAC write access:
+The container runtime identity must match host ownership of the bind-mounted persistent data directory.
 
-```text
-/opt/k-trader/caddy_data   root:root 0700
-/opt/k-trader/caddy_config root:root 0700
-```
-
-`scripts/provision_vps.sh` creates these directories with that ownership.
+Caddy persistent storage remains separately owned according to the Caddy runtime contract.
 
 ## Container security baseline
 
 K-Trader container:
 
-- non-root user;
-- runtime UID/GID aligned with deployment host user;
+- non-root runtime user;
+- host-aligned runtime UID/GID;
 - read-only root filesystem;
-- writable `/data` persistent volume only;
+- persistent writable `/data` volume;
 - temporary `/tmp` tmpfs;
-- all Linux capabilities dropped;
+- Linux capabilities dropped;
 - `no-new-privileges`;
-- application port bound to host loopback only;
+- application port bound to host loopback;
 - restart policy `unless-stopped`.
 
-Caddy container:
+Caddy:
 
 - reverse-proxy/TLS role only;
-- all capabilities dropped, then only `NET_BIND_SERVICE` added;
-- `no-new-privileges`;
-- persistent `/data` and `/config` bind mounts;
-- public host ports 80/443 only.
+- minimal capability set required for public ports;
+- persistent `/data` and `/config` mounts;
+- public host ports 80/443.
 
-The read-only root filesystem is intentional. Operator diagnostics that need to execute a temporary Python script should stream the host file into `docker exec -i ... python -` rather than `docker cp` it into the container root filesystem.
+## SentinelX operator channel
 
-## Health semantics
+Policy-constrained SentinelX access is accepted for direct production diagnostics and selected maintenance.
 
-`/health` preserves its public response shape. Scanner partial failures may produce `scanner_status=DEGRADED` while the service remains usable when canonical data is ready and fresh.
+Security boundary:
 
-The Docker healthcheck evaluates service readiness, not a requirement that scanner status itself equal `READY`. Stale scanner data still fails the health gate.
+- agent runs unprivileged;
+- unrestricted `NOPASSWD: ALL` is prohibited;
+- arbitrary root execution is denied;
+- structured K-Trader filesystem access is read-only;
+- approved readable K-Trader trees include `/opt/k-trader/releases` and `/opt/k-trader/data`;
+- SSH remains the independent recovery/bootstrap path;
+- source changes and production activation must still go through GitHub PR/CI/deploy.
 
-Accepted Deploy #10 evidence:
+Canonical details: `docs/SENTINELX_REMOTE_ACCESS.md`.
 
-- provider: `binance_usdm`;
-- provider REST/WebSocket acceptance: PASS;
-- scanner readiness acceptance: PASS with 3 ready / 17 failed and DEGRADED status;
-- MTF API publication: PASS;
-- K-Trader container: healthy;
-- Caddy HTTPS/TLS: PASS;
-- Phase 10 Action live acceptance: PASS;
-- final deployed SHA: `9a257957e033f6265b9e746cb9f15e755ff87b72`;
-- live FAST TTL boundary: 60m valid / 60m+1s expired.
+## Research/production separation
 
-## HTTPS and Action gate
+Production runtime and research artefacts share data acquisition, but research does not silently alter live trading rules.
 
-The Caddy Compose profile is enabled when `KTRADER_DOMAIN` is set.
+- FAST M5/60m is the only active production lifecycle profile;
+- M15/H1 studies are research-only;
+- `RR >= 3`, ATR-used, HTF, primary-level strength, structural target and freshness rules are unchanged by research tooling;
+- dataset materialization is not a deployment operation;
+- probability calibration is not active.
 
-Current production configuration:
+Current research/control state is documented in:
 
-- `KTRADER_DOMAIN=ktrader-api.duckdns.org` as a GitHub `production` Environment variable;
-- `KTRADER_ACTION_API_KEY` as a GitHub `production` Environment secret;
-- DNS A record to `92.5.56.198`;
-- OCI stateful ingress TCP 80/443;
-- host firewall explicitly allows TCP 80/443 before terminal reject;
-- firewall rules persisted through `netfilter-persistent`.
-
-When `KTRADER_DOMAIN` is non-empty, deployment requires public HTTPS and Phase 10 Action acceptance before release promotion.
-
-## Target-VPS live acceptance
-
-`scripts/vps_acceptance.py` validates the first usable provider in configured priority order:
-
-- instrument discovery;
-- closed contiguous REST candles on 5m/15m/1h/4h/1d;
-- public 5m WebSocket event.
-
-`scripts/phase9_acceptance.sh` additionally requires scanner data readiness and API publication of all five canonical timeframes. Local protected `/v1/*` checks use Bearer authentication when `KTRADER_ACTION_API_KEY` is configured.
-
-`scripts/phase10_action_acceptance.py` validates the public HTTPS/read-only Action boundary and required TradingDecision response fields.
-
-Provider failure is isolated; bars from failed and fallback providers are never combined.
-
-## Historical fail-closed evidence
-
-Earlier Phase 10 deployment incidents validated rollback behavior:
-
-- local acceptance initially lacked Bearer authentication after Action auth activation; PR #19 fixed the integration defect;
-- Caddy initially could not persist ACME state under incorrect host bind-mount ownership; ownership/provisioning were corrected.
-
-Subsequent accepted deployments continued through Deploy Production #10 on `9a257957e033f6265b9e746cb9f15e755ff87b72`.
-
-## Provisioning
-
-Canonical operator instructions are in `docs/VPS_PROVISIONING.md`.
-
-Provisioning and runner registration remain separate from normal deployment because runner registration requires a short-lived GitHub token.
+`docs/checkpoints/2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md`.

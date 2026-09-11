@@ -1,306 +1,218 @@
 # K-Trader Current State
 
-Updated: 2026-09-09
+Updated: 2026-09-11
 
-Canonical operational checkpoint:
+Canonical transition checkpoint:
 
-`docs/checkpoints/2026-09-09_PHASE11G_PROD_TTL_AND_CORRECTED_WINDOWS_1_4.md`
+`docs/checkpoints/2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md`
 
 Latest horizon research checkpoint:
 
 `docs/checkpoints/2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md`
 
-Prior research checkpoint:
-
-`docs/checkpoints/2026-09-08_PHASE11G_CORRECTED_REPLAY_RR_GEOMETRY_GATE.md`
-
-Prior dataset checkpoint:
-
-`docs/checkpoints/2026-09-07_PHASE11G_TWO_CHAIN_DATASET_CHECKPOINT.md`
-
 ## Current phase boundary
 
-- Phase 10: COMPLETE / product accepted for the current single-provider read-only v1 scope;
-- Phase 11A-11G repository-side foundation: VERIFIED;
-- Phase 11F production accumulation: active and provider-coherent;
-- Phase 11G physical catalogue: two canonical chains COMPLETE / VERIFIED / CATALOGUED;
-- Phase 11G corrected historical Windows #1-#4 under FAST TTL60: COMPLETE / zero tradable signals;
-- Phase 11G prospective/provider-recorded discovery: ACTIVE;
-- INTRADAY/M15 lifecycle: RESEARCH ONLY / universal TTL unresolved after broader time-split validation;
-- MEDIUM/H1 lifecycle: RESEARCH ONLY / 8-12h lifecycle design band time-split validated;
-- RR-geometry audit: COMPLETE / no geometry defect found;
-- Setup Lifecycle / Expiry gate: REPOSITORY + REPLAY + PRODUCTION VALIDATED;
-- approved canonical FAST setup TTL: `60 minutes = 12 x M5 bars`;
-- production deployment of the TTL implementation: COMPLETE / accepted on canonical `main`;
+- Phase 10: COMPLETE / current single-provider read-only product accepted;
+- Phase 11A-11F: VERIFIED;
+- Phase 11G dataset-catalogue foundation: VERIFIED;
+- Phase 11G catalogue: two canonical chains, `SUIUSDT` + `XRPUSDT`;
+- FAST/M5 lifecycle: PRODUCTION, TTL `60m = 12 x M5 bars`;
+- corrected FAST W1-W4 historical closure: COMPLETE / zero tradable signals;
+- 2026-09-10→11 prospective 24h control: COMPLETE / zero tradable signals;
+- provider-recorded prospective discovery: ACTIVE;
+- INTRADAY/M15 lifecycle: RESEARCH ONLY / universal TTL unresolved;
+- MEDIUM/H1 lifecycle: RESEARCH ONLY / `8-12h` lifecycle design band time-split validated, not profitability-optimal;
 - Phase 12 multi-provider expansion: FUTURE / NOT ACTIVE.
 
-## Repository and production identity
+## Production identity
 
-Current accepted production baseline:
+Accepted runtime/deployment baseline:
 
-- canonical/deployed `main` SHA: `9a257957e033f6265b9e746cb9f15e755ff87b72`;
-- deployed image: `k-trader:9a257957e033f6265b9e746cb9f15e755ff87b72`;
-- GitHub `Deploy Production #10`: SUCCESS;
-- production container: healthy;
+- runtime SHA: `30119a44fa82b1029d2de6e3a6f76320a7705079`;
+- image: `k-trader:30119a44fa82b1029d2de6e3a6f76320a7705079`;
+- GitHub `Deploy Production #11`: SUCCESS;
+- host: Oracle Cloud Ampere A1 / Ubuntu 24.04 ARM64;
+- production provider: `binance_usdm`;
+- container: healthy;
+- `/health`: `status=ok`, `data_ready=true`;
 - provider REST/WebSocket acceptance: PASS;
 - MTF API acceptance: PASS;
 - public HTTPS / Phase 10 Action acceptance: PASS;
-- live FAST lifecycle: `setup_interval=5m`, `setup_max_age_bars=12`, `setup_max_age_seconds=3600`;
-- exact 60m age remains valid; 60m+1s is `SETUP_EXPIRED`;
-- GitHub `main` + PR/CI/deploy remains canonical; no direct source mutation on PROD is permitted.
+- application remains read-only;
+- GitHub PR/CI/manual deployment remains the canonical source/activation path.
 
-The current `main` also contains the horizon-aware research foundation. M15/H1 lifecycle profiles remain research-only; production defaults remain FAST/M5 unless a later explicit activation gate changes that contract.
+Documentation-only commits may make repository `main` newer than the runtime SHA without requiring a new production deploy.
 
-## Direct production operator access
+## Runtime hardening accepted on 2026-09-11
 
-A policy-constrained SentinelX management channel from ChatGPT to the production VM is accepted and operational.
+Two operational defects were closed without changing trading semantics.
 
-- host: `k-trader-prod-vnic`;
-- platform: Oracle Cloud / Ubuntu 24.04 / ARM64;
-- SentinelX agent acceptance version: `0.11.18`;
-- purpose: direct production diagnostics and controlled maintenance without requiring the operator to relay every SSH command;
-- approved operations include allowlisted command execution, selected file/log inspection, Docker/K-Trader diagnostics, controlled container exec and selected service inspection/restart;
-- SSH remains the out-of-band bootstrap/recovery path;
-- unrestricted `NOPASSWD: ALL` is prohibited;
-- arbitrary root execution is denied;
-- structured filesystem access is read-only and currently exposes only `/opt/k-trader/releases` and `/opt/k-trader/data`.
+### D1 retry backoff — PR #45
 
-Canonical details: `docs/SENTINELX_REMOTE_ACCESS.md`.
+Young contracts with insufficient D1 history are still rejected fail-closed, but the scanner no longer re-fetches the same impossible D1 requirement every cycle. Retry is deferred until the next UTC day boundary.
+
+Unchanged:
+
+- D1 minimum remains `250` for runtime readiness;
+- universe ranking/analysis-limit semantics remain unchanged;
+- no substitute symbol is promoted to manufacture a full eligible shortlist;
+- RR, ATR, TTL, structure, target and scoring rules remain unchanged.
+
+### Recent MTF gap heal — PR #46
+
+The manual 24h control found recent persisted `15m` gaps for mature symbols `IOSTUSDT` and `DOTUSDT`, even though Binance deep history was contiguous.
+
+Root cause: recent count/freshness could pass even when the required window was non-contiguous. PR #46 added recent-sequence contiguity validation to `_ensure_ready()` and routes failures through the existing canonical bootstrap-heal path.
+
+Production acceptance after Deploy #11:
+
+- `IOSTUSDT 15m`: 250 required recent bars, contiguous, gaps `[]`;
+- `DOTUSDT 15m`: 250 required recent bars, contiguous, gaps `[]`;
+- both bootstrap-healed successfully;
+- no mature-symbol MTF gap remained in the accepted observation.
+
+## Current scanner state
+
+Post-deploy observation:
+
+- scanner status: `DEGRADED`;
+- `symbols_ready=17`;
+- `symbols_failed=3`;
+- `live_streaming=true`;
+- current failures: `牛来USDT`, `MARSCOINUSDT`, `PONSUSDT`;
+- reason: insufficient closed D1 history;
+- retries correctly deferred until the next UTC day boundary;
+- `/v1/signals`: `count=0`.
+
+`DEGRADED` currently reflects expected young-contract ineligibility rather than a mature-symbol data-integrity defect.
+
+## 24h prospective control
+
+Control interval:
+
+- start: `2026-09-10T04:15:00Z`;
+- end: `2026-09-11T07:20:00Z`;
+- logical M5 cutoffs: `326`;
+- selected context cutoffs: `326/326`;
+- unique selected snapshots: `326`;
+- production analysis limit: top-20;
+- provider: `binance_usdm`;
+- context rule: newest recorded snapshot at/before cutoff, age `<=300s`.
+
+Universe archive SHA:
+
+`3048d9129a9667b1cb97124f25c7c9deccc082cc8a5a7d4cd975081c45676a57`
+
+Scanner-config SHA:
+
+`2ad4b4369f3276eb081b02fe44c9b05bec49bf05a7ae4f146dcbe66ff594bff0`
+
+Prospective report SHA:
+
+`dcbacc311c722ce1dea7313b80df38271f0ba1404cd0bd2f166a8399f8b14e7d`
+
+Coverage:
+
+- symbol slots: `6520`;
+- fully analyzed/history-pass slots: `5448`;
+- history-fail slots: `1055`;
+- analysis-error slots: `17`;
+- decision records: `67822`;
+- unique tradable signals: `0`.
+
+History failures were concentrated in insufficient-history young contracts:
+
+- `MARSCOINUSDT`: `326`;
+- `PONSUSDT`: `326`;
+- `牛来USDT`: `326`;
+- `KATUSDT`: `77`.
+
+The 17 analysis errors were explicit `ValueError: 5m day sequence is empty` records in the control utility. They were not converted into decisions and remain a reporting-tool edge case to harden separately.
+
+## 24h sequential hard-gate funnel
+
+```text
+HTF aligned               1522
+-> STRONG confirmed level  431
+-> valid geometry           311
+-> ATR <= 80%               189
+-> TTL60 pass                10
+-> RR >= 3                    0
+-> grade A/A+                  0
+-> tradable LONG/SHORT         0
+```
+
+Interpretation:
+
+- natural deterministic setups did survive through TTL during the window;
+- none of the 10 final TTL-valid survivors had structural `RR >= 3`;
+- no evidence supports weakening RR, ATR, TTL, HTF, level-strength or structural-target rules;
+- no signal was materialized.
 
 ## Strict Phase 11G policy
 
 Unchanged controls:
 
-- provider: `binance_usdm` for the current production research scope;
+- current production research provider: `binance_usdm`;
 - `max_context_age_seconds=300`;
-- historical context uses the newest recorded snapshot at or before each replay cutoff;
+- historical context uses newest recorded snapshot at/before cutoff;
 - no historical rank/context fabrication;
-- no freshness widening to manufacture eligible history;
-- canonical research MTF depths: `1d=300`, `4h=300`, `1h=300`, `15m=300`, `5m=400`;
-- full-engine replay before any materialization decision;
+- no freshness widening to manufacture samples;
+- live and replay use the same canonical analyzer;
 - structural target only; no synthetic 3R target;
-- `RR >= 3` remains a hard gate;
-- ATR-used threshold remains unchanged;
-- outcome samples only from actual binary WIN/LOSS outcomes;
+- `RR >= 3` hard gate;
+- canonical ATR-used hard gate;
+- HTF directional-alignment hard gate;
+- STRONG/confirmed primary-level gate;
+- FAST TTL: `60m`, hard reject only when age is strictly greater than 60m;
+- outcome samples only from real binary WIN/LOSS outcomes;
 - no synthetic outcomes;
 - no probability calibration;
 - `estimated_probability` remains null/N/A;
-- no Phase 12 expansion while current Phase 11G discovery remains active.
+- no Phase 12 activation while Phase 11G continuous discovery is open.
 
-## Setup lifecycle contract
+## Dataset catalogue
 
-`docs/SETUP_SPEC.md` is now v1.1.
+Canonical persisted catalogue remains:
 
-Canonical lifecycle:
-
-- setup interval: `5m`;
-- `setup_max_age_bars = 12`;
-- `setup_age = evaluation_time - canonical_confirmation_time`;
-- canonical confirmation time is the latest confirmed evidence bar that activates the selected setup;
-- exactly `60 minutes` old remains valid;
-- `setup_age > 60 minutes` -> hard reject `SETUP_EXPIRED`;
-- fresh market candles do not refresh or extend the life of an already-confirmed setup;
-- Trap/VSA evidence-local confirmation windows are unchanged;
-- stop, structural target and RR calculation are unchanged.
-
-The lifecycle policy is enforced in the same canonical analyzer used by live analysis and historical replay.
-
-## Current dataset catalogue
-
-Canonical persisted dataset state remains two chains:
-
-- path: `/data/research/phase11g/catalogue.json`;
+- `/data/research/phase11g/catalogue.json`;
 - schema: `ktrader.dataset_catalogue.v1`;
-- entry count: `2`;
+- entries: `2`;
 - symbols: `SUIUSDT`, `XRPUSDT`;
-- no new chain was materialized during the RR/lifecycle investigations.
+- no new chain from the 24h control;
+- no new outcome sample.
 
-The earlier checkpoint recorded catalogue SHA:
+Catalogue SHA semantics are resolved: `catalogue_sha256` is the semantic digest of `{schema_version, entries}`. The serialized `catalogue.json` file has a separate raw content hash by design; the difference is not corruption.
 
-`057ff750966d2bc5043fffd7fdc37583dd0133480452c131b51f84109d2fb4b6`
+## Horizon profiles
 
-A later runtime verification found the currently materialized catalogue file SHA as:
+| Profile | Setup interval | Lifecycle | State |
+| --- | --- | --- | --- |
+| FAST | M5 | 60m | PRODUCTION |
+| INTRADAY | M15 | unresolved | RESEARCH ONLY |
+| MEDIUM | H1 | 8-12h design band | RESEARCH ONLY |
 
-`d1b1c42b51a2f54c865d03e21bae3faa2a0e58166baa46c7a01a241b47eed250`
+No adaptive TTL table by symbol/evidence/primary-level timeframe is approved.
 
-while canonical loader verification with `verify_artifacts=True` still passed. This SHA drift is not yet fully explained and must not be represented as corruption without evidence.
+## Operational access
 
-### Entry 1 - SUIUSDT
+Policy-constrained SentinelX access to `k-trader-prod-vnic` remains the accepted direct diagnostic/maintenance channel.
 
-- provider: `binance_usdm`;
-- replay window: `2026-09-05T14:45:00Z` through `2026-09-05T16:00:00Z`;
-- cohort SHA: `c63b90a1905149462e1eb31a842fff7c5f15290a7f4963107d7c8c4cf2273686`;
-- bundle SHA: `c0112c0d3688cddb86cabc54ae1c9da05e04ff2cef63f395b438448e3070d344`;
-- study ID: `ebfd16b0b9059c5bd51f948d4c1b0086f4a2966a610e58dd7a6fb0d8ee474f5e`;
-- catalogue entry ID: `f056dadd63c2283c07b0b2aa37b3bb2236d15e916d6fa3cf5a11fc71b38b814a`;
-- unique tradable signals: `0`;
-- outcome sample: `null`.
+Security boundary remains:
 
-### Entry 2 - XRPUSDT
+- no arbitrary root execution;
+- no unrestricted `NOPASSWD: ALL`;
+- structured K-Trader filesystem access is read-only;
+- SSH remains independent recovery/bootstrap;
+- repository source mutation and production activation continue through GitHub PR/CI/deploy rather than direct host edits.
 
-- provider: `binance_usdm`;
-- replay window: `2026-09-05T14:45:00Z` through `2026-09-05T16:00:00Z`;
-- cohort SHA: `f417e64f9c2a31916564037709554971035adbb14054a3f83b2b76261e2ee58c`;
-- bundle SHA: `8b276ab7d8ffa5614c38759a7fbccdf3fdf27c855e4460b04f8e4693b8b090af`;
-- study ID: `886d2a5c136af427657d005655d3b654b046dd9ede19b922390bb403fbe60c80`;
-- catalogue entry ID: `4788384b5268ae8062eaa1a225de8d54cbd12e59e17ea3905d702ed5545a8eef`;
-- unique tradable signals: `0`;
-- outcome sample: `null`.
-
-## Historical Window #4 reference checkpoint
-
-The original corrected historical Window #4 checkpoint remains a historical audit record:
-
-- strict symbols: `45`;
-- MTF/history pass: `40`;
-- MTF rejected: `5`;
-- analyzed cutoffs: `600`;
-- candidate decisions: `7596`;
-- HTF aligned: `435`;
-- sequential funnel: `435 -> 202 -> 168 -> 142 -> 0`;
-- all 142 final survivors were rejected only by `RR_BELOW_3`.
-
-Exact old Window #4 input artifacts are not persisted on the VM, so later reconstructions must be labelled separately rather than forced to reproduce this population exactly.
-
-## Reconstructed Window #4 V2 baseline
-
-Using the currently available recorded universe snapshots and deep history:
-
-- logical cutoffs: `16`;
-- selected snapshots: `16` unique;
-- strict symbols: `47`;
-- history pass: `43`;
-- history failures: `4`;
-- analyzed cutoffs: `645`;
-- candidate decisions: `8874`;
-- pre-expiry stage funnel: `8874 -> 454 -> 166 -> 133 -> 81 -> 0`;
-- tradable decisions: `0`.
-
-History failures:
-
-- `MARSCOINUSDT`: 8/300;
-- `PONSUSDT`: 3/300;
-- `牛来USDT`: 10/300;
-- `龙虾USDT`: 182/300.
-
-The current V2 population differs from the old historical checkpoint. A roughly one-day pause between research sessions is a plausible source of archive/provider drift, but this has not been proven.
-
-## RR geometry audit conclusion
-
-The read-only RR geometry audit traced all `81/81` V2 RR-only decisions before public decision masking.
-
-Results:
-
-- real unique geometries: `21`;
-- all were LONG;
-- targets were real active structural resistance levels;
-- no synthetic 3R target was observed;
-- RR range was approximately `0.026` through `1.0`;
-- no arithmetic RR defect was found;
-- low RR was structurally explained by small available reward relative to stop risk.
-
-Therefore the geometry implementation and `RR >= 3` threshold were not relaxed.
-
-## Setup recency audit and policy study
-
-RR-only setup age before expiry:
-
-- minimum: `0m`;
-- median: `545m`;
-- maximum: `1295m`;
-- older than 1h: `78/81`;
-- older than 3h: `65/81`;
-- older than 6h: `53/81`.
-
-The approved expiry mode is canonical trigger age, not independent component age.
-
-The 60m policy sensitivity study produced:
-
-```text
-470 -> 24 -> 5 -> 3 -> 3 -> 0
-```
-
-with three RR-only survivors, all `NEARUSDT`, and no `RR >= 3` trade.
-
-## Control replay after PR #36
-
-Read-only control job:
-
-`job_d77dc7277002`
-
-Result:
-
-- status: succeeded;
-- exit code: `0`;
-- duration: `386.38s`;
-- candidate decisions: `8874`;
-- `SETUP_EXPIRED`: `6563`;
-- exact RR-only after all hard reasons: `3`;
-- unique RR-only geometry after expiry: `3`;
-- all three: `NEARUSDT`;
-- RR approximately `0.0851`, `0.1316`, `0.1316`;
-- RR pass: `0`;
-- tradable decisions: `0`.
-
-The old stage counters still show `81` before expiry because those helper counters are evaluated before the new lifecycle reason is applied. The operational post-expiry result is the exact RR-only population of `3`.
-
-## Production TTL rollout and corrected Windows #1-#4 closure
-
-Canonical checkpoint: `docs/checkpoints/2026-09-09_PHASE11G_PROD_TTL_AND_CORRECTED_WINDOWS_1_4.md`.
-
-The accepted production rollout and historical rerun produced:
-
-- deployed SHA/image: `9a257957e033f6265b9e746cb9f15e755ff87b72`;
-- corrected W1-W4 analyzed cutoffs: `2445`;
-- candidate decisions: `29508`;
-- `SETUP_EXPIRED` reason occurrences: `23952`;
-- HTF-aligned decisions: `1987`;
-- strong primary-level stage: `944`;
-- tradable decisions: `0`;
-- skipped selected context after strict selection: `0`;
-- skipped replay history after symbol-level qualification: `0`;
-- W4 reproduced the historical high-level population exactly: `45` strict symbols, `40` history pass, `600` analyzed cutoffs, `7596` decisions, `435` HTF aligned, `202` strong-level stage.
-- corrected W4 conditional funnel: `435 -> 202 -> 168 -> 142 -> 0 -> 0` for HTF -> strong -> geometry -> ATR -> TTL60 -> RR>=3; the first four stages exactly reproduce the historical pre-TTL audit.
-
-The `SETUP_EXPIRED` count overlaps other rejection reasons and is not a disjoint funnel stage. Public `TradingDecision` masks entry/stop/target for `NO_TRADE`, so conditional geometry audits must not infer geometry absence from those masked fields.
-
-No new dataset chain was materialized. Catalogue remains SUIUSDT + XRPUSDT.
-
-## Horizon time-split validation
-
-Canonical research checkpoint: `docs/checkpoints/2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md`.
-
-A new provider-recorded sample (`46` snapshots, eight-symbol panel, cohort SHA `5c23efe9f9749a48857e0fcd89521b923e2da6f780d29ae141b45db010b002bb`) was replayed without changing hard gates.
-
-INTRADAY/M15:
-
-- `2754` candidate records / `1415` geometry records / `0` tradable;
-- geometry survivors: 4h `37.0%`, 6h `45.4%`, 8h `58.4%`;
-- longer-TTL RR-only survivors were entirely concentrated in NEARUSDT;
-- setup-type stratification was dominated by `TRAP_LEVEL_CONFIRMATION` (`1400/1415` geometry records);
-- primary-level-timeframe stratification varied materially between the exact first sample and the new time-split sample;
-- result: the earlier 4-6h band is not validated as a universal M15 TTL and no adaptive TTL table is approved.
-
-MEDIUM/H1:
-
-- exact first sample: 8h `66.7%`, 12h `88.9%`;
-- new eight-symbol sample: 8h `55.9%`, 12h `84.7%`;
-- result: 8-12h is time-split validated as a lifecycle design band, but remains research-only because tradable/outcome evidence is still zero.
-
-The exact first-study archive, cohort and all three bundle SHA identities were reproduced, so this cross-sample comparison is provenance-grounded rather than approximate.
-
-## Current interpretation
-
-- RR geometry is behaving as designed under the structural-target contract;
-- the setup-lifecycle gap is closed for the FAST/M5 production profile;
-- TTL60 removes systematic reuse of old confirmed setups without manufacturing signals;
-- corrected W1-W4 yielded zero natural tradable signals under unchanged hard gates;
-- no change to RR, stop, target, freshness, probability or catalogue standards is justified by this work.
+Canonical details: `docs/SENTINELX_REMOTE_ACCESS.md`.
 
 ## Next action
 
-1. keep provider-recorded production research capture active;
-2. materialize/register a new Phase 11G chain only when a naturally useful deterministic setup survives every unchanged hard gate;
-3. keep INTRADAY/M15 unresolved and MEDIUM/H1 8-12h research-only; do not add adaptive TTL dimensions until additional time-separated evidence and naturally tradable setups/outcomes exist;
-4. keep probability calibration inactive until sufficient real binary outcomes and a separately approved out-of-sample methodology exist;
-5. keep Phase 12 multi-provider expansion inactive until the current Phase 11G research boundary is explicitly closed.
+1. keep provider-recorded production capture active;
+2. continue natural prospective discovery under unchanged FAST/M5 hard gates;
+3. materialize/register a new Phase 11G chain only after a natural LONG/SHORT signal survives every hard gate and exact provenance is captured;
+4. evaluate outcomes only from subsequent real bars;
+5. harden the prospective-report utility for explicit midnight/day-sequence handling and resumable/sharded long runs without changing trading semantics;
+6. keep M15/H1 research-only and Phase 12 inactive until a later explicit approval gate.
