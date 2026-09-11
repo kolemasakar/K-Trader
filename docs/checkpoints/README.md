@@ -4,22 +4,22 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-11_PHASE11G_PRE_PAUSE_DEPLOYMENT_AND_24H_OBSERVATION.md`
+`2026-09-11_PHASE11G_SURVIVORSHIP_AND_PRE_FREEZE_ACCEPTANCE.md`
 
 Current accepted state at this checkpoint:
 
-- PR #51 single-writer hardening is squash-merged and deployed;
-- accepted runtime/deployed SHA is `b698f8744f631a1a704d40cc3b2b66cfd31a6199`;
-- PR-head CI #182 (`34621302939`) and post-merge CI #183 (`34621739596`) succeeded across Python 3.12/3.14, amd64, arm64 and `canonical-merge-gate`;
-- approved production deployment run `34622156136` succeeded through the canonical rollback-capable `scripts/deploy.sh` path;
+- accepted runtime/deployed SHA is `81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
+- PR #51 single-writer hardening remains production-accepted;
+- PR #53 unique-primary-level survivorship diagnostic is squash-merged and deployed;
+- PR #53 PR-head CI #186 (`34624965946`) and post-merge CI #187 (`34625353779`) succeeded across Python 3.12/3.14, amd64, arm64 and `canonical-merge-gate`;
+- approved production deployment run `34625823230` succeeded through the canonical rollback-capable `scripts/deploy.sh` path;
 - container health is `status=ok`, `mode=read_only`, `data_ready=true`;
-- deployed single-writer smoke: concurrent second writer blocked PASS; lock reuse after owner exit PASS;
+- survivorship CLI is packaged and passed functional production acceptance on real Phase 11G shards;
 - universe capture continuity was preserved across deployment with no `>300s` context gap;
-- FAST/M5 TTL60 remains the only production-active lifecycle profile;
-- provider-recorded Binance USD-M capture remains active;
-- latest incremental prospective control covered `93` M5 cutoffs / `1860` slots / `17946` decisions with zero analysis errors and zero tradable signals;
-- cumulative non-overlap prospective evidence is `419` cutoffs / `8380` slots / `85768` decisions;
-- cumulative hard-gate funnel: `2167 -> 671 -> 480 -> 229 -> 20 -> 0 -> 0 -> 0` for HTF -> strong level -> geometry -> ATR -> TTL60 -> RR>=3 -> A/A+ -> tradable;
+- latest additional prospective window covered `19` M5 cutoffs / `380` slots / `4853` decisions with zero analysis errors and zero tradable signals;
+- cumulative non-overlap prospective evidence is now `438` cutoffs / `8760` slots / `90621` decisions;
+- cumulative hard-gate funnel: `2374 -> 740 -> 527 -> 229 -> 20 -> 0 -> 0 -> 0` for HTF -> strong level -> geometry -> ATR -> TTL60 -> RR>=3 -> A/A+ -> tradable;
+- recent two-window survivorship is `852 -> 309 -> 216 -> 40 -> 10 -> 0 -> 0 -> 0` by records but only `28 -> 12 -> 8 -> 4 -> 3 -> 0 -> 0 -> 0` by distinct `(canonical_symbol, primary_level_id)`;
 - canonical catalogue remains `SUIUSDT` + `XRPUSDT`, with no new natural chain/outcome sample;
 - planned technical development freeze is `2026-09-12 09:00 Kyiv` -> `2026-09-13 09:00 Kyiv` (`06:00Z` -> `06:00Z`);
 - during the freeze, production read-only capture/monitoring continues while code/config/deploy changes and heavy production-host replay are frozen except emergency recovery;
@@ -32,6 +32,7 @@ Current accepted state at this checkpoint:
 
 Historical checkpoints include:
 
+- `2026-09-11_PHASE11G_PRE_PAUSE_DEPLOYMENT_AND_24H_OBSERVATION.md` — pre-freeze baseline after single-writer deployment;
 - `2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_DEPLOYMENT.md` — canonical prospective-control production activation before single-writer hardening;
 - `2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md` — canonical prospective-control tooling hardening before production activation;
 - `2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md` — 24h control, D1 backoff and recent-MTF production hardening;
@@ -47,6 +48,7 @@ Historical checkpoints include:
 
 - Phase 11G current boundary: `../PHASE_11G_CHECKPOINT.md`;
 - prospective-control contract: `../PROSPECTIVE_CONTROL_SPEC.md`;
+- survivorship diagnostic contract: `../PROSPECTIVE_SURVIVORSHIP_DIAGNOSTIC.md`;
 - dataset catalogue contract: `../DATASET_CATALOGUE_SPEC.md`;
 - historical replay contract: `../HISTORICAL_REPLAY_SPEC.md`;
 - current project state: `../CURRENT_STATE.md`;
