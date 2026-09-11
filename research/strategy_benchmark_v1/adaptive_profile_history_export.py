@@ -8,9 +8,9 @@ import pathlib
 import re
 from datetime import datetime, timezone
 
+from ktrader.history import write_mtf_bundle
 from ktrader.history.bundle import build_mtf_bundle
 from ktrader.history.collector import collect_deep_provider_history
-from ktrader.history.io import write_mtf_bundle
 from ktrader.providers.base import ProviderError
 from ktrader.providers.registry import create_provider
 
