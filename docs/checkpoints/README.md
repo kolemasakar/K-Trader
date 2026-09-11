@@ -4,31 +4,33 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md`
+`2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md`
 
 Current accepted state at this checkpoint:
 
-- accepted runtime/deployed SHA: `30119a44fa82b1029d2de6e3a6f76320a7705079`;
+- accepted runtime/deployed SHA remains `30119a44fa82b1029d2de6e3a6f76320a7705079`; no new production deployment is implied;
 - `Deploy Production #11`: SUCCESS;
 - K-Trader container healthy; provider REST/WebSocket, MTF API and public Phase 10 Action acceptance PASS;
 - FAST/M5 TTL60 remains the only production-active lifecycle profile;
 - provider-recorded Binance USD-M capture remains active;
-- PR #45 D1 retry backoff is production-verified: young insufficient-D1 contracts remain fail-closed while repeated every-cycle provider bootstrap is suppressed until the next UTC day boundary;
-- PR #46 recent-MTF gap heal is production-verified: `IOSTUSDT` and `DOTUSDT` recent `15m` windows were repaired to 250 contiguous bars;
-- scanner is usable but `DEGRADED` with `17 ready / 3 failed`; current failures are only the expected young insufficient-D1 symbols `牛来USDT`, `MARSCOINUSDT`, `PONSUSDT`;
-- live `/v1/signals`: `0`;
+- PR #45 D1 retry backoff remains production-verified;
+- PR #46 recent-MTF gap heal remains production-verified;
+- scanner remains usable with expected young-contract D1 ineligibility and no live signal in the accepted observation;
 - the 2026-09-10→11 causal prospective control analyzed `5448` valid symbol-cutoffs and `67822` decisions from `326` causal M5 cutoffs;
 - 24h sequential funnel: `1522 -> 431 -> 311 -> 189 -> 10 -> 0 -> 0 -> 0` for HTF -> strong level -> geometry -> ATR -> TTL60 -> RR>=3 -> A/A+ -> tradable;
 - no new catalogue chain or binary outcome sample was materialized;
 - canonical catalogue remains SUIUSDT + XRPUSDT;
-- catalogue semantic SHA vs raw file SHA question is closed and is not corruption;
-- automated ChatGPT signal-watch remains disabled; control is manual;
+- Phase 11G prospective-control methodology is now repository-owned with explicit UTC-midnight error handling, deterministic sharding, checkpoint/resume and deterministic merge;
+- exact `300s` context age remains valid and `>300s` is stale;
+- missing selected-symbol history does not promote a lower-ranked replacement;
+- focused prospective-control regression is present and repository-wide CI remains the merge authority;
 - INTRADAY/M15 remains unresolved research-only; MEDIUM/H1 8-12h remains a research-only lifecycle design band;
 - Phase 12 remains FUTURE / NOT ACTIVE;
-- no RR, ATR, structural-target, HTF, strength, freshness, history, catalogue or probability rule is relaxed.
+- no RR, ATR, TTL, structural-target, HTF, strength, freshness, history, catalogue or probability rule is relaxed.
 
 Historical checkpoints include:
 
+- `2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md` — 24h control, D1 backoff and recent-MTF production hardening;
 - `2026-09-10_PHASE11G_MONITORING_AND_READINESS_CHECKPOINT.md` — pre-24h accumulation/readiness state;
 - `2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md` — horizon time-split validation;
 - `2026-09-09_PHASE11G_PROD_TTL_AND_CORRECTED_WINDOWS_1_4.md` — FAST production rollout + corrected W1-W4 closure;
@@ -40,6 +42,7 @@ Historical checkpoints include:
 ## Related canonical documents
 
 - Phase 11G current boundary: `../PHASE_11G_CHECKPOINT.md`;
+- prospective-control contract: `../PROSPECTIVE_CONTROL_SPEC.md`;
 - dataset catalogue contract: `../DATASET_CATALOGUE_SPEC.md`;
 - historical replay contract: `../HISTORICAL_REPLAY_SPEC.md`;
 - current project state: `../CURRENT_STATE.md`;

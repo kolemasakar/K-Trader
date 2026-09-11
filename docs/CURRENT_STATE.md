@@ -4,6 +4,10 @@ Updated: 2026-09-11
 
 Canonical transition checkpoint:
 
+`docs/checkpoints/2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md`
+
+Previous operational checkpoint:
+
 `docs/checkpoints/2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md`
 
 Latest horizon research checkpoint:
@@ -16,6 +20,7 @@ Latest horizon research checkpoint:
 - Phase 11A-11F: VERIFIED;
 - Phase 11G dataset-catalogue foundation: VERIFIED;
 - Phase 11G catalogue: two canonical chains, `SUIUSDT` + `XRPUSDT`;
+- Phase 11G prospective-control tooling: CANONICAL / deterministic sharding+resume / explicit midnight fail-closed handling;
 - FAST/M5 lifecycle: PRODUCTION, TTL `60m = 12 x M5 bars`;
 - corrected FAST W1-W4 historical closure: COMPLETE / zero tradable signals;
 - 2026-09-10→11 prospective 24h control: COMPLETE / zero tradable signals;
@@ -41,7 +46,7 @@ Accepted runtime/deployment baseline:
 - application remains read-only;
 - GitHub PR/CI/manual deployment remains the canonical source/activation path.
 
-Documentation-only commits may make repository `main` newer than the runtime SHA without requiring a new production deploy.
+Repository acceptance of the prospective-control utility does **not** imply a new production deployment. The running production image remains on `30119a44...` until a separate deployment decision.
 
 ## Runtime hardening accepted on 2026-09-11
 
@@ -127,7 +132,30 @@ History failures were concentrated in insufficient-history young contracts:
 - `牛来USDT`: `326`;
 - `KATUSDT`: `77`.
 
-The 17 analysis errors were explicit `ValueError: 5m day sequence is empty` records in the control utility. They were not converted into decisions and remain a reporting-tool edge case to harden separately.
+The 17 analysis errors were explicit `ValueError: 5m day sequence is empty` records at the UTC-day boundary. They were not converted into decisions.
+
+## Canonical prospective-control hardening
+
+PR #48 converts the temporary long-run control methodology into repository-owned tooling:
+
+- core: `src/ktrader/replay/prospective.py`;
+- CLI: `scripts/run_prospective_control.py`;
+- contract: `docs/PROSPECTIVE_CONTROL_SPEC.md`;
+- focused tests: `tests/test_phase11g_prospective_control.py`.
+
+Canonical behavior:
+
+- logical cutoffs are deterministic and interval-aligned;
+- context is newest recorded universe snapshot `<= cutoff`, exact `300s` still valid, `>300s` stale;
+- recorded top-N ranking is preserved with no lower-ranked substitution for history failures;
+- candles come only from `slice_datasets_asof()` and therefore cannot include future closes;
+- the same `analyze_candle_snapshot()` remains the analysis implementation;
+- empty current-UTC-day M5 state is recorded as `ANALYSIS_ERROR` before analyzer invocation, with no synthetic range/candle/decision;
+- slot accounting is explicit as `ANALYZED`, `HISTORY_FAIL`, or `ANALYSIS_ERROR`;
+- deterministic modulo sharding supports atomic checkpoints and strict-provenance resume;
+- merge requires complete coherent shard coverage and yields the same final report/hash as equivalent monolithic execution.
+
+Focused acceptance evidence: `4 passed`; repository-wide Python 3.12 regression: `208 passed`; Python 3.14 regression: PASS. Canonical merge remains governed by `canonical-merge-gate`, including amd64/arm64 image validation.
 
 ## 24h sequential hard-gate funnel
 
@@ -211,8 +239,8 @@ Canonical details: `docs/SENTINELX_REMOTE_ACCESS.md`.
 ## Next action
 
 1. keep provider-recorded production capture active;
-2. continue natural prospective discovery under unchanged FAST/M5 hard gates;
-3. materialize/register a new Phase 11G chain only after a natural LONG/SHORT signal survives every hard gate and exact provenance is captured;
-4. evaluate outcomes only from subsequent real bars;
-5. harden the prospective-report utility for explicit midnight/day-sequence handling and resumable/sharded long runs without changing trading semantics;
+2. use the canonical prospective-control utility for future long-window controls instead of temporary ad-hoc scripts;
+3. continue natural prospective discovery under unchanged FAST/M5 hard gates;
+4. materialize/register a new Phase 11G chain only after a natural LONG/SHORT signal survives every hard gate and exact provenance is captured;
+5. evaluate outcomes only from subsequent real bars;
 6. keep M15/H1 research-only and Phase 12 inactive until a later explicit approval gate.

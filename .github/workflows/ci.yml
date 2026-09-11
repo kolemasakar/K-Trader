@@ -37,6 +37,9 @@ jobs:
       - name: Validate shell scripts
         run: sh -n scripts/deploy.sh scripts/provision_vps.sh scripts/register_runner.sh scripts/phase9_acceptance.sh
 
+      - name: Phase 11G prospective-control focused tests
+        run: python -m pytest -q tests/test_phase11g_prospective_control.py
+
       - name: Repository-wide tests
         run: python -m pytest -q
 
@@ -88,6 +91,9 @@ jobs:
       - name: Verify VPS acceptance utility is packaged
         run: docker run --rm --platform linux/amd64 k-trader:${{ github.sha }}-amd64 python scripts/vps_acceptance.py --help >/dev/null
 
+      - name: Verify prospective-control utility is packaged
+        run: docker run --rm --platform linux/amd64 k-trader:${{ github.sha }}-amd64 python scripts/run_prospective_control.py --help >/dev/null
+
   docker-arm64:
     name: docker-arm64
     needs: pytest-py312
@@ -126,6 +132,9 @@ jobs:
 
       - name: Verify VPS acceptance utility is packaged
         run: docker run --rm --platform linux/arm64 k-trader:${{ github.sha }}-arm64 python scripts/vps_acceptance.py --help >/dev/null
+
+      - name: Verify prospective-control utility is packaged
+        run: docker run --rm --platform linux/arm64 k-trader:${{ github.sha }}-arm64 python scripts/run_prospective_control.py --help >/dev/null
 
   canonical-merge-gate:
     name: canonical-merge-gate
