@@ -11,13 +11,15 @@ This checkpoint records production activation of the repository-owned Phase 11G 
 ## Canonical repository and runtime identity
 
 - canonical repository: `kolemasakar/K-Trader`;
-- canonical `main`: `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
-- merge commit verification: GitHub verified;
+- deployed application/runtime SHA: `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
+- PR #48 merge commit verification: GitHub verified;
 - deployed SHA: `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
 - deployed image: `k-trader:a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
 - production host: Oracle Cloud ARM64 / Ubuntu 24.04;
 - provider: `binance_usdm`;
 - API mode: `read_only`.
+
+Repository `main` may advance beyond the deployed application SHA through documentation-only synchronization commits. Such docs-only drift does not imply runtime drift and does not require redeployment.
 
 ## Deployment evidence
 
