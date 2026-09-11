@@ -4,32 +4,35 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_DEPLOYMENT.md`
+`2026-09-11_PHASE11G_PRE_PAUSE_DEPLOYMENT_AND_24H_OBSERVATION.md`
 
 Current accepted state at this checkpoint:
 
-- accepted runtime/deployed SHA is now `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`; approved GitHub Actions deployment run `34612617730` succeeded;
-- `Deploy Production #11`: SUCCESS;
-- K-Trader container healthy; provider REST/WebSocket, MTF API and public Phase 10 Action acceptance PASS;
+- PR #51 single-writer hardening is squash-merged and deployed;
+- accepted runtime/deployed SHA is `b698f8744f631a1a704d40cc3b2b66cfd31a6199`;
+- PR-head CI #182 (`34621302939`) and post-merge CI #183 (`34621739596`) succeeded across Python 3.12/3.14, amd64, arm64 and `canonical-merge-gate`;
+- approved production deployment run `34622156136` succeeded through the canonical rollback-capable `scripts/deploy.sh` path;
+- container health is `status=ok`, `mode=read_only`, `data_ready=true`;
+- deployed single-writer smoke: concurrent second writer blocked PASS; lock reuse after owner exit PASS;
+- universe capture continuity was preserved across deployment with no `>300s` context gap;
 - FAST/M5 TTL60 remains the only production-active lifecycle profile;
 - provider-recorded Binance USD-M capture remains active;
-- PR #45 D1 retry backoff remains production-verified;
-- PR #46 recent-MTF gap heal remains production-verified;
-- scanner remains usable with expected young-contract D1 ineligibility and no live signal in the accepted observation;
-- the 2026-09-10→11 causal prospective control analyzed `5448` valid symbol-cutoffs and `67822` decisions from `326` causal M5 cutoffs;
-- 24h sequential funnel: `1522 -> 431 -> 311 -> 189 -> 10 -> 0 -> 0 -> 0` for HTF -> strong level -> geometry -> ATR -> TTL60 -> RR>=3 -> A/A+ -> tradable;
-- no new catalogue chain or binary outcome sample was materialized;
-- canonical catalogue remains SUIUSDT + XRPUSDT;
-- Phase 11G prospective-control methodology is now repository-owned with explicit UTC-midnight error handling, deterministic sharding, checkpoint/resume and deterministic merge;
+- latest incremental prospective control covered `93` M5 cutoffs / `1860` slots / `17946` decisions with zero analysis errors and zero tradable signals;
+- cumulative non-overlap prospective evidence is `419` cutoffs / `8380` slots / `85768` decisions;
+- cumulative hard-gate funnel: `2167 -> 671 -> 480 -> 229 -> 20 -> 0 -> 0 -> 0` for HTF -> strong level -> geometry -> ATR -> TTL60 -> RR>=3 -> A/A+ -> tradable;
+- canonical catalogue remains `SUIUSDT` + `XRPUSDT`, with no new natural chain/outcome sample;
+- planned technical development freeze is `2026-09-12 09:00 Kyiv` -> `2026-09-13 09:00 Kyiv` (`06:00Z` -> `06:00Z`);
+- during the freeze, production read-only capture/monitoring continues while code/config/deploy changes and heavy production-host replay are frozen except emergency recovery;
+- the exact 24h observation replay target is `288` M5 cutoffs (`06:00Z` through `05:55Z`) and up to `5760` top-20 symbol slots before readiness accounting;
 - exact `300s` context age remains valid and `>300s` is stale;
 - missing selected-symbol history does not promote a lower-ranked replacement;
-- focused prospective-control regression is present and repository-wide CI remains the merge authority;
-- INTRADAY/M15 remains unresolved research-only; MEDIUM/H1 8-12h remains a research-only lifecycle design band;
+- INTRADAY/M15 remains unresolved research-only; MEDIUM/H1 remains research-only;
 - Phase 12 remains FUTURE / NOT ACTIVE;
 - no RR, ATR, TTL, structural-target, HTF, strength, freshness, history, catalogue or probability rule is relaxed.
 
 Historical checkpoints include:
 
+- `2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_DEPLOYMENT.md` — canonical prospective-control production activation before single-writer hardening;
 - `2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md` — canonical prospective-control tooling hardening before production activation;
 - `2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md` — 24h control, D1 backoff and recent-MTF production hardening;
 - `2026-09-10_PHASE11G_MONITORING_AND_READINESS_CHECKPOINT.md` — pre-24h accumulation/readiness state;
