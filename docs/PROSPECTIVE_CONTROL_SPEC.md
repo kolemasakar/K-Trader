@@ -147,6 +147,7 @@ The deterministic report includes at minimum:
 - reason-code and setup-type counts;
 - sequential hard-gate funnel;
 - tradable, RR>=3 non-tradable and near-miss audit records;
+- every flattened decision audit record identifies its `canonical_symbol`;
 - unique stable tradable-signal count;
 - archive/config/bundle provenance hashes;
 - semantic report SHA-256.
