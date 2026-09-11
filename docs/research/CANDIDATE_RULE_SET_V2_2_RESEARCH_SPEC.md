@@ -1,210 +1,225 @@
 # Candidate Rule Set v2.2 — Research Specification
 
 Date: 2026-09-11
-Status: RESEARCH SPEC / NOT YET AN EXECUTABLE FROZEN CANDIDATE / HOLDOUT UNTOUCHED
+Status: FROZEN EXECUTABLE RESEARCH CANDIDATE / PREHOLDOUT EVALUATED / HOLDOUT UNTOUCHED / PRODUCTION UNCHANGED
 
 ## Objective
 
-Extend the current v2.1 trend-pullback-continuation foundation with the useful parts of the uploaded legacy Knowledge Base without importing unvalidated legacy constants as production rules.
+Extend the current v2.1 trend-pullback-continuation foundation with deterministic structural-space context derived from the legacy Knowledge Base, without importing unvalidated legacy constants as production rules.
 
-Core remains:
+Core:
 
-`trend context -> pullback -> reclaim/continuation -> structural invalidation stop -> target >= 3R`
+`trend context -> pullback -> reclaim/continuation -> structural invalidation stop -> structural-space gate -> target 3R`
 
-## 1. Multi-horizon profiles
+## Frozen executable v2.2
 
-Time limits are profile-specific. The current 8h rule is not universal.
+Executable harness:
 
-### FAST
-- context: H1/M15
-- trigger: M5
-- provisional max hold: 4h
-- intended trade duration: minutes to several hours
+`research/strategy_benchmark_v1/candidate_v2_2_backtest.py`
 
-### INTRADAY
-- context: H4/H1
-- trigger: M15
-- provisional max hold: 8-12h
-- v2.1 belongs to this profile
+Frozen harness commit:
 
-### SWING
-- context: D1/H4
-- trigger: H1
-- provisional max hold: 2-4 days
+`9abb05d88912293cee3c254dd427a7127ce5bcc7`
 
-### POSITION
-- context: W1/D1
-- trigger: H4
-- provisional max hold: 7-21 days
+Runtime harness SHA256:
 
-These are starting envelopes only. Final time-stop parameters must be learned from MFE/MAE and duration distributions on unique resolved setup families.
+`b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`
 
-## 2. Structural level layer
+Prospective shadow protocol commit:
 
-Legacy knowledge distinguishes floating/forming zones from confirmed fixed levels and describes trend-break, historical, mirror, limit/repeated-touch, abnormal-bar, consolidation and gap levels.
+`0aba55432dc084181651b5f254c25800f309a754`
 
-v2.2 should implement deterministic level features before deciding whether any are hard gates:
+Holdout status: **UNTOUCHED**.
 
-- level_detected
-- level_type
-- higher_tf_level
-- touch_count
-- false_break_count
-- rejection_tail_score
-- level_age_bars
-- mirror_role_change
-- distance_to_level_R
-- floating_zone_flag
+Production status: **NO CHANGE**.
 
-Primary hypothesis:
+## 1. Active INTRADAY v2.2 profile
 
-- continuation entries anchored to confirmed structural levels outperform entries inside ambiguous/floating congestion.
+v2.2 is the current frozen INTRADAY research candidate.
 
-No production gate until causal OOS evidence exists.
+Base inherited from v2.1:
+- H1 trend context;
+- M15 pullback/reclaim trigger;
+- structural SL;
+- next executable M15 open;
+- target `3R`;
+- current frozen maximum hold `32 x M15 = 8h`;
+- same-bar ambiguity: STOP first;
+- fees, slippage and actual funding included.
 
-## 3. Available-range layer
+v2.1 quality gates retained:
+- H1 EMA20/EMA50 separation / ATR14 >= `0.20`;
+- M15 signal body fraction <= `0.60`;
+- structural risk distance >= `1.25%` of executed entry.
 
-Implement:
+v2.2 adds deterministic H1 structural-space detection:
+- causal pivot radius: `2` H1 bars;
+- level clustering tolerance: `0.20 * ATR14_H1`;
+- confirmed level requires >= `2` clustered pivots;
+- trade allowed only if no confirmed obstacle is ahead (`open_space`) or nearest confirmed obstacle is >= `3R` away.
 
-- clean ATR5D based only on closed D1 bars;
-- D1 ATR14;
-- directional ATR used from UTC-day open;
-- remaining statistical range;
-- next structural obstacle distance in R;
-- technical range in R;
-- whether 3R target fits before the next structural obstacle.
+The current level detector is versioned:
 
-### Legacy ATR threshold audit already performed
+`h1_pivot_cluster_v1`
 
-On 80 usable v2.1 development+validation trades:
+It is intentionally simple and is not considered a final universal level model.
 
-- base: WR 42.5%, expectancy +0.0666R, PF_R 1.117;
-- `<60% directional ATR used`: 56 trades, WR 42.9%, expectancy +0.0536R, PF_R 1.092;
-- `<80%`: 61 trades, WR 41.0%, expectancy +0.0124R, PF_R 1.021.
+## 2. Preholdout v2.2 result
 
-Validation alone improved under `<60%`:
+Report:
 
-- 18 trades, WR 44.4%, expectancy +0.104R, PF_R 1.177.
+`/data/research/phase11g/strategy_benchmark_v1/combined_rules/v2_2_preholdout_report.json`
 
-But development did not show a comparable robust gain, and >100% ATR-used behaved positively in development but negatively in validation.
+Report SHA256:
 
-Decision: do NOT make 60% or 80% a universal hard gate. Keep ATR-used as a feature/regime variable. Test an exception for breakout into open space separately.
+`577debe6e6a8a4f1954ffd5b27e872ce971d2de2074783a0abe2e69e79747f8a`
 
-## 4. Technical-range safety hypothesis
+Candidate artifact:
 
-A stronger candidate than raw ATR-used is whether the intended 3R target has room before a known structural obstacle.
+`/data/research/phase11g/strategy_benchmark_v1/combined_rules/candidate_rule_set_v2_2.json`
 
-Research hypothesis:
+Candidate SHA256:
 
-`technical_range_R >= target_R + cost_buffer_R`
+`85e96f699e54d08a4795d50034fc40b2f69aea535ecf4b22b56ddfbb9417179b`
 
-may be a defensible eligibility constraint after deterministic level detection exists.
+Results:
 
-The legacy recommendation that ATR should contain five stop distances remains a research feature, not a frozen rule.
+| Segment | Trades | WR | expectancy_R | PF_R |
+|---|---:|---:|---:|---:|
+| Development | 23 | 47.83% | +0.1003R | 1.1818 |
+| Validation | 10 | 30.00% | +0.2507R | 1.3941 |
+| Non-holdout | 37 | 45.95% | +0.2888R | 1.5592 |
+| Stress non-holdout | 37 | 43.24% | +0.2741R | 1.5235 |
 
-## 5. VSA layer
+Promotion gate: **FAIL**.
 
-Implement quantitative, causal feature definitions for:
+Reasons:
+- non-holdout sample <100;
+- validation sample <30;
+- non-holdout WR <50%;
+- validation WR <50%.
 
-- No Demand
-- No Supply
-- Test
-- Upthrust
-- Buying Climax
-- Selling Climax
-- Stopping Volume
+Important: positive expectancy/PF does not authorize holdout because the preregistered user target and minimum sample gates were not met.
 
-Each definition must explicitly use only closed bars and measurable quantities:
+## 3. Current diagnostics
 
-- spread/range relative to recent distribution;
-- volume relative to recent distribution;
-- close location within bar;
-- interaction with deterministic level;
-- 1-2 bar confirmation.
+Non-holdout exit composition:
+- 18 STOP;
+- 8 TARGET;
+- 11 TIME_EXIT.
 
-Initial policy:
+TIME_EXIT behavior:
+- 9 of 11 time exits positive;
+- average TIME_EXIT approximately `+0.55R`.
 
-- VSA is a score/context feature;
-- no VSA signal is a mandatory hard gate;
-- VSA may only be promoted after ablation and OOS validation show incremental expectancy beyond structure/trend alone.
+Therefore current evidence does **not** justify lengthening the frozen v2.2 8h INTRADAY max-hold solely to improve results.
 
-## 6. Stop and sizing policy
+Directional concentration:
+- LONG 34;
+- SHORT 3.
 
-Preserve the useful legacy principle:
+This is a concentration warning, not evidence to disable SHORT or promote LONG-only behavior.
 
-- stop belongs beyond the structure whose failure invalidates the thesis;
-- actual execution/slippage is included in risk distance;
-- position size normalizes account risk to that structural stop.
+Structural detector observation:
+- 35 of 37 non-holdout trades classified `open_space`.
 
-Reject direct reuse of old market-specific fixed stop percentages/pips/cents.
+This indicates `h1_pivot_cluster_v1` is too sparse to represent the full structural environment and motivates a separate **Level Context Layer v2** research track. It does not authorize retroactive modification of frozen v2.2.
 
-The current v2.1 observation that very narrow risk units are fragile remains relevant and should be re-estimated separately by FAST/INTRADAY/SWING/POSITION profile.
+## 4. Historical Knowledge interpretation
 
-## 7. Risk-management policy
+Historical files remain `HISTORICAL / RESEARCH REFERENCE`.
 
-Legacy daily-risk and loss-streak ideas are informative but cannot override canonical K-Trader Risk Manager settings.
+Do not automatically promote:
+- ATR-used 60%/80% thresholds;
+- fixed percentage/pip stops;
+- mandatory VSA/volume gates;
+- historical risk percentages;
+- legacy timeframe/holding assumptions.
 
-Research should track:
+The useful retained concepts are:
+- fixed vs floating/forming levels;
+- trend-break / first-pullback levels;
+- mirror levels;
+- repeated-touch/limit levels;
+- consolidation/protorgovka zones;
+- false breaks and rejection tails;
+- structural stop beyond thesis invalidation;
+- technical room to target.
 
-- risk_per_trade_pct
-- total_open_risk_pct
-- correlated setup-family exposure
-- symbol/sector/market-beta cluster exposure
-- daily realized R
-- daily loss streak
+## 5. Multi-horizon architecture
 
-The dependence unit is unique setup family, not raw signal count.
+Research envelopes remain provisional:
+- FAST: H1/M15 -> M5, up to ~4h;
+- INTRADAY: H4/H1 -> M15, ~8-12h envelope; current frozen v2.2 specifically uses 8h;
+- SWING: D1/H4 -> H1, ~2-4 days;
+- POSITION: W1/D1 -> H4, ~7-21 days.
 
-## 8. Learning loop from real trades
+TTL and max-hold are separate parameters. No universal time rule applies across profiles.
 
-Every accepted, rejected-near-miss and executed setup stores:
+## 6. Evidence policy
 
-- strategy/profile version;
-- complete causal features;
-- level features;
-- ATR/range features;
-- VSA features;
-- trend/pullback/confirmation features;
-- planned and realized entry/SL/TP;
-- fees/slippage/funding;
-- MFE/MAE;
-- realized R;
-- hold duration;
-- unique setup-family id;
-- exact data/config hashes.
+Primary evidence unit = unique resolved setup family.
 
-Evidence gates remain:
-
-- <30 resolved unique families: observation only;
+- <30 families: observation only;
 - 30-49: diagnostics only;
-- 50-99: ablation/component proposals allowed;
-- >=100 diverse resolved families: versioned recalibration proposal allowed;
-- every rule change creates a new preregistered version and requires fresh walk-forward/OOS evidence.
+- 50-99: hypotheses/ablation proposals allowed, no production change;
+- >=100 diverse families: versioned recalibration proposal allowed.
+
+Every strategy change requires a new version and fresh causal walk-forward/OOS evidence.
+
+Validation and holdout must not be reused for iterative tuning of the same version.
 
 No automatic live-rule mutation.
 
-## 9. Promotion objective
+## 7. Prospective freeze
+
+Frozen executable candidate timestamp is tied to commit `9abb05d...` on 2026-09-11.
+
+First fully prospective M15 signal-bar boundary after the freeze:
+
+`2026-09-11T20:00:00Z`
+
+Frozen v2.2 rules must remain unchanged while prospective evidence accumulates.
+
+## 8. Next research tracks
+
+Proceed in parallel without modifying v2.2:
+
+### A. Level Context Layer v2
+Develop richer causal structural features for:
+- trend-break levels;
+- mirror levels;
+- repeated-touch/limit levels;
+- consolidation boundaries;
+- false breaks;
+- rejection tails;
+- level age/strength/role change;
+- floating-zone detection;
+- next obstacle distance in R.
+
+This track is **feature research**, not a v2.2 rule change.
+
+### B. MFE/MAE diagnostics
+Measure for frozen v2.2 and prior comparable setups:
+- MFE_R;
+- MAE_R;
+- time-to-1R/2R/3R;
+- time-to-MFE;
+- whether STOP trades first achieved positive excursion;
+- whether TIME_EXIT trades were still expanding or already decaying;
+- outcome by exit reason, side, symbol, regime and structural context.
+
+Diagnostics must not be used to retune v2.2 in place. Any resulting rule proposal becomes a new version.
+
+## 9. Promotion objective remains unchanged
 
 For nominal target RR 1:3:
-
 - OOS WR target >=50%;
-- expectancy_R >0 after all costs;
+- expectancy_R >0 after costs;
 - PF_R >1 mandatory, target >=1.5;
 - stress-slippage survival;
-- no single-symbol/single-regime domination;
-- drawdown compatible with expected return;
-- sufficient unique-family sample.
+- adequate unique-family sample;
+- no single-symbol or single-regime domination;
+- acceptable drawdown.
 
-A strategy below 50% WR can still be profitable mathematically, but it does not satisfy the user's preferred operating target and should not be represented as having met that target.
-
-## 10. Next implementation order
-
-1. deterministic level detector and floating-zone detector;
-2. technical-range-to-next-level metric;
-3. clean ATR5D / directional ATR-used feature capture;
-4. deterministic VSA feature definitions;
-5. profile-aware time/TTL framework;
-6. causal ablation on development data;
-7. freeze executable v2.2 candidate only after definitions are complete;
-8. validation/walk-forward;
-9. holdout only after preregistered promotion gate passes.
+Until these gates pass, v2.2 remains a research candidate only.
