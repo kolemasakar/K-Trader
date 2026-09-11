@@ -4,27 +4,32 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-10_PHASE11G_MONITORING_AND_READINESS_CHECKPOINT.md`
+`2026-09-11_PHASE11G_24H_CONTROL_AND_RUNTIME_HARDENING.md`
 
-Current accepted state at the checkpoint:
+Current accepted state at this checkpoint:
 
-- canonical repository `main`: `1e6e20fb5d0e74aaf620f3aebf69429e0c0f3198`, GitHub-verified;
-- accepted production runtime remains `9a257957e033f6265b9e746cb9f15e755ff87b72` because PR #43 was docs/research-only;
-- FAST/M5 TTL60 remains the only production-active profile;
-- provider-recorded Binance USD-M universe capture remains active;
-- next prospective signal/discovery review is manual after approximately 24 hours; the temporary automated ChatGPT signal-watch task is disabled;
-- no natural tradable LONG/SHORT signal has yet been accepted and no new catalogue chain has been materialized;
-- SQLite integrity check is `ok`, completed backups are present, and storage headroom is healthy;
-- canonical dataset catalogue verifies successfully with two entries: SUIUSDT + XRPUSDT;
-- catalogue SHA identity question is closed: `catalogue_sha256` is the semantic digest of `{schema_version, entries}`, while the raw serialized `catalogue.json` file has a separate content SHA by design;
-- operational audit found continuous ~5-minute capture with no >7-minute gap across the inspected cross-day interval;
-- bootstrap failure volume is concentrated only in four young contracts with insufficient D1 history; eligibility remains fail-closed, while retry-frequency hardening is the next scanner operations task;
-- parallel work proceeds through scanner retry/reconciliation hardening, deterministic discovery-report and outcome-readiness audits;
-- INTRADAY/M15 universal TTL remains unresolved; MEDIUM/H1 8-12h remains a research-only time-split validated lifecycle band;
-- no RR, ATR, structural-target, freshness, history, catalogue or probability rule is relaxed.
+- accepted runtime/deployed SHA: `30119a44fa82b1029d2de6e3a6f76320a7705079`;
+- `Deploy Production #11`: SUCCESS;
+- K-Trader container healthy; provider REST/WebSocket, MTF API and public Phase 10 Action acceptance PASS;
+- FAST/M5 TTL60 remains the only production-active lifecycle profile;
+- provider-recorded Binance USD-M capture remains active;
+- PR #45 D1 retry backoff is production-verified: young insufficient-D1 contracts remain fail-closed while repeated every-cycle provider bootstrap is suppressed until the next UTC day boundary;
+- PR #46 recent-MTF gap heal is production-verified: `IOSTUSDT` and `DOTUSDT` recent `15m` windows were repaired to 250 contiguous bars;
+- scanner is usable but `DEGRADED` with `17 ready / 3 failed`; current failures are only the expected young insufficient-D1 symbols `牛来USDT`, `MARSCOINUSDT`, `PONSUSDT`;
+- live `/v1/signals`: `0`;
+- the 2026-09-10→11 causal prospective control analyzed `5448` valid symbol-cutoffs and `67822` decisions from `326` causal M5 cutoffs;
+- 24h sequential funnel: `1522 -> 431 -> 311 -> 189 -> 10 -> 0 -> 0 -> 0` for HTF -> strong level -> geometry -> ATR -> TTL60 -> RR>=3 -> A/A+ -> tradable;
+- no new catalogue chain or binary outcome sample was materialized;
+- canonical catalogue remains SUIUSDT + XRPUSDT;
+- catalogue semantic SHA vs raw file SHA question is closed and is not corruption;
+- automated ChatGPT signal-watch remains disabled; control is manual;
+- INTRADAY/M15 remains unresolved research-only; MEDIUM/H1 8-12h remains a research-only lifecycle design band;
+- Phase 12 remains FUTURE / NOT ACTIVE;
+- no RR, ATR, structural-target, HTF, strength, freshness, history, catalogue or probability rule is relaxed.
 
 Historical checkpoints include:
 
+- `2026-09-10_PHASE11G_MONITORING_AND_READINESS_CHECKPOINT.md` — pre-24h accumulation/readiness state;
 - `2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md` — horizon time-split validation;
 - `2026-09-09_PHASE11G_PROD_TTL_AND_CORRECTED_WINDOWS_1_4.md` — FAST production rollout + corrected W1-W4 closure;
 - `2026-09-09_PHASE11G_HORIZON_PROFILE_LIFECYCLE_STUDY.md` — first horizon lifecycle sensitivity study;
@@ -34,11 +39,11 @@ Historical checkpoints include:
 
 ## Related canonical documents
 
-- Phase 11G checkpoint: `../PHASE_11G_CHECKPOINT.md`;
+- Phase 11G current boundary: `../PHASE_11G_CHECKPOINT.md`;
 - dataset catalogue contract: `../DATASET_CATALOGUE_SPEC.md`;
 - historical replay contract: `../HISTORICAL_REPLAY_SPEC.md`;
 - current project state: `../CURRENT_STATE.md`;
-- deployment state: `../DEPLOYMENT.md`;
+- deployment specification: `../DEPLOYMENT.md`;
 - Phase 10 acceptance: `../PHASE_10_PRODUCT_ACCEPTANCE.md`;
 - roadmap: `../../ROADMAP.md`;
 - project overview: `../../README.md`;
