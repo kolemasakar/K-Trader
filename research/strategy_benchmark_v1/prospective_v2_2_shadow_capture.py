@@ -31,6 +31,14 @@ def stable_hash(obj):
     return hashlib.sha256(payload).hexdigest()
 
 
+def sha_file(path):
+    h = hashlib.sha256()
+    with pathlib.Path(path).open('rb') as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--bundle-root', required=True)
@@ -45,18 +53,23 @@ def main():
     output = pathlib.Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
     boundary = ts(args.boundary)
+    harness_path = pathlib.Path(args.harness)
 
-    frozen = load_module('candidate_v2_2_frozen', pathlib.Path(args.harness))
+    frozen = load_module('candidate_v2_2_frozen', harness_path)
     v21 = frozen.v
     b = frozen.b
     lc = load_module('level_context_v2', HERE / 'level_context_v2_features.py')
     lc21 = load_module('level_context_v2_1', HERE / 'level_context_v2_1_diagnostics.py')
     traversal = load_module('level_context_v2_2_traversal', HERE / 'level_context_v2_2_traversal.py')
 
-    protocol = json.loads((root / 'protocol.json').read_text())
+    protocol_path = root / 'protocol.json'
+    protocol = json.loads(protocol_path.read_text())
     panel = protocol['primary_panel']['symbols']
     rows = []
     missing = []
+    bundle_provenance = {}
+    signal_bars_evaluated_by_symbol = {}
+    evaluated_signal_open_times = []
 
     for symbol in panel:
         sdir = bundle_root / symbol
@@ -65,19 +78,32 @@ def main():
         bundlep = sdir / 'bundle.json'
         if not (m15p.exists() and h1p.exists() and bundlep.exists()):
             missing.append(symbol)
+            signal_bars_evaluated_by_symbol[symbol] = 0
             continue
 
         bundle_meta = json.loads(bundlep.read_text())
+        bundle_provenance[symbol] = {
+            'as_of': bundle_meta.get('as_of'),
+            'bundle_sha256': bundle_meta.get('bundle_sha256'),
+            'provider_id': bundle_meta.get('provider_id'),
+            'candle_counts': bundle_meta.get('candle_counts'),
+        }
         m15 = b.load_bars(m15p)
         h1 = b.load_bars(h1p)
         mx = b.indicators(m15)
         hx = b.indicators(h1)
         h1cts = [x['close_dt'] for x in h1]
+        symbol_evaluated = 0
 
+        # len(m15)-1 is intentional: a signal bar is evaluated only when the
+        # next closed M15 bar exists, so the frozen next-open entry price is
+        # available causally inside this captured bundle.
         for i in range(max(53, b.PULLBACK_WINDOW), len(m15) - 1):
             bar = m15[i]
             if bar['open_dt'] < boundary:
                 continue
+            symbol_evaluated += 1
+            evaluated_signal_open_times.append(bar['open_time'])
             signal = v21.signal_at(i, m15, mx, h1, hx, h1cts)
             if signal is None:
                 continue
@@ -162,6 +188,8 @@ def main():
             )
             rows.append(row)
 
+        signal_bars_evaluated_by_symbol[symbol] = symbol_evaluated
+
     rows.sort(key=lambda r: (r['signal_bar_open_time'], r['symbol'], r['side']))
     with (output / 'shadow_events.jsonl').open('w') as f:
         for row in rows:
@@ -170,19 +198,28 @@ def main():
     counts = collections.Counter(r['status'] for r in rows)
     eligible = [r for r in rows if r['status'] == 'ELIGIBLE_SHADOW_SETUP']
     summary = {
-        'schema_version': 'ktrader.candidate_v2_2.prospective_shadow.summary.v1',
+        'schema_version': 'ktrader.candidate_v2_2.prospective_shadow.summary.v1_1',
         'strategy_id': 'candidate_rule_set_v2_2',
         'boundary': args.boundary,
         'holdout_opened': False,
         'production_action': False,
         'panel_size': len(panel),
         'missing_symbols': missing,
+        'bundle_root': str(bundle_root),
+        'bundle_provenance': dict(sorted(bundle_provenance.items())),
+        'bundle_set_sha256': stable_hash(bundle_provenance),
+        'frozen_harness_path': str(harness_path),
+        'frozen_harness_sha256': sha_file(harness_path),
+        'protocol_sha256': sha_file(protocol_path),
+        'signal_bars_evaluated_count': sum(signal_bars_evaluated_by_symbol.values()),
+        'signal_bars_evaluated_by_symbol': dict(sorted(signal_bars_evaluated_by_symbol.items())),
+        'earliest_signal_bar_open_time': min(evaluated_signal_open_times) if evaluated_signal_open_times else None,
+        'latest_signal_bar_open_time': max(evaluated_signal_open_times) if evaluated_signal_open_times else None,
         'event_count': len(rows),
         'status_counts': dict(sorted(counts.items())),
         'eligible_setup_count': len(eligible),
         'unique_eligible_family_count': len({r['setup_family_id'] for r in eligible}),
         'clean_break_no_revisit_eligible_count': sum(r.get('clean_break_no_revisit', False) for r in eligible),
-        'bundle_root': str(bundle_root),
     }
     p = output / 'summary.json'
     p.write_text(json.dumps(summary, indent=2, sort_keys=True) + '\n')
