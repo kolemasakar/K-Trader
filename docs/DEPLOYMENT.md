@@ -1,4 +1,4 @@
-# Deployment Specification v1.10
+# Deployment Specification v1.11
 
 Updated: 2026-09-11
 
@@ -20,9 +20,9 @@ Latest accepted production runtime was verified on 2026-09-11.
 - active allocation: 1 OCPU / 6 GB RAM;
 - production runner label: `k-trader-prod-arm64`;
 - public origin: `https://ktrader-api.duckdns.org`;
-- deployed SHA: `30119a44fa82b1029d2de6e3a6f76320a7705079`;
-- deployed image: `k-trader:30119a44fa82b1029d2de6e3a6f76320a7705079`;
-- GitHub Actions deployment: `Deploy Production #11`, SUCCESS;
+- deployed SHA: `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
+- deployed image: `k-trader:a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
+- current deployment activation: GitHub Actions run `34612617730`, SUCCESS;
 - runtime identity: UID/GID `1002:1002` aligned with host user `ktrader`;
 - persistent application data: `/opt/k-trader/data`;
 - persistent Caddy storage: `/opt/k-trader/caddy_data`, `/opt/k-trader/caddy_config`;
@@ -190,6 +190,28 @@ Acceptance log recorded:
 - release promoted;
 - `/opt/k-trader/DEPLOYED_SHA` updated to exact SHA;
 - `/opt/k-trader/current` points to exact release directory.
+
+## Prospective-control deployment acceptance — 2026-09-11
+
+Approved runtime SHA:
+
+`a73ba261a3ca97d2df3deac20b1459b7b4c38fff`
+
+Deployment evidence:
+
+- GitHub Actions run: `34612617730` — SUCCESS;
+- trigger branch was temporary and checked out the exact approved canonical `main` SHA;
+- ARM64 production architecture gate: PASS;
+- canonical `scripts/deploy.sh`: PASS;
+- localhost health/market-runtime acceptance: PASS;
+- public HTTPS / Phase 10 Action acceptance: PASS inside the canonical deploy script;
+- resulting image: `k-trader:a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
+- `/opt/k-trader/DEPLOYED_SHA`: exact approved SHA;
+- container: healthy;
+- `/health`: `status=ok`, `mode=read_only`, `data_ready=true`, provider `binance_usdm`;
+- `scripts/run_prospective_control.py --help`: PASS inside the deployed container.
+
+The one-time trigger workflow was removed from its temporary branch immediately after the successful run. Canonical `.github/workflows/deploy.yml` remains `workflow_dispatch` only and unchanged.
 
 ## Runtime identity and storage contract
 

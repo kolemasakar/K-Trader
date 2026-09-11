@@ -6,7 +6,7 @@ Status: **VERIFIED FOUNDATION / TWO CHAINS CATALOGUED / FAST TTL60 PRODUCTION / 
 
 Detailed current transition evidence:
 
-`docs/checkpoints/2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_HARDENING.md`
+`docs/checkpoints/2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_DEPLOYMENT.md`
 
 Previous operational evidence:
 
@@ -48,15 +48,15 @@ Catalogue digest semantics are explicitly resolved: `catalogue_sha256` is the se
 
 Current production runtime:
 
-- deployed SHA/image: `30119a44fa82b1029d2de6e3a6f76320a7705079`;
-- GitHub `Deploy Production #11`: SUCCESS;
+- deployed SHA/image: `a73ba261a3ca97d2df3deac20b1459b7b4c38fff`;
+- approved GitHub Actions deployment run `34612617730`: SUCCESS;
 - provider: `binance_usdm`;
 - public/read-only runtime: healthy;
 - provider REST/WebSocket: PASS;
 - MTF API: PASS;
 - Phase 10 public Action acceptance: PASS.
 
-Repository acceptance of the prospective-control utility does not constitute a new production deployment. The running image remains on the accepted runtime SHA above until a separate deployment decision.
+The repository-owned prospective-control utility is now present in the accepted production image. The deployment changed tooling availability only; FAST/M5 trading semantics and Phase 11G hard gates are unchanged.
 
 FAST lifecycle is the only active production profile:
 
