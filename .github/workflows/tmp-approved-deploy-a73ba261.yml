@@ -1,0 +1,37 @@
+name: Temporary Approved Deploy a73ba261
+
+on:
+  push:
+    branches:
+      - ops/approved-deploy-a73ba261
+
+permissions:
+  contents: read
+
+concurrency:
+  group: k-trader-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, k-trader-prod-arm64]
+    environment: production
+    timeout-minutes: 30
+    env:
+      KTRADER_DOMAIN: ${{ vars.KTRADER_DOMAIN }}
+      KTRADER_ACTION_API_KEY: ${{ secrets.KTRADER_ACTION_API_KEY }}
+    steps:
+      - name: Checkout approved canonical main
+        uses: actions/checkout@v6
+        with:
+          ref: a73ba261a3ca97d2df3deac20b1459b7b4c38fff
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify approved SHA and Oracle production architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "a73ba261a3ca97d2df3deac20b1459b7b4c38fff"
+          test "$(uname -m)" = "aarch64" -o "$(uname -m)" = "arm64"
+
+      - name: Deploy approved main and run live acceptance
+        run: ./scripts/deploy.sh
