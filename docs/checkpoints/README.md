@@ -21,16 +21,21 @@ Current accepted research state:
 - evidence remains `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`;
 - the two resolved STOP families are also the two current Level Context v2 disagreements with frozen open-space classification; this is diagnostic only and changes no gate;
 - FAST v0 remains a negative baseline; SWING v0 remains near-breakeven base but negative validation/stress; POSITION W1 remains prototype-only;
+- approved GPT Builder v1.3 and active Knowledge Priority files are present on the research branch; canonicalization is tracked in PR #57;
+- PR #57 is open/mergeable at head `1543861ff9e8ee97e64371a0b41e467ee1c866d1`; CI run 195 is in progress and merge remains gated by `canonical-merge-gate`;
 - no post-hoc subgroup or feature has been promoted into frozen v2.2;
 - next hard evidence milestone remains `>=30 unique resolved prospective frozen-v2.2 setup families`;
 - planned technical freeze remains `2026-09-12 09:00 Kyiv` -> `2026-09-13 09:00 Kyiv` (`06:00Z` -> `06:00Z`);
-- production safety is PASS, but the fully clean research-finalization gate is conditional because the exact 05:45Z capture could not be authorized;
+- production safety is PASS;
+- exact 05:45Z research finalization is blocked by authorization boundary;
+- strict host freeze integrity is also blocked while `apt-daily.timer` and `apt-daily-upgrade.timer` remain active with triggers inside the freeze window;
+- overall clean-freeze gate is therefore **NO-GO / NOT FULL PASS** until these blockers are resolved or explicitly accepted as boundary exceptions;
 - Phase 11G remains active;
 - Phase 12 remains FUTURE / NOT ACTIVE.
 
 ## Recent research checkpoints
 
-- `2026-09-12_PRE_FREEZE_FINAL_CHECK.md` — fresh production verification, latest valid 04:45Z family outcomes, exact 05:45Z authorization blocker and freeze decision;
+- `2026-09-12_PRE_FREEZE_FINAL_CHECK.md` — fresh production verification, latest valid 04:45Z family outcomes, exact 05:45Z authorization blocker, APT freeze-integrity blocker and freeze decision;
 - `2026-09-12_V2_2_FAMILY_SEMANTICS_PROFILE_BASELINES_W1.md` — family outcome semantics/resolver, FAST/SWING baseline execution, POSITION W1 contract;
 - `2026-09-12_V2_2_FIRST_PROSPECTIVE_FAMILIES_AND_PROFILE_DATASET.md` — first non-empty frozen prospective snapshot, adaptive profile dataset and funding completeness;
 - `2026-09-11_V2_2_PARALLEL_RESEARCH_CHECKPOINT.md` — Level/VSA/execution/portfolio/robustness diagnostics and prospective-infrastructure hardening;
