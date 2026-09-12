@@ -93,6 +93,15 @@ Fresh pre-freeze timer check:
 
 Both triggers fall inside the planned technical-freeze window. The connected SentinelX identity cannot stop/mask these timers because root/passwordless-sudo is not authorized. Therefore a strict no-system-change freeze cannot be asserted until an authorized operator disables them or explicitly accepts automatic APT activity as outside the freeze definition.
 
+## GPT Builder governance
+
+Approved files are present on the research branch:
+
+- `custom_gpt/SYSTEM_K_TRADER_v1_3_COMPACT.md` — approved;
+- `custom_gpt/00_KNOWLEDGE_PRIORITY.md` — active governance.
+
+Canonicalization is tracked by PR #57. At this checkpoint the PR is open and mergeable at head `1543861ff9e8ee97e64371a0b41e467ee1c866d1`; latest CI run 195 is in progress and merge remains subject to required `canonical-merge-gate`. The PR is documentation/governance only and does not deploy production code.
+
 ## Governance
 
 No current observation authorizes:
