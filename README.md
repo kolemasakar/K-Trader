@@ -293,7 +293,8 @@ Core contracts and product documentation:
 - `docs/SECURITY.md`
 - `docs/VPS_PROVISIONING.md`
 - `docs/PHASE_10_PRODUCT_ACCEPTANCE.md`
-- `custom_gpt/SYSTEM_K_TRADER_v1_2_COMPACT.md`
+- `custom_gpt/SYSTEM_K_TRADER_v1_3_COMPACT.md`
+- `custom_gpt/00_KNOWLEDGE_PRIORITY.md`
 - `custom_gpt/openapi.yaml`
 - `custom_gpt/ACTION_GUIDE.md`
 - `custom_gpt/BUILDER_CHECKLIST.md`
@@ -305,4 +306,4 @@ Historical transition checkpoints remain under `docs/checkpoints/`.
 
 Phase 9 production and Phase 10 Custom GPT integration are complete. Phase 11A-11G repository-side foundations are verified. Two Phase 11G dataset chains are catalogued, continuous Phase 11F research capture remains active, and corrected Phase 11G discovery is currently stopped at the **RR-geometry audit gate**.
 
-Phase 12 multi-provider expansion is **future / not active**. Statistical win probability remains deferred until adequate confirmed outcomes and a separately approved time-separated calibration methodology exist.
+Phase 12 multi-provider expansion is **future / not active**. Statistical win probability remains deferred until adequate confirmed outcomes and a separately approved time-separated calibration methodology exists.
