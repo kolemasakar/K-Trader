@@ -41,7 +41,7 @@ Research does not imply production activation.
 
 ## Latest valid prospective evidence
 
-A requested exact final `2026-09-12T05:45:00Z` capture was attempted before freeze but could not be executed because the connected SentinelX identity is `sentinelx` without Docker/root permission. The Docker socket and research-volume path correctly fail closed. No substitute result is asserted.
+A requested exact final `2026-09-12T05:45:00Z` capture was attempted before freeze but could not be executed because the connected SentinelX identity lacks Docker/root permission. The Docker socket and protected research-volume path correctly fail closed. No substitute result is asserted.
 
 Therefore the latest **valid** immutable capture remains:
 
@@ -109,10 +109,42 @@ SWING baseline v0 remains near breakeven under base assumptions but negative in 
 
 POSITION W1 contract remains prototype/data-architecture only; temporal-integrity audit passed for 19/19 symbols with 47–70 W1 bars.
 
+## GPT Builder governance
+
+Approved governance files are present on the research branch:
+
+- `custom_gpt/SYSTEM_K_TRADER_v1_3_COMPACT.md` — status `ЗАТВЕРДЖЕНО`;
+- `custom_gpt/00_KNOWLEDGE_PRIORITY.md` — status `ACTIVE KNOWLEDGE-GOVERNANCE FILE`.
+
+Canonicalization to `main` is tracked in PR #57, `Custom GPT: canonize approved system instructions v1.3`.
+
+Current PR state at this sync:
+
+- open and mergeable;
+- current head `1543861ff9e8ee97e64371a0b41e467ee1c866d1`;
+- 5 commits / 5 changed files;
+- latest CI run 195 is in progress;
+- merge remains subject to required repository check `canonical-merge-gate`.
+
+No production deployment is associated with this governance PR.
+
 ## Pre-freeze status
 
 Planned technical freeze: `2026-09-12 09:00 Kyiv` -> `2026-09-13 09:00 Kyiv` (`06:00Z` -> `06:00Z`).
 
-Production itself is healthy and read-only. Research evidence is internally consistent through `04:45Z`, but the requested exact `05:45Z` final capture is **NOT VERIFIED** because the automation identity lacks Docker/root access. The freeze must therefore be treated as **SAFE FOR PRODUCTION / NOT A FULL CLEAN RESEARCH FINALIZATION** unless an authorized operator performs the final capture before the boundary.
+Production itself is healthy and read-only. Research evidence is internally consistent through `04:45Z`, but the requested exact `05:45Z` final capture is **NOT VERIFIED** because the automation identity lacks Docker/root access. The freeze must therefore be treated as **SAFE FOR PRODUCTION / NOT A FULL CLEAN RESEARCH FINALIZATION** unless an authorized operator accepts `04:45Z` as the final research boundary or performs the final capture.
+
+### Freeze-integrity blocker: APT timers
+
+At the latest check immediately before the freeze:
+
+- `apt-daily.timer`: `active`;
+- `apt-daily-upgrade.timer`: `active`;
+- next `apt-daily-upgrade.timer` trigger: `2026-09-12T06:04:18Z` (~09:04 Kyiv), inside the freeze window;
+- next `apt-daily.timer` trigger: `2026-09-12T07:10:39Z` (~10:10 Kyiv).
+
+Stopping/masking these timers requires privileged host access not available to the connected SentinelX identity. Therefore a **fully clean technical freeze is blocked** until an authorized operator disables the timers or explicitly accepts the package-maintenance risk.
+
+The pause-start automation is configured fail-closed and must not report a full clean freeze while this condition persists.
 
 Phase 11G remains active. Phase 12 remains FUTURE / NOT ACTIVE.
