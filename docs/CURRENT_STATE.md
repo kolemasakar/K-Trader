@@ -1,37 +1,38 @@
 # K-Trader Current State
 
-Updated: 2026-09-11  
-Research checkpoint: `docs/checkpoints/2026-09-11_V2_2_PARALLEL_RESEARCH_CHECKPOINT.md`
+Updated: 2026-09-12  
+Research checkpoint: `docs/checkpoints/2026-09-12_V2_2_FIRST_PROSPECTIVE_FAMILIES_AND_PROFILE_DATASET.md`
 
 ## Production state
 
 Production remains unchanged by strategy research.
 
-Verified 2026-09-11 after the parallel-research batch:
+Accepted production application SHA:
 
-- deployed SHA: `81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
-- `/health`: `status=ok`;
-- mode: `read_only`;
+`81b79b281a4cc330b7c11058d202e0d74fb6d70e`
+
+Expected runtime contract:
+
+- health `ok`;
+- mode `read_only`;
+- provider `binance_usdm`;
 - `data_ready=true`;
-- `scanner_status=DEGRADED`;
-- provider: `binance_usdm`;
-- Action authentication enabled.
+- Action authentication enabled;
+- `scanner_status=DEGRADED` is the known fail-closed/history-readiness condition and does not by itself mean the runtime is unavailable.
 
-`DEGRADED` remains a known fail-closed/history-readiness condition and does not by itself mean the entire runtime is unavailable.
+No production code, deployment, risk, execution or trading semantics were changed by the strategy-research batch.
 
-No production code, deployment, risk, execution or trading semantics were changed by the independent strategy research.
+## Research isolation
 
-## Canonical/research separation
-
-Production remains GitHub/deployment controlled. Independent strategy work is isolated on:
+Research branch:
 
 `research-strategy-benchmark-v1`
 
 The research branch does not imply production activation.
 
-Canonical production FAST behavior remains governed by the deployed system and `docs/TRADING_HORIZON_PROFILES.md`.
+Holdout remains:
 
-New INTRADAY/FAST/SWING/POSITION strategy architecture is research-only unless separately approved.
+`UNTOUCHED / NOT AUTHORIZED`
 
 ## Frozen INTRADAY candidate
 
@@ -64,9 +65,9 @@ Frozen max hold:
 
 `32 x M15 = 8h`
 
-This 8h rule belongs only to this exact INTRADAY candidate and is not a universal profile limit.
+The 8h rule belongs only to this exact candidate and is not a universal profile limit.
 
-## v2.2 pre-holdout result
+## Historical pre-holdout result
 
 | Segment | Trades | WR | expectancy_R | PF_R |
 |---|---:|---:|---:|---:|
@@ -75,151 +76,165 @@ This 8h rule belongs only to this exact INTRADAY candidate and is not a universa
 | Non-holdout | 37 | 45.95% | +0.2888R | 1.5592 |
 | Stress non-holdout | 37 | 43.24% | +0.2741R | 1.5235 |
 
-Promotion gate: **FAIL**.
-
-Reasons:
+Promotion gate remains **FAIL** because:
 
 - non-holdout sample <100;
 - validation sample <30;
 - non-holdout WR <50%;
 - validation WR <50%.
 
-Therefore:
-
-- `production_approved=false`;
-- `holdout_authorized=false`;
-- holdout remains untouched.
-
-Positive expectancy/PF does not override the preregistered gates.
+Therefore `production_approved=false` and `holdout_authorized=false`.
 
 ## Post-v2.2 diagnostics
 
-Detailed results:
+Detailed historical diagnostic report:
 
 `docs/research/PARALLEL_RESEARCH_RESULTS_2026-09-11.md`
 
-### Level Context + MFE/MAE
+Main current conclusions:
 
-Completed:
-
-- Level Context v2;
-- Level Context v2.1 strict-break diagnostics;
-- broken-level traversal lifecycle;
-- MFE/MAE stages 1–3;
-- canonical static-level parity.
-
-Main observations:
-
-- most STOP trades fail early rather than first producing large favorable excursion;
+- STOP trades generally fail early rather than first producing large favorable excursion;
 - TARGET trades usually show strength quickly;
-- TIME_EXIT trades are often positive but may give back meaningful MFE;
-- `clean break -> no revisit before entry` is the strongest current post-hoc structural hypothesis;
-- it is not a v2.2 hard gate.
+- `clean break -> no revisit before entry` is the strongest current post-hoc structural hypothesis, but is not a v2.2 gate;
+- canonical static level clustering does not reproduce the discrimination of the richer Level Context v2 layer;
+- historical non-holdout economics are materially supported by IOSTUSDT: removing it leaves expectancy positive at about `+0.046R`, PF about `1.079`, WR about `39.4%`;
+- median explicit fee+funding cost is about `0.041R` and median explicit+base execution burden about `0.051R`;
+- raw canonical VSA does not support a mandatory directional-match gate.
 
-Canonical static clustering does not reproduce Level Context v2 discrimination: canonical static clustering saw open-space on 35/37 non-holdout trades while Level Context v2 saw H1 open-space on 22/37.
-
-### Portfolio/correlation
-
-- 37 historical trades -> 36 diagnostic correlation families under the current definition;
-- only one multi-trade diagnostic family;
-- maximum simultaneous positions = 5;
-- top-symbol trade share ~16.2%;
-- main high-correlation traded-symbol cluster: `1000PEPEUSDT / DOGEUSDT / TRUMPUSDT`.
-
-This grouping is diagnostic and is not yet canonical setup-family semantics.
-
-### Execution economics
-
-- median explicit fee+funding cost ~`0.041R`;
-- median zero-to-base full-path execution drag ~`0.009R`;
-- median combined explicit+base execution burden ~`0.051R`;
-- base-to-stress adds ~`0.015R` median full-path drag.
-
-Execution changes can alter path identity/eligibility; they must be tested by full replay rather than subtracting a constant cost.
-
-No new min-stop threshold is authorized from these diagnostics.
-
-### VSA / volume
-
-Heuristic VSA/volume features were studied as diagnostics only.
-
-Canonical raw VSA parity used the exact current raw detection rules from `src/ktrader/evidence/vsa.py`.
-
-Result: no evidence supports mandatory raw-VSA direction matching. Raw VSA remains contextual and requires regime/level/confirmation logic before it can be considered validated evidence.
-
-### Robustness warning
-
-Historical non-holdout economics are materially supported by IOSTUSDT:
-
-- removing IOSTUSDT leaves expectancy positive but reduces it from ~`+0.289R` to ~`+0.046R`;
-- PF falls to ~`1.079`;
-- WR falls to ~`39.4%`.
-
-This weakens current confidence in symbol robustness. It is not a reason to post-hoc remove or require IOSTUSDT.
+None of these diagnostics are independent OOS evidence and none automatically changes the frozen rules.
 
 ## Prospective frozen-v2.2 evidence
 
-Frozen boundary:
+Frozen prospective boundary:
 
 `2026-09-11T20:00:00Z`
 
-Prospective capture is provider-recorded and immutable. The runner now:
+The runner is provider-recorded, immutable and fail-closed. It records bundle/protocol/harness hashes and rejects invalid snapshots from the evidence ledger.
 
-- exports the fixed panel through canonical K-Trader history tooling;
-- records bundle, protocol and frozen-harness hashes;
-- fails closed on incomplete/mislaid bundles;
-- records invalid attempts separately;
-- updates a de-duplicated prospective ledger.
+Valid snapshots:
 
-### Valid snapshot 1 — 20:30Z
+- `20:30Z`: 19/19 symbols, 19 entry-evaluable symbol-bars, 0 events;
+- `20:45Z` retry-2: 19/19, 38 symbol-bars, 0 events;
+- `21:00Z`: 19/19, 57 symbol-bars, 0 events;
+- `2026-09-12 00:00Z`: 19/19, 285 symbol-bars, 11 events, 3 eligible observations, 2 unique eligible families.
 
-- 19/19 symbols;
-- 19 causally entry-evaluable symbol-bars;
-- 0 frozen-v2.2 events;
-- 0 eligible families.
+One first-attempt `20:45Z` capture is explicitly `INVALID_INFRASTRUCTURE` because of the old bundle-layout error and is excluded by ledger v1.1.
 
-### 20:45Z attempt 1
+Latest evidence status:
 
-Infrastructure-invalid due incorrect bundle directory layout.
+`OBSERVATION_ONLY_LT_30_FAMILIES`
 
-Status:
+Latest ledger SHA256:
 
-`INVALID_INFRASTRUCTURE`
+`a4f04b85f9568b3f4df02fd11d2744e25176053cfee793054c346700832f5e27`
 
-It is explicitly rejected by the ledger and is not evidence.
+### First eligible prospective observations
 
-### Valid snapshot 2 — 20:45Z retry 2
+All three are `RAYSOLUSDT LONG` and belong to two setup families.
 
-- 19/19 symbols;
-- 38 causally entry-evaluable symbol-bars;
-- signal range: M15 opens `20:00` through `20:15` UTC;
-- 0 frozen-v2.2 events;
-- 0 eligible families;
-- exact frozen harness SHA preserved.
+Family `15fc0ad1...`:
 
-Current independent evidence state:
+- signal `20:45Z`, entry `21:00Z`;
+- signal `21:00Z`, entry `21:15Z`.
 
-`NO_ELIGIBLE_FAMILIES_YET`
+Family `6aabd4ef...`:
+
+- signal `23:00Z`, entry `23:15Z`.
+
+All three carried `clean_break_no_revisit=true`; this remains observation-only.
+
+At the exact `00:00Z` cutoff no observation had a terminal STOP or 3R TARGET:
+
+- first: MFE `2.514R`, MAE `0.027R`;
+- second: MFE `1.836R`, MAE `0.061R`;
+- third: MFE `0.232R`, MAE `0.638R`.
+
+All remain censored until a frozen terminal outcome becomes causally observable. They must not be counted as wins/losses yet.
+
+Partial-outcome artifact SHA256:
+
+`fab4fca86ecc26f5817318702d716e19c801080235168ee024affcee8c526185`
+
+## Multi-profile research dataset
+
+A separate research-only adaptive dataset was captured at:
+
+`2026-09-11T20:45:00Z`
+
+It is explicitly not a v2.2 retuning source.
+
+Panel: 19/19 `binance_usdm` symbols.
+
+Depths:
+
+- M5 = 3000 bars;
+- M15 = 3000;
+- H1 = 2000;
+- H4 = 1000;
+- D1 = up to 500, listing-age aware.
+
+Age-limited D1 histories:
+
+- AKEUSDT 350;
+- METUSDT 335;
+- PUMPUSDT 428;
+- USELESSUSDT 392.
+
+Dataset summary SHA256:
+
+`4f49f57dcd3d36939bfa56167b13a9af2ea08884fb11be66dd0f957389b3f077`
+
+### Funding layer
+
+Official Binance Futures funding source:
+
+`/fapi/v1/fundingRate`
+
+Funding was captured for 19/19 symbols.
+
+Completeness status:
+
+`PASS_WITH_LISTING_BOUNDARY_HEAD_GAPS`
+
+Audit facts:
+
+- 19/19 pass;
+- strictly increasing timestamps;
+- all records inside query bounds;
+- maximum internal gap <=`8.01h`;
+- tail lag <=`8.01h`;
+- head lag <=24h for listing-day boundaries.
+
+Listing-boundary head-gap symbols:
+
+`AKEUSDT`, `METUSDT`, `USELESSUSDT`.
+
+Funding summary SHA256:
+
+`c987475c7417bb8c34722e0da67ebe71909eb57a99af3be0191d02209122911f`
+
+Funding completeness report SHA256:
+
+`42e48e6452f80a940018859a072705a06dcf2551dabb7d1056b3116f7bb48d88`
+
+This removes the historical OHLCV+funding prerequisite for FAST/SWING research on currently supported canonical intervals. POSITION still requires a separate W1 data contract.
 
 ## Cross-provider portability
 
-Second implemented provider: `bybit_linear`.
+`bybit_linear` supports 16/19 fixed-panel symbols. Missing:
 
-Fixed-panel availability:
+`PUMPUSDT`, `RAYSOLUSDT`, `VTHOUSDT`.
 
-- available: 16/19;
-- unavailable: `PUMPUSDT`, `RAYSOLUSDT`, `VTHOUSDT`.
+At synchronized `20:45Z` on the common 16-symbol set:
 
-Synchronized 20:45Z comparison on the fixed 16-symbol intersection:
+- median M15 return correlation ~`0.9984`;
+- median absolute close basis ~`4.32 bps`;
+- Binance events 0;
+- Bybit events 0.
 
-- median M15 return correlation: ~`0.9984`;
-- median absolute close basis: ~`4.32 bps`;
-- Binance frozen post-boundary events: 0;
-- Bybit frozen post-boundary events: 0.
+This is data/signal portability only, not profitability validation.
 
-This is data/signal portability evidence only, not profitability validation.
-
-## Profile research architecture
+## Profile architecture
 
 Research spec:
 
@@ -229,62 +244,43 @@ Current research envelopes:
 
 | Profile | Context | Setup/trigger | Research envelope |
 |---|---|---|---|
-| FAST | H1/M15 | M15 -> M5 execution | up to ~4h |
+| FAST | H1/M15 | M15 -> M5 | up to ~4h |
 | INTRADAY | H4/H1 conceptual; frozen v2.2 currently H1 | M15 | ~8–12h architecture; frozen v2.2 uses 8h |
 | SWING | D1/H4 | H1 | ~2–4 days |
 | POSITION | W1/D1 | H4 | ~7–21 days, architecture reserved |
 
-These research envelopes do not modify the existing production FAST TTL contract or earlier lifecycle studies.
-
 TTL before entry and max-hold after entry remain separate concepts.
-
-## Knowledge governance
-
-Legacy Knowledge files remain:
-
-`HISTORICAL / RESEARCH REFERENCE`
-
-Do not automatically promote old:
-
-- ATR-used thresholds;
-- fixed SL percentages/pips/cents;
-- old risk percentages;
-- mandatory VSA/volume filters;
-- old TF/holding assumptions.
-
-They may generate hypotheses/features only.
 
 ## Evidence governance
 
-Primary evidence unit = unique resolved setup family.
+Primary evidence unit = **unique resolved setup family**.
+
+Current prospective state:
+
+- 2 unique eligible families;
+- 0 resolved families.
+
+Evidence bands remain:
 
 - `<30`: observation only;
 - `30–49`: diagnostics;
 - `50–99`: hypotheses/ablation proposals only;
 - `>=100`: versioned recalibration proposal may be considered, still requiring fresh OOS/prospective evidence and explicit promotion.
 
-Every strategy-rule change requires:
-
-- new strategy version;
-- preregistration;
-- causal full-path backtest/walk-forward;
-- fresh OOS/prospective evidence;
-- holdout only after predefined gates;
-- explicit promotion decision.
-
-Validation/holdout must not be repeatedly mined to tune the same version.
+Every rule change requires a new strategy version, preregistration, causal full-path testing, fresh OOS/prospective evidence and explicit promotion. Validation/holdout must not be repeatedly mined to tune the same version.
 
 ## Current safe work boundary
 
 Continue:
 
 - exact frozen-v2.2 prospective shadow capture;
+- causal outcome resolution of prospective families;
 - provenance/ledger hardening;
 - feature observation without changing eligibility;
-- separate FAST/SWING data-readiness/specification work;
+- separate FAST/SWING research using the new dataset;
 - portfolio/correlation research.
 
-Do not change frozen v2.2 using the current seen data:
+Do not change frozen v2.2 from currently seen data:
 
 - no clean-break/no-revisit hard gate;
 - no early-progress exit rule;
