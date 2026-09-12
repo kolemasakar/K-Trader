@@ -1,6 +1,6 @@
 # CHECKPOINT — Pre-Freeze Final Check — 2026-09-12
 
-Status: **PRODUCTION SAFE / RESEARCH FINALIZATION PARTIALLY BLOCKED**
+Status: **PRODUCTION SAFE / CLEAN FREEZE BLOCKED**
 
 ## Production boundary
 
@@ -84,6 +84,15 @@ Hashes:
 
 The two resolved STOP families are the same two families where frozen v2.2 reports open-space but Level Context v2 detects a richer obstacle approximately `0.028R` and `0.214R` ahead. This remains diagnostic only. No gate or frozen rule is changed.
 
+## Host freeze-integrity check
+
+Fresh pre-freeze timer check:
+
+- `apt-daily-upgrade.timer`: `active`, next trigger `2026-09-12T06:04:18Z` (`09:04:18 Kyiv`);
+- `apt-daily.timer`: `active`, next trigger `2026-09-12T07:10:39Z` (`10:10:39 Kyiv`).
+
+Both triggers fall inside the planned technical-freeze window. The connected SentinelX identity cannot stop/mask these timers because root/passwordless-sudo is not authorized. Therefore a strict no-system-change freeze cannot be asserted until an authorized operator disables them or explicitly accepts automatic APT activity as outside the freeze definition.
+
 ## Governance
 
 No current observation authorizes:
@@ -107,6 +116,7 @@ Decision:
 - **Production safety: PASS** — live service is healthy/read-only on the accepted SHA.
 - **Research continuity through 04:45Z: PASS**.
 - **Exact 05:45Z final-capture requirement: BLOCKED by authorization boundary**.
-- **Overall clean-freeze gate: CONDITIONAL / NOT FULL PASS** until an authorized operator executes the exact final capture or explicitly accepts `04:45Z` as the final research boundary.
+- **Strict host freeze integrity: BLOCKED** by active APT timers scheduled inside the freeze window.
+- **Overall clean-freeze gate: NO-GO / NOT FULL PASS** until both blockers are resolved or explicitly accepted as boundary exceptions.
 
 Phase 11G remains active. Phase 12 remains FUTURE / NOT ACTIVE.
