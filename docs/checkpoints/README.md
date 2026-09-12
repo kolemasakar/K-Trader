@@ -4,31 +4,38 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-11_PHASE11G_STRATEGY_RESEARCH_HANDOFF.md`
+`2026-09-12_V2_2_FIRST_PROSPECTIVE_FAMILIES_AND_PROFILE_DATASET.md`
 
-Current accepted state at this checkpoint:
+Current accepted research state at this checkpoint:
 
-- accepted production application SHA is `81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
-- canonical repository `main` immediately before this handoff documentation is `35cdbdd81882064ebd59c6b49fe7f2ff95aa2b21`;
-- production is healthy, read-only and continues provider-recorded `binance_usdm` universe capture;
-- PR #51 single-writer hardening remains production-accepted;
-- PR #53 unique-primary-level survivorship diagnostic remains production-accepted;
-- cumulative non-overlap prospective evidence is `438` cutoffs / `8760` slots / `90621` decisions / `0` tradable records;
-- cumulative hard-gate funnel is `2374 -> 740 -> 527 -> 229 -> 20 -> 0 -> 0 -> 0` for HTF -> strong level -> geometry -> ATR -> TTL60 -> RR>=3 -> A/A+ -> tradable;
-- recent two-window survivorship is `852 -> 309 -> 216 -> 40 -> 10 -> 0 -> 0 -> 0` by records but only `28 -> 12 -> 8 -> 4 -> 3 -> 0 -> 0 -> 0` by distinct `(canonical_symbol, primary_level_id)`;
-- no production trading gate was changed before the research handoff;
-- the current gate-redesign discussion is paused pending an independent simple-strategy benchmark study;
-- canonical benchmark protocol is `../research/STRATEGY_BENCHMARK_RESEARCH_PROTOCOL.md`;
-- new-chat bootstrap is `../handoffs/BOOTSTRAP_PACKAGE_2026-09-11_K_TRADER_STRATEGY_BENCHMARK_RESEARCH.md`;
-- the benchmark will research simple reproducible strategies, backtest them on existing K-Trader historical data, filter for observed win rate `>60%` subject to expectancy/robustness checks, synthesize a simple candidate rule set, and re-test it on untouched data;
-- no benchmark result is production-approved without a later explicit decision;
-- planned technical development freeze remains `2026-09-12 09:00 Kyiv` -> `2026-09-13 09:00 Kyiv` (`06:00Z` -> `06:00Z`);
-- during the freeze, production read-only capture/monitoring continues while code/config/deploy changes and heavy production-host replay remain frozen except emergency recovery;
+- accepted production application SHA remains `81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
+- production remains healthy/read-only and strategy research has not changed deployment, risk, execution or trading semantics;
+- frozen research candidate remains `candidate_rule_set_v2_2`;
+- frozen executable harness SHA256 remains `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`;
+- frozen prospective boundary is `2026-09-11T20:00:00Z`;
+- holdout remains untouched and unauthorized;
+- latest valid frozen shadow snapshot is `2026-09-12T00:00:00Z`;
+- prospective ledger now contains 2 unique eligible setup families / 0 resolved families;
+- evidence status is `OBSERVATION_ONLY_LT_30_FAMILIES`;
+- first three eligible observations are RAYSOLUSDT LONG and remain censored at the 00:00Z cutoff;
+- adaptive 19-symbol multi-profile research dataset is complete for canonical M5/M15/H1/H4/D1 intervals;
+- official Binance Futures funding history is captured for 19/19 symbols and passed completeness audit, with only listing-boundary head gaps on AKEUSDT/METUSDT/USELESSUSDT;
+- POSITION research still requires a separate W1 data contract;
+- no post-hoc diagnostic feature has been promoted into frozen v2.2;
+- next hard evidence milestone remains `>=30 unique resolved prospective frozen-v2.2 setup families`;
+- planned technical development freeze remains `2026-09-12 09:00 Kyiv` -> `2026-09-13 09:00 Kyiv` (`06:00Z` -> `06:00Z`); production read-only capture/monitoring may continue during the freeze while code/config/deploy changes and heavy production-host replay remain frozen except emergency recovery;
 - Phase 11G remains active;
 - Phase 12 remains FUTURE / NOT ACTIVE.
 
-Historical checkpoints include:
+## Recent research checkpoints
 
+- `2026-09-12_V2_2_FIRST_PROSPECTIVE_FAMILIES_AND_PROFILE_DATASET.md` — first non-empty frozen prospective snapshot, adaptive profile dataset and funding completeness;
+- `2026-09-11_V2_2_PARALLEL_RESEARCH_CHECKPOINT.md` — Level/VSA/execution/portfolio/robustness diagnostics and prospective-infrastructure hardening;
+- `2026-09-11_V2_2_FIRST_PROSPECTIVE_SHADOW_CAPTURE.md` — initial prospective shadow capture state;
+- `2026-09-11_STRATEGY_V2_2_PREHOLDOUT_CHECKPOINT.md` — frozen v2.2 pre-holdout state;
+- `2026-09-11_STRATEGY_SYNTHESIS_V2_1.md` — v2.1 synthesis;
+- `2026-09-11_STRATEGY_BENCHMARK_V1_DISCOVERY_GATE.md` — first benchmark discovery gate;
+- `2026-09-11_PHASE11G_STRATEGY_RESEARCH_HANDOFF.md` — Phase 11G handoff into independent strategy research;
 - `2026-09-11_PHASE11G_SURVIVORSHIP_AND_PRE_FREEZE_ACCEPTANCE.md` — survivorship diagnostic deployment and pre-freeze acceptance;
 - `2026-09-11_PHASE11G_PRE_PAUSE_DEPLOYMENT_AND_24H_OBSERVATION.md` — pre-freeze baseline after single-writer deployment;
 - `2026-09-11_PHASE11G_PROSPECTIVE_CONTROL_DEPLOYMENT.md` — canonical prospective-control production activation before single-writer hardening;
@@ -44,18 +51,17 @@ Historical checkpoints include:
 
 ## Related canonical documents
 
+- current project state: `../CURRENT_STATE.md`;
 - strategy benchmark research protocol: `../research/STRATEGY_BENCHMARK_RESEARCH_PROTOCOL.md`;
-- strategy benchmark new-chat bootstrap: `../handoffs/BOOTSTRAP_PACKAGE_2026-09-11_K_TRADER_STRATEGY_BENCHMARK_RESEARCH.md`;
+- parallel research report: `../research/PARALLEL_RESEARCH_RESULTS_2026-09-11.md`;
+- profile research specs: `../research/PROFILE_RESEARCH_SPECS_FAST_SWING_V0.md`;
 - Phase 11G current boundary: `../PHASE_11G_CHECKPOINT.md`;
 - prospective-control contract: `../PROSPECTIVE_CONTROL_SPEC.md`;
 - survivorship diagnostic contract: `../PROSPECTIVE_SURVIVORSHIP_DIAGNOSTIC.md`;
 - dataset catalogue contract: `../DATASET_CATALOGUE_SPEC.md`;
 - historical replay contract: `../HISTORICAL_REPLAY_SPEC.md`;
-- current project state: `../CURRENT_STATE.md`;
 - deployment specification: `../DEPLOYMENT.md`;
-- Phase 10 acceptance: `../PHASE_10_PRODUCT_ACCEPTANCE.md`;
 - roadmap: `../../ROADMAP.md`;
-- project overview: `../../README.md`;
-- GPT Builder acceptance checklist: `../../custom_gpt/BUILDER_CHECKLIST.md`.
+- project overview: `../../README.md`.
 
 A checkpoint does not replace those specifications. It records which accepted versions/state should be used when work resumes.
