@@ -1,7 +1,7 @@
 # K-Trader Current State
 
-Updated: 2026-09-13 post-pause resume  
-Research checkpoint: `docs/checkpoints/2026-09-13_POST_PAUSE_RESUME.md`  
+Updated: 2026-09-13 post-pause P0 catch-up accepted  
+Research checkpoint: `docs/checkpoints/2026-09-13_POST_PAUSE_CATCHUP_ACCEPTANCE.md`  
 Bootstrap: `docs/handoffs/BOOTSTRAP_PACKAGE_2026-09-13_K_TRADER_POST_PAUSE_RESUME.md`
 
 ## Production
@@ -10,38 +10,16 @@ Accepted/deployed application SHA:
 
 `81b79b281a4cc330b7c11058d202e0d74fb6d70e`
 
-Fresh verification at approximately `2026-09-13T06:12:54Z`:
+Fresh P0 acceptance:
 
-- `/health`: `status=ok`;
-- mode `read_only`;
-- provider `binance_usdm`;
-- `data_ready=true`;
-- action authentication enabled;
-- `scanner_status=DEGRADED` remains the known fail-closed/history-readiness condition;
-- VM uptime ~`3 days 22:44`, therefore no reboot occurred during the technical pause.
+- container image `k-trader:81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
+- container `running / healthy`;
+- localhost and public HTTPS `/health`: `status=ok`, `mode=read_only`, `data_ready=true`, provider `binance_usdm`;
+- scanner `DEGRADED` remains the known fail-closed/history-readiness state;
+- host system state `running`;
+- no reboot-required marker.
 
-The connected SentinelX identity cannot access the Docker socket directly, so direct container inspection requires an authorized Docker/root channel.
-
-## Pause result
-
-Planned pause:
-
-`2026-09-12T06:00:00Z -> 2026-09-13T06:00:00Z`
-
-Production is healthy after the pause and the deployed K-Trader SHA did not change.
-
-However the pause was **not a strict no-host-change freeze**. `apt-daily-upgrade` ran inside the window at approximately `2026-09-12T06:04:35Z` and upgraded:
-
-- Python 3.12 family `3.12.3-1ubuntu0.16 -> 3.12.3-1ubuntu0.17`;
-- libc6 family `2.39-0ubuntu8.8 -> 2.39-0ubuntu8.9`.
-
-No `2026-09-13` APT transaction was present at the resume audit. APT timers are back in normal active/waiting state.
-
-This is host-environment drift, not a repository/deployment/strategy change. Before any production mutation, perform the post-pause host/runtime acceptance described in the current checkpoint.
-
-## Monitoring limitation
-
-The pause-watch automation does not provide a complete hourly evidence chain across the full 24h window. Current uptime and current health are positive runtime-continuity signals, but data/research continuity must be reconstructed from provider-recorded artifacts.
+The 24h technical pause was not a strict host freeze because unattended-upgrade changed host Python/libc shortly after the pause began. The deployed K-Trader SHA did not change, no host reboot occurred, and post-pause runtime acceptance is PASS.
 
 ## Research isolation
 
@@ -65,71 +43,95 @@ Holdout:
 
 `UNTOUCHED / NOT AUTHORIZED`
 
-No frozen rule, RR, 8h max-hold, risk gate, symbol/direction filter or holdout authorization changed during the pause.
+No frozen rule, RR, 8h max-hold, risk gate, symbol/direction filter or holdout authorization changed during P0.
 
 ## Latest accepted prospective evidence
 
-A fully authorized post-pause catch-up has **not yet been executed**. Therefore the latest accepted immutable snapshot remains:
+Canonical post-pause catch-up cutoff:
 
-`2026-09-12T04:45:00Z`
+`2026-09-13T06:30:00Z`
 
-Ledger at that boundary:
+Run root:
 
-- valid snapshots: 7;
-- panel: 19/19;
-- causally evaluable symbol-bars: 646;
-- deduplicated frozen events: 31;
-- eligible observations: 6;
-- unique eligible families: 4;
-- resolved primary families: 2;
-- unresolved primary families: 2;
-- resolved wins: 0;
-- resolved losses: 2;
-- resolved expectancy: `-1.0285267114R`;
-- evidence status: `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`.
+`/data/research/phase11g/v2_2_shadow_20260913T063000Z`
+
+Capture:
+
+- cycle: `VALID_SHADOW_CAPTURE`;
+- panel: `19/19`;
+- signal bars evaluated: `2603`;
+- deduplicated events: `96`;
+- eligible observations: `12`;
+- unique eligible families: `9`;
+- frozen harness hash: exact match;
+- holdout: unopened.
 
 Accepted hashes:
 
-- shadow summary: `4af1233c90464ab1d0e8cdf4b6e1ede062f66731558e6eb1eb947dc9377ca9df`;
-- bundle set: `6e41b993477b47b179bc40e9f46a700d0aca9529797111562103920c124f355e`;
-- bundle export summary: `8ce3bb969943ebe8814bd1c67952d8ef1215e56399134dd1430891097711e50d`;
-- event file: `83b3f64813a803382048a9193a092e7423a3fef986213905603acdaa8b091073`;
-- ledger event set: `cd25594d5e3f46a8894acf0bca050bf7b253c1618fe2f45184ed8a431287d166`;
-- outcome summary: `f7e8314337166cdc4657f37b175c9744833a8356d2f0e3bc64702a5d0f4b19cb`;
-- Level Context observation: `de61c71e7aef0c01b07eef03c01572f4dd618cd0def99f7bda2b0b1edc113b02`.
+- bundle set: `646752f07e1567aefde0246d35bd61011758dff272156edc2f59da68a2e70376`;
+- bundle export summary: `ccce2649dc42248db8cc4839d2b792401bd3032738dcfc859ce7569f8920fb11`;
+- shadow summary: `fa1ece1af5b1e85ac123e92828de3990cc8f5c07b16d0b250290ebf7d8857528`;
+- event file: `c611d4721443e4f53bd5b29b9be0c3f19e4ef9c8cd543bb2b519e7f3c4b2168b`;
+- ledger event set: `60aac34c860d06f0d291d73714c31a741293ced74d0d41e5e6b957fe0a8b9b92`;
+- outcome summary: `5f1d550ed439aecda7aeae2dd9c5d8f386e1f555b6b42b11ca7cbe2415edf718`;
+- Level Context observation: `ea30b0183ad2f8e0b4898f07c78d0f86e532f5646975b6042c8e65c0e12eaef7`.
 
-Primary outcomes at that boundary:
+## Family outcomes
 
-| Family | Symbol | Side | State | Realized R |
-|---|---|---|---|---:|
-| `15fc0a...` | RAYSOLUSDT | LONG | unresolved | — |
-| `6aabd4...` | RAYSOLUSDT | LONG | STOP | `-1.0221R` |
-| `293d11...` | RAYSOLUSDT | LONG | STOP | `-1.0350R` |
-| `eecbdb...` | ENAUSDT | SHORT | unresolved | — |
+Primary evidence unit remains unique resolved `setup_family_id`.
 
-The two resolved STOP families are the two current prospective Level Context disagreements: frozen v2.2 saw open-space, while the richer detector saw obstacles near `0.028R` and `0.214R`. This remains observation-only.
+Current state:
 
-## Catch-up requirement
+- unique families: `9`;
+- resolved primary families: `9`;
+- unresolved: `0`;
+- wins/losses: `1 / 8`;
+- resolved WR: `11.11%`;
+- resolved expectancy: `-0.8807054663R`;
+- evidence status: `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`.
 
-The prospective runner retains 400 M15 bars per symbol (~100h), so the 24h pause remains inside the causal recovery horizon.
+This is a small prospective sample and does not authorize any v2.2 retuning or holdout opening.
 
-First resumed research action must be:
+## Pause-window data continuity
 
-- resolve the latest safe closed M15 cutoff;
-- run one authorized provider-recorded frozen-v2.2 shadow cycle;
-- rebuild the ledger;
-- run deterministic family outcome resolution;
-- refresh Level Context/VSA/execution observation diagnostics;
-- audit pause-window continuity/gaps;
-- write a post-catch-up checkpoint.
+For the exact technical-pause interval `2026-09-12T06:00:00Z -> 2026-09-13T06:00:00Z`:
 
-Do not substitute a noncanonical path if Docker/research-volume authorization is unavailable.
+- 19/19 symbols have exactly 96 M15 bars;
+- gaps: `0`;
+- duplicates: `0`;
+- two additional closed M15 bars are present from pause end to the 06:30Z catch-up cutoff.
+
+M15 continuity: **PASS 19/19**.
+
+The pause-watch automation still did not provide a complete hourly monitoring chain; provider-recorded catch-up artifacts establish the accepted data continuity instead.
+
+## Observation-only diagnostics
+
+Level Context v2 across 9 primary families:
+
+- clean-break/no-revisit: `4`;
+- frozen-v2.2 vs richer open-space disagreement: `2`;
+- richer obstacle inside `3R`: `5`;
+- richer obstacle inside `1R`: `4`.
+
+Raw VSA parity on the 9 primary signal bars:
+
+- `NONE`: `8`;
+- `OPPOSING`: `1`;
+- `ALIGNED`: `0`;
+- only observed raw event: one opposing `BC` on RAYSOLUSDT.
+
+Execution observation for 9 resolved primaries:
+
+- `7 STOP`, `2 TIME_EXIT`, `0 TARGET`;
+- median realized result about `-1.0330R`;
+- median combined observed fee/funding/slippage contribution about `0.0407R`.
+
+All remain diagnostic only.
 
 ## Family evidence governance
 
-Primary evidence unit = unique resolved setup family.
-
-- `<30`: observation only;
+- `<30` resolved primary families: observation only;
 - `30–49`: diagnostics;
 - `50–99`: hypotheses/ablation proposals only;
 - `>=100`: versioned recalibration proposal may be considered, still requiring fresh OOS/prospective evidence and explicit promotion.
@@ -138,44 +140,36 @@ Next hard milestone:
 
 `>=30 unique resolved prospective frozen-v2.2 setup families`.
 
-Do not tune frozen v2.2 from the current tiny prospective sample.
-
 ## Retained profile research
 
 FAST v0 remains a negative baseline and is not promotable.
 
 SWING v0 remains near breakeven under base assumptions but negative in validation/stress and is not promotable.
 
-POSITION W1 remains prototype/data-architecture only; temporal integrity passed for 19/19 symbols with 47–70 W1 bars.
+POSITION W1 remains prototype/data-architecture only.
 
 ## Repository/governance
 
-Canonical `main` after PR #57:
+Canonical `main`:
 
 `4919fea4397d34898ddc7d4215ea898e6caea815`
 
-PR #57 was squash-merged after CI success and canonized:
+Governance parity between `main` and the research branch was verified before ancestry synchronization:
 
-- approved `custom_gpt/SYSTEM_K_TRADER_v1_3_COMPACT.md`;
-- active `custom_gpt/00_KNOWLEDGE_PRIORITY.md`;
-- Builder/Action/catalogue references to v1.3.
+- `SYSTEM_K_TRADER_v1_3_COMPACT.md` blob: `5969606306e93d5798a77d79f82a559e088c8529`;
+- `00_KNOWLEDGE_PRIORITY.md` blob: `e52c5817cfbd3ee0907db2711884b742752a15e3`.
 
-Research branch accepted pre-resume head was:
+Preserve research history; synchronize canonical ancestry via merge/no-rewrite only.
 
-`90debd3ed5c4284b4590b8e4ebe7f106d475a8d3`
+Production remains deployed on `81b79...`; canonical governance/documentation commits do not require redeployment.
 
-At the resume audit the research branch was approximately `83 ahead / 1 behind` relative to the newly updated `main`. Preserve research history; do not rebase blindly. Synchronize ancestry after post-pause catch-up and content-parity verification.
+## Next work order
 
-Production remains deployed on `81b79...`; the new main commit is governance/documentation and does not require deployment.
-
-## Resume order
-
-1. P0 post-pause catch-up and continuity audit.
-2. Post-host-drift runtime acceptance.
-3. Post-catch-up checkpoint and repo ancestry sync.
-4. Continue frozen-v2.2 prospective accumulation.
-5. Continue observation-only Level Context/portfolio/execution diagnostics.
-6. Consider only preregistered new strategy versions when evidence supports them.
+1. Complete research-branch ancestry synchronization with canonical `main` without rewriting research history.
+2. Continue exact frozen-v2.2 prospective accumulation and deterministic outcome resolution.
+3. Continue observation-only Level Context / VSA / execution / portfolio diagnostics.
+4. Keep accumulating toward `>=30` resolved prospective primary families.
+5. Create a new strategy version only through preregistration when evidence supports it.
 
 Phase 11G remains **ACTIVE**.
 
