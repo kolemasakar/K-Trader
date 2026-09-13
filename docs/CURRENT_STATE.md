@@ -1,6 +1,6 @@
 # K-Trader Current State
 
-Updated: 2026-09-13 post-pause P0 catch-up accepted  
+Updated: 2026-09-13 post-pause P0 accepted + first continued prospective capture  
 Research checkpoint: `docs/checkpoints/2026-09-13_POST_PAUSE_CATCHUP_ACCEPTANCE.md`  
 Bootstrap: `docs/handoffs/BOOTSTRAP_PACKAGE_2026-09-13_K_TRADER_POST_PAUSE_RESUME.md`
 
@@ -10,7 +10,7 @@ Accepted/deployed application SHA:
 
 `81b79b281a4cc330b7c11058d202e0d74fb6d70e`
 
-Fresh P0 acceptance:
+Fresh post-pause acceptance:
 
 - container image `k-trader:81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
 - container `running / healthy`;
@@ -43,38 +43,57 @@ Holdout:
 
 `UNTOUCHED / NOT AUTHORIZED`
 
-No frozen rule, RR, 8h max-hold, risk gate, symbol/direction filter or holdout authorization changed during P0.
+No frozen rule, RR, 8h max-hold, risk gate, symbol/direction filter or holdout authorization changed.
+
+## P0 catch-up acceptance
+
+Canonical P0 catch-up at `2026-09-13T06:30:00Z` passed:
+
+- `VALID_SHADOW_CAPTURE`;
+- panel `19/19`;
+- exact frozen harness hash verified;
+- technical-pause M15 continuity `PASS 19/19`;
+- every symbol had exactly `96/96` pause-window M15 bars, zero gaps and zero duplicates;
+- deterministic resolver completed;
+- post-host-drift runtime acceptance passed.
+
+Canonical details and P0 hashes are frozen in:
+
+`docs/checkpoints/2026-09-13_POST_PAUSE_CATCHUP_ACCEPTANCE.md`
 
 ## Latest accepted prospective evidence
 
-Canonical post-pause catch-up cutoff:
+After P0, exact frozen-v2.2 accumulation continued with the next safe closed M15 cutoff:
 
-`2026-09-13T06:30:00Z`
+`2026-09-13T06:45:00Z`
 
 Run root:
 
-`/data/research/phase11g/v2_2_shadow_20260913T063000Z`
+`/data/research/phase11g/v2_2_shadow_20260913T064500Z`
 
 Capture:
 
 - cycle: `VALID_SHADOW_CAPTURE`;
+- provider: `binance_usdm`;
 - panel: `19/19`;
-- signal bars evaluated: `2603`;
-- deduplicated events: `96`;
-- eligible observations: `12`;
-- unique eligible families: `9`;
-- frozen harness hash: exact match;
+- signal bars evaluated: `2622`;
+- deduplicated events: `101`;
+- eligible observations: `13`;
+- unique eligible families: `10`;
+- valid snapshots: `9`;
+- discovered snapshots: `10`;
+- one previously known invalid infrastructure snapshot remains rejected;
 - holdout: unopened.
 
-Accepted hashes:
+Latest hashes:
 
-- bundle set: `646752f07e1567aefde0246d35bd61011758dff272156edc2f59da68a2e70376`;
-- bundle export summary: `ccce2649dc42248db8cc4839d2b792401bd3032738dcfc859ce7569f8920fb11`;
-- shadow summary: `fa1ece1af5b1e85ac123e92828de3990cc8f5c07b16d0b250290ebf7d8857528`;
-- event file: `c611d4721443e4f53bd5b29b9be0c3f19e4ef9c8cd543bb2b519e7f3c4b2168b`;
-- ledger event set: `60aac34c860d06f0d291d73714c31a741293ced74d0d41e5e6b957fe0a8b9b92`;
-- outcome summary: `5f1d550ed439aecda7aeae2dd9c5d8f386e1f555b6b42b11ca7cbe2415edf718`;
-- Level Context observation: `ea30b0183ad2f8e0b4898f07c78d0f86e532f5646975b6042c8e65c0e12eaef7`.
+- bundle set: `e98d9aa558e8946c0a2b77becb23b3ce99c84e04a1dc6cf3d21a550511345407`;
+- bundle export summary: `36e53cb999048b2f504565930232da614160b93dd6092c98357a48590437f411`;
+- shadow summary: `e0976e106d54dde4818f881d014e40df936621196a4f14fdbbe07f1d902f611d`;
+- event file: `4b335f5974e69485113de112fe060dfc52b7e00b0e11a35cc5f72688501a5f45`;
+- ledger event set: `86e67c90ec0a8f2cde17bcebe00865c3d7cbbaf8c9b80bdd7924de0a9ac7f652`;
+- outcome summary: `39c72e48eb9921ca45326f6fed9f60cef7c10e9bee6168d24818037b7a3423f6`;
+- Level Context observation: `87763530a30549db1060d9a93e14d4b46f9883a5fe5ba912a372bc65c78409fa`.
 
 ## Family outcomes
 
@@ -82,46 +101,37 @@ Primary evidence unit remains unique resolved `setup_family_id`.
 
 Current state:
 
-- unique families: `9`;
+- unique families: `10`;
 - resolved primary families: `9`;
-- unresolved: `0`;
-- wins/losses: `1 / 8`;
+- unresolved primary families: `1`;
+- resolved wins/losses: `1 / 8`;
 - resolved WR: `11.11%`;
 - resolved expectancy: `-0.8807054663R`;
 - evidence status: `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`.
 
-This is a small prospective sample and does not authorize any v2.2 retuning or holdout opening.
+The new unresolved family is:
 
-## Pause-window data continuity
+- `e363704d...` — `VTHOUSDT LONG`, primary entry `2026-09-13T06:30:00Z`.
 
-For the exact technical-pause interval `2026-09-12T06:00:00Z -> 2026-09-13T06:00:00Z`:
-
-- 19/19 symbols have exactly 96 M15 bars;
-- gaps: `0`;
-- duplicates: `0`;
-- two additional closed M15 bars are present from pause end to the 06:30Z catch-up cutoff.
-
-M15 continuity: **PASS 19/19**.
-
-The pause-watch automation still did not provide a complete hourly monitoring chain; provider-recorded catch-up artifacts establish the accepted data continuity instead.
+The current sample is still far below the preregistered evidence threshold and does not authorize v2.2 retuning or holdout opening.
 
 ## Observation-only diagnostics
 
-Level Context v2 across 9 primary families:
+Level Context v2 across 10 primary families:
 
 - clean-break/no-revisit: `4`;
 - frozen-v2.2 vs richer open-space disagreement: `2`;
 - richer obstacle inside `3R`: `5`;
 - richer obstacle inside `1R`: `4`.
 
-Raw VSA parity on the 9 primary signal bars:
+Raw VSA parity across 10 primary signal bars:
 
-- `NONE`: `8`;
+- `NONE`: `9`;
 - `OPPOSING`: `1`;
 - `ALIGNED`: `0`;
-- only observed raw event: one opposing `BC` on RAYSOLUSDT.
+- only observed raw event remains one opposing `BC` on RAYSOLUSDT.
 
-Execution observation for 9 resolved primaries:
+Execution observation for the 9 resolved primary families remains:
 
 - `7 STOP`, `2 TIME_EXIT`, `0 TARGET`;
 - median realized result about `-1.0330R`;
@@ -154,19 +164,22 @@ Canonical `main`:
 
 `4919fea4397d34898ddc7d4215ea898e6caea815`
 
-Governance parity between `main` and the research branch was verified before ancestry synchronization:
+Research ancestry synchronization is complete without history rewrite:
 
-- `SYSTEM_K_TRADER_v1_3_COMPACT.md` blob: `5969606306e93d5798a77d79f82a559e088c8529`;
-- `00_KNOWLEDGE_PRIORITY.md` blob: `e52c5817cfbd3ee0907db2711884b742752a15e3`.
+- merge commit: `ae27adb125800c27b5aa5a4d41b3e91219059168`;
+- parents: previous research head + canonical `4919fea...`;
+- merge commit content delta: `0`;
+- compare state after merge: research `ahead 94 / behind 0`;
+- no rebase and no force update were used.
 
-Preserve research history; synchronize canonical ancestry via merge/no-rewrite only.
+Before the merge, all five files changed by canonical commit `4919fea...` were synchronized/verified, including approved System Instructions v1.3, Knowledge Priority, README, Action Guide and Builder Checklist.
 
-Production remains deployed on `81b79...`; canonical governance/documentation commits do not require redeployment.
+Production remains deployed on `81b79...`; the canonical governance/documentation ancestry change does not require redeployment.
 
 ## Next work order
 
-1. Complete research-branch ancestry synchronization with canonical `main` without rewriting research history.
-2. Continue exact frozen-v2.2 prospective accumulation and deterministic outcome resolution.
+1. Continue exact frozen-v2.2 prospective accumulation and deterministic outcome resolution.
+2. Resolve the current `VTHOUSDT LONG` family causally as new closed M15 data becomes available.
 3. Continue observation-only Level Context / VSA / execution / portfolio diagnostics.
 4. Keep accumulating toward `>=30` resolved prospective primary families.
 5. Create a new strategy version only through preregistration when evidence supports it.
