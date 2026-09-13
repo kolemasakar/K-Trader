@@ -122,7 +122,7 @@ Base evaluator commit:
 
 Accepted runtime optimization is a lossless short-circuit applied before expensive M15 indicator calculation. It rejects only cases that the frozen rule must reject by H1 side/separation or signal-bar geometry. Prospective parity remained zero-mismatch after this optimization.
 
-Persisted patch:
+Persisted equivalent patch:
 
 `research/strategy_benchmark_v1/patches/historical_causal_rolling_replay_v1_1_lossless_short_circuit.patch`
 
@@ -134,7 +134,7 @@ Runtime evaluator SHA256:
 
 `c0dead4957622515a7d432d8142ac7ae8915f46e36905a5cc0e483c93e78b7e7`
 
-Persisted patch SHA256:
+Runtime-generated diff SHA256 (the `/tmp` diff included local path/timestamp headers, so this is not asserted as the byte hash of the normalized repo patch file):
 
 `59c591d803f0656ce729b099409b73b2350392d30cb2e76dfaf64371f6e1e3bf`
 
