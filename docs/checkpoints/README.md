@@ -4,26 +4,25 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-13_FROZEN_V2_2_CONTINUATION_0645Z.md`
+`2026-09-13_FROZEN_V2_2_DUAL_TRACK_HISTORICAL_EXPANSION_V1.md`
 
 Current accepted state:
 
-- mandatory P0 post-pause catch-up is complete;
-- production deployed SHA remains `81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
-- container/runtime post-pause acceptance is PASS and production remains read-only;
+- Phase 11G remains ACTIVE; Phase 12 remains FUTURE / NOT ACTIVE;
+- production deployed SHA remains `81b79b281a4cc330b7c11058d202e0d74fb6d70e`, healthy and read-only;
 - frozen candidate remains `candidate_rule_set_v2_2` with harness SHA `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`;
 - holdout remains untouched and unauthorized;
-- pause-window M15 continuity is `PASS 19/19`, 96/96 bars each, zero gaps/duplicates;
-- latest accepted prospective cutoff is `2026-09-13T06:45:00Z`;
-- latest capture is `VALID_SHADOW_CAPTURE`, panel `19/19`, 101 deduplicated events, 13 eligible observations, 10 unique families;
-- deterministic resolver: 9 resolved primary families, 1 unresolved, 1 win / 8 losses, expectancy `-0.8807054663R`;
-- evidence remains `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`;
-- Level Context/VSA/execution observations remain diagnostic only;
-- canonical `main` remains `4919fea4397d34898ddc7d4215ea898e6caea815`;
-- research ancestry synchronization is complete via merge commit `ae27adb125800c27b5aa5a4d41b3e91219059168`;
-- canonical `main` is now an ancestor of the research branch; no rebase/force was used;
-- Phase 11G remains active;
-- Phase 12 remains FUTURE / NOT ACTIVE.
+- research now operates two separated evidence tracks: prospective accumulation plus preregistered historical confirmatory expansion;
+- Historical Expansion v1 uses the fixed external window `2026-08-11T14:45:00Z -> 2026-09-05T14:44:59.999Z`, 2400 M15 bars per symbol, panel `19/19`, official Binance funding and no symbol substitution;
+- Historical Expansion v1 base result: 117 completed trades, WR `42.7350%`, expectancy `+0.1863256189R`, PF_R `1.347812099`, max DD `19.09473870R`;
+- frozen stress-slippage result: expectancy `+0.1742143868R`, PF_R `1.326332898`;
+- historical direction diagnostic: LONG `+0.3260R` vs SHORT `-0.5343R`; diagnostic only, no rule change authorized;
+- latest prospective cutoff is `2026-09-13T08:30:00Z`;
+- prospective capture: `VALID_SHADOW_CAPTURE`, panel `19/19`, 110 deduplicated events, 15 eligible observations, 11 unique families;
+- deterministic resolver: 9 resolved primary families, 2 unresolved, 1 win / 8 losses, expectancy `-0.8807054663R`;
+- prospective evidence remains `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`;
+- historical trades are not merged into prospective family-count thresholds;
+- no rebase/force update is permitted or used.
 
 ## New-chat bootstrap
 
@@ -35,6 +34,7 @@ Recovery instruction:
 
 ## Recent research checkpoints
 
+- `2026-09-13_FROZEN_V2_2_DUAL_TRACK_HISTORICAL_EXPANSION_V1.md` — first accepted dual-track state: prospective evidence plus preregistered 25-day historical expansion;
 - `2026-09-13_FROZEN_V2_2_CONTINUATION_0645Z.md` — first continued frozen-v2.2 snapshot after P0 plus completed research/main ancestry synchronization;
 - `2026-09-13_POST_PAUSE_CATCHUP_ACCEPTANCE.md` — canonical catch-up, family resolution, continuity and runtime acceptance;
 - `2026-09-13_POST_PAUSE_RESUME.md` — post-pause production audit, host APT drift, evidence/catch-up boundary and resume gate;
@@ -45,18 +45,12 @@ Recovery instruction:
 - `2026-09-11_V2_2_FIRST_PROSPECTIVE_SHADOW_CAPTURE.md` — first prospective shadow capture;
 - `2026-09-11_STRATEGY_V2_2_PREHOLDOUT_CHECKPOINT.md` — frozen v2.2 pre-holdout state;
 - `2026-09-11_STRATEGY_SYNTHESIS_V2_1.md` — v2.1 synthesis;
-- `2026-09-11_STRATEGY_BENCHMARK_V1_DISCOVERY_GATE.md` — benchmark discovery gate;
-- `2026-09-11_PHASE11G_STRATEGY_RESEARCH_HANDOFF.md` — Phase 11G strategy-research handoff;
-- `2026-09-11_PHASE11G_SURVIVORSHIP_AND_PRE_FREEZE_ACCEPTANCE.md` — survivorship/pre-freeze acceptance;
-- `2026-09-11_PHASE11G_PRE_PAUSE_DEPLOYMENT_AND_24H_OBSERVATION.md` — pre-pause production baseline;
-- `2026-09-09_PHASE11G_HORIZON_TIMESPLIT_VALIDATION.md` — horizon time-split validation;
-- `2026-09-09_PHASE11G_SETUP_LIFECYCLE_60M_GATE.md` — canonical FAST TTL60 gate;
-- `2026-09-08_PHASE11G_CORRECTED_REPLAY_RR_GEOMETRY_GATE.md` — RR geometry/corrected replay checkpoint;
-- `2026-09-07_PHASE11G_TWO_CHAIN_DATASET_CHECKPOINT.md` — accepted two-chain dataset state.
+- `2026-09-11_STRATEGY_BENCHMARK_V1_DISCOVERY_GATE.md` — benchmark discovery gate.
 
 ## Related documents
 
 - current state: `../CURRENT_STATE.md`;
+- historical expansion protocol: `../research/FROZEN_V2_2_HISTORICAL_EXPANSION_V1_PROTOCOL.md`;
 - family semantics: `../research/PROSPECTIVE_FAMILY_OUTCOME_SEMANTICS_V1.md`;
 - prospective protocol: `../research/V2_2_PROSPECTIVE_SHADOW_PROTOCOL.md`;
 - profile/prospective report: `../research/PROFILE_BASELINES_AND_PROSPECTIVE_UPDATE_2026-09-12.md`;
