@@ -1,7 +1,8 @@
 # K-Trader Current State
 
-Updated: 2026-09-12 pre-freeze  
-Research checkpoint: `docs/checkpoints/2026-09-12_PRE_FREEZE_FINAL_CHECK.md`
+Updated: 2026-09-13 post-pause resume  
+Research checkpoint: `docs/checkpoints/2026-09-13_POST_PAUSE_RESUME.md`  
+Bootstrap: `docs/handoffs/BOOTSTRAP_PACKAGE_2026-09-13_K_TRADER_POST_PAUSE_RESUME.md`
 
 ## Production
 
@@ -9,45 +10,70 @@ Accepted/deployed application SHA:
 
 `81b79b281a4cc330b7c11058d202e0d74fb6d70e`
 
-Fresh verification at approximately `2026-09-12T05:50:31Z`:
+Fresh verification at approximately `2026-09-13T06:12:54Z`:
 
-- localhost `/health`: HTTP 200;
-- public HTTPS `/health`: HTTP 200;
-- status `ok`;
+- `/health`: `status=ok`;
 - mode `read_only`;
 - provider `binance_usdm`;
 - `data_ready=true`;
-- Action authentication enabled;
+- action authentication enabled;
 - `scanner_status=DEGRADED` remains the known fail-closed/history-readiness condition;
-- `/opt/k-trader/current` resolves to release `81b79b281a4cc330b7c11058d202e0d74fb6d70e`.
+- VM uptime ~`3 days 22:44`, therefore no reboot occurred during the technical pause.
 
-No production code/config/deployment/risk/execution/trading semantics were changed by strategy research.
+The connected SentinelX identity cannot access the Docker socket directly, so direct container inspection requires an authorized Docker/root channel.
+
+## Pause result
+
+Planned pause:
+
+`2026-09-12T06:00:00Z -> 2026-09-13T06:00:00Z`
+
+Production is healthy after the pause and the deployed K-Trader SHA did not change.
+
+However the pause was **not a strict no-host-change freeze**. `apt-daily-upgrade` ran inside the window at approximately `2026-09-12T06:04:35Z` and upgraded:
+
+- Python 3.12 family `3.12.3-1ubuntu0.16 -> 3.12.3-1ubuntu0.17`;
+- libc6 family `2.39-0ubuntu8.8 -> 2.39-0ubuntu8.9`.
+
+No `2026-09-13` APT transaction was present at the resume audit. APT timers are back in normal active/waiting state.
+
+This is host-environment drift, not a repository/deployment/strategy change. Before any production mutation, perform the post-pause host/runtime acceptance described in the current checkpoint.
+
+## Monitoring limitation
+
+The pause-watch automation does not provide a complete hourly evidence chain across the full 24h window. Current uptime and current health are positive runtime-continuity signals, but data/research continuity must be reconstructed from provider-recorded artifacts.
 
 ## Research isolation
 
-Branch: `research-strategy-benchmark-v1`.
+Research branch:
 
-Frozen candidate: `candidate_rule_set_v2_2`.
+`research-strategy-benchmark-v1`
+
+Frozen candidate:
+
+`candidate_rule_set_v2_2`
 
 Frozen harness SHA256:
 
 `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`
 
-Prospective boundary: `2026-09-11T20:00:00Z`.
+Prospective boundary:
 
-Holdout: `UNTOUCHED / NOT AUTHORIZED`.
+`2026-09-11T20:00:00Z`
 
-Research does not imply production activation.
+Holdout:
 
-## Latest valid prospective evidence
+`UNTOUCHED / NOT AUTHORIZED`
 
-A requested exact final `2026-09-12T05:45:00Z` capture was attempted before freeze but could not be executed because the connected SentinelX identity lacks Docker/root permission. The Docker socket and protected research-volume path correctly fail closed. No substitute result is asserted.
+No frozen rule, RR, 8h max-hold, risk gate, symbol/direction filter or holdout authorization changed during the pause.
 
-Therefore the latest **valid** immutable capture remains:
+## Latest accepted prospective evidence
+
+A fully authorized post-pause catch-up has **not yet been executed**. Therefore the latest accepted immutable snapshot remains:
 
 `2026-09-12T04:45:00Z`
 
-Latest accepted ledger state:
+Ledger at that boundary:
 
 - valid snapshots: 7;
 - panel: 19/19;
@@ -62,7 +88,7 @@ Latest accepted ledger state:
 - resolved expectancy: `-1.0285267114R`;
 - evidence status: `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`.
 
-Latest artifact hashes:
+Accepted hashes:
 
 - shadow summary: `4af1233c90464ab1d0e8cdf4b6e1ede062f66731558e6eb1eb947dc9377ca9df`;
 - bundle set: `6e41b993477b47b179bc40e9f46a700d0aca9529797111562103920c124f355e`;
@@ -72,79 +98,85 @@ Latest artifact hashes:
 - outcome summary: `f7e8314337166cdc4657f37b175c9744833a8356d2f0e3bc64702a5d0f4b19cb`;
 - Level Context observation: `de61c71e7aef0c01b07eef03c01572f4dd618cd0def99f7bda2b0b1edc113b02`.
 
-## Primary family outcomes at 04:45Z
+Primary outcomes at that boundary:
 
-| Family | Symbol | Side | Obs | State | Realized R |
-|---|---|---|---:|---|---:|
-| `15fc0a...` | RAYSOLUSDT | LONG | 2 | unresolved | — |
-| `6aabd4...` | RAYSOLUSDT | LONG | 1 | STOP | `-1.0221R` |
-| `293d11...` | RAYSOLUSDT | LONG | 2 | STOP | `-1.0350R` |
-| `eecbdb...` | ENAUSDT | SHORT | 1 | unresolved | — |
+| Family | Symbol | Side | State | Realized R |
+|---|---|---|---|---:|
+| `15fc0a...` | RAYSOLUSDT | LONG | unresolved | — |
+| `6aabd4...` | RAYSOLUSDT | LONG | STOP | `-1.0221R` |
+| `293d11...` | RAYSOLUSDT | LONG | STOP | `-1.0350R` |
+| `eecbdb...` | ENAUSDT | SHORT | unresolved | — |
 
-The two resolved STOP families are exactly the two current families where frozen v2.2 classified open-space while Level Context v2 detected a richer obstacle inside 1R/3R (`~0.028R` and `~0.214R`). This remains observation-only and does not change frozen eligibility.
+The two resolved STOP families are the two current prospective Level Context disagreements: frozen v2.2 saw open-space, while the richer detector saw obstacles near `0.028R` and `0.214R`. This remains observation-only.
 
-## Frozen strategy governance
+## Catch-up requirement
 
-Family accounting remains preregistered: earliest eligible observation is the immutable primary representative. Later observations are correlated diagnostics only.
+The prospective runner retains 400 M15 bars per symbol (~100h), so the 24h pause remains inside the causal recovery horizon.
 
-Do not modify frozen v2.2 from current evidence:
+First resumed research action must be:
 
-- no Level Context/clean-break hard gate;
-- no early-progress/profit-protection rule;
-- no new minimum-risk threshold;
-- no volume/VSA hard gate;
-- no symbol/direction inclusion rule;
-- no RR/8h retuning;
-- no holdout opening.
+- resolve the latest safe closed M15 cutoff;
+- run one authorized provider-recorded frozen-v2.2 shadow cycle;
+- rebuild the ledger;
+- run deterministic family outcome resolution;
+- refresh Level Context/VSA/execution observation diagnostics;
+- audit pause-window continuity/gaps;
+- write a post-catch-up checkpoint.
 
-Next hard evidence milestone:
+Do not substitute a noncanonical path if Docker/research-volume authorization is unavailable.
+
+## Family evidence governance
+
+Primary evidence unit = unique resolved setup family.
+
+- `<30`: observation only;
+- `30–49`: diagnostics;
+- `50–99`: hypotheses/ablation proposals only;
+- `>=100`: versioned recalibration proposal may be considered, still requiring fresh OOS/prospective evidence and explicit promotion.
+
+Next hard milestone:
 
 `>=30 unique resolved prospective frozen-v2.2 setup families`.
 
-## Profile research retained
+Do not tune frozen v2.2 from the current tiny prospective sample.
 
-FAST baseline v0 remains negative across development/validation/stress and is not promotable.
+## Retained profile research
 
-SWING baseline v0 remains near breakeven under base assumptions but negative in validation/stress and is not promotable.
+FAST v0 remains a negative baseline and is not promotable.
 
-POSITION W1 contract remains prototype/data-architecture only; temporal-integrity audit passed for 19/19 symbols with 47–70 W1 bars.
+SWING v0 remains near breakeven under base assumptions but negative in validation/stress and is not promotable.
 
-## GPT Builder governance
+POSITION W1 remains prototype/data-architecture only; temporal integrity passed for 19/19 symbols with 47–70 W1 bars.
 
-Approved governance files are present on the research branch:
+## Repository/governance
 
-- `custom_gpt/SYSTEM_K_TRADER_v1_3_COMPACT.md` — status `ЗАТВЕРДЖЕНО`;
-- `custom_gpt/00_KNOWLEDGE_PRIORITY.md` — status `ACTIVE KNOWLEDGE-GOVERNANCE FILE`.
+Canonical `main` after PR #57:
 
-Canonicalization to `main` is tracked in PR #57, `Custom GPT: canonize approved system instructions v1.3`.
+`4919fea4397d34898ddc7d4215ea898e6caea815`
 
-Current PR state at this sync:
+PR #57 was squash-merged after CI success and canonized:
 
-- open and mergeable;
-- current head `1543861ff9e8ee97e64371a0b41e467ee1c866d1`;
-- 5 commits / 5 changed files;
-- latest CI run 195 is in progress;
-- merge remains subject to required repository check `canonical-merge-gate`.
+- approved `custom_gpt/SYSTEM_K_TRADER_v1_3_COMPACT.md`;
+- active `custom_gpt/00_KNOWLEDGE_PRIORITY.md`;
+- Builder/Action/catalogue references to v1.3.
 
-No production deployment is associated with this governance PR.
+Research branch accepted pre-resume head was:
 
-## Pre-freeze status
+`90debd3ed5c4284b4590b8e4ebe7f106d475a8d3`
 
-Planned technical freeze: `2026-09-12 09:00 Kyiv` -> `2026-09-13 09:00 Kyiv` (`06:00Z` -> `06:00Z`).
+At the resume audit the research branch was approximately `83 ahead / 1 behind` relative to the newly updated `main`. Preserve research history; do not rebase blindly. Synchronize ancestry after post-pause catch-up and content-parity verification.
 
-Production itself is healthy and read-only. Research evidence is internally consistent through `04:45Z`, but the requested exact `05:45Z` final capture is **NOT VERIFIED** because the automation identity lacks Docker/root access. The freeze must therefore be treated as **SAFE FOR PRODUCTION / NOT A FULL CLEAN RESEARCH FINALIZATION** unless an authorized operator accepts `04:45Z` as the final research boundary or performs the final capture.
+Production remains deployed on `81b79...`; the new main commit is governance/documentation and does not require deployment.
 
-### Freeze-integrity blocker: APT timers
+## Resume order
 
-At the latest check immediately before the freeze:
+1. P0 post-pause catch-up and continuity audit.
+2. Post-host-drift runtime acceptance.
+3. Post-catch-up checkpoint and repo ancestry sync.
+4. Continue frozen-v2.2 prospective accumulation.
+5. Continue observation-only Level Context/portfolio/execution diagnostics.
+6. Consider only preregistered new strategy versions when evidence supports them.
 
-- `apt-daily.timer`: `active`;
-- `apt-daily-upgrade.timer`: `active`;
-- next `apt-daily-upgrade.timer` trigger: `2026-09-12T06:04:18Z` (~09:04 Kyiv), inside the freeze window;
-- next `apt-daily.timer` trigger: `2026-09-12T07:10:39Z` (~10:10 Kyiv).
+Phase 11G remains **ACTIVE**.
 
-Stopping/masking these timers requires privileged host access not available to the connected SentinelX identity. Therefore a **fully clean technical freeze is blocked** until an authorized operator disables the timers or explicitly accepts the package-maintenance risk.
-
-The pause-start automation is configured fail-closed and must not report a full clean freeze while this condition persists.
-
-Phase 11G remains active. Phase 12 remains FUTURE / NOT ACTIVE.
+Phase 12 remains **FUTURE / NOT ACTIVE**.
