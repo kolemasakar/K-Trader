@@ -4,7 +4,7 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md`
+`2026-09-13_V2_2_PROSPECTIVE_1200Z.md`
 
 Current accepted state:
 
@@ -12,14 +12,16 @@ Current accepted state:
 - production deployed SHA remains `81b79b281a4cc330b7c11058d202e0d74fb6d70e`, healthy and read-only;
 - frozen candidate remains `candidate_rule_set_v2_2` with harness SHA `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`;
 - holdout remains untouched and unauthorized;
-- Track B historical inference now uses the corrected causal rolling-context replay, not the earlier unbounded-context Historical Expansion v1 results;
-- corrected replay uses `400` M15 + `300` H1 closed bars at each historical decision and passed prospective parity with `0` mismatches across 19/19 symbols, 1824 checked M15 decisions, 70 signal cases and 69 structural cases;
+- Track B historical inference uses the corrected causal rolling-context replay, not the earlier unbounded-context Historical Expansion v1 results;
+- corrected replay uses `400` M15 + `300` H1 closed bars per historical decision and passed prospective parity with `0` mismatches across 19/19 symbols, 1824 checked M15 decisions, 70 signal cases and 69 structural cases;
 - corrected historical base expectancy: P25 `+0.2594R`, R90 `+0.0316R`, R180 `-0.0131R`, R365 `-0.0510R`;
 - frozen stress expectancy: P25 `+0.2249R`, R90 `-0.0097R`, R180 `-0.0429R`, R365 `-0.0745R`;
 - interpretation: v2.2 is currently a recent/regime-dependent candidate, not a long-horizon historically robust strategy;
 - no LONG-only or other in-place rule change is authorized;
 - latest accepted prospective capture/ledger cutoff is `2026-09-13T12:00:00Z`;
 - latest prospective capture: `VALID_SHADOW_CAPTURE`, panel `19/19`, 124 deduplicated events, 17 eligible observations, 12 unique families;
+- new family `f7c6c400...` is `VTHOUSDT LONG`, primary entry `2026-09-13T09:00:00Z`;
+- Level Context at 12 families remains diagnostic-only: clean-break `4`, disagreements `2`, obstacle-inside-3R `5`, inside-1R `4`;
 - fresh deterministic resolver for the 12:00Z ledger is pending because the execution channel blocked the invocation before server execution;
 - last accepted resolver state remains 9 resolved primary families / 2 unresolved, 1 win / 8 losses, expectancy `-0.8807054663R` at 08:30Z;
 - historical trades are never merged into prospective family-count thresholds;
@@ -35,7 +37,8 @@ Recovery instruction:
 
 ## Recent research checkpoints
 
-- `2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md` — accepted corrected bounded-context historical replay, parity gate, corrected P25/R90/R180/R365 results, and prospective continuation to 12:00Z;
+- `2026-09-13_V2_2_PROSPECTIVE_1200Z.md` — latest accepted prospective capture/ledger and Level Context state; outcome resolver refresh pending;
+- `2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md` — accepted corrected bounded-context historical replay, parity gate, and corrected P25/R90/R180/R365 results;
 - `2026-09-13_FROZEN_V2_2_DUAL_TRACK_HISTORICAL_EXPANSION_V1.md` — earlier dual-track checkpoint; historical inference section superseded by the causal rolling-replay acceptance checkpoint;
 - `2026-09-13_FROZEN_V2_2_CONTINUATION_0645Z.md` — first continued frozen-v2.2 snapshot after P0 plus completed research/main ancestry synchronization;
 - `2026-09-13_POST_PAUSE_CATCHUP_ACCEPTANCE.md` — canonical catch-up, family resolution, continuity and runtime acceptance;
