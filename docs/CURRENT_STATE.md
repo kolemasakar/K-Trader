@@ -1,7 +1,7 @@
 # K-Trader Current State
 
-Updated: 2026-09-13 dual-track frozen-v2.2 evidence through prospective cutoff `2026-09-13T08:30:00Z`  
-Research checkpoint: `docs/checkpoints/2026-09-13_FROZEN_V2_2_DUAL_TRACK_HISTORICAL_EXPANSION_V1.md`  
+Updated: 2026-09-13 through prospective capture `2026-09-13T12:00:00Z` and accepted corrected causal rolling historical replay.  
+Current research checkpoint: `docs/checkpoints/2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md`  
 Bootstrap: `docs/handoffs/BOOTSTRAP_PACKAGE_2026-09-13_K_TRADER_POST_PAUSE_RESUME.md`
 
 ## Production
@@ -10,17 +10,14 @@ Accepted/deployed application SHA:
 
 `81b79b281a4cc330b7c11058d202e0d74fb6d70e`
 
-Latest runtime state:
+Current accepted runtime state:
 
 - container `k-trader-ktrader-1`;
 - image `k-trader:81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
-- `running / healthy`;
-- API `status=ok`, `mode=read_only`, `data_ready=true`;
-- provider `binance_usdm`;
+- running / healthy;
+- API read-only, data ready, provider `binance_usdm`;
 - scanner `DEGRADED` remains the known fail-closed/history-readiness state;
-- host system state `running`;
-- no reboot-required marker;
-- no production deploy/restart was performed during current research work.
+- no production deploy or restart performed during current research work.
 
 ## Research isolation
 
@@ -46,200 +43,167 @@ Holdout:
 
 No frozen rule, RR, 8h max-hold, risk gate, symbol/direction filter or holdout authorization changed.
 
-## Dual-track evidence plan
+## Evidence architecture
 
-Current research now runs two strictly separated evidence streams.
+Two evidence streams remain strictly separate.
 
-### Track A — prospective evidence
+### Track A — prospective
 
-Independent future observations continue under exact frozen v2.2 semantics. This stream alone counts toward the preregistered prospective family thresholds.
+Only unique resolved prospective `setup_family_id` values count toward the preregistered family thresholds.
 
-### Track B — historical confirmatory expansion
+Latest accepted capture/ledger cutoff:
 
-A separate historical block is evaluated before the existing benchmark dataset. It supplements confidence and regime diagnostics but is never numerically merged with prospective family counts.
-
-Protocol:
-
-`docs/research/FROZEN_V2_2_HISTORICAL_EXPANSION_V1_PROTOCOL.md`
-
-Protocol commit:
-
-`7a3a51962030d1a5f591a41a1f200167cc47cc53`
-
-Evaluator:
-
-`research/strategy_benchmark_v1/historical_expansion_v2_2_v1.py`
-
-Evaluator commit:
-
-`a7ec89c5329db0b1a7a4aeaf08c871639916c8f6`
-
-## Track B — Historical Expansion v1 result
-
-Hard external cutoff:
-
-`2026-09-05T14:45:00Z`
-
-Primary scored window:
-
-`2026-08-11T14:45:00Z -> 2026-09-05T14:44:59.999Z`
-
-Coverage:
-
-- frozen panel `19/19`;
-- `2400` scored M15 bars per symbol = 25 days;
-- all 19 symbols have at least `3000` M15 and `2000` H1 bars in the exported dataset;
-- official Binance USD-M funding exported for all 19;
-- no symbol substitution;
-- existing benchmark holdout not evaluated.
-
-Accepted report:
-
-`/data/research/phase11g/historical_expansion_v1_20260905T144500Z/results_v1/report.json`
-
-Report SHA256:
-
-`2adf7f9ffeb9defd7ae57c42624abb6d797255e0c2284292e38949c0fbc7026c`
-
-Data hashes:
-
-- dataset summary: `1b25536c06489a8151c9de09989bbcf98c2c98e65c8d7be8ea17924a8be00b52`;
-- funding summary: `924ac2dad419f13ef19bd3eaf2ec8def24bbf47c094e5138e6cd069dcaaf854b`;
-- base trades: `3446d1f9d1aedac059426dacee88ad37245edeb43013aa52e5c62221a9f26641`;
-- stress trades: `0c819605a07f2c8f5e68991d4e01ebe159df3c59e3253049b27d2254ac2c5224`.
-
-Base historical result:
-
-- completed trades: `117`;
-- censored open positions: `2`;
-- wins/losses: `50 / 67`;
-- win rate: `42.7350%`;
-- expectancy: `+0.1863256189R`;
-- profit factor R: `1.347812099`;
-- max drawdown: `19.09473870R`;
-- exits: `55 STOP / 22 TARGET / 40 TIME_EXIT`;
-- directions: `98 LONG / 19 SHORT`;
-- top-symbol trade share: `14.53%`.
-
-Stress result at frozen `5 bps` execution slippage per side:
-
-- completed trades: `118`;
-- win rate: `42.3729%`;
-- expectancy: `+0.1742143868R`;
-- profit factor R: `1.326332898`;
-- max drawdown: `20.88130304R`;
-- expectancy delta vs base: `-0.0121112321R`.
-
-Direction diagnostic, base:
-
-- LONG: `98` trades, expectancy `+0.3260307549R`;
-- SHORT: `19` trades, expectancy `-0.5342587667R`.
-
-This direction split is a hypothesis signal only. It does not authorize an in-place LONG-only filter or any v2.2 retuning.
-
-Five equal 5-day diagnostic blocks produced expectancy values:
-
-`-0.1038R, +0.3799R, -0.0192R, +0.1412R, +0.5106R`.
-
-Historical Expansion v1 therefore supports a positive aggregate historical edge over this fixed 25-day block, but also shows material direction/regime heterogeneity and a large chronological trade-stream drawdown. It remains confirmatory historical evidence, not prospective evidence.
-
-## Track A — latest prospective evidence
-
-Latest accepted safe closed-M15 cutoff:
-
-`2026-09-13T08:30:00Z`
+`2026-09-13T12:00:00Z`
 
 Run root:
 
-`/data/research/phase11g/v2_2_shadow_20260913T083000Z`
+`/data/research/phase11g/v2_2_shadow_20260913T120000Z`
 
-Capture:
+Capture state:
 
-- cycle: `VALID_SHADOW_CAPTURE`;
-- provider: `binance_usdm`;
-- panel: `19/19`;
-- signal bars evaluated: `2755`;
-- deduplicated events: `110`;
-- eligible observations: `15`;
-- unique eligible families: `11`;
-- valid snapshots: `11`;
-- discovered snapshots: `12`;
-- one previously known invalid infrastructure snapshot remains rejected;
-- holdout: unopened.
+- cycle `VALID_SHADOW_CAPTURE`;
+- provider `binance_usdm`;
+- panel `19/19`;
+- signal bars evaluated `3021`;
+- deduplicated events `124`;
+- eligible observations `17`;
+- unique eligible families `12`;
+- valid snapshots `12`;
+- one known invalid infrastructure snapshot remains rejected;
+- holdout unopened.
 
-Latest hashes:
+Latest capture hashes:
 
-- bundle set: `70df3ba7a614f7e254a0e3bcba545c30e43cc161ba238b8aabbf51cee6a91f9a`;
-- bundle export summary: `10204b8dab8a0cf8c0550c55409adfa8e81307f3e65159ab543ad8d447c69089`;
-- shadow summary: `0b8c88dc9973c4ad803f72e6021b8c41a32b1501d5dbae2e7a8a7ef8470ba1f0`;
-- event file: `25063e48eaa1a9667fea4674a6194f1f6d593a77e7b3173c46b999c2af4e5ff1`;
-- ledger event set: `c506a23a1fc32b49f718263318c9cba2288d01d2bc928632cf98a97379ace5b1`;
-- outcome report: `4b068d4326c494c11a37270bacf217d90f528d4f8236c893f134c7e1f353e002`;
-- family outcome set: `b5708948c98f9fdacd59551749e9368cf1f2afdac23de1aa4c41ae8d36c60ae2`;
-- observation outcome set: `200b76ab25bb9194ba8e121f5f9d4d422a99107e6034a481b38d66d7cfae5ddc`;
-- Level Context observation: `a687cf20b552d7eb6a0f855572becb2fecd1b198af71b081609d295666c2c532`.
+- bundle set: `6b3f9762be7e1704d9db6dc9490b25f44e99cd79903c8511dc26b192b44843dc`;
+- bundle export summary: `a1f62a6e5930d663bcd708af37ab7e9b25832de7968cdfde0907331c04e4c60c`;
+- shadow summary: `fac14d51f33958adb2e8aab98320477a02910687a2c60b383ab329c6e80541c0`;
+- event file: `43dededa0e76386c518d81a2861fb88c3e9a7c52a4688d29561ad1fe990fbebe`;
+- ledger event set: `39477107acb99b0a5a8b4443bbe27d10f8828c809fd5dcc29c4adfa05fcc0d78`.
 
-## Prospective family outcomes
+Deterministic outcome resolution has not yet been refreshed for 12:00Z because the execution channel blocked the resolver invocation before server execution. Therefore the last accepted resolved-family state remains the 08:30Z result:
 
-Primary evidence unit remains unique resolved `setup_family_id`.
-
-Current state:
-
-- unique families: `11`;
+- unique families known at that resolver state: `11`;
 - resolved primary families: `9`;
 - unresolved primary families: `2`;
 - resolved wins/losses: `1 / 8`;
-- resolved WR: `11.11%`;
+- resolved win rate: `11.11%`;
 - resolved expectancy: `-0.8807054663R`;
-- evidence status: `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`.
+- status: `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`.
 
-Unresolved primary families:
-
-- `e363704d...` — `VTHOUSDT LONG`, primary entry `2026-09-13T06:30:00Z`;
-- `5f7acb47...` — `VTHOUSDT LONG`, primary entry `2026-09-13T08:00:00Z`.
-
-Current prospective sample remains too small to override the preregistered governance or explain the historical/prospective difference statistically.
-
-## Observation-only diagnostics
-
-Level Context v2 across 11 primary families:
-
-- clean-break/no-revisit: `4`;
-- frozen-v2.2 vs richer open-space disagreements: `2`;
-- richer obstacle inside `3R`: `5`;
-- richer obstacle inside `1R`: `4`.
-
-All diagnostic features remain non-gating.
-
-## Family evidence governance
-
-- `<30` resolved primary families: observation only;
-- `30–49`: diagnostics;
-- `50–99`: hypotheses/ablation proposals only;
-- `>=100`: versioned recalibration proposal may be considered, still requiring fresh OOS/prospective evidence and explicit promotion.
+The 12th family is accepted in the ledger but must not be counted as resolved until the deterministic resolver succeeds.
 
 Next prospective hard milestone:
 
 `>=30 unique resolved prospective frozen-v2.2 setup families`.
 
-Historical trades do not count toward this threshold.
+## Track B — corrected causal historical replay
 
-## Host / pre-pause preparation
+Earlier Historical Expansion v1 / first long-window results are superseded for inference because they exposed the structural-space detector to more H1 history than the canonical prospective path.
 
-Planned technical/data-collection pause:
+Supersession record:
+
+`docs/research/FROZEN_V2_2_HISTORICAL_EXPANSION_V1_SUPERSESSION.md`
+
+Corrected protocol:
+
+`docs/research/FROZEN_V2_2_CAUSAL_ROLLING_CONTEXT_REPLAY_V1_PROTOCOL.md`
+
+Accepted checkpoint:
+
+`docs/checkpoints/2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md`
+
+Corrected replay semantics:
+
+- rolling M15 context exactly `400` closed bars after warm-up;
+- rolling H1 context exactly `300` closed bars after warm-up;
+- original frozen `signal_at()` and `level_features()`;
+- original 3R / 32-M15 max hold / STOP-first / costs and funding;
+- no holdout access;
+- no production action.
+
+Global context audit:
+
+- `630240` historical decision bars;
+- `19` symbols;
+- M15 context min/max `400/400`;
+- H1 context min/max `300/300`;
+- raw frozen signal cases `21964`.
+
+Prospective parity gate against the canonical 08:30Z snapshot:
+
+- symbols `19/19`;
+- decision bars checked `1824`;
+- signal cases `70`;
+- structural cases `69`;
+- mismatches `0`;
+- status `PASS`.
+
+Accepted corrected historical results:
+
+| Window | Cohort | Trades | WR | Expectancy R | PF_R | Stress expectancy R | Stress PF_R |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| P25 | 19 | 214 | 44.86% | +0.259415 | 1.5193 | +0.224861 | 1.4459 |
+| R90 | 19 | 531 | 39.36% | +0.031637 | 1.0574 | -0.009676 | 0.9829 |
+| R180 | 19 | 1073 | 39.14% | -0.013131 | 0.9761 | -0.042896 | 0.9232 |
+| R365 | 17 | 2099 | 37.54% | -0.051000 | 0.9096 | -0.074531 | 0.8704 |
+
+Direction diagnostics, base:
+
+- P25 LONG `+0.457787R`, SHORT `-0.408573R`;
+- R90 LONG `+0.209006R`, SHORT `-0.213339R`;
+- R180 LONG `+0.084231R`, SHORT `-0.112140R`;
+- R365 LONG `-0.011860R`, SHORT `-0.074765R`.
+
+Interpretation:
+
+- corrected historical edge decays materially with horizon;
+- P25 is positive and robust to frozen stress;
+- R90 is marginally positive under base costs and slightly negative under stress;
+- R180 and R365 are negative;
+- frozen v2.2 is therefore a recent/regime-dependent candidate, not a long-horizon historically robust strategy;
+- SHORT weakness is a future-version hypothesis only and does not authorize an in-place LONG-only filter.
+
+Corrected artifact hashes:
+
+- result index: `5db748737535254ac9983fa55f6c971e7198d9a6ffe80899e08f2d3ac23ea528`;
+- parity: `47b03d3c7280d8cc2c7f3f73af529fb2fa89e9ccf47c8b2132d289438396effe`;
+- context audit: `4e7ee32542c0ec15d6e166a285fcc1252529cf73420d70d869b1c73625ec82f9`.
+
+Reproducibility:
+
+- base evaluator: `research/strategy_benchmark_v1/historical_causal_rolling_replay_v1_1.py`;
+- base evaluator commit: `196df4948f292505ffdb8c7b5966781843c5c878`;
+- persisted equivalent lossless optimization patch: `research/strategy_benchmark_v1/patches/historical_causal_rolling_replay_v1_1_lossless_short_circuit.patch`;
+- patch commit: `a90585ca4ac5068fe434b8f52767ae3f4b426b4c`;
+- accepted runtime evaluator SHA256: `c0dead4957622515a7d432d8142ac7ae8915f46e36905a5cc0e483c93e78b7e7`.
+
+## Governance
+
+Prospective thresholds remain unchanged:
+
+- `<30` resolved primary families: observation only;
+- `30–49`: diagnostics;
+- `50–99`: hypotheses/ablation proposals only;
+- `>=100`: a versioned recalibration proposal may be considered, still requiring fresh OOS/prospective evidence and explicit promotion.
+
+Historical trades never count toward these family thresholds.
+
+No in-place retuning of frozen v2.2 is authorized by either the corrected historical results or the current prospective sample.
+
+## Planned data-collection pause
+
+Planned pause:
 
 `2026-09-14 10:00 Europe/Kyiv -> 2026-09-15 10:00 Europe/Kyiv`.
 
-Current host preparation state:
+Pre-pause host fact retained:
 
-- `/data` free space approximately `37G`;
-- Phase 11G research footprint approximately `294M` before the new historical bundle growth;
 - `apt-daily.timer` enabled/active;
 - `apt-daily-upgrade.timer` enabled/active;
-- observed next `apt-daily-upgrade` schedule was approximately `2026-09-14 09:01 Europe/Kyiv`;
-- SentinelX `sudo systemctl` requires a password, so host timer freeze is expected to require a manual owner action unless permissions change.
+- observed next `apt-daily-upgrade` schedule approximately `2026-09-14 09:01 Europe/Kyiv`;
+- SentinelX `sudo systemctl` requires a password, so manual owner action is expected if the timer state has not changed.
 
-Per user instruction, exact manual actions are to be supplied at `2026-09-14 07:00 Europe/Kyiv`. No automatic reminder/task is configured.
+Per user instruction, exact manual actions are to be supplied at `2026-09-14 07:00 Europe/Kyiv`. No automatic reminder or automation is configured.
 
 ## Repository/governance
 
@@ -247,23 +211,18 @@ Canonical `main`:
 
 `4919fea4397d34898ddc7d4215ea898e6caea815`
 
-Research ancestry remains synchronized without history rewrite:
+Research remains a descendant of canonical main with no rebase or force update.
 
-- canonical `main` is an ancestor of research;
-- no rebase;
-- no force update.
-
-Production remains deployed on `81b79...`; research and documentation commits do not require redeployment.
+Production remains deployed on `81b79...`; research/documentation updates do not require redeployment.
 
 ## Next work order
 
-1. Continue exact frozen-v2.2 prospective accumulation and deterministic family resolution.
-2. Keep Historical Expansion v1 immutable as the primary 25-day historical confirmatory block.
-3. Preregister and add longer historical robustness windows separately (90d / 180d / 1y where instrument age supports them), without redefining the primary result.
-4. Continue direction/regime/Level Context/VSA/execution diagnostics only as hypotheses, not gates.
-5. Prepare the 2026-09-14 pre-pause baseline and manual host freeze instructions at 07:00 Europe/Kyiv.
-6. Create a new strategy version only through preregistration when evidence supports it.
+1. Refresh the deterministic prospective resolver as soon as the execution channel permits it; resolve the 12-family ledger causally.
+2. Continue exact frozen-v2.2 prospective captures only on materially newer safe closed-M15 cutoffs.
+3. Keep corrected historical replay results immutable as accepted Track B evidence; no further window tuning based on P&L.
+4. Continue Level Context / VSA / execution / correlation diagnostics as observation-only features.
+5. Prepare the pre-pause baseline and owner manual host actions for 07:00 Europe/Kyiv on 2026-09-14.
+6. Do not open holdout and do not retune frozen v2.2 in place.
 
-Phase 11G remains **ACTIVE**.
-
+Phase 11G remains **ACTIVE**.  
 Phase 12 remains **FUTURE / NOT ACTIVE**.
