@@ -4,7 +4,7 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-13_FROZEN_V2_2_DUAL_TRACK_HISTORICAL_EXPANSION_V1.md`
+`2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md`
 
 Current accepted state:
 
@@ -12,16 +12,17 @@ Current accepted state:
 - production deployed SHA remains `81b79b281a4cc330b7c11058d202e0d74fb6d70e`, healthy and read-only;
 - frozen candidate remains `candidate_rule_set_v2_2` with harness SHA `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`;
 - holdout remains untouched and unauthorized;
-- research now operates two separated evidence tracks: prospective accumulation plus preregistered historical confirmatory expansion;
-- Historical Expansion v1 uses the fixed external window `2026-08-11T14:45:00Z -> 2026-09-05T14:44:59.999Z`, 2400 M15 bars per symbol, panel `19/19`, official Binance funding and no symbol substitution;
-- Historical Expansion v1 base result: 117 completed trades, WR `42.7350%`, expectancy `+0.1863256189R`, PF_R `1.347812099`, max DD `19.09473870R`;
-- frozen stress-slippage result: expectancy `+0.1742143868R`, PF_R `1.326332898`;
-- historical direction diagnostic: LONG `+0.3260R` vs SHORT `-0.5343R`; diagnostic only, no rule change authorized;
-- latest prospective cutoff is `2026-09-13T08:30:00Z`;
-- prospective capture: `VALID_SHADOW_CAPTURE`, panel `19/19`, 110 deduplicated events, 15 eligible observations, 11 unique families;
-- deterministic resolver: 9 resolved primary families, 2 unresolved, 1 win / 8 losses, expectancy `-0.8807054663R`;
-- prospective evidence remains `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`;
-- historical trades are not merged into prospective family-count thresholds;
+- Track B historical inference now uses the corrected causal rolling-context replay, not the earlier unbounded-context Historical Expansion v1 results;
+- corrected replay uses `400` M15 + `300` H1 closed bars at each historical decision and passed prospective parity with `0` mismatches across 19/19 symbols, 1824 checked M15 decisions, 70 signal cases and 69 structural cases;
+- corrected historical base expectancy: P25 `+0.2594R`, R90 `+0.0316R`, R180 `-0.0131R`, R365 `-0.0510R`;
+- frozen stress expectancy: P25 `+0.2249R`, R90 `-0.0097R`, R180 `-0.0429R`, R365 `-0.0745R`;
+- interpretation: v2.2 is currently a recent/regime-dependent candidate, not a long-horizon historically robust strategy;
+- no LONG-only or other in-place rule change is authorized;
+- latest accepted prospective capture/ledger cutoff is `2026-09-13T12:00:00Z`;
+- latest prospective capture: `VALID_SHADOW_CAPTURE`, panel `19/19`, 124 deduplicated events, 17 eligible observations, 12 unique families;
+- fresh deterministic resolver for the 12:00Z ledger is pending because the execution channel blocked the invocation before server execution;
+- last accepted resolver state remains 9 resolved primary families / 2 unresolved, 1 win / 8 losses, expectancy `-0.8807054663R` at 08:30Z;
+- historical trades are never merged into prospective family-count thresholds;
 - no rebase/force update is permitted or used.
 
 ## New-chat bootstrap
@@ -34,7 +35,8 @@ Recovery instruction:
 
 ## Recent research checkpoints
 
-- `2026-09-13_FROZEN_V2_2_DUAL_TRACK_HISTORICAL_EXPANSION_V1.md` — first accepted dual-track state: prospective evidence plus preregistered 25-day historical expansion;
+- `2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md` — accepted corrected bounded-context historical replay, parity gate, corrected P25/R90/R180/R365 results, and prospective continuation to 12:00Z;
+- `2026-09-13_FROZEN_V2_2_DUAL_TRACK_HISTORICAL_EXPANSION_V1.md` — earlier dual-track checkpoint; historical inference section superseded by the causal rolling-replay acceptance checkpoint;
 - `2026-09-13_FROZEN_V2_2_CONTINUATION_0645Z.md` — first continued frozen-v2.2 snapshot after P0 plus completed research/main ancestry synchronization;
 - `2026-09-13_POST_PAUSE_CATCHUP_ACCEPTANCE.md` — canonical catch-up, family resolution, continuity and runtime acceptance;
 - `2026-09-13_POST_PAUSE_RESUME.md` — post-pause production audit, host APT drift, evidence/catch-up boundary and resume gate;
@@ -50,7 +52,9 @@ Recovery instruction:
 ## Related documents
 
 - current state: `../CURRENT_STATE.md`;
-- historical expansion protocol: `../research/FROZEN_V2_2_HISTORICAL_EXPANSION_V1_PROTOCOL.md`;
+- corrected historical replay protocol: `../research/FROZEN_V2_2_CAUSAL_ROLLING_CONTEXT_REPLAY_V1_PROTOCOL.md`;
+- historical expansion supersession: `../research/FROZEN_V2_2_HISTORICAL_EXPANSION_V1_SUPERSESSION.md`;
+- historical expansion original protocol: `../research/FROZEN_V2_2_HISTORICAL_EXPANSION_V1_PROTOCOL.md`;
 - family semantics: `../research/PROSPECTIVE_FAMILY_OUTCOME_SEMANTICS_V1.md`;
 - prospective protocol: `../research/V2_2_PROSPECTIVE_SHADOW_PROTOCOL.md`;
 - profile/prospective report: `../research/PROFILE_BASELINES_AND_PROSPECTIVE_UPDATE_2026-09-12.md`;
