@@ -1,0 +1,75 @@
+--- historical_causal_rolling_replay_v1_1.orig.py
++++ historical_causal_rolling_replay_v1_1.py
+@@ -96,14 +96,10 @@
+ def rolling_signal_at(m15, h1, h1cts, i, h1_cache):
+     m_start = max(0, i - M15_CONTEXT + 1)
+     lm = m15[m_start : i + 1]
+-    mx = m15_indicators_exact_sparse(lm)
+     decision_dt = lm[-1]["close_dt"]
+     h_abs = bisect.bisect_right(h1cts, decision_dt) - 1
+     if h_abs < 0:
+-        return None, {
+-            "m15_count": len(lm), "h1_count": 0, "m15_start_abs": m_start,
+-            "h1_start_abs": None, "h1_decision_abs": None,
+-        }
++        return None, {"m15_count": len(lm), "h1_count": 0, "m15_start_abs": m_start, "h1_start_abs": None, "h1_decision_abs": None}
+     cached = h1_cache.get(h_abs)
+     if cached is None:
+         h_start = max(0, h_abs - H1_CONTEXT + 1)
+@@ -113,14 +109,29 @@
+         cached = (h_start, lh, hx, lhcts)
+         h1_cache[h_abs] = cached
+     h_start, lh, hx, lhcts = cached
++    audit = {"m15_count": len(lm), "h1_count": len(lh), "m15_start_abs": m_start, "h1_start_abs": h_start, "h1_decision_abs": h_abs}
++    if len(lm) < 53:
++        return None, audit
++    h1_context = v22.v._base_signal.__globals__["h1_context"]
++    side, hfeat = h1_context(lh, hx, lhcts, decision_dt)
++    if side == 0 or hfeat is None or hfeat["h1_ema_sep_atr"] < v22.v.MIN_H1_SEP_ATR:
++        return None, audit
++    bar = lm[-1]
++    prev = lm[-2]
++    body = abs(bar["close"] - bar["open"])
++    rng = max(1e-15, bar["high"] - bar["low"])
++    if body / rng > v22.v.MAX_SIGNAL_BODY_FRAC:
++        return None, audit
++    if side == 1:
++        price_possible = bar["close"] > prev["high"] and bar["close"] > bar["open"]
++    else:
++        price_possible = bar["close"] < prev["low"] and bar["close"] < bar["open"]
++    if not price_possible:
++        return None, audit
++    mx = m15_indicators_exact_sparse(lm)
+     raw = v22.v.signal_at(len(lm) - 1, lm, mx, lh, hx, lhcts)
+-    audit = {
+-        "m15_count": len(lm), "h1_count": len(lh), "m15_start_abs": m_start,
+-        "h1_start_abs": h_start, "h1_decision_abs": h_abs,
+-    }
+     if raw is None:
+         return None, audit
+-
+     local_pullback = int(raw["features"]["pullback_episode_index"])
+     global_pullback = m_start + local_pullback
+     features = dict(raw["features"])
+@@ -132,15 +143,12 @@
+         "h1_abs_index": h_start + int(raw["features"]["h1_index"]),
+         "pullback_episode_abs_index": global_pullback,
+     })
+-    return {
+-        "side": raw["side"],
+-        "stop_raw": raw["stop_raw"],
+-        "episode_key": f"{raw['side']}:{global_pullback}",
+-        "features": features,
+-        "_h1": lh,
+-        "_hx": hx,
+-        "_decision_idx_local": int(raw["features"]["h1_index"]),
+-    }, audit
++    pending = {
++        "side": raw["side"], "stop_raw": raw["stop_raw"],
++        "features": features, "episode_key": f"{raw['side']}:{global_pullback}",
++        "_h1": lh, "_hx": hx, "_decision_idx_local": int(raw["features"]["h1_index"]),
++    }
++    return pending, audit
+ 
+ 
+ def stripped_rolling_signal(signal, direct_episode_key):
