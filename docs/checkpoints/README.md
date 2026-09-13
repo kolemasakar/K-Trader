@@ -4,27 +4,28 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-13_POST_PAUSE_RESUME.md`
+`2026-09-13_POST_PAUSE_CATCHUP_ACCEPTANCE.md`
 
 Current accepted state:
 
-- technical pause window `2026-09-12T06:00:00Z -> 2026-09-13T06:00:00Z` has ended;
+- mandatory P0 post-pause catch-up is complete;
 - production deployed SHA remains `81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
-- fresh post-pause `/health` at ~`2026-09-13T06:12:54Z` is `ok`, `read_only`, `data_ready=true`, provider `binance_usdm`;
-- VM uptime spans the pause with no reboot;
-- strict freeze integrity failed because unattended-upgrade changed host Python 3.12 and libc6 at ~`2026-09-12T06:04Z`;
-- no K-Trader deployment SHA changed during the pause;
-- pause-watch automation does not provide a complete hourly evidence chain through the full 24h window;
-- frozen candidate remains `candidate_rule_set_v2_2` with harness SHA `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`;
+- container is `running / healthy` on the exact accepted image;
+- localhost and public `/health` are `ok`, `read_only`, `data_ready=true`, provider `binance_usdm`;
+- post-pause host state is running with no reboot-required marker;
+- technical pause was not a strict host freeze because unattended-upgrade changed host Python/libc, but K-Trader deployment did not change;
+- frozen candidate remains `candidate_rule_set_v2_2`;
+- frozen harness SHA remains `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`;
 - holdout remains untouched and unauthorized;
-- latest accepted prospective snapshot remains `2026-09-12T04:45:00Z` pending authorized post-pause catch-up;
-- accepted prospective state: 7 snapshots / 31 events / 6 eligible observations / 4 families / 2 resolved STOP / 2 unresolved;
+- latest accepted prospective cutoff is `2026-09-13T06:30:00Z`;
+- latest capture is `VALID_SHADOW_CAPTURE`, panel `19/19`, 96 deduplicated events, 12 eligible observations, 9 unique families;
+- deterministic resolver: 9 resolved primary families, 1 win / 8 losses, expectancy `-0.8807054663R`;
 - evidence remains `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`;
-- full 24h pause remains inside the runner's ~100h M15 catch-up horizon;
-- first resumed operation is P0 post-pause catch-up + deterministic resolver + continuity audit;
-- canonical `main` is now `4919fea4397d34898ddc7d4215ea898e6caea815` after PR #57 squash merge;
-- approved System Instructions v1.3 and Knowledge Priority are canonical on `main`;
-- research history must be preserved when synchronizing the one new canonical main commit;
+- pause-window M15 continuity is `PASS 19/19`, 96/96 bars each, zero gaps/duplicates;
+- Level Context/VSA/execution observations remain diagnostic only;
+- canonical `main` remains `4919fea4397d34898ddc7d4215ea898e6caea815`;
+- governance blobs are identical between canonical main and the research branch;
+- research history must be preserved during ancestry synchronization;
 - Phase 11G remains active;
 - Phase 12 remains FUTURE / NOT ACTIVE.
 
@@ -38,6 +39,7 @@ Recovery instruction:
 
 ## Recent research checkpoints
 
+- `2026-09-13_POST_PAUSE_CATCHUP_ACCEPTANCE.md` — canonical catch-up, family resolution, continuity and runtime acceptance;
 - `2026-09-13_POST_PAUSE_RESUME.md` — post-pause production audit, host APT drift, evidence/catch-up boundary and resume gate;
 - `2026-09-12_PRE_FREEZE_FINAL_CHECK.md` — final pre-freeze verification and authorization/freeze-integrity blockers;
 - `2026-09-12_V2_2_FAMILY_SEMANTICS_PROFILE_BASELINES_W1.md` — family outcome semantics/resolver, FAST/SWING baseline execution, POSITION W1 contract;
