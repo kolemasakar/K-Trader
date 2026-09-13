@@ -94,7 +94,8 @@ Latest hashes:
 - ledger event set: `4419fc7d00b29767c3aa0d3d7017f01f4b0862cb18419ca54ac4adaec15bcf33`;
 - outcome summary: `ff5e9948e707eec3ef64238703662a2acb376229890b02898e22ed42d6b585e3`;
 - family outcome set: `f138c05a5d1c5690a839a11e34fec90db1fe5b9b3803b8faddb71bb9d3d75814`;
-- observation outcome set: `decb9b36427e124179f3d8c2ba777114a540f202cea7c3edc7008b46532a2e61`.
+- observation outcome set: `decb9b36427e124179f3d8c2ba777114a540f202cea7c3edc7008b46532a2e61`;
+- Level Context observation: `f8840345aa311ab2fa9d7b084e40b9ef819ff2cc58f316bdf10293f5da943c51`.
 
 ## Family outcomes
 
@@ -120,7 +121,7 @@ The current sample is still far below the preregistered evidence threshold and d
 
 ## Observation-only diagnostics
 
-Latest successfully persisted Level Context v2 diagnostic remains the 06:45Z state across 10 primary families:
+Level Context v2 at the 07:45Z state across 10 primary families:
 
 - clean-break/no-revisit: `4`;
 - frozen-v2.2 vs richer open-space disagreement: `2`;
