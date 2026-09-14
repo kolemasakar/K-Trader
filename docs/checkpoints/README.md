@@ -4,64 +4,64 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-13_V2_2_PROSPECTIVE_1200Z.md`
+`2026-09-14_EXTENDED_SOAK_PAUSE_START.md`
 
 Current accepted state:
 
 - Phase 11G remains ACTIVE; Phase 12 remains FUTURE / NOT ACTIVE;
-- production deployed SHA remains `81b79b281a4cc330b7c11058d202e0d74fb6d70e`, healthy and read-only;
+- production deployed SHA remains `81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
+- production health at soak start was `ok`, mode `read_only`, provider `binance_usdm`;
+- scanner `DEGRADED` is the known fail-closed/history-readiness state;
+- extended soak window is active from `2026-09-14 06:08 Europe/Kyiv` through `2026-09-16 09:00 Europe/Kyiv`;
+- published K_Trader read-only analysis/data access is allowed during soak;
+- deploy/restart/config mutation/package upgrade/manual prospective runs/retuning/holdout opening/new VM automation are forbidden during soak;
+- `apt-daily.timer` and `apt-daily-upgrade.timer` are `masked-runtime`; corresponding services are inactive and have no next activation;
+- root disk usage at soak start was `18%`;
 - frozen candidate remains `candidate_rule_set_v2_2` with harness SHA `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`;
 - holdout remains untouched and unauthorized;
-- Track B historical inference uses the corrected causal rolling-context replay, not the earlier unbounded-context Historical Expansion v1 results;
-- corrected replay uses `400` M15 + `300` H1 closed bars per historical decision and passed prospective parity with `0` mismatches across 19/19 symbols, 1824 checked M15 decisions, 70 signal cases and 69 structural cases;
-- corrected historical base expectancy: P25 `+0.2594R`, R90 `+0.0316R`, R180 `-0.0131R`, R365 `-0.0510R`;
-- frozen stress expectancy: P25 `+0.2249R`, R90 `-0.0097R`, R180 `-0.0429R`, R365 `-0.0745R`;
-- interpretation: v2.2 is currently a recent/regime-dependent candidate, not a long-horizon historically robust strategy;
-- no LONG-only or other in-place rule change is authorized;
-- latest accepted prospective capture/ledger cutoff is `2026-09-13T12:00:00Z`;
-- latest prospective capture: `VALID_SHADOW_CAPTURE`, panel `19/19`, 124 deduplicated events, 17 eligible observations, 12 unique families;
-- new family `f7c6c400...` is `VTHOUSDT LONG`, primary entry `2026-09-13T09:00:00Z`;
-- Level Context at 12 families remains diagnostic-only: clean-break `4`, disagreements `2`, obstacle-inside-3R `5`, inside-1R `4`;
-- fresh deterministic resolver for the 12:00Z ledger is pending because the execution channel blocked the invocation before server execution;
-- last accepted resolver state remains 9 resolved primary families / 2 unresolved, 1 win / 8 losses, expectancy `-0.8807054663R` at 08:30Z;
-- historical trades are never merged into prospective family-count thresholds;
+- latest accepted prospective cutoff is `2026-09-13T13:00:00Z`;
+- accepted prospective state is 17 eligible observations, 12 unique families, 12 resolved primary families, 0 unresolved, 1 win / 11 losses, expectancy `-0.9007780994315739R`;
+- evidence remains `OBSERVATION_ONLY_LT_30_RESOLVED_FAMILIES`;
+- corrected historical inference uses causal rolling M15=400 / H1=300 replay and not superseded unbounded-context runs;
+- corrected historical expectancy: P25 `+0.259415R`, R90 `+0.031637R`, R180 `-0.013131R`, R365 `-0.051000R`;
+- no LONG-only or other in-place frozen-v2.2 rule change is authorized;
+- disk-retention policy is approved (`>=80%` usage -> oldest 20% of explicitly eligible reproducible/temporary data), but automatic VM cleanup is not installed until after soak closure;
 - no rebase/force update is permitted or used.
 
 ## New-chat bootstrap
 
-`../handoffs/BOOTSTRAP_PACKAGE_2026-09-13_K_TRADER_POST_PAUSE_RESUME.md`
+`../handoffs/BOOTSTRAP_PACKAGE_2026-09-14_K_TRADER_EXTENDED_SOAK_HANDOFF.md`
 
 Recovery instruction:
 
-`віднови <<File name="BOOTSTRAP_PACKAGE_2026-09-13_K_TRADER_POST_PAUSE_RESUME.md">>`
+`віднови <<File name="BOOTSTRAP_PACKAGE_2026-09-14_K_TRADER_EXTENDED_SOAK_HANDOFF.md">>`
 
 ## Recent research checkpoints
 
-- `2026-09-13_V2_2_PROSPECTIVE_1200Z.md` — latest accepted prospective capture/ledger and Level Context state; outcome resolver refresh pending;
-- `2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md` — accepted corrected bounded-context historical replay, parity gate, and corrected P25/R90/R180/R365 results;
-- `2026-09-13_FROZEN_V2_2_DUAL_TRACK_HISTORICAL_EXPANSION_V1.md` — earlier dual-track checkpoint; historical inference section superseded by the causal rolling-replay acceptance checkpoint;
-- `2026-09-13_FROZEN_V2_2_CONTINUATION_0645Z.md` — first continued frozen-v2.2 snapshot after P0 plus completed research/main ancestry synchronization;
-- `2026-09-13_POST_PAUSE_CATCHUP_ACCEPTANCE.md` — canonical catch-up, family resolution, continuity and runtime acceptance;
-- `2026-09-13_POST_PAUSE_RESUME.md` — post-pause production audit, host APT drift, evidence/catch-up boundary and resume gate;
-- `2026-09-12_PRE_FREEZE_FINAL_CHECK.md` — final pre-freeze verification and authorization/freeze-integrity blockers;
-- `2026-09-12_V2_2_FAMILY_SEMANTICS_PROFILE_BASELINES_W1.md` — family outcome semantics/resolver, FAST/SWING baseline execution, POSITION W1 contract;
-- `2026-09-12_V2_2_FIRST_PROSPECTIVE_FAMILIES_AND_PROFILE_DATASET.md` — first non-empty prospective families, adaptive dataset and funding completeness;
-- `2026-09-11_V2_2_PARALLEL_RESEARCH_CHECKPOINT.md` — Level/VSA/execution/portfolio/robustness diagnostics and prospective infrastructure;
-- `2026-09-11_V2_2_FIRST_PROSPECTIVE_SHADOW_CAPTURE.md` — first prospective shadow capture;
-- `2026-09-11_STRATEGY_V2_2_PREHOLDOUT_CHECKPOINT.md` — frozen v2.2 pre-holdout state;
-- `2026-09-11_STRATEGY_SYNTHESIS_V2_1.md` — v2.1 synthesis;
-- `2026-09-11_STRATEGY_BENCHMARK_V1_DISCOVERY_GATE.md` — benchmark discovery gate.
+- `2026-09-14_EXTENDED_SOAK_PAUSE_START.md` — active extended production soak, APT freeze and allowed/forbidden operations;
+- `2026-09-13_V2_2_PROSPECTIVE_1300Z.md` — latest accepted prospective capture/ledger;
+- `2026-09-13_V2_2_PROSPECTIVE_1300Z_OUTCOME_ADDENDUM.md` — accepted 12/12 resolved family outcomes at 13:00Z;
+- `2026-09-13_V2_2_PROSPECTIVE_1200Z.md` — prior prospective capture;
+- `2026-09-13_V2_2_PROSPECTIVE_1200Z_OUTCOME_ADDENDUM.md` — accepted prior outcome state and float-cache finding;
+- `2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md` — corrected bounded-context historical replay, parity gate and P25/R90/R180/R365 results;
+- `2026-09-13_FROZEN_V2_2_DUAL_TRACK_HISTORICAL_EXPANSION_V1.md` — earlier dual-track checkpoint; historical inference section superseded by causal rolling replay;
+- `2026-09-13_POST_PAUSE_CATCHUP_ACCEPTANCE.md` — earlier catch-up/runtime acceptance;
+- `2026-09-13_POST_PAUSE_RESUME.md` — earlier post-pause production audit;
+- `2026-09-12_PRE_FREEZE_FINAL_CHECK.md` — pre-freeze verification;
+- `2026-09-12_V2_2_FAMILY_SEMANTICS_PROFILE_BASELINES_W1.md` — family outcome semantics and profile baselines;
+- `2026-09-11_V2_2_PARALLEL_RESEARCH_CHECKPOINT.md` — parallel research diagnostics;
+- `2026-09-11_STRATEGY_V2_2_PREHOLDOUT_CHECKPOINT.md` — frozen v2.2 pre-holdout state.
 
 ## Related documents
 
 - current state: `../CURRENT_STATE.md`;
+- active handoff: `../handoffs/BOOTSTRAP_PACKAGE_2026-09-14_K_TRADER_EXTENDED_SOAK_HANDOFF.md`;
+- disk policy: `../operations/DISK_RETENTION_POLICY.md`;
 - corrected historical replay protocol: `../research/FROZEN_V2_2_CAUSAL_ROLLING_CONTEXT_REPLAY_V1_PROTOCOL.md`;
 - historical expansion supersession: `../research/FROZEN_V2_2_HISTORICAL_EXPANSION_V1_SUPERSESSION.md`;
-- historical expansion original protocol: `../research/FROZEN_V2_2_HISTORICAL_EXPANSION_V1_PROTOCOL.md`;
 - family semantics: `../research/PROSPECTIVE_FAMILY_OUTCOME_SEMANTICS_V1.md`;
 - prospective protocol: `../research/V2_2_PROSPECTIVE_SHADOW_PROTOCOL.md`;
-- profile/prospective report: `../research/PROFILE_BASELINES_AND_PROSPECTIVE_UPDATE_2026-09-12.md`;
-- strategy benchmark protocol: `../research/STRATEGY_BENCHMARK_RESEARCH_PROTOCOL.md`;
+- offline resolver: `../research/PROSPECTIVE_V2_2_OFFLINE_RESOLVER_V1.md`;
 - Phase 11G boundary: `../PHASE_11G_CHECKPOINT.md`;
 - roadmap: `../../ROADMAP.md`.
 
