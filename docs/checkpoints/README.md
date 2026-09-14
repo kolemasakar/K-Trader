@@ -4,7 +4,7 @@ This directory contains transition snapshots used to recover the exact project s
 
 ## Current checkpoint
 
-`2026-09-14_EXTENDED_SOAK_PAUSE_START.md`
+`2026-09-14_CHAT_TRANSITION_EXTENDED_SOAK.md`
 
 Current accepted state:
 
@@ -38,7 +38,8 @@ Recovery instruction:
 
 ## Recent research checkpoints
 
-- `2026-09-14_EXTENDED_SOAK_PAUSE_START.md` — active extended production soak, APT freeze and allowed/forbidden operations;
+- `2026-09-14_CHAT_TRANSITION_EXTENDED_SOAK.md` — authoritative chat-transition checkpoint during the active extended soak;
+- `2026-09-14_EXTENDED_SOAK_PAUSE_START.md` — extended production soak, APT freeze and allowed/forbidden operations;
 - `2026-09-13_V2_2_PROSPECTIVE_1300Z.md` — latest accepted prospective capture/ledger;
 - `2026-09-13_V2_2_PROSPECTIVE_1300Z_OUTCOME_ADDENDUM.md` — accepted 12/12 resolved family outcomes at 13:00Z;
 - `2026-09-13_V2_2_PROSPECTIVE_1200Z.md` — prior prospective capture;
