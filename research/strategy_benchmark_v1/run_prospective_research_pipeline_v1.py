@@ -11,6 +11,14 @@ import sys
 
 BASE_DEFAULT = pathlib.Path('/data/research/phase11g')
 
+CAPTURE_RUNTIME_DEPENDENCIES = (
+    'prospective_v2_2_shadow_capture.py',
+    'prospective_v2_2_shadow_ledger.py',
+    'level_context_v2_features.py',
+    'level_context_v2_1_diagnostics.py',
+    'level_context_v2_2_traversal.py',
+)
+
 
 def utc(value: str) -> dt.datetime:
     parsed = dt.datetime.fromisoformat(value.replace('Z', '+00:00'))
@@ -66,11 +74,11 @@ def main() -> None:
 
     run_root = base / f'v2_2_shadow_{run_stamp}'
     funding_root = run_root / 'funding_offline_v1'
-    outcomes_root = (
+    outcomes_parent = (
         base
         / 'strategy_benchmark_v1/combined_rules/prospective_v2_2_outcomes_offline_v1_2'
-        / run_stamp
     )
+    outcomes_root = outcomes_parent / run_stamp
     diagnostics_root = (
         base
         / 'strategy_benchmark_v1/combined_rules/prospective_post30_diagnostics'
@@ -93,15 +101,19 @@ def main() -> None:
         'diagnostics': script_dir / 'prospective_v2_2_post30_diagnostics.py',
         'statistics': script_dir / 'prospective_post30_statistical_diagnostics.py',
     }
-    missing = [str(path) for path in scripts.values() if not path.exists()]
+    runtime_dependencies = [script_dir / name for name in CAPTURE_RUNTIME_DEPENDENCIES]
+    required_runtime_files = list(scripts.values()) + runtime_dependencies
+    missing = [str(path) for path in required_runtime_files if not path.exists()]
     if missing:
-        raise SystemExit('MISSING_PIPELINE_SCRIPTS ' + json.dumps(missing))
+        raise SystemExit('MISSING_PIPELINE_RUNTIME_FILES ' + json.dumps(missing))
 
     prior = pathlib.Path(args.prior_outcomes)
     if not (prior / 'observations.jsonl').exists():
         raise SystemExit(f'PRIOR_OUTCOMES_MISSING {prior}')
     if args.execute and run_root.exists():
         raise SystemExit(f'RUN_ROOT_EXISTS {run_root}')
+    if args.execute and outcomes_root.exists():
+        raise SystemExit(f'OUTCOMES_ROOT_EXISTS {outcomes_root}')
 
     commands = [
         ('capture', [python, str(scripts['capture']), '--as-of', args.as_of]),
@@ -127,6 +139,8 @@ def main() -> None:
                 str(prior),
                 '--funding-snapshot-root',
                 str(funding_root),
+                '--output-root',
+                str(outcomes_parent),
             ],
         ),
         (
@@ -179,7 +193,9 @@ def main() -> None:
         'holdout_opened': False,
         'production_action': False,
         'run_root': str(run_root),
+        'outcomes_root': str(outcomes_root),
         'prior_outcomes': str(prior),
+        'runtime_preflight_file_count': len(required_runtime_files),
         'stages': records,
     }
     if error is not None:
