@@ -1,0 +1,15 @@
+{
+  "trigger_percent": 80,
+  "delete_fraction": 0.2,
+  "eligible_globs": [],
+  "protected_paths": [
+    "/data/research/phase11g/strategy_benchmark_v1",
+    "/data/research/phase11g/v2_2_shadow_20260913T130000Z"
+  ],
+  "protected_globs": [
+    "/data/research/**/*holdout*"
+  ],
+  "protect_latest_for_globs": [
+    "/data/research/phase11g/v2_2_shadow_*"
+  ]
+}
