@@ -58,7 +58,7 @@ class PipelineHardeningTests(unittest.TestCase):
         primary = [
             'run_prospective_v2_2_shadow_cycle.py',
             'export_prospective_funding_snapshot_v1.py',
-            'prospective_v2_2_outcome_resolver_offline_v1_2.py',
+            'prospective_v2_2_outcome_resolver_offline_v1_3.py',
             'prospective_v2_2_post30_diagnostics.py',
             'prospective_post30_statistical_diagnostics.py',
         ]
@@ -69,7 +69,7 @@ class PipelineHardeningTests(unittest.TestCase):
         (prior / 'observations.jsonl').touch()
         return script_dir, prior
 
-    def test_plan_has_explicit_v1_2_output_root_and_full_preflight(self):
+    def test_plan_has_explicit_v1_3_output_root_and_full_preflight(self):
         with tempfile.TemporaryDirectory() as td:
             root = pathlib.Path(td)
             script_dir, prior = self._prepare_plan_fixture(root)
@@ -91,9 +91,10 @@ class PipelineHardeningTests(unittest.TestCase):
             resolver = next(x for x in report['stages'] if x['stage'] == 'resolver')
             self.assertIn('--output-root', resolver['command'])
             i = resolver['command'].index('--output-root')
-            expected = base / 'strategy_benchmark_v1/combined_rules/prospective_v2_2_outcomes_offline_v1_2'
+            expected = base / 'strategy_benchmark_v1/combined_rules/prospective_v2_2_outcomes_offline_v1_3'
             self.assertEqual(resolver['command'][i + 1], str(expected))
             self.assertEqual(report['outcomes_root'], str(expected / '20260916T133000Z'))
+            self.assertEqual(report['resolver_version'], 'v1.3')
             self.assertEqual(report['runtime_preflight_file_count'], 10)
 
     def test_missing_capture_dependency_fails_before_plan(self):
