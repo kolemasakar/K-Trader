@@ -6,7 +6,7 @@ Date: 2026-09-16
 
 ## Trigger
 
-OpenAI announced planned retirement of Custom GPTs and migration toward Plugins. Plugins combine reusable skills with apps/integrations. Custom Actions are not guaranteed to migrate automatically.
+OpenAI announced planned retirement of Custom GPTs and migration toward Plugins. Plugins combine reusable skills with apps/integrations. Custom Actions are not assumed to migrate automatically.
 
 For K-Trader this changes the product integration layer, not the canonical market/research backend.
 
@@ -16,7 +16,9 @@ Long-term target:
 
 `K-Trader Plugin = K-Trader Skill + read-only K-Trader App/Connector integration`
 
-The current Custom GPT becomes a temporary compatibility wrapper.
+If the supported custom-integration path requires it, use a thin MCP adapter between the Plugin/App surface and the existing backend.
+
+The current Custom GPT remains a temporary compatibility wrapper until replacement acceptance.
 
 The existing production backend remains integration-neutral and read-only:
 
@@ -56,7 +58,7 @@ These remain available until migration is complete and verified.
 
 - behavioral instructions become a reusable K-Trader skill;
 - backend access becomes an app/connector/MCP-based integration supported by the Plugin environment;
-- plugin permissions/sharing are configured independently;
+- Plugin permissions/sharing are configured independently;
 - migration validation uses a dedicated regression suite.
 
 ## Migration rules
@@ -69,12 +71,15 @@ These remain available until migration is complete and verified.
 6. Treat the replacement Plugin as private until regression and access tests pass.
 7. Re-test permissions/sharing after migration; old GPT access does not imply Plugin access.
 8. Do not tie K-Trader business logic to a selected ChatGPT model.
+9. Do not invent/freeze a final Plugin package manifest until the actual migration/developer surface for the account exposes its current required contract.
 
 ## Prepared artifacts
 
 - `K_TRADER_SKILL_DRAFT.md` — migration-ready behavioral specification;
 - `INTEGRATION_CONTRACT_V1.md` — app/connector/MCP requirements;
 - `REGRESSION_SUITE.md` — acceptance scenarios;
+- `SOURCE_ASSESSMENT_2026-09-16.md` — verified product-change assessment;
+- `PLUGIN_IMPLEMENTATION_BLUEPRINT_V1.md` — target composition, permissions, MCP/app constraints, cutover sequence;
 - `../operations/PRODUCTION_SAFETY_EXECUTION_COMPATIBILITY_AUDIT_2026-09-16.md` — current backend safety baseline.
 
 ## Activation gate
