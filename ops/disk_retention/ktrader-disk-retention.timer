@@ -1,0 +1,12 @@
+[Unit]
+Description=Hourly K-Trader disk retention dry-run check
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1h
+RandomizedDelaySec=5min
+Persistent=true
+Unit=ktrader-disk-retention.service
+
+[Install]
+WantedBy=timers.target
