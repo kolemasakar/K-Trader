@@ -77,6 +77,7 @@ These remain available until migration is complete and verified.
 
 - `K_TRADER_SKILL_DRAFT.md` — migration-ready behavioral specification;
 - `INTEGRATION_CONTRACT_V1.md` — app/connector/MCP requirements;
+- `MCP_TOOL_SURFACE_V1.md` — exact packaging-neutral typed mapping for the eight read-only canonical capabilities, including parameters and failure semantics;
 - `REGRESSION_SUITE.md` — acceptance scenarios;
 - `SOURCE_ASSESSMENT_2026-09-16.md` — verified product-change assessment;
 - `PLUGIN_IMPLEMENTATION_BLUEPRINT_V1.md` — target composition, permissions, MCP/app constraints, cutover sequence;
