@@ -1,10 +1,11 @@
 # K-Trader Current State
 
-Updated: 2026-09-16 through accepted prospective cutoff `2026-09-16T12:00:00Z` and the parallel diagnostic package.
+Updated: 2026-09-16 through accepted prospective cutoff `2026-09-16T12:00:00Z`, hypothesis preregistration, path-quality analysis and fail-closed pipeline hardening.
 
-Current checkpoint: `docs/checkpoints/2026-09-16_PARALLEL_DIAGNOSTICS_1200Z.md`  
-Resolver checkpoint: `docs/checkpoints/2026-09-16_PROSPECTIVE_1145Z_RESOLVER_V1_2.md`  
-Resolver v1.2 specification: `docs/research/PROSPECTIVE_V2_2_OFFLINE_RESOLVER_V1_2.md`  
+Current checkpoint: `docs/checkpoints/2026-09-16_PREREG_PATH_PIPELINE_HARDENING.md`  
+Previous diagnostic checkpoint: `docs/checkpoints/2026-09-16_PARALLEL_DIAGNOSTICS_1200Z.md`  
+Resolver specification: `docs/research/PROSPECTIVE_V2_2_OFFLINE_RESOLVER_V1_2.md`  
+Hypothesis preregistration: `docs/research/PROSPECTIVE_HYPOTHESES_PREREG_2026-09-16.md`  
 Historical methodology checkpoint: `docs/checkpoints/2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md`
 
 ## Production
@@ -67,7 +68,7 @@ Holdout:
 
 No frozen rule, RR, 32-M15 max hold, risk gate, symbol/direction filter or holdout authorization changed.
 
-## Track A — latest prospective state
+## Track A — accepted prospective state
 
 Latest accepted capture cutoff:
 
@@ -77,7 +78,7 @@ Run root:
 
 `/data/research/phase11g/v2_2_shadow_20260916T120000Z`
 
-Capture state:
+Capture:
 
 - `VALID_SHADOW_CAPTURE`;
 - panel `19/19`;
@@ -110,7 +111,7 @@ Official Binance USD-M funding snapshot:
 - records `1849`;
 - summary SHA256 `22a5785767abf3717eadda2c69c78524e5e8195ac975544c6557dafed7ed8b7c`.
 
-### Accepted resolver-v1.2 outcome at 12:00Z
+### Resolver-v1.2 outcome at 12:00Z
 
 Output:
 
@@ -133,7 +134,7 @@ Summary SHA256:
 
 `6e7f07d0d54d421967bb689d71798f943e26e065f29de5e58838a789ca9a5a58`
 
-Four primary families remain causal/open at 12:00Z:
+Open primary families at this accepted cutoff:
 
 - SUIUSDT entry `08:00Z`: `16/32` M15 bars;
 - XRPUSDT entry `08:00Z`: `16/32` M15 bars;
@@ -142,84 +143,151 @@ Four primary families remain causal/open at 12:00Z:
 
 If STOP/3R does not occur first, max-hold boundaries remain `16:00Z` and `16:15Z` on 2026-09-16.
 
-## Resolver v1.2 hardening
+## Resolver v1.2 / provenance hardening
 
-v1.2 preserves v1.1 semantics and changes only the absolute prior-price identity guard:
+Resolver v1.2 changes only the absolute prior-price identity guard from `2e-9` to `3e-9` while preserving v1.1 outcome semantics.
 
-`2e-9 -> 3e-9`
+Hardening: **PASS**.
 
-Hardening at 12:00Z: **PASS**.
-
-- observed maximum relevant drift passes;
-- an inside-tolerance case passes;
-- an outside-tolerance `3.5e-9` case fails closed;
-- missing funding snapshot fails closed with `FUNDING_SUMMARY_MISSING`;
-- `50/50` prior resolved observations remain present;
-- economic/terminal mismatches `0`;
+- observed stop drift passes;
+- `2.5e-9` inside-tolerance test passes;
+- `3.5e-9` outside-tolerance test fails closed;
+- missing funding snapshot fails closed;
+- `50/50` prior resolved observations retained;
+- terminal/economic mismatches `0`;
 - aged-out immutable accepted outcomes preserved `6`.
 
 Hardening report SHA256:
 
 `6b780390daabad1b74824bcc2a01fdbc40457b639aa253dc425c4334155fa369`
 
-## Provenance audit
-
 12:00Z provenance audit: **PASS**.
 
 - family set `43/43` matches outcomes;
 - primary identity mismatches `0`;
-- symbol/side family inconsistencies `0`;
-- exact identity duplicates after ledger dedup `0`;
+- symbol/side inconsistencies `0`;
+- exact identity duplicates after dedup `0`;
 - multi-observation families `13`, expected under family semantics;
-- observations and families hashes match accepted summary.
+- observations/families hashes match accepted summary.
 
-Report SHA256:
+Provenance report SHA256:
 
 `5c4341421d1e702f3256e50639c9e909c1880053346bc26a1d98142e6d8d4e0e`
 
 ## Post-30 / portfolio diagnostics
 
-Current 39-resolved-family evidence remains diagnostic only.
-
-Base findings:
+Current evidence remains diagnostic only.
 
 - LONG expectancy `-0.585215R`;
 - SHORT expectancy `-0.679800R`;
 - no supported general LONG-only / SHORT-exclusion rule;
-- obstacle `<1R/<3R` remains hypothesis-generating but the original broad contrasts do not survive BH adjustment;
+- obstacle `<1R/<3R` remains hypothesis-generating;
 - raw VSA does not provide reliable separation;
 - max concurrent exposure `6`;
 - largest correlated cohort `4`.
 
-12:00Z report hashes:
+A post-hoc discovery signal was observed for `SHORT × low H1 EMA20/50 separation / ATR14`:
 
-- descriptive `81c90dbedf726366f26bdb0703f6dd9ea5ddc0b39237c0ebf2a882771ea0cc17`;
-- statistical `38063ca5d80b9cb8da02d17f3b92cc02b3b151cfb658f1b9dcbba1c4476b8fc2`.
-
-### Registered hypothesis: SHORT × low H1 EMA separation / ATR
-
-Exploratory data-derived tercile cutpoint:
-
-`H1 EMA20/50 separation / ATR14 < 0.9033277894201235`
-
-Prospective diagnostic:
-
+- discovery cutpoint `<0.9033277894201235`;
 - LOW SHORT: `n=10`, expectancy `-0.137355R`;
 - other SHORT: `n=16`, expectancy `-1.018829R`;
 - difference `+0.881473R`;
-- permutation `p≈0.00061`;
-- BH-adjusted `q≈0.00366` across six exploratory interaction contrasts;
-- leave-one-symbol-out sign remains positive `8/8`.
+- exploratory permutation `p≈0.00061`;
+- BH-adjusted `q≈0.00366` across six exploratory contrasts;
+- leave-one-symbol-out sign positive `8/8`.
 
-Important limitation: LOW observations are concentrated mainly on `2026-09-15`, so regime/time confounding remains plausible. The threshold is post-hoc and is **not a rule**.
+The LOW group is temporally concentrated, especially on 2026-09-15, so regime/time confounding remains plausible.
 
-Report hashes:
+This is not a frozen-v2.2 rule.
 
-- extended diagnostics `22ef770b4f9be8dee4c5f9121df9a28afda6ea319d6a86ba6dcc4d2fa1eb80e2`;
-- interaction statistics `4a9160e718b5f59e88aa6ae47ecc695ab021030bdd551b0c1460331b17eb64ed`;
-- leave-one-symbol-out robustness `ee7028f64f87a2c995651f19fed6dbc6a46843a27507c87f31d119112f0210ba`.
+## Preregistered future hypotheses
 
-## Track B — causal historical context
+Canonical preregistration:
+
+`docs/research/PROSPECTIVE_HYPOTHESES_PREREG_2026-09-16.md`
+
+Future confirmation boundary:
+
+`entry_time >= 2026-09-16T13:00:00Z`
+
+Anything before this boundary is discovery/context only and cannot count as confirmatory evidence, including the four families already open before the boundary.
+
+Primary H1 freezes:
+
+`SHORT && h1_ema_sep_atr < 0.9033277894201235`
+
+The cutpoint cannot be re-estimated from confirmation data. H1 requires at least `20` resolved future primary SHORT families in LOW and `20` in REST, fixed effect-size/statistical/concentration checks, and remains eligible only for a future versioned proposal even if supported.
+
+Secondary preregistered hypotheses cover obstacle inside 1R, obstacle inside 3R and same-side 60-minute portfolio concentration.
+
+## Path quality / MFE / MAE
+
+Runtime report:
+
+`/data/research/phase11g/strategy_benchmark_v1/combined_rules/prospective_path_quality/20260916T120000Z/report.json`
+
+SHA256:
+
+`4cf1085bbcd35bb381f1f2981136f6f66f97c734b5efa10fedf9a8a9d7e41030`
+
+Reproducible implementation:
+
+`research/strategy_benchmark_v1/prospective_path_quality_diagnostics.py`
+
+Overall 39 resolved primary families:
+
+- mean MFE `0.8013R`;
+- mean MAE `1.0491R`;
+- median realized result `-1.0247R`;
+- median hold `20` M15 bars.
+
+STOP outcomes (`26`):
+
+- expectancy `-1.0669R`;
+- mean MFE `0.7015R`;
+- mean MAE `1.3103R`;
+- `17/26` reached at least `+0.5R`;
+- `7/26` reached at least `+1R` but still finished non-positive;
+- none reached `+2R` before STOP.
+
+TIME_EXIT outcomes (`13`):
+
+- expectancy `+0.1890R`;
+- wins `9/13`;
+- mean MFE `1.0010R`;
+- mean MAE `0.5265R`;
+- median hold `33` under current resolver counting semantics.
+
+TIME_EXIT by achieved MFE:
+
+- `<0.5R`: n=3, expectancy `-0.5869R`;
+- `0.5–1R`: n=5, expectancy `+0.1439R`;
+- `1–2R`: n=3, expectancy `+0.4769R`;
+- `2–3R`: n=2, expectancy `+1.0336R`.
+
+These are future exit-management hypotheses only; they do not authorize break-even, trailing, partial exits or max-hold changes.
+
+## Execution-cost / symbol / temporal diagnostics
+
+- post-cost expectancy `-0.6483R`;
+- estimated mean pre-cost expectancy `-0.5811R`;
+- mean execution drag about `0.0671R`;
+- only one resolved family crossed from pre-cost positive to post-cost non-positive.
+
+Therefore trading costs are material but not the primary source of current weakness.
+
+Leave-one-symbol-out expectancy remains negative after every single-symbol exclusion, approximately `-0.576R` to `-0.740R`; the result is not driven by one symbol alone.
+
+By entry day:
+
+- 2026-09-12: `-1.005R`;
+- 2026-09-13: `-1.133R`;
+- 2026-09-14: `-0.798R`;
+- 2026-09-15: `-0.146R`.
+
+This keeps regime/time variation as a central research explanation.
+
+## Historical context
 
 Accepted corrected causal rolling-context results remain:
 
@@ -230,17 +298,46 @@ Accepted corrected causal rolling-context results remain:
 | R180 | 1073 | -0.013131 | -0.042896 |
 | R365 | 2099 | -0.051000 | -0.074531 |
 
-Current prospective expectancy `-0.648272R` and win rate `23.08%` are below all four historical windows. This reinforces a regime/current-condition weakness interpretation.
+Current prospective expectancy and win rate are below all four historical windows, reinforcing a current-regime weakness interpretation.
 
-Historical-vs-prospective report SHA256:
+Historical data show the same directional sign for the discovery-stage SHORT-low-trend hypothesis across all four windows, but this is context only, not fresh OOS confirmation.
 
-`dbb09c81ee29e5da43e825b9b9a7d9e72f213c6eb1b2b01f4318fb43d2e35315`
+## Fail-closed prospective research orchestration
 
-The prospective-derived SHORT low-trend cutpoint has a better-than-rest SHORT expectancy by sign in all four historical windows, including P25 and R365 with small permutation p-values. This is **historical hypothesis context only**, not fresh OOS validation.
+Canonical runner:
 
-Historical-context report SHA256:
+`research/strategy_benchmark_v1/run_prospective_research_pipeline_v1.py`
 
-`7be8b49cf07ed0798646b6cc6b54277e28d3dcf379c257e251637dae4d0c23ac`
+Properties:
+
+- plan-only by default;
+- explicit `--execute` required;
+- stages: capture -> funding -> resolver v1.2 -> post-30 diagnostics -> statistical diagnostics;
+- hashed manifest records planned/executed stage state;
+- any non-zero stage stops all later stages;
+- execute mode rejects an existing run root;
+- missing scripts/prior outcomes fail closed;
+- no holdout or production action.
+
+Plan-mode validation for the future 13:00Z boundary produced a five-stage PLAN_ONLY manifest without executing stages.
+
+Plan manifest SHA256:
+
+`f684f38bf8793c1cbc0cfc0f0a01fc58ca07466b31a94ec83d05db62faafba73`
+
+Synthetic failure-path validation intentionally failed funding with rc=7 and confirmed that resolver and later stages were not executed:
+
+`LATER_STAGES_BLOCKED=PASS`
+
+Failure manifest SHA256:
+
+`e2c1ecb3f2fb92fcbf9e1f67317d4d16282b474f3eaff633f3196bf203eba51b`
+
+Regression tests:
+
+`research/strategy_benchmark_v1/tests/test_prospective_research_pipeline_v1.py`
+
+Result: **4/4 PASS**.
 
 ## Disk retention
 
@@ -267,19 +364,18 @@ Prospective thresholds remain:
 - `50–99`: hypotheses/ablation proposals only;
 - `>=100`: versioned recalibration proposal may be considered, still requiring fresh OOS/prospective evidence and explicit promotion.
 
-Current state remains **39 resolved primary families**. Historical trades never count toward these thresholds.
+Current accepted state remains **39 resolved primary families**. Historical trades never count toward these thresholds.
 
-The SHORT-low-trend result is registered as a **future-version hypothesis only**. It does not authorize an EMA-separation filter, a SHORT filter, or the specific `0.9033277894` threshold in frozen v2.2.
-
-No evidence currently authorizes RR/max-hold/risk changes, holdout access, production mutation or Phase 12 activation.
+No current evidence authorizes in-place retuning, direction filtering, exit-management modification, RR/max-hold/risk changes, holdout access, production mutation or Phase 12 activation.
 
 ## Next work order
 
 1. continue causal prospective collection/resolution under the `30–49` tier;
-2. resolve the four open primary families after STOP/3R or their actual max-hold boundaries;
-3. preserve resolver v1.2 hardening and provenance invariants;
-4. track the SHORT-low-trend hypothesis without modifying frozen v2.2; any future test must be preregistered and use fresh independent evidence;
-5. keep holdout closed and disk-retention timer disabled.
+2. resolve the four pre-prereg open primary families after STOP/3R or actual max-hold boundaries, but do not count them toward confirmation H1–H4;
+3. collect future confirmation observations only from `entry_time >= 2026-09-16T13:00:00Z`;
+4. use the fail-closed runner for future controlled cycles after explicit execution decisions;
+5. preserve resolver/provenance invariants, frozen v2.2 and closed holdout;
+6. keep disk-retention timer disabled unless disk pressure or a separately approved monitoring policy justifies it.
 
 Phase 11G remains **ACTIVE**.  
 Phase 12 remains **FUTURE / NOT ACTIVE**.
