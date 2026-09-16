@@ -4,48 +4,52 @@ This directory contains accepted snapshots used to recover the exact project sta
 
 ## Current checkpoint
 
-`2026-09-16_PROSPECTIVE_1415Z_CONTINUITY.md`
+`2026-09-16_1615Z_HARDENING_PLUGIN_MIGRATION.md`
 
 Current accepted state:
 
-- Phase 11G remains **ACTIVE**; Phase 12 remains **FUTURE / NOT ACTIVE**;
-- production deployed SHA remains `81b79b281a4cc330b7c11058d202e0d74fb6d70e`;
-- production health remains `ok`, mode `read_only`, `data_ready=true`, provider `binance_usdm`;
-- frozen candidate remains `candidate_rule_set_v2_2` with harness SHA `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`;
-- protocol SHA remains `ba671cbed71fdc79380f37a72b75f93e75aa3ee895f5385ef433f497165de5a3`;
-- holdout remains untouched and unauthorized;
-- latest accepted cutoff is `2026-09-16T14:15:00Z`;
-- ledger is `60` eligible observations / `46` unique primary families;
-- outcome state is `39` resolved / `7` unresolved primary families, `9/30` wins/losses, expectancy `-0.6482720085510278R`;
-- resolver v1.3 continuity parity remains **PASS**, `50/50` prior resolved observations with `0` terminal/economic mismatches;
-- post-prereg confirmation boundary remains `entry_time >= 2026-09-16T13:00:00Z`;
-- confirmation sample currently contains `2` unresolved primary families: ADAUSDT SHORT and DOGEUSDT SHORT at `13:15Z`, both H1 REST rather than LOW;
-- TRUMPUSDT primary entry is `12:30Z`, so later observations from that family do not count as post-prereg primary evidence;
-- max concurrent SHORT exposure has increased to `7`, diagnostic only;
-- no retuning, exit-management change, direction filter, holdout access or production mutation is authorized;
-- broad adaptive strategy discovery remains delegated to `K_Investigation_Forecast` and must not be reopened inside K-Trader until the user reports positive results;
-- disk-retention remains `DRY_RUN_ONLY`, timer disabled by design.
+- Phase 11G **ACTIVE**; Phase 12 **FUTURE / NOT ACTIVE**;
+- production SHA `81b79b281a4cc330b7c11058d202e0d74fb6d70e`, health `ok`, mode `read_only`, `data_ready=true`, provider `binance_usdm`;
+- frozen candidate `candidate_rule_set_v2_2`, harness SHA `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`;
+- protocol SHA `ba671cbed71fdc79380f37a72b75f93e75aa3ee895f5385ef433f497165de5a3`;
+- holdout untouched/unauthorized;
+- latest accepted cutoff `2026-09-16T16:15:00Z`;
+- ledger `61` eligible observations / `47` unique primary families;
+- outcome state `41` resolved / `6` unresolved, wins/losses `11/30`, expectancy `-0.5902225135899566R`;
+- SUIUSDT and XRPUSDT `08:00Z` families resolved TIME_EXIT at `16:00Z` with positive R;
+- max-hold closed-bar evidence lag is documented and is not a strategy change;
+- prereg confirmation sample contains `3` unresolved primary families, all SHORT/REST;
+- evidence tracker/provenance invariants PASS;
+- portfolio diagnostics observe max concurrent all/SHORT `8`, largest correlated cohort `4`; no production caps selected;
+- prospective pipeline v2 adds evidence/risk/state stages and is fail-closed; v1 tests `6/6`, v2 tests `2/2` PASS;
+- storage ~19.1% used by exact bytes; retention timer remains disabled and destructive mode unauthorized;
+- production-safety audit PASS; a future execution-spec contract is still required before any real trading;
+- Phase 11G closure criteria and recovery runbook are documented;
+- Custom GPT is now a legacy compatibility wrapper; Phase 10P Plugin Migration preparation is active, with skill/integration/regression artifacts prepared;
+- broad adaptive strategy discovery remains delegated to `K_Investigation_Forecast` and must not be reopened here until the user reports positive results.
 
 ## Latest accepted research checkpoints
 
-- `2026-09-16_PROSPECTIVE_1415Z_CONTINUITY.md` — authoritative 14:15Z capture, resolver-v1.3 continuity, prereg tracking and diagnostics;
+- `2026-09-16_1615Z_HARDENING_PLUGIN_MIGRATION.md` — authoritative 16:15Z evidence state, parallel hardening completion and Plugin migration preparation;
+- `2026-09-16_PROSPECTIVE_1415Z_CONTINUITY.md` — prior 14:15Z continuity state;
 - `2026-09-16_PROSPECTIVE_1345Z_RESOLVER_V1_3.md` — resolver-v1.3 acceptance;
-- `2026-09-16_PREREG_PATH_PIPELINE_HARDENING.md` — preregistration, path-quality analysis and orchestration hardening;
-- `2026-09-16_PARALLEL_DIAGNOSTICS_1200Z.md` — parallel diagnostics and provenance/hardening;
+- `2026-09-16_PREREG_PATH_PIPELINE_HARDENING.md` — preregistration, path-quality and pipeline hardening;
+- `2026-09-16_PARALLEL_DIAGNOSTICS_1200Z.md` — parallel diagnostics/provenance;
 - `2026-09-16_PROSPECTIVE_1145Z_RESOLVER_V1_2.md` — prior resolver-v1.2 acceptance;
-- `2026-09-16_POST_SOAK_1030Z_AND_DISK_RETENTION_DRY_RUN.md` — post-soak catch-up and retention validation;
-- `2026-09-16_POST30_PROSPECTIVE_DIAGNOSTIC_BASELINE.md` — initial 30–49-family diagnostic baseline.
+- `2026-09-16_POST_SOAK_1030Z_AND_DISK_RETENTION_DRY_RUN.md` — post-soak catch-up/retention validation.
 
 ## Related documents
 
 - current state: `../CURRENT_STATE.md`;
 - resolver v1.3: `../research/PROSPECTIVE_V2_2_OFFLINE_RESOLVER_V1_3.md`;
+- max-hold evidence semantics: `../research/MAX_HOLD_CAUSAL_EVIDENCE_SEMANTICS.md`;
 - hypothesis preregistration: `../research/PROSPECTIVE_HYPOTHESES_PREREG_2026-09-16.md`;
-- fail-closed research orchestration: `../../research/strategy_benchmark_v1/run_prospective_research_pipeline_v1.py`;
-- path-quality diagnostics: `../../research/strategy_benchmark_v1/prospective_path_quality_diagnostics.py`;
-- disk policy: `../operations/DISK_RETENTION_POLICY.md`;
-- causal historical replay protocol: `../research/FROZEN_V2_2_CAUSAL_ROLLING_CONTEXT_REPLAY_V1_PROTOCOL.md`;
-- family semantics: `../research/PROSPECTIVE_FAMILY_OUTCOME_SEMANTICS_V1.md`;
-- prospective protocol: `../research/V2_2_PROSPECTIVE_SHADOW_PROTOCOL.md`.
+- portfolio-risk contract: `../research/PORTFOLIO_RISK_RESEARCH_CONTRACT_V1.md`;
+- pipeline v2: `../../research/strategy_benchmark_v1/run_prospective_research_pipeline_v2.py`;
+- recovery: `../operations/RESEARCH_RECOVERY_RUNBOOK.md`;
+- Phase 11G closure: `../research/PHASE_11G_CLOSURE_CRITERIA.md`;
+- production safety audit: `../operations/PRODUCTION_SAFETY_EXECUTION_COMPATIBILITY_AUDIT_2026-09-16.md`;
+- storage growth: `../operations/RESEARCH_STORAGE_GROWTH_2026-09-16.md`;
+- Plugin migration: `../plugin_migration/README.md`.
 
 A checkpoint does not replace canonical specifications. It records the accepted state to resume from.
