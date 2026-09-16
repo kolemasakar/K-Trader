@@ -40,7 +40,7 @@ No critical infrastructure blocker is currently open.
 | fees | PASS | included in resolver economics |
 | funding | PASS | persisted official Binance USD-M funding snapshot |
 | slippage | PASS | base slippage included |
-| stress economics | PARTIAL / AVAILABLE HISTORICALLY | historical stress evidence exists; final closure report must refresh/quote the applicable stress baseline explicitly |
+| stress economics | PASS | packaged in `PHASE_11G_STRESS_ECONOMICS_BASELINE.md` |
 | symbol concentration | PASS | current post-30 diagnostics |
 | same-side/concurrent exposure | PASS | max observed concurrent/SHORT = 8 |
 | correlated-cluster exposure | PASS | largest correlated cohort = 4 |
@@ -49,7 +49,7 @@ No critical infrastructure blocker is currently open.
 | regime dependence | PASS / KNOWN | current prospective weakness remains regime/time dependent |
 | data limitations | PASS / DOCUMENTED | rolling source windows, evidence lag and underpowered confirmation sample documented |
 
-The remaining `PARTIAL` stress item is documentation/evidence packaging work for final closure, not a runtime blocker.
+All currently available portfolio/economic packaging work required by the closure contract is complete. This does not mean the evidence threshold for closure has been reached.
 
 ## 3. Current prospective evidence tier
 
@@ -108,8 +108,7 @@ Continue only:
 - causal prospective collection through pipeline v2;
 - resolver v1.3 continuity;
 - post-prereg confirmation accumulation;
-- portfolio/economic diagnostics refresh as sample changes;
-- final stress-economics packaging before closure;
+- portfolio/economic diagnostics refresh when the sample materially changes;
 - final closure report only after Path A or explicit Path B.
 
 ## 8. Explicitly not authorized
