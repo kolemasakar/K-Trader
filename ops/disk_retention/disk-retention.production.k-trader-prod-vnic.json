@@ -1,0 +1,21 @@
+{
+  "trigger_percent": 80,
+  "delete_fraction": 0.2,
+  "eligible_globs": [
+    "/opt/k-trader/data/research/phase11g/historical_expansion_v1_20260905T144500Z/bundles/*",
+    "/opt/k-trader/data/research/phase11g/historical_robustness_v1_20260905T144500Z/bundles/*"
+  ],
+  "protected_paths": [
+    "/opt/k-trader/data/research/phase11g/strategy_benchmark_v1"
+  ],
+  "protected_globs": [
+    "/opt/k-trader/data/research/**/*holdout*",
+    "/opt/k-trader/data/research/phase11g/v2_2_shadow_*",
+    "/opt/k-trader/data/research/phase11g/prospective_control_*",
+    "/opt/k-trader/data/research/phase11g/profile_research_dataset*",
+    "/opt/k-trader/data/research/phase11g/pre_pause_*"
+  ],
+  "protect_latest_for_globs": [
+    "/opt/k-trader/data/research/phase11g/v2_2_shadow_*"
+  ]
+}
