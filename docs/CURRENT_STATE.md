@@ -1,10 +1,10 @@
 # K-Trader Current State
 
-Updated: 2026-09-16 through accepted prospective cutoff `2026-09-16T10:30:00Z`, resolver-v1.1 parity acceptance and disk-retention dry-run validation.
+Updated: 2026-09-16 through accepted prospective cutoff `2026-09-16T11:45:00Z`, resolver-v1.2 parity acceptance, updated post-30 diagnostics and completed dry-run retention installation validation.
 
-Current checkpoint: `docs/checkpoints/2026-09-16_POST_SOAK_1030Z_AND_DISK_RETENTION_DRY_RUN.md`  
+Current checkpoint: `docs/checkpoints/2026-09-16_PROSPECTIVE_1145Z_RESOLVER_V1_2.md`  
 Post-30 diagnostic baseline: `docs/checkpoints/2026-09-16_POST30_PROSPECTIVE_DIAGNOSTIC_BASELINE.md`  
-Resolver v1.1 specification: `docs/research/PROSPECTIVE_V2_2_OFFLINE_RESOLVER_V1_1.md`  
+Resolver v1.2 specification: `docs/research/PROSPECTIVE_V2_2_OFFLINE_RESOLVER_V1_2.md`  
 Historical methodology checkpoint: `docs/checkpoints/2026-09-13_V2_2_CAUSAL_ROLLING_REPLAY_ACCEPTANCE.md`  
 Previous transition bootstrap: `docs/handoffs/BOOTSTRAP_PACKAGE_2026-09-14_K_TRADER_EXTENDED_SOAK_HANDOFF.md` — active-soak instructions are superseded by the current checkpoint.
 
@@ -24,9 +24,9 @@ Latest verified runtime state on `2026-09-16`:
 - provider `binance_usdm`;
 - scanner `DEGRADED` remains the known fail-closed/history-readiness state, not an outage;
 - root filesystem `/dev/sda1` is `45G`, approximately `19%` used;
-- no production deploy or container restart was performed by the post-soak research work.
+- no production deploy or container restart was performed by the research continuation.
 
-Container mount inspection established the production data mapping:
+Container mount mapping:
 
 `host /opt/k-trader/data -> container /data`
 
@@ -40,21 +40,20 @@ Result:
 
 `EXTENDED_PRODUCTION_SOAK = PASS`
 
-The earlier anomalous `15G / 87%` reading was not the verified K-Trader filesystem. Re-checking the identified SentinelX host showed the expected `45G` root filesystem near the soak-start `18%` state.
-
 APT runtime masks were removed with the existing bounded helper after soak acceptance.
 
 Current APT state:
 
 - `apt-daily.timer = enabled / active`;
-- `apt-daily-upgrade.timer = enabled / active`;
-- transient post-unfreeze package-manager activity completed.
+- `apt-daily-upgrade.timer = enabled / active`.
 
 ## Research isolation
 
 Research branch:
 
 `research-strategy-benchmark-v1`
+
+Current research HEAD at this checkpoint series is descendant of canonical main with no rebase/force update.
 
 Canonical main baseline:
 
@@ -80,25 +79,26 @@ Holdout:
 
 `UNTOUCHED / NOT AUTHORIZED`
 
-No frozen rule, RR, 8h max-hold, risk gate, symbol/direction filter or holdout authorization changed. No rebase or force update is authorized or used.
+No frozen rule, RR, 8h max-hold, risk gate, symbol/direction filter or holdout authorization changed.
 
 ## Track A — prospective evidence
 
 Latest accepted cutoff:
 
-`2026-09-16T10:30:00Z`
+`2026-09-16T11:45:00Z`
 
 Run root:
 
-`/data/research/phase11g/v2_2_shadow_20260916T103000Z`
+`/data/research/phase11g/v2_2_shadow_20260916T114500Z`
 
-Controlled catch-up capture:
+Capture:
 
 - `VALID_SHADOW_CAPTURE`;
+- provider `binance_usdm`;
 - panel `19/19`;
 - missing symbols `0`;
 - signal bars evaluated `6574`;
-- current-capture events `292`;
+- event count `295`;
 - current-capture eligible observations `44`;
 - current-capture unique eligible families `34`;
 - holdout opened `false`;
@@ -106,29 +106,34 @@ Controlled catch-up capture:
 
 Capture hashes:
 
-- bundle set `a0ba2edf0149cfd0db17d72a0c8d7870a50a1ef10d0d9d733142fbb899fa8b3e`;
-- shadow summary `acba842b66a5618d7944ceadeea978cdaba1cf1bb973c9eae495f7e312f5d68e`;
-- event file `20e639cbaa017e6b7da3b0be8aaa5f0e1c539d738a8f4813f83a336cc861bd68`.
+- bundle set `971c4f62fd8d5a5341e8ae625e38558a3ae270be2222488636535619582aa2cf`;
+- bundle export summary `ecfefa9a709682615c52daa7a33d55ff03cd9c1e0f3f5bcd5548b0a24f5b4a3a`;
+- event file `ed1c6826bb63124a98081bd7998a0bde155c2d02654116146403aa46e767ff7e`;
+- shadow summary `d4f52490488867d425a2eda1079b684f18322278c8e66b0272ba55071b574b3b`.
 
 Rebuilt prospective ledger:
 
-- valid snapshots `15`;
+- discovered snapshots `17`;
+- valid snapshots `16`;
 - rejected snapshots `1` known infrastructure-invalid first attempt;
+- deduplicated events `365`;
 - eligible observations `56`;
 - unique eligible families `43`;
-- ledger event set SHA256 `31f92f56a74ec4004e1e0922631907b8f5dbafc5b47022bf6f4cf500144473d6`.
+- ledger event set SHA256 `3139b622956c90618222b864ef401ee179f99c18c4b60309822e724aa7288d36`.
+
+No new independent family was added at 11:45Z.
 
 Persisted official Binance USD-M funding snapshot:
 
 - symbols `19`;
 - records `1849`;
-- summary SHA256 `e6a9c13b6c5ba6719c6b67f67269a5be56e57bfb7785a4fa77474c362c84affc`.
+- summary SHA256 `b1d94137e7cb4474d7ac0a35f1336c1fe337bf0b4deba10bd746db5e8daaa8d3`.
 
-### Accepted outcomes at 10:30Z
+### Accepted outcomes at 11:45Z
 
-Canonical output:
+Validated v1.2 output:
 
-`/data/research/phase11g/strategy_benchmark_v1/combined_rules/prospective_v2_2_outcomes_offline_v1_1/20260916T103000Z`
+`/data/research/phase11g/strategy_benchmark_v1/combined_rules/prospective_v2_2_outcomes_offline_v1_2/20260916T114500Z`
 
 State:
 
@@ -139,65 +144,78 @@ State:
 - win rate `23.076923076923077%`;
 - resolved expectancy `-0.6482720085510278R`;
 - evidence status `DIAGNOSTIC_30_49_RESOLVED_FAMILIES`;
-- network used by final resolver `false`;
+- network used `false`;
 - holdout opened `false`;
 - production action `false`.
 
-Outcome hashes:
+Validation summary SHA256:
 
-- observations `a92ea777ef4e97625611cf86340a91394d46b347402010f97c032b960052a185`;
-- families `57e983858608398832f1cc8d54c4dad85b9baf7eafcc823cd0211d8f4108238f`;
-- summary `230ef51493c55c627f26b617657bd94c1ad3dc0fa18321a718712b2c8a3ad483`.
+`923d990bdd8d94b676ff0c79a92469ba78b65a469cba689e4d759da2914bd6d2`
 
-## Offline resolver v1.1
+## Offline resolver v1.2
 
-The original offline resolver v1 remains preserved. It has two known continuity limitations:
+Original v1 and versioned v1.1 remain preserved.
 
-- exact-float cache identity weakness;
-- after a long pause, accepted early entries can age out of the newest `400`-M15 bundle before v1 attempts prior-cache reuse.
+v1.2 is the current versioned continuation:
 
-Versioned v1.1 is canonical for continuation:
+`research/strategy_benchmark_v1/prospective_v2_2_outcome_resolver_offline_v1_2.py`
 
-`research/strategy_benchmark_v1/prospective_v2_2_outcome_resolver_offline_v1_1.py`
+Specification:
 
-Key behavior:
+`docs/research/PROSPECTIVE_V2_2_OFFLINE_RESOLVER_V1_2.md`
 
-- stable prior identity `(setup_family_id, symbol, side, entry_time)`;
-- narrow entry/stop numerical guard (`2e-9` absolute, `1e-12` relative);
-- accepted resolved terminal outcomes remain immutable if their source bars age out;
-- accepted outcomes are revalidated when causal source bars remain available;
-- new observations fail closed if their source entry bar is unavailable;
-- new realized economics use persisted official funding snapshots;
-- final resolution uses no network.
+v1.2 preserves all v1.1 outcome semantics and output schema. The only change is:
 
-10:30Z continuity accounting:
+`PRIOR_PRICE_ABS_TOL: 2e-9 -> 3e-9`
 
-- prior accepted terminal observations reused `17`;
-- current-path revalidated `11`;
-- source-window expired but immutable accepted terminal observations `6`;
-- new resolved observations `33`;
-- new unresolved observations `6`.
+The relative tolerance remains `1e-12`.
 
-Parity acceptance:
+Reason:
 
-- `17/17` previously accepted observations retained with zero economic/terminal-field mismatches;
-- archived 13:00Z bundle replay reproduced terminal state and exit time for `17/17` observations with zero mismatches.
+- one stable-identity RAYSOLUSDT observation showed stop representation drift `2.1062864785648117e-9`;
+- across all `50` previously resolved observations, maximum entry delta remained exactly `0.0`;
+- maximum stop delta was `2.1062864785648117e-9`;
+- parity across all `50` previously resolved rows produced `0` terminal/economic mismatches.
+
+11:45Z resolver accounting:
+
+- prior resolved observations reused `50`;
+- current-path revalidated `44`;
+- source-window-expired immutable accepted outcomes `6`;
+- newly resolved observations `0`;
+- new unresolved observations `6` representing `4` unresolved primary families.
+
+## Four open primary families
+
+At `11:45Z`:
+
+- SUIUSDT entry `08:00Z`: `15` M15 bars observed; max-hold boundary `16:00Z`;
+- XRPUSDT entry `08:00Z`: `15` M15 bars observed; max-hold boundary `16:00Z`;
+- ADAUSDT entry `08:15Z`: `14` M15 bars observed; max-hold boundary `16:15Z`;
+- DOGEUSDT entry `08:15Z`: `14` M15 bars observed; max-hold boundary `16:15Z`.
+
+No STOP/3R terminal occurred by 11:45Z. They must remain unresolved until a causal terminal occurs or the 32-M15 max-hold boundary is actually reached.
 
 ## Post-30 diagnostics
 
-The accepted diagnostic baseline remains descriptive only. Current prospective evidence does not authorize an in-place rule change.
+Updated diagnostic-only analysis at 11:45Z remains consistent with the prior accepted baseline.
 
-Key findings at 39 resolved families:
+Descriptive report SHA256:
 
-- current data do not support LONG-only or SHORT-exclusion behavior;
-- rich obstacle distance remains the strongest hypothesis-generating feature, but current exploratory contrasts do not survive multiple-comparison adjustment;
-- raw signal-bar VSA does not show reliable prospective separation;
-- fees, funding and execution drag remain material and mandatory in future evaluation;
-- correlated simultaneous exposure exists as a portfolio diagnostic dimension.
+`ff12665d0781b29a932e66923c88868c66e071e2c89559f49fbeb96c3c1e6717`
 
-Canonical baseline:
+Statistical report SHA256:
 
-`docs/checkpoints/2026-09-16_POST30_PROSPECTIVE_DIAGNOSTIC_BASELINE.md`
+`e467c88533f1fd989180902b7745afe3f773830ec8dbdb5a8cc629b4c85c6483`
+
+Key findings remain:
+
+- SHORT vs LONG: no statistically supported separation;
+- rich obstacle `<1R` / `<3R`: strongest current hypothesis-generating feature, but does not survive Benjamini-Hochberg adjustment;
+- raw signal-bar VSA: no reliable separation;
+- fees, funding and execution drag remain material;
+- correlated simultaneous exposure remains a portfolio diagnostic dimension;
+- no diagnostic authorizes an in-place frozen-v2.2 rule change.
 
 ## Track B — corrected causal historical replay
 
@@ -212,8 +230,6 @@ Accepted replay semantics:
 - no holdout access;
 - no production action.
 
-Prospective parity gate remains PASS with `0` mismatches.
-
 Accepted corrected historical results:
 
 | Window | Cohort | Trades | Expectancy R | Stress expectancy R |
@@ -227,7 +243,7 @@ Interpretation remains unchanged: v2.2 is recent/regime-dependent, not long-hori
 
 ## Disk retention
 
-Approved policy remains:
+Approved policy:
 
 - trigger at filesystem usage `>=80%`;
 - oldest `20%` of explicitly eligible reproducible/temporary data;
@@ -238,43 +254,38 @@ Canonical policy:
 
 `docs/operations/DISK_RETENTION_POLICY.md`
 
-Dry-run implementation:
+Implementation:
 
 `ops/disk_retention/`
 
-Current implementation status:
+Current state:
 
-- planner is **DRY-RUN ONLY** and contains no deletion/apply mode;
-- host-side allowed base is now correctly `/opt/k-trader/data/research` because `/opt/k-trader/data` is bind-mounted to container `/data`;
-- production config is `ops/disk_retention/disk-retention.production.k-trader-prod-vnic.json`;
-- eligible paths are limited to direct symbol-bundle directories under two explicitly superseded/reproducible historical datasets;
+- helper `/usr/local/sbin/ktrader-disk-retention` installed;
+- config `/etc/k-trader/disk-retention.json` installed;
+- systemd service installed and sandbox-tested;
+- planner is **DRY_RUN_ONLY** and contains no destructive mode;
+- host-side allowed base is `/opt/k-trader/data/research`;
+- eligible candidates are limited to direct symbol-bundle directories under two explicitly superseded/reproducible historical datasets;
 - all prospective/shadow/current strategy evidence remains ineligible/protected;
-- holdout/symlink/overlap protections are fail-closed;
-- manifests are hashed.
+- holdout/symlink/overlap protections are fail-closed.
 
-Refined dry-run validation at approximately `19%` filesystem usage:
+Accepted host dry-run manifest:
 
+- filesystem use `19.000516%`;
 - trigger `false`;
 - eligible candidates `38`;
-- eligible bytes about `441 MB`;
-- target oldest `20%` about `88 MB`;
-- deterministic plan selected `20` candidates totaling about `97 MB`;
-- actual deletion `0`.
+- would-delete candidates `20`;
+- would-delete bytes `97,393,279`;
+- deletion performed `false`;
+- manifest SHA256 `d1ecdb98b8d4fc000098482126c3f9542a67562e44b5eddb73411187e3037d20`.
 
-Manual refined manifest SHA256:
+Systemd oneshot sandbox test:
 
-`e49439915269de4d29f9c9270344a86179b3350d767ec2b0d0e1261613b11a2b`
+- `Result=success`;
+- `ExecMainStatus=0`;
+- `ActiveState=inactive` after completion, expected for oneshot.
 
-Repository-planner production-equivalent validation:
-
-- status `FORCED_DRY_RUN_PLAN_READY`;
-- `38` eligible candidates;
-- `20` would-delete candidates;
-- `97,393,279` would-delete bytes;
-- deletion remained impossible by design;
-- validation manifest SHA256 `160cd8e2547115098c02d8989f4bce6cc49a9eb6693d3c24f26d77d4b212b16c`.
-
-Host installation is still **PENDING** because current SentinelX sudo policy intentionally does not permit arbitrary writes to `/usr/local/sbin`, `/etc/k-trader` or `/etc/systemd/system`. No privilege expansion was performed. Installation must use a bounded owner-side root action, followed by a manual oneshot/manfiest review before the hourly timer is enabled.
+`ktrader-disk-retention.timer` is **disabled by design**. At current ~19% disk use, hourly dry-run execution provides little operational value and would only generate recurring manifests. No general sudo or Docker privilege was expanded.
 
 ## Governance
 
@@ -291,10 +302,10 @@ No current evidence authorizes in-place retuning, direction filtering, RR/max-ho
 
 ## Next work order
 
-1. continue prospective collection/resolution under the `30–49` prospective governance tier;
-2. resolve the four currently open primary families causally after sufficient closed M15 bars exist, using resolver v1.1 and persisted official funding snapshot semantics;
-3. perform only a bounded owner-side root installation of the reviewed dry-run disk-retention helper/config/service/timer; do not grant general sudo;
-4. run the retention oneshot manually, inspect its hashed manifest, then enable the hourly timer only after acceptance;
+1. continue prospective collection under the `30–49` diagnostic-only governance tier;
+2. run a fresh capture/funding/resolver cycle after a suitable future closed-bar cutoff; the four currently open primary families may resolve before max hold, otherwise their max-hold boundaries are `16:00Z` and `16:15Z` on 2026-09-16;
+3. use resolver v1.2 for continuation and preserve accepted prior terminal outcomes;
+4. keep `ktrader-disk-retention.timer` disabled unless disk pressure or an explicitly approved monitoring policy justifies periodic execution;
 5. keep frozen v2.2 unchanged and holdout closed.
 
 Phase 11G remains **ACTIVE**.  
