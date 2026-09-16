@@ -2,13 +2,13 @@
 
 Status: **DRY-RUN ONLY / FAIL-CLOSED**
 
-This implementation follows `docs/operations/DISK_RETENTION_POLICY.md` but deliberately contains **no deletion/apply mode**. It only measures disk usage, builds a deterministic oldest-first cleanup plan from an explicit allowlist, and writes a hashed manifest.
+This implementation follows `docs/operations/DISK_RETENTION_POLICY.md` and deliberately contains **no deletion/apply mode**. It measures disk usage, builds a deterministic oldest-first cleanup plan from an explicit allowlist, and writes a hashed manifest.
 
 ## Safety model
 
 - trigger defaults to `80%` filesystem usage;
 - target defaults to oldest `20%` of explicitly eligible bytes;
-- candidates must resolve below `/data/research`;
+- candidates must resolve below the configured `--allowed-base`;
 - symlink candidates and symlinks inside a candidate fail closed;
 - overlapping candidates fail closed;
 - any path containing `holdout` is protected;
@@ -21,13 +21,29 @@ This implementation follows `docs/operations/DISK_RETENTION_POLICY.md` but delib
 ## Files
 
 - `ktrader_disk_retention.py` — dry-run planner;
-- `disk-retention.example.json` — fail-closed example configuration;
-- `ktrader-disk-retention.service` — hardened oneshot service;
+- `disk-retention.example.json` — fail-closed generic example configuration;
+- `disk-retention.production.k-trader-prod-vnic.json` — reviewed production dry-run allowlist for `k-trader-prod-vnic`;
+- `ktrader-disk-retention.service` — hardened production-host oneshot service;
 - `ktrader-disk-retention.timer` — hourly timer.
+
+## Production data path
+
+The running container exposes `/data` from the host bind mount `/opt/k-trader/data`. Therefore the host-side planner must use:
+
+`/opt/k-trader/data/research`
+
+as its allowed base. The service unit passes this path explicitly and grants it read-only access.
+
+The production dry-run configuration currently makes eligible only direct symbol bundle directories below two explicitly superseded/reproducible historical datasets:
+
+- `historical_expansion_v1_20260905T144500Z/bundles/*`;
+- `historical_robustness_v1_20260905T144500Z/bundles/*`.
+
+Results, summaries, funding artifacts, `strategy_benchmark_v1`, all prospective/shadow captures, prospective-control data, profile research data, pre-pause evidence and anything matching `holdout` remain outside the eligible set or are explicitly protected.
 
 ## Validation before installation
 
-Run manually from the repository or an immutable checkout:
+Generic fail-closed validation from a repository checkout:
 
 ```bash
 python ops/disk_retention/ktrader_disk_retention.py \
@@ -41,19 +57,21 @@ At normal disk usage below `80%`, expected status is:
 
 For planner-only testing below the threshold, `--force-plan` is allowed. It still cannot delete data.
 
+The production-equivalent configuration was validated against the mounted research tree on 2026-09-16: disk usage was about `19%`, `38` eligible symbol-bundle candidates were discovered, and an oldest-first forced plan selected `20` candidates totaling about `97 MB`. No deletion occurred.
+
 ## Host installation
 
-Installation requires a bounded root action because the target paths are `/usr/local/sbin`, `/etc/k-trader`, and `/etc/systemd/system`.
+Installation requires a bounded owner/root action because the targets are `/usr/local/sbin`, `/etc/k-trader`, and `/etc/systemd/system`.
 
-Recommended installation mapping:
+Install mapping:
 
 - planner → `/usr/local/sbin/ktrader-disk-retention`, mode `0755`, owner `root:root`;
-- reviewed config → `/etc/k-trader/disk-retention.json`, mode `0644`, owner `root:root`;
+- `disk-retention.production.k-trader-prod-vnic.json` → `/etc/k-trader/disk-retention.json`, mode `0644`, owner `root:root`;
 - service/timer → `/etc/systemd/system/`, mode `0644`, owner `root:root`.
 
-Then run `systemctl daemon-reload` and enable `ktrader-disk-retention.timer` only after manual dry-run output is reviewed.
+After copying, run `systemctl daemon-reload`, execute the oneshot manually once, inspect its manifest under `/var/lib/k-trader-disk-retention`, and only then enable `ktrader-disk-retention.timer`.
 
-The current SentinelX policy intentionally does not grant arbitrary root file installation. Do not broaden general sudo or Docker privileges merely to install this helper; use a bounded owner-side installation action.
+The current SentinelX policy intentionally does not grant arbitrary root file installation. Do **not** broaden general sudo or Docker privileges merely to install this helper; use a bounded owner-side installation action.
 
 ## Future apply mode
 
