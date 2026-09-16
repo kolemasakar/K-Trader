@@ -14,15 +14,22 @@ OpenAI currently states that:
 - new Custom GPT creation is planned to end for affected Enterprise workspaces on `2026-09-25`;
 - exact rollout/timing may vary by account/workspace/plan;
 - replacement Plugins combine reusable skills with connected apps/integrations;
+- skills are reusable workflow guidance and may include instructions, examples and code;
+- apps remain the external data/action integration surface;
+- OpenAI currently documents MCP as the protocol for building custom apps that expose approved tools/data to ChatGPT/Codex;
+- OpenAI recommends Apps SDK for packaging/publishing app capabilities, including MCP-based tools;
 - Custom Actions require separate migration work and should not be assumed to transfer automatically;
-- migrated replacement Plugin access/sharing must be reviewed separately.
+- migrated replacement Plugin access/sharing must be reviewed separately;
+- replacement Plugins should be tested against familiar prompts and harder regression cases before wider switching.
 
 Official references reviewed:
 
 - OpenAI Help: GPTs in ChatGPT;
 - OpenAI Help: Custom GPT retirement and migration FAQ;
 - OpenAI Help: Plugins in ChatGPT and Codex;
-- OpenAI ChatGPT Release Notes, 2026-09-11 entry.
+- OpenAI Help: Skills in ChatGPT;
+- OpenAI Help: Apps in ChatGPT;
+- OpenAI ChatGPT Release Notes / current migration notices.
 
 Project-source input also reviewed:
 
@@ -42,6 +49,8 @@ Long-term target is now:
 
 `Plugin skill + app/connector/MCP integration -> existing read-only K-Trader backend`
 
+The existing FastAPI backend should stay integration-neutral. The replacement Plugin integration should be a thin typed adapter rather than a second copy of K-Trader trading logic.
+
 ## Immediate decisions
 
 - keep existing Custom GPT working until replacement acceptance;
@@ -49,9 +58,25 @@ Long-term target is now:
 - stop treating new Custom Action work as the strategic integration target;
 - keep API semantics generic/read-only;
 - extract behavioral instructions into a skill draft;
-- specify a connector/MCP integration contract;
+- specify an app/connector/MCP integration contract;
 - create a regression suite for semantic parity and permissions;
-- do not assume old GPT sharing/public access transfers to the Plugin.
+- do not assume old GPT sharing/public access transfers to the Plugin;
+- do not invent a final Plugin manifest/package format until the migration/developer surface visible to this account exposes the exact current contract;
+- keep authentication and credentials out of the skill and inside the integration/infrastructure layer.
+
+## Implementation consequence
+
+Repository preparation can proceed now without waiting for cutover:
+
+- durable skill source;
+- typed capability mapping for all eight read-only backend operations;
+- least-privilege permission model;
+- auth boundary;
+- MCP/app adapter requirements;
+- regression and hard-case acceptance matrix;
+- rollback/cutover procedure.
+
+The actual Plugin package/install/share step remains account/product-surface dependent and must be verified when available.
 
 ## No strategy impact
 
