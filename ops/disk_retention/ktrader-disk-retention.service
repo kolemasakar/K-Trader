@@ -1,0 +1,26 @@
+[Unit]
+Description=K-Trader disk retention dry-run planner
+After=local-fs.target
+ConditionPathExists=/etc/k-trader/disk-retention.json
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+StateDirectory=ktrader-disk-retention
+ExecStart=/usr/local/sbin/ktrader-disk-retention --config /etc/k-trader/disk-retention.json --manifest-dir /var/lib/k-trader-disk-retention
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX
+ReadOnlyPaths=/data/research
+ReadWritePaths=/var/lib/k-trader-disk-retention
+
+[Install]
+WantedBy=multi-user.target
