@@ -1,18 +1,20 @@
 # K-Trader Current State
 
-Updated: 2026-09-16 through accepted prospective cutoff `2026-09-16T14:15:00Z`.
+Updated: 2026-09-16 through accepted prospective cutoff `2026-09-16T16:15:00Z`, parallel hardening completion and Plugin-migration preparation.
 
 Current checkpoint:
 
-`docs/checkpoints/2026-09-16_PROSPECTIVE_1415Z_CONTINUITY.md`
+`docs/checkpoints/2026-09-16_1615Z_HARDENING_PLUGIN_MIGRATION.md`
 
-Resolver specification:
+Core specifications:
 
-`docs/research/PROSPECTIVE_V2_2_OFFLINE_RESOLVER_V1_3.md`
-
-Hypothesis preregistration:
-
-`docs/research/PROSPECTIVE_HYPOTHESES_PREREG_2026-09-16.md`
+- resolver: `docs/research/PROSPECTIVE_V2_2_OFFLINE_RESOLVER_V1_3.md`;
+- preregistration: `docs/research/PROSPECTIVE_HYPOTHESES_PREREG_2026-09-16.md`;
+- max-hold evidence semantics: `docs/research/MAX_HOLD_CAUSAL_EVIDENCE_SEMANTICS.md`;
+- portfolio-risk contract: `docs/research/PORTFOLIO_RISK_RESEARCH_CONTRACT_V1.md`;
+- Phase 11G closure: `docs/research/PHASE_11G_CLOSURE_CRITERIA.md`;
+- recovery: `docs/operations/RESEARCH_RECOVERY_RUNBOOK.md`;
+- Plugin migration: `docs/plugin_migration/README.md`.
 
 ## Production
 
@@ -20,7 +22,7 @@ Accepted/deployed application SHA:
 
 `81b79b281a4cc330b7c11058d202e0d74fb6d70e`
 
-Latest verified runtime invariants:
+Latest verified runtime:
 
 - host `k-trader-prod-vnic`;
 - health `ok`;
@@ -28,11 +30,20 @@ Latest verified runtime invariants:
 - `data_ready=true`;
 - provider `binance_usdm`;
 - scanner `DEGRADED` remains the known fail-closed/history-readiness condition, not an outage;
-- no production deploy, restart or trading action was performed by research continuation;
-- disk remains approximately 19% used;
-- disk-retention planner remains `DRY_RUN_ONLY`, destructive mode absent, timer disabled by design.
+- container user `uid=1002(ktrader)`;
+- Linux capabilities all zero;
+- Docker socket absent inside the container;
+- current public K-Trader API GET-only;
+- no exchange-order credential names observed during the environment-name-only audit;
+- no production deploy, restart or trading action performed by current research/hardening work.
 
-Extended production soak remains accepted: `PASS`. APT timers remain restored/enabled.
+Storage:
+
+- filesystem exact byte utilization approximately `19.1%` (`df` rounded display 20%);
+- inode use approximately `5%`;
+- `/data/research` approximately `1.446 GB`;
+- disk-retention remains `DRY_RUN_ONLY`, destructive mode absent;
+- `ktrader-disk-retention.timer` remains disabled by design.
 
 ## Research boundary
 
@@ -62,175 +73,279 @@ Holdout remains `UNTOUCHED / NOT AUTHORIZED`.
 
 Phase 11G remains **ACTIVE**. Phase 12 remains **FUTURE / NOT ACTIVE**.
 
-Broad strategy-discovery/self-improving-strategy research is delegated to `K_Investigation_Forecast` and must not be reopened inside K-Trader until the user explicitly reports positive results.
+Broad strategy-discovery/self-improving-strategy research remains delegated to `K_Investigation_Forecast` and must not be reopened inside K-Trader until the user explicitly reports positive results.
 
-## Latest accepted prospective state — 14:15Z
+## Latest accepted prospective state — 16:15Z
 
 Run root:
 
-`/data/research/phase11g/v2_2_shadow_20260916T141500Z`
+`/data/research/phase11g/v2_2_shadow_20260916T161500Z`
 
 Capture:
 
-- status `VALID_SHADOW_CAPTURE`;
+- `VALID_SHADOW_CAPTURE`;
 - panel `19/19`;
-- current-capture eligible setups `48`;
-- current-capture unique eligible families `37`;
-- event count `298`;
 - signal bars evaluated `6574`;
-- bundle set SHA256 `56e108731b61cfa1f5ef6d72cc3d5a14f95c5147e2a55a6c8dfd9ca50bc8b47d`;
-- event file SHA256 `95f1256cb01c1ce720df4ef2f4974440df57678b2bc0653512f6e12c2bf27aa8`;
-- shadow summary SHA256 `dbab78e36542e4471ca248d409f9dc0d2db2cb1aa89e65342b6018e5dcc27e90`;
-- holdout opened `false`;
-- production action `false`.
+- current-capture eligible setups `49`;
+- event count `299`;
+- bundle set SHA256 `b929050728d0a07158f92775746c62ba861d6323fe751ff2e4ee59e7d6bca78a`;
+- shadow summary SHA256 `a08597e26583516048e1c9e3596ded387e2d5a5bbd171f4795396055bbdc0abb`;
+- holdout false;
+- production false.
 
 Ledger:
 
-- discovered snapshots `21`;
-- valid snapshots `20`;
-- rejected snapshots `1` known historical infrastructure-invalid first attempt;
-- eligible observations `60`;
-- unique primary families `46`;
-- ledger event-set SHA256 `06070917e913759c680b9a0e420742864ac7772e5796036b453be437223ac0a7`.
+- eligible observations `61`;
+- unique primary families `47`;
+- valid snapshots `22`;
+- one historical infrastructure-invalid first snapshot remains rejected;
+- ledger event-set SHA256 `0fac0e8ed782b37090ca91b3388618724214bc2148c376e9ac580eecc0d8ba5c`.
 
-Official Binance USD-M funding:
+Funding:
 
 - symbols `19`;
-- records `1859`;
-- summary SHA256 `19ecb0e27938375970e62f344439e9978511f23f24b15cca322e565fcab2f979`.
+- records `1878`;
+- SHA256 `88882f4aa563438ea9723366d7f30c2b596174e8d4ac381960ffcbf1577f29a0`.
 
 ## Resolver v1.3
 
 Canonical output:
 
-`/data/research/phase11g/strategy_benchmark_v1/combined_rules/prospective_v2_2_outcomes_offline_v1_3/20260916T141500Z`
+`/data/research/phase11g/strategy_benchmark_v1/combined_rules/prospective_v2_2_outcomes_offline_v1_3/20260916T161500Z`
 
 Summary SHA256:
 
-`0f71d5c954d3176565c5380c134049f00d107a2404a82f5a03cb2af99dad15e2`
+`c579ac1684fa6d2f74d970601f69946559619341f9386e6747e3f829a9d0de75`
 
 State:
 
-- eligible observations `60`;
-- unique primary families `46`;
-- resolved primary families `39`;
-- unresolved primary families `7`;
-- wins/losses `9/30`;
-- win rate `23.0769230769%`;
-- expectancy `-0.6482720085510278R`;
-- evidence tier `DIAGNOSTIC_30_49_RESOLVED_FAMILIES`;
-- prior resolved observations reused `50`;
-- current-path revalidated `44`;
-- aged-out accepted terminal outcomes preserved `6`;
-- max prior entry delta `0.0`;
-- max prior stop delta `3.495449963004417e-9`;
-- network used `false`;
-- holdout opened `false`;
-- production action `false`.
+- unique primary families `47`;
+- resolved primary families `41`;
+- unresolved primary families `6`;
+- wins/losses `11/30`;
+- win rate `26.8292682927%`;
+- expectancy `-0.5902225135899566R`;
+- evidence `DIAGNOSTIC_30_49_RESOLVED_FAMILIES`;
+- holdout false;
+- production false;
+- network used false.
 
-Continuity parity against all previously accepted resolved observations: `50/50`, terminal/economic mismatches `0` — **PASS**.
+Newly resolved at this cutoff:
 
-v1.3 remains the canonical continuation. It requires exact accepted entry identity, bounds stop recomputation drift by the existing close guard or at most `1e-4` of accepted initial risk, and revalidates terminal paths using accepted prior entry/stop. v1.1 and v1.2 remain preserved for audit/history.
+- SUIUSDT SHORT `08:00Z` -> `TIME_EXIT` at `16:00Z`, `+0.0991586118R`;
+- XRPUSDT SHORT `08:00Z` -> `TIME_EXIT` at `16:00Z`, `+0.9843266645R`.
 
-## Post-prereg confirmation sample
+Both are discovery-context families.
 
-Preregistered confirmation boundary:
+## Max-hold / evidence-lag semantics
+
+Frozen v2.2 processes 32 held M15 bars and TIME_EXIT executes at the next-bar open. The prospective resolver uses closed-bar-only evidence, so that open is confirmable one M15 evidence interval later.
+
+Therefore:
+
+- SUI/XRP strategy exit `16:00Z`, prospective confirmation `16:15Z`;
+- ADA/DOGE discovery entries `08:15Z`: strategy TIME_EXIT `16:15Z`, prospective confirmation available at `16:30Z` if no earlier STOP/3R.
+
+This is evidence lag, not a change to max hold.
+
+## Preregistered confirmation sample
+
+Boundary:
 
 `entry_time >= 2026-09-16T13:00:00Z`
 
-Current genuine post-prereg primary families:
+Evidence-tracker report SHA256:
 
-- ADAUSDT SHORT, entry `13:15Z`, unresolved, `h1_ema_sep_atr≈1.7236`;
-- DOGEUSDT SHORT, entry `13:15Z`, unresolved, `h1_ema_sep_atr≈1.6144`.
+`92378aaca9c3b60faf5a24cfb6371dcd66aa6f93ec648be1a9ebe019598373a3`
 
-Both are H1 `REST`, not `LOW` (`LOW < 0.9033277894201235`).
+Counts:
 
-TRUMPUSDT SHORT primary entry is `12:30Z`; a later 13:15Z observation belongs to that pre-prereg family and therefore does not count as post-prereg primary evidence.
-
-Confirmation counts:
-
-- total post-prereg primary families `2`;
-- resolved `0`;
+- discovery primary families `44`;
+- confirmation primary families `3`;
+- confirmation resolved `0`;
+- confirmation unresolved `3`;
+- all current confirmation families are `SHORT / REST`;
 - H1 LOW resolved `0`;
-- H1 REST resolved `0`.
+- obstacle <1R/<3R confirmation count `0`;
+- chronology/governance invariants PASS.
+
+Confirmation families:
+
+- ADAUSDT SHORT `13:15Z`;
+- DOGEUSDT SHORT `13:15Z`;
+- ADAUSDT SHORT `15:00Z`.
 
 No preregistered hypothesis can yet be evaluated.
 
-## Unresolved primary families at 14:15Z
+## Current unresolved primary families
 
-Pre-prereg/discovery context:
+Discovery context:
 
-- SUIUSDT SHORT `08:00Z`: `25/32` bars;
-- XRPUSDT SHORT `08:00Z`: `25/32` bars;
-- ADAUSDT SHORT `08:15Z`: `24/32` bars;
-- DOGEUSDT SHORT `08:15Z`: `24/32` bars;
-- TRUMPUSDT SHORT `12:30Z`: `7/32` bars.
+- ADAUSDT SHORT `08:15Z` — strategy TIME_EXIT `16:15Z`, closed-bar confirmation available `16:30Z`;
+- DOGEUSDT SHORT `08:15Z` — same evidence boundary;
+- TRUMPUSDT SHORT `12:30Z`.
 
-Post-prereg confirmation:
+Confirmation:
 
-- ADAUSDT SHORT `13:15Z`: `4/32` bars;
-- DOGEUSDT SHORT `13:15Z`: `4/32` bars.
+- ADAUSDT SHORT `13:15Z`;
+- DOGEUSDT SHORT `13:15Z`;
+- ADAUSDT SHORT `15:00Z`.
 
-The four early families retain max-hold boundaries `16:00Z` and `16:15Z` if STOP/3R does not occur first.
+Total unresolved: `6`.
 
-## Diagnostics
+## Diagnostics — 41 resolved
 
-Resolved sample remains `39`; all findings remain diagnostic-only and non-authorizing.
+Descriptive SHA256:
 
-14:15Z post-30 descriptive SHA256:
+`b2ffefbe71352e737e699feeba9ecb50f4d0df716a389e7c6a9a0714eb59f275`
 
-`29c636f0a4a8b01fb0fb4b24ee9588955b97700ca3bb698ac3b4fd66df485621`
+Statistical SHA256:
 
-14:15Z statistical SHA256:
+`b4fdd55d1db88ce33bfe5778d4dc2220b80e1cdb7495cdeb52fba1c16c94ebd7`
 
-`8d8ad6f472a61beb32afbc7f0927cb213282939ef5b02e29a36a2bf07216c306`
+Key state:
 
-Resolved metrics remain unchanged:
-
+- overall expectancy `-0.590223R`;
 - LONG expectancy `-0.585215R`;
-- SHORT expectancy `-0.679800R`;
-- no supported general LONG-only/SHORT-exclusion rule;
+- SHORT expectancy `-0.592547R`;
+- STOP: `26`, wins `0`, expectancy `-1.066884R`;
+- TIME_EXIT: `15`, wins `11`, expectancy `+0.235991R`;
+- no broad exploratory contrast currently authorizes a frozen-v2.2 retune;
 - obstacle <1R/<3R remains exploratory;
-- raw VSA remains non-separating.
+- VSA remains non-authorizing.
 
-Portfolio state changed as more unresolved SHORT families coexist:
+Portfolio diagnostics:
 
-- max concurrent all `7`;
-- max concurrent SHORT `7`;
-- largest correlated cohort `4`;
-- multi-family correlated cohort count `5`.
+- current open families `6`, all SHORT;
+- current open symbols: ADA x3, DOGE x2, TRUMP x1;
+- observed max concurrent all `8`;
+- observed max concurrent SHORT `8`;
+- largest correlated cohort `4`.
 
-Previously accepted path-quality findings remain diagnostic only. No exit-management change is authorized.
+No production risk cap has been selected. `docs/research/PORTFOLIO_RISK_RESEARCH_CONTRACT_V1.md` defines the future parameter interface only.
 
-## Prospective orchestration
+## Prospective automation v2
 
-Canonical runner:
+New canonical hardening target:
 
-`research/strategy_benchmark_v1/run_prospective_research_pipeline_v1.py`
+`research/strategy_benchmark_v1/run_prospective_research_pipeline_v2.py`
 
-It uses resolver v1.3 and remains fail-closed, plan-only by default, explicit `--execute`, dependency-preflighted, versioned-output aware and manifest-producing. Regression suite remains accepted.
+Stages:
+
+`capture -> funding -> resolver -> post30 -> statistics -> evidence -> portfolio_risk -> state_manifest`
+
+Properties:
+
+- plan-only default;
+- explicit `--execute`;
+- fail-closed sequencing;
+- output collision protection;
+- resolver v1.3;
+- discovery/confirmation tracking;
+- portfolio-risk artifact;
+- machine-readable current-state artifact.
+
+Tests:
+
+- pipeline v1 regression `6/6 PASS`;
+- pipeline v2 regression `2/2 PASS`;
+- current research Python compile PASS.
+
+16:15 machine-readable state:
+
+`/data/research/phase11g/strategy_benchmark_v1/combined_rules/current_state_manifests/20260916T161500Z.json`
+
+SHA256:
+
+`348a31f0fbc7735660abab1203a4f25ed566def5ae17366386b9395883fc2d01`
+
+## Storage planning
+
+Read-only storage diagnostics are documented in:
+
+`docs/operations/RESEARCH_STORAGE_GROWTH_2026-09-16.md`
+
+Approximate additional growth to thresholds:
+
+- 70% review point: `24.09 GB`;
+- 80% retention-planning threshold: `28.82 GB`.
+
+Timer remains disabled and destructive cleanup unauthorized.
+
+## Production safety / future execution compatibility
+
+Audit:
+
+`docs/operations/PRODUCTION_SAFETY_EXECUTION_COMPATIBILITY_AUDIT_2026-09-16.md`
+
+Current read-only phase safety: PASS.
+
+Before any future real execution, a separate versioned exchange/broker execution-spec contract is required for minimum/maximum quantity, notional, leverage/margin, position mode, order constraints and idempotency. This is a future prerequisite, not a Phase 11G blocker.
+
+## Recovery and Phase 11G closure
+
+Recovery runbook:
+
+`docs/operations/RESEARCH_RECOVERY_RUNBOOK.md`
+
+Closure contract:
+
+`docs/research/PHASE_11G_CLOSURE_CRITERIA.md`
+
+Closure paths:
+
+- Path A: evidence-complete v2.2 benchmark at `>=100` resolved primary prospective families plus final reproducible report;
+- Path B: explicit user decision to terminate v2.2 collection earlier and archive it as negative/inconclusive benchmark.
+
+Closure does not itself open holdout, activate Phase 12 or authorize production trading.
+
+## OpenAI product migration — Phase 10P
+
+OpenAI's announced Custom GPT retirement changes the ChatGPT-facing product layer, not the canonical backend.
+
+Current decision:
+
+- keep the working Custom GPT until replacement acceptance;
+- classify `custom_gpt/` as legacy compatibility assets;
+- treat Custom Actions/OpenAPI as legacy transport, not the strategic future interface;
+- preserve the existing read-only HTTPS backend;
+- migrate durable behavior to a reusable K-Trader skill;
+- use a Plugin app/connector integration, or thin MCP adapter if required by the supported platform path;
+- re-test auth, permissions and sharing independently.
+
+Prepared package:
+
+- `docs/plugin_migration/README.md`;
+- `docs/plugin_migration/K_TRADER_SKILL_DRAFT.md`;
+- `docs/plugin_migration/INTEGRATION_CONTRACT_V1.md`;
+- `docs/plugin_migration/REGRESSION_SUITE.md`;
+- `docs/plugin_migration/SOURCE_ASSESSMENT_2026-09-16.md`;
+- `custom_gpt/LEGACY_MIGRATION_NOTICE_2026-09-16.md`;
+- `docs/ROADMAP_ADDENDUM_PLUGIN_MIGRATION_2026-09-16.md`.
+
+New workstream: **Phase 10P — Plugin Migration**, preparation active; activation depends on the account/workspace migration/plugin creation capability becoming available.
+
+Phase 10P and Phase 11G are independent.
 
 ## Governance
 
 Prospective thresholds remain:
 
-- `<30` resolved primary families: observation only;
+- `<30`: observation only;
 - `30–49`: diagnostics;
 - `50–99`: hypotheses/ablation proposals only;
 - `>=100`: versioned recalibration proposal may be considered, still requiring fresh OOS/prospective evidence and explicit promotion.
 
-Historical trades never count toward thresholds.
+Current resolved count: `41`.
 
-Current resolved count remains `39`.
-
-No evidence authorizes in-place retuning, direction filtering, exit-management modification, RR/max-hold/risk changes, holdout access, production mutation or Phase 12 activation.
+No evidence authorizes in-place retuning, side filtering, exit-management modification, RR/max-hold/risk changes, holdout access, production mutation or Phase 12 activation.
 
 ## Next work order
 
-1. Continue causal prospective collection using the hardened runner and resolver v1.3.
-2. Resolve the seven current open primary families only after real STOP/3R or causal max hold.
-3. Keep all pre-13:00Z primary families out of prereg confirmation counts.
-4. Track post-prereg confirmation sample separately.
-5. At/after the early-family causal boundaries `16:00Z` and `16:15Z`, run capture → funding → resolver → diagnostics and reassess the evidence tier.
-6. Preserve frozen v2.2, holdout closure, production read-only boundary and disk-retention timer state.
-7. Do not reopen the broad adaptive-strategy research delegated to `K_Investigation_Forecast` until the user explicitly reports positive results.
+1. At the next causally available closed-bar cutoff `>=16:30Z`, confirm the ADA/DOGE discovery-family TIME_EXIT paths if no STOP/3R occurs first.
+2. Continue prospective collection with resolver v1.3 and the evidence-aware pipeline v2.
+3. Keep discovery and post-prereg confirmation evidence separated.
+4. Keep portfolio-risk diagnostics current; do not choose production caps inside Phase 11G.
+5. Preserve production read-only state, holdout closure and disk-retention timer state.
+6. Prepare Phase 10P only; do not disable the current Custom GPT until replacement Plugin acceptance.
+7. Do not reopen `K_Investigation_Forecast` strategy discovery until the user explicitly returns positive results.
