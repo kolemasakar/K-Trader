@@ -76,7 +76,7 @@ def main() -> None:
     funding_root = run_root / 'funding_offline_v1'
     outcomes_parent = (
         base
-        / 'strategy_benchmark_v1/combined_rules/prospective_v2_2_outcomes_offline_v1_2'
+        / 'strategy_benchmark_v1/combined_rules/prospective_v2_2_outcomes_offline_v1_3'
     )
     outcomes_root = outcomes_parent / run_stamp
     diagnostics_root = (
@@ -97,7 +97,7 @@ def main() -> None:
     scripts = {
         'capture': script_dir / 'run_prospective_v2_2_shadow_cycle.py',
         'funding': script_dir / 'export_prospective_funding_snapshot_v1.py',
-        'resolver': script_dir / 'prospective_v2_2_outcome_resolver_offline_v1_2.py',
+        'resolver': script_dir / 'prospective_v2_2_outcome_resolver_offline_v1_3.py',
         'diagnostics': script_dir / 'prospective_v2_2_post30_diagnostics.py',
         'statistics': script_dir / 'prospective_post30_statistical_diagnostics.py',
     }
@@ -190,6 +190,7 @@ def main() -> None:
         'as_of': args.as_of,
         'mode': 'EXECUTE' if args.execute else 'PLAN_ONLY',
         'status': status,
+        'resolver_version': 'v1.3',
         'holdout_opened': False,
         'production_action': False,
         'run_root': str(run_root),
