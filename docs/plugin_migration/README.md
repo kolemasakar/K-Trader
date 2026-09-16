@@ -80,7 +80,14 @@ These remain available until migration is complete and verified.
 - `REGRESSION_SUITE.md` — acceptance scenarios;
 - `SOURCE_ASSESSMENT_2026-09-16.md` — verified product-change assessment;
 - `PLUGIN_IMPLEMENTATION_BLUEPRINT_V1.md` — target composition, permissions, MCP/app constraints, cutover sequence;
+- `ACCOUNT_SURFACE_PRECHECK_2026-09-16.md` — account-observed Plugin/MCP surface and current creation-path blocker;
 - `../operations/PRODUCTION_SAFETY_EXECUTION_COMPATIBILITY_AUDIT_2026-09-16.md` — current backend safety baseline.
+
+## Current account-surface state
+
+The 2026-09-16 precheck confirms that the current ChatGPT account/session can discover and manage Plugin/App/connector integrations, including MCP-backed integrations, but this session does not expose a repository-to-custom-K-Trader-Plugin creation operation. No third-party plugin was installed or connected during the precheck.
+
+Therefore repository preparation remains implementation-ready while actual replacement creation/cutover stays blocked until the supported custom Plugin/App creation path is observable or an explicitly approved external MCP/App deployment path is selected.
 
 ## Activation gate
 
