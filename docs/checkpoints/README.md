@@ -4,7 +4,7 @@ This directory contains accepted snapshots used to recover the exact project sta
 
 ## Current checkpoint
 
-`2026-09-16_1615Z_HARDENING_PLUGIN_MIGRATION.md`
+`2026-09-16_1630Z_PARALLEL_HARDENING_COMPLETE.md`
 
 Current accepted state:
 
@@ -13,24 +13,25 @@ Current accepted state:
 - frozen candidate `candidate_rule_set_v2_2`, harness SHA `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`;
 - protocol SHA `ba671cbed71fdc79380f37a72b75f93e75aa3ee895f5385ef433f497165de5a3`;
 - holdout untouched/unauthorized;
-- latest accepted cutoff `2026-09-16T16:15:00Z`;
+- latest accepted cutoff `2026-09-16T16:30:00Z`;
 - ledger `61` eligible observations / `47` unique primary families;
-- outcome state `41` resolved / `6` unresolved, wins/losses `11/30`, expectancy `-0.5902225135899566R`;
-- SUIUSDT and XRPUSDT `08:00Z` families resolved TIME_EXIT at `16:00Z` with positive R;
-- max-hold closed-bar evidence lag is documented and is not a strategy change;
-- prereg confirmation sample contains `3` unresolved primary families, all SHORT/REST;
+- outcome state `43` resolved / `4` unresolved, wins/losses `13/30`, expectancy `-0.5539825538227888R`;
+- ADAUSDT/DOGEUSDT `08:15Z` primary families resolved as positive TIME_EXIT at `16:15Z`;
+- confirmation sample remains `3` unresolved primary families, all SHORT/REST;
 - evidence tracker/provenance invariants PASS;
-- portfolio diagnostics observe max concurrent all/SHORT `8`, largest correlated cohort `4`; no production caps selected;
-- prospective pipeline v2 adds evidence/risk/state stages and is fail-closed; v1 tests `6/6`, v2 tests `2/2` PASS;
-- storage ~19.1% used by exact bytes; retention timer remains disabled and destructive mode unauthorized;
-- production-safety audit PASS; a future execution-spec contract is still required before any real trading;
-- Phase 11G closure criteria and recovery runbook are documented;
-- Custom GPT is now a legacy compatibility wrapper; Phase 10P Plugin Migration preparation is active, with skill/integration/regression artifacts prepared;
-- broad adaptive strategy discovery remains delegated to `K_Investigation_Forecast` and must not be reopened here until the user reports positive results.
+- max observed concurrent all/SHORT `8`, largest correlated cohort `4`; no production caps selected;
+- portfolio policy simulation confirms concentration can be reduced but does not repair negative strategy expectancy;
+- pipeline v2 accepted as canonical future orchestration entry point, with full current research tests `10/10 PASS`;
+- Phase 11G closure audit: infrastructure/evidence/economic packaging complete, Path A `43/100`, Path B not selected;
+- future execution compatibility contract documented; production remains read-only;
+- storage/provenance audit PASS, retention timer disabled;
+- Phase 10P Plugin Migration preparation includes skill/integration/regression/implementation blueprint; current Custom GPT remains legacy compatibility wrapper until replacement acceptance;
+- broad adaptive strategy discovery remains delegated to `K_Investigation_Forecast` until the user reports positive results.
 
 ## Latest accepted research checkpoints
 
-- `2026-09-16_1615Z_HARDENING_PLUGIN_MIGRATION.md` — authoritative 16:15Z evidence state, parallel hardening completion and Plugin migration preparation;
+- `2026-09-16_1630Z_PARALLEL_HARDENING_COMPLETE.md` — authoritative 16:30Z state after causal resolution and full parallel-hardening package;
+- `2026-09-16_1615Z_HARDENING_PLUGIN_MIGRATION.md` — prior 16:15Z evidence/hardening state;
 - `2026-09-16_PROSPECTIVE_1415Z_CONTINUITY.md` — prior 14:15Z continuity state;
 - `2026-09-16_PROSPECTIVE_1345Z_RESOLVER_V1_3.md` — resolver-v1.3 acceptance;
 - `2026-09-16_PREREG_PATH_PIPELINE_HARDENING.md` — preregistration, path-quality and pipeline hardening;
@@ -41,15 +42,18 @@ Current accepted state:
 ## Related documents
 
 - current state: `../CURRENT_STATE.md`;
+- new-chat handoff: `../operations/K_TRADER_NEW_CHAT_HANDOFF_2026-09-16_1630Z.md`;
 - resolver v1.3: `../research/PROSPECTIVE_V2_2_OFFLINE_RESOLVER_V1_3.md`;
 - max-hold evidence semantics: `../research/MAX_HOLD_CAUSAL_EVIDENCE_SEMANTICS.md`;
 - hypothesis preregistration: `../research/PROSPECTIVE_HYPOTHESES_PREREG_2026-09-16.md`;
 - portfolio-risk contract: `../research/PORTFOLIO_RISK_RESEARCH_CONTRACT_V1.md`;
-- pipeline v2: `../../research/strategy_benchmark_v1/run_prospective_research_pipeline_v2.py`;
+- portfolio simulation: `../research/PORTFOLIO_RISK_POLICY_SIMULATION_2026-09-16_1630Z.md`;
+- pipeline v2 acceptance: `../research/PROSPECTIVE_PIPELINE_V2_ACCEPTANCE.md`;
 - recovery: `../operations/RESEARCH_RECOVERY_RUNBOOK.md`;
-- Phase 11G closure: `../research/PHASE_11G_CLOSURE_CRITERIA.md`;
-- production safety audit: `../operations/PRODUCTION_SAFETY_EXECUTION_COMPATIBILITY_AUDIT_2026-09-16.md`;
-- storage growth: `../operations/RESEARCH_STORAGE_GROWTH_2026-09-16.md`;
+- Phase 11G closure: `../research/PHASE_11G_CLOSURE_AUDIT_2026-09-16_1630Z.md`;
+- stress economics: `../research/PHASE_11G_STRESS_ECONOMICS_BASELINE.md`;
+- execution compatibility: `../architecture/EXECUTION_COMPATIBILITY_CONTRACT_V1.md`;
+- storage/provenance: `../operations/STORAGE_PROVENANCE_AUDIT_2026-09-16_1630Z.md`;
 - Plugin migration: `../plugin_migration/README.md`.
 
 A checkpoint does not replace canonical specifications. It records the accepted state to resume from.
