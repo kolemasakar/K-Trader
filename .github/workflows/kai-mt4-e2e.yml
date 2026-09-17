@@ -1,0 +1,57 @@
+name: K_AI MT4 Live E2E
+
+on:
+  push:
+    branches:
+      - integration/kai-mt4-market-context
+    paths:
+      - 'src/ktrader/providers/kai_mt4.py'
+      - 'scripts/kai_mt4_http_e2e.py'
+      - 'tests/test_kai_mt4_market_context.py'
+      - 'docs/integrations/KAI_MT4_E2E_PREFLIGHT_2026-09-17.md'
+      - '.github/workflows/kai-mt4-e2e.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kai-mt4-live-e2e
+  cancel-in-progress: false
+
+jobs:
+  live-e2e:
+    runs-on: [self-hosted, linux, k-trader-prod-arm64]
+    timeout-minutes: 5
+    env:
+      KAI_MARKET_CONTEXT_DELIVERY_TOKEN: ${{ secrets.KAI_MARKET_CONTEXT_DELIVERY_TOKEN }}
+    steps:
+      - name: Checkout integration branch
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Verify bounded transport health
+        run: |
+          set -euo pipefail
+          test -n "${KAI_MARKET_CONTEXT_DELIVERY_TOKEN:-}" || { echo 'KAI_MARKET_CONTEXT_DELIVERY_TOKEN is not provisioned to this workflow'; exit 20; }
+          curl -fsS --max-time 5 http://127.0.0.1:18765/health | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d.get("status")=="ok"; assert d.get("execution_surface") is False; print("transport_health=PASS")'
+
+      - name: Run live schema 1.1 E2E acceptance
+        run: |
+          set -euo pipefail
+          mkdir -p reports/audits
+          PYTHONPATH=src python3 scripts/kai_mt4_http_e2e.py \
+            --symbol ETHUSDt \
+            --market crypto \
+            --negative-contract-smoke \
+            --output reports/audits/kai_mt4_http_e2e_acceptance.json
+
+      - name: Upload acceptance summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kai-mt4-http-e2e-acceptance
+          path: reports/audits/kai_mt4_http_e2e_acceptance.json
+          if-no-files-found: ignore
+          retention-days: 7
