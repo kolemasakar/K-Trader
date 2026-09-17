@@ -32,6 +32,22 @@ The adapter defaults to `KAI_MT4_BASE_URL=http://127.0.0.1:8765`; optional beare
 - K-Trader must never synthesize M15 from three M5 candles in this integration;
 - all scopes must contain closed, strictly chronological bars with `bar_depth == len(bars)`.
 
+## K-Trader validation hardening
+
+Before a K_AI payload is accepted, the adapter fails closed on:
+
+- missing, non-numeric or non-finite market facts;
+- `ask < bid`, non-positive `point/tick_value/tick_size/contract_size`, negative `spread/stop_level/freeze_level`, or invalid `digits`;
+- missing, non-numeric or non-finite OHLCV values;
+- OHLC invariant violations (`high` below open/close/low or `low` above open/close/high);
+- negative volume;
+- duplicate or non-chronological bar timestamps;
+- `latest_closed_bar_time` not matching the last supplied bar;
+- `current_bar_time <= latest_closed_bar_time`;
+- mixed timezone-aware and timezone-naive values inside one scope.
+
+These are validation-only checks. They do not register the provider, transform the strategy, alter risk/execution rules or authorize any broker action.
+
 ## Timestamp semantics
 
 Current K_AI/MT4 timestamps are broker-server wall-clock values and do not carry a UTC offset. K-Trader therefore treats them as source timestamps and does not silently relabel them as UTC. Schema 1.1 should make timezone/offset semantics explicit when K_AI can do so reliably.
