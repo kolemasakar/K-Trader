@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import os
 from datetime import datetime
-from typing import Any
+from typing import Any, Mapping
 
 import httpx
 
@@ -15,6 +15,8 @@ class KAIMT4MarketContextAdapter:
 
     provider_id = "kai_mt4"
     endpoint = "/v1/market-context/acquire"
+    canonical_bar_depths = {"D1": 60, "H1": 200, "M15": 300, "M5": 300}
+    opaque_timestamp_semantics = "BROKER_SERVER_WALL_CLOCK_OPAQUE"
 
     def __init__(
         self,
@@ -22,11 +24,13 @@ class KAIMT4MarketContextAdapter:
         base_url: str | None = None,
         api_token: str | None = None,
         timeout_seconds: float = 55.0,
+        expected_bar_depths: Mapping[str, int] | None = None,
         client: httpx.AsyncClient | None = None,
     ) -> None:
         resolved_url = base_url or os.getenv("KAI_MT4_BASE_URL", "http://127.0.0.1:8765")
         self.base_url = resolved_url.rstrip("/")
         self.api_token = api_token or os.getenv("KAI_MT4_API_TOKEN")
+        self.expected_bar_depths = dict(expected_bar_depths or self.canonical_bar_depths)
         self._owns_client = client is None
         headers = {"User-Agent": "K-Trader/0.1 read-only-kai-mt4"}
         if self.api_token:
@@ -59,6 +63,7 @@ class KAIMT4MarketContextAdapter:
             payload,
             expected_symbol=symbol,
             expected_market=market,
+            expected_bar_depths=self.expected_bar_depths,
             require_m15=require_m15,
         )
         return payload
@@ -70,6 +75,7 @@ class KAIMT4MarketContextAdapter:
         *,
         expected_symbol: str | None = None,
         expected_market: str | None = None,
+        expected_bar_depths: Mapping[str, int] | None = None,
         require_m15: bool = False,
     ) -> None:
         if not isinstance(payload, dict):
@@ -97,6 +103,16 @@ class KAIMT4MarketContextAdapter:
         if payload.get("closed_bars_only") is not True:
             raise ProviderError("K_AI market context must contain closed bars only")
 
+        opaque_wall_clock = schema == "1.1"
+        if opaque_wall_clock:
+            if payload.get("timestamp_semantics") != cls.opaque_timestamp_semantics:
+                raise ProviderError(
+                    "K_AI schema 1.1 timestamp_semantics must be "
+                    f"{cls.opaque_timestamp_semantics}"
+                )
+            if "utc_offset_minutes" not in payload or payload["utc_offset_minutes"] is not None:
+                raise ProviderError("K_AI schema 1.1 utc_offset_minutes must be null")
+
         symbol = str(payload.get("symbol") or "")
         market = str(payload.get("market") or "").lower()
         if expected_symbol is not None and symbol != expected_symbol:
@@ -106,6 +122,12 @@ class KAIMT4MarketContextAdapter:
         for field in ("run_id", "captured_at", "last_tick_time"):
             if not str(payload.get(field) or "").strip():
                 raise ProviderError(f"K_AI market context is missing {field}")
+        cls._parse_source_time(
+            payload["captured_at"], field="captured_at", opaque_wall_clock=opaque_wall_clock
+        )
+        cls._parse_source_time(
+            payload["last_tick_time"], field="last_tick_time", opaque_wall_clock=opaque_wall_clock
+        )
 
         cls._validate_market_facts(payload)
 
@@ -115,7 +137,17 @@ class KAIMT4MarketContextAdapter:
                 f"K_AI schema {schema} must contain exactly {sorted(expected_scopes)} scopes"
             )
         for scope in expected_scopes:
-            cls._validate_scope(scope, scopes[scope])
+            expected_depth = None
+            if expected_bar_depths is not None:
+                expected_depth = expected_bar_depths.get(scope)
+                if expected_depth is None:
+                    raise ProviderError(f"K_AI expected bar depth is missing for {scope}")
+            cls._validate_scope(
+                scope,
+                scopes[scope],
+                expected_depth=expected_depth,
+                opaque_wall_clock=opaque_wall_clock,
+            )
 
     @staticmethod
     def _finite_number(value: Any, *, field: str) -> float:
@@ -171,23 +203,47 @@ class KAIMT4MarketContextAdapter:
                 raise ProviderError(f"K_AI market fact {field} must be boolean")
 
     @staticmethod
-    def _parse_source_time(value: Any, *, field: str) -> datetime:
+    def _parse_source_time(
+        value: Any,
+        *,
+        field: str,
+        opaque_wall_clock: bool = False,
+    ) -> datetime:
         text = str(value or "").strip()
         if not text:
             raise ProviderError(f"K_AI {field} is missing")
         try:
-            return datetime.fromisoformat(text.replace("Z", "+00:00"))
+            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
         except ValueError as exc:
             raise ProviderError(f"K_AI {field} must be ISO-8601 compatible") from exc
+        if opaque_wall_clock and parsed.tzinfo is not None:
+            raise ProviderError(
+                f"K_AI schema 1.1 {field} must be opaque broker-server wall-clock without UTC offset"
+            )
+        return parsed
 
     @classmethod
-    def _validate_scope(cls, scope: str, data: Any) -> None:
+    def _validate_scope(
+        cls,
+        scope: str,
+        data: Any,
+        *,
+        expected_depth: int | None = None,
+        opaque_wall_clock: bool = False,
+    ) -> None:
         if not isinstance(data, dict) or data.get("timeframe") != scope:
             raise ProviderError(f"Invalid K_AI {scope} scope")
-        depth = int(data.get("bar_depth") or 0)
+        try:
+            depth = int(data.get("bar_depth") or 0)
+        except (TypeError, ValueError) as exc:
+            raise ProviderError(f"K_AI {scope} bar_depth must be an integer") from exc
         bars = data.get("bars")
         if depth <= 0 or not isinstance(bars, list) or len(bars) != depth:
             raise ProviderError(f"K_AI {scope} bar depth/count mismatch")
+        if expected_depth is not None and depth != int(expected_depth):
+            raise ProviderError(
+                f"K_AI {scope} bar_depth mismatch: {depth} != {int(expected_depth)}"
+            )
 
         times: list[datetime] = []
         time_texts: list[str] = []
@@ -199,7 +255,11 @@ class KAIMT4MarketContextAdapter:
                     raise ProviderError(f"K_AI {scope} bar {index} missing {field}")
 
             bar_time_text = str(bar["time"])
-            bar_time = cls._parse_source_time(bar_time_text, field=f"{scope} bar {index} time")
+            bar_time = cls._parse_source_time(
+                bar_time_text,
+                field=f"{scope} bar {index} time",
+                opaque_wall_clock=opaque_wall_clock,
+            )
             open_ = cls._finite_number(bar["open"], field=f"{scope} bar {index} open")
             high = cls._finite_number(bar["high"], field=f"{scope} bar {index} high")
             low = cls._finite_number(bar["low"], field=f"{scope} bar {index} low")
@@ -225,8 +285,16 @@ class KAIMT4MarketContextAdapter:
         latest_text = str(data.get("latest_closed_bar_time") or "")
         if latest_text != time_texts[-1]:
             raise ProviderError(f"K_AI {scope} latest_closed_bar_time mismatch")
-        latest = cls._parse_source_time(latest_text, field=f"{scope} latest_closed_bar_time")
-        current = cls._parse_source_time(data.get("current_bar_time"), field=f"{scope} current_bar_time")
+        latest = cls._parse_source_time(
+            latest_text,
+            field=f"{scope} latest_closed_bar_time",
+            opaque_wall_clock=opaque_wall_clock,
+        )
+        current = cls._parse_source_time(
+            data.get("current_bar_time"),
+            field=f"{scope} current_bar_time",
+            opaque_wall_clock=opaque_wall_clock,
+        )
         try:
             if current <= latest:
                 raise ProviderError(
