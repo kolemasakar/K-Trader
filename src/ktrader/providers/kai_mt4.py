@@ -87,6 +87,7 @@ class KAIMT4MarketContextAdapter:
             "report_type": "MARKET_CONTEXT",
             "source_name": "MT4",
             "data_quality_flag": "VALID",
+            "time_source": "BrokerServer",
         }
         for field, expected in required_equal.items():
             if payload.get(field) != expected:
@@ -100,10 +101,11 @@ class KAIMT4MarketContextAdapter:
             raise ProviderError(f"K_AI symbol mismatch: {symbol!r} != {expected_symbol!r}")
         if expected_market is not None and market != expected_market.lower():
             raise ProviderError(f"K_AI market mismatch: {market!r} != {expected_market.lower()!r}")
-        if not str(payload.get("run_id") or "").strip():
-            raise ProviderError("K_AI market context is missing run_id")
-        if not str(payload.get("captured_at") or "").strip():
-            raise ProviderError("K_AI market context is missing captured_at")
+        for field in ("run_id", "captured_at", "last_tick_time"):
+            if not str(payload.get(field) or "").strip():
+                raise ProviderError(f"K_AI market context is missing {field}")
+
+        cls._validate_market_facts(payload)
 
         scopes = payload.get("scopes")
         if not isinstance(scopes, dict) or set(scopes) != expected_scopes:
@@ -112,6 +114,31 @@ class KAIMT4MarketContextAdapter:
             )
         for scope in expected_scopes:
             cls._validate_scope(scope, scopes[scope])
+
+    @staticmethod
+    def _validate_market_facts(payload: dict[str, Any]) -> None:
+        required = (
+            "bid", "ask", "spread", "digits", "point", "stop_level",
+            "freeze_level", "tick_value", "tick_size", "contract_size",
+            "trade_allowed", "terminal_connected", "market_open",
+        )
+        missing = [field for field in required if field not in payload]
+        if missing:
+            raise ProviderError(f"K_AI market context missing market facts: {', '.join(missing)}")
+        try:
+            bid = float(payload["bid"])
+            ask = float(payload["ask"])
+            point = float(payload["point"])
+            tick_value = float(payload["tick_value"])
+            tick_size = float(payload["tick_size"])
+            contract_size = float(payload["contract_size"])
+        except (TypeError, ValueError) as exc:
+            raise ProviderError("K_AI market facts must be numeric") from exc
+        if bid <= 0 or ask < bid or point <= 0 or tick_value <= 0 or tick_size <= 0 or contract_size <= 0:
+            raise ProviderError("K_AI market facts violate positive-price/size invariants")
+        for field in ("trade_allowed", "terminal_connected", "market_open"):
+            if not isinstance(payload[field], bool):
+                raise ProviderError(f"K_AI market fact {field} must be boolean")
 
     @staticmethod
     def _validate_scope(scope: str, data: Any) -> None:
