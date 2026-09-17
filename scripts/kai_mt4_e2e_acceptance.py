@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import argparse
-import asyncio
 import copy
 import json
-import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -82,50 +81,45 @@ def _negative_contract_smoke(payload: dict[str, Any]) -> list[dict[str, str]]:
     return results
 
 
-async def _run(args: argparse.Namespace) -> dict[str, Any]:
-    base_url = args.base_url or os.getenv("KAI_MT4_BASE_URL")
-    if not base_url:
-        return {
-            "schema_version": "ktrader.kai_mt4_e2e_acceptance.v1",
-            "status": "BLOCKED_TRANSPORT",
-            "reason": "KAI_MT4_BASE_URL is not configured",
-            "provider_registered": False,
-            "production_activation": False,
-            "trading_authorized": False,
-        }
-
-    adapter = KAIMT4MarketContextAdapter(
-        base_url=base_url,
-        api_token=os.getenv("KAI_MT4_API_TOKEN"),
-        timeout_seconds=args.timeout,
-    )
-    try:
-        payload = await adapter.acquire_market_context(
-            args.symbol,
-            args.market,
-            require_m15=True,
-        )
-    finally:
-        await adapter.close()
-
-    result = _summary(payload)
-    if args.negative_contract_smoke:
-        result["negative_contract_smoke"] = _negative_contract_smoke(payload)
-    return result
+def _load_payload(path: str | None) -> dict[str, Any]:
+    if path:
+        raw = Path(path).read_text(encoding="utf-8")
+    else:
+        raw = sys.stdin.read()
+    if not raw.strip():
+        raise ValueError("no MARKET_CONTEXT payload supplied; use --input or stdin")
+    payload = json.loads(raw)
+    if not isinstance(payload, dict):
+        raise ValueError("MARKET_CONTEXT payload must be a JSON object")
+    return payload
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run read-only K_AI MT4 -> K-Trader E2E acceptance")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Validate a freshly delivered K_AI MARKET_CONTEXT payload on the K-Trader side. "
+            "Cross-system delivery is intentionally transport-neutral."
+        )
+    )
+    parser.add_argument("--input", help="path to a freshly delivered MARKET_CONTEXT JSON; stdin if omitted")
     parser.add_argument("--symbol", default="ETHUSDt")
     parser.add_argument("--market", default="crypto")
-    parser.add_argument("--base-url")
-    parser.add_argument("--timeout", type=float, default=55.0)
     parser.add_argument("--negative-contract-smoke", action="store_true")
     parser.add_argument("--output")
     args = parser.parse_args()
 
     try:
-        result = asyncio.run(_run(args))
+        payload = _load_payload(args.input)
+        adapter = KAIMT4MarketContextAdapter()
+        accepted = adapter.accept_market_context(
+            payload,
+            symbol=args.symbol,
+            market=args.market,
+            require_m15=True,
+        )
+        result = _summary(accepted)
+        if args.negative_contract_smoke:
+            result["negative_contract_smoke"] = _negative_contract_smoke(accepted)
     except Exception as exc:
         result = {
             "schema_version": "ktrader.kai_mt4_e2e_acceptance.v1",
@@ -143,7 +137,7 @@ def main() -> int:
         path = Path(args.output)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(rendered + "\n", encoding="utf-8")
-    return 0 if result["status"] in {"PASS", "BLOCKED_TRANSPORT"} else 1
+    return 0 if result["status"] == "PASS" else 1
 
 
 if __name__ == "__main__":
