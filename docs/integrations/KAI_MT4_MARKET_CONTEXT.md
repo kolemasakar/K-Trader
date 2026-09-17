@@ -1,6 +1,6 @@
 # K_AI -> K-Trader MT4 Market Context
 
-Status: integration staging only; not production-activated.
+Status: consumer contract staging only; remote transport not yet implemented or production-activated.
 
 ## Decision
 
@@ -18,32 +18,34 @@ For the native M15 upgrade, do not use K_AI `main` as source of truth yet.
 
 The producer completion record reports focused `45 passed`, active repository regression `358 passed`, MQ4 v1.9 compile `0 errors, 0 warnings`, runtime `alive_validation_only`, and live broker-disabled validation run `M15LIVE_20260917_135101_433422` for `ETHUSDt` with imported `D1/H1/M15/M5` and native M15 depth/count `300`.
 
-## Boundary
+## Verified producer transport
 
-Data flow:
+The authoritative K_AI branch implements market-context acquisition locally:
 
-`MT4 -> K_AI MT4 Bridge -> K_AI market-context API -> K-Trader KAIMT4MarketContextAdapter`
+`MT4BridgeAgent.acquire_market_context(run_id, symbol, market)`
+
+The verified flow is:
+
+`K_AI Python -> market_context_request.json -> MT4 Bridge -> market_context_<run_id>.json -> K_AI validation/import/archive`
+
+The request contains separate configured `d1_bars`, `h1_bars`, `m15_bars`, and `m5_bars`. The response is validated atomically before canonical persistence.
+
+No remote HTTP market-context endpoint is established by the inspected authoritative M15 implementation. K-Trader therefore must not assume `/v1/market-context/acquire`, a localhost service, bearer authentication, or any other remote protocol until such a transport is separately implemented and accepted.
+
+## K-Trader boundary
 
 K-Trader is a consumer only. This integration must not expose or invoke K_AI `OrderSend`, risk manager, local executor, authorization, `signal.json`, or broker execution paths.
 
-## K_AI API contract
-
-Expected private endpoint:
-
-`POST /v1/market-context/acquire`
-
-Request body contains only `symbol` and `market`. K_AI owns `run_id`, acquisition, MT4 validation, canonical persistence and archive selection. A successful response is the validated canonical `MARKET_CONTEXT` payload, not a newly transformed OHLCV copy.
-
-The adapter defaults to `KAI_MT4_BASE_URL=http://127.0.0.1:8765`; optional bearer authentication uses `KAI_MT4_API_TOKEN`. The intended deployment transport is private; no public HP-OMEN listener is required.
+`KAIMT4MarketContextAdapter` is intentionally transport-neutral at this stage. It accepts an already-delivered canonical payload, validates the K_AI contract, and returns the same payload unchanged. It does not initiate network traffic, access the K_AI workstation, or register itself as a live K-Trader provider.
 
 ## Schema handling
 
 - schema `1.0`: exactly `D1/H1/M5`; accepted for backward-compatible read/replay;
 - schema `1.1`: exactly `D1/H1/M15/M5` and canonical live transport;
-- M15-dependent K-Trader flows must call with `require_m15=True` and fail closed on schema `1.0`;
+- M15-dependent K-Trader flows must use `require_m15=True` and fail closed on schema `1.0`;
 - K-Trader must never synthesize M15 from three M5 candles in this integration;
 - canonical live bar depths are `D1=60`, `H1=200`, `M15=300`, `M5=300`;
-- all scopes must contain closed, strictly chronological bars with `bar_depth == len(bars)` and no duplicate timestamps.
+- all scopes must contain `snapshot_id`, closed strictly chronological bars, exact `bar_depth == len(bars)`, and no duplicate timestamps.
 
 K_AI `required_timeframes` for current Strategy A/Evidence may remain `D1/H1/M5`; that is a decision-scope setting and does not weaken the schema 1.1 transport requirement of exact `D1/H1/M15/M5` scopes.
 
@@ -53,6 +55,7 @@ Before a K_AI payload is accepted, the adapter fails closed on:
 
 - unsupported schema or wrong exact scope set;
 - schema `1.0` when `require_m15=True`;
+- missing scope `snapshot_id`;
 - schema `1.1` timestamp semantics other than `BROKER_SERVER_WALL_CLOCK_OPAQUE`;
 - schema `1.1` with missing/non-null `utc_offset_minutes`;
 - schema `1.1` source timestamps carrying `Z` or any UTC offset;
@@ -60,13 +63,13 @@ Before a K_AI payload is accepted, the adapter fails closed on:
 - missing, non-numeric or non-finite market facts;
 - `ask < bid`, non-positive `point/tick_value/tick_size/contract_size`, negative `spread/stop_level/freeze_level`, or invalid `digits`;
 - missing, non-numeric or non-finite OHLCV values;
-- OHLC invariant violations (`high` below open/close/low or `low` above open/close/high);
+- OHLC invariant violations;
 - negative volume;
 - duplicate or non-chronological bar timestamps;
 - `latest_closed_bar_time` not matching the last supplied bar;
 - `current_bar_time <= latest_closed_bar_time`.
 
-These are validation-only checks. They do not register the provider, transform the strategy, alter risk/execution rules or authorize any broker action.
+These are validation-only checks. They do not transform strategy data, alter risk/execution rules, or authorize any broker action.
 
 ## Timestamp semantics
 
@@ -76,10 +79,18 @@ Schema 1.1 source timestamps are opaque broker-server wall-clock values:
 - `timestamp_semantics=BROKER_SERVER_WALL_CLOCK_OPAQUE`;
 - `utc_offset_minutes=null`.
 
-K-Trader must not interpret these values as UTC, append `Z`, fabricate a numeric offset, or convert them to an absolute instant. They are used only as coherent source-time ordering/freshness facts within the producer contract.
+K-Trader must not interpret these values as UTC, append `Z`, fabricate a numeric offset, or convert them to an absolute instant. They are used only as coherent source-time facts under the producer contract.
 
 Schema 1.0 remains backward-compatible and does not retroactively require the schema 1.1 timestamp metadata.
 
 ## Activation gate
 
-This branch does not register `kai_mt4` in the production provider registry and does not change the active `binance_usdm` provider. Production activation requires a separate explicit decision after a K_AI -> K-Trader live end-to-end market-context acceptance test passes against the authoritative schema 1.1 producer implementation.
+This branch does not register `kai_mt4` in the production provider registry and does not change the active `binance_usdm` provider.
+
+Activation requires, in order:
+
+1. a separately defined and accepted read-only cross-system delivery transport from K_AI to K-Trader;
+2. a live K_AI -> K-Trader end-to-end market-context acceptance using schema 1.1;
+3. a separate explicit production-provider decision.
+
+Until all three are complete, this integration remains consumer-contract staging only.
