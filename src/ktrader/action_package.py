@@ -12,6 +12,8 @@ REQUIRED_OPERATION_IDS = frozenset(
         "listUniverse",
         "getMarketSnapshot",
         "getMT4MarketContext",
+        "getMT4MarketContextSummary",
+        "getMT4Candles",
         "getCandles",
         "getAnalysis",
         "listCandidates",
