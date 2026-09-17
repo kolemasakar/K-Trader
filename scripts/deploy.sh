@@ -18,7 +18,7 @@ for path in "$ROOT" "$ROOT/releases" "$ROOT/data" "$ROOT/caddy_data" "$ROOT/cadd
 done
 
 if [ ! -w "$ROOT/data" ] || [ ! -w "$ROOT/run" ]; then
-    echo "runner user cannot write $ROOT/data or $ROOT/run; fix production ownership before deployment" >&2
+    echo "runner user cannot write $ROOT/data or $ROOT/run; fix production data ownership before deployment" >&2
     exit 1
 fi
 
