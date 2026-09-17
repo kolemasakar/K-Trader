@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import math
 import os
+from datetime import datetime
 from typing import Any
 
 import httpx
@@ -116,7 +118,19 @@ class KAIMT4MarketContextAdapter:
             cls._validate_scope(scope, scopes[scope])
 
     @staticmethod
-    def _validate_market_facts(payload: dict[str, Any]) -> None:
+    def _finite_number(value: Any, *, field: str) -> float:
+        if isinstance(value, bool):
+            raise ProviderError(f"K_AI {field} must be numeric, not boolean")
+        try:
+            number = float(value)
+        except (TypeError, ValueError) as exc:
+            raise ProviderError(f"K_AI {field} must be numeric") from exc
+        if not math.isfinite(number):
+            raise ProviderError(f"K_AI {field} must be finite")
+        return number
+
+    @classmethod
+    def _validate_market_facts(cls, payload: dict[str, Any]) -> None:
         required = (
             "bid", "ask", "spread", "digits", "point", "stop_level",
             "freeze_level", "tick_value", "tick_size", "contract_size",
@@ -125,23 +139,49 @@ class KAIMT4MarketContextAdapter:
         missing = [field for field in required if field not in payload]
         if missing:
             raise ProviderError(f"K_AI market context missing market facts: {', '.join(missing)}")
+
+        bid = cls._finite_number(payload["bid"], field="market fact bid")
+        ask = cls._finite_number(payload["ask"], field="market fact ask")
+        spread = cls._finite_number(payload["spread"], field="market fact spread")
+        point = cls._finite_number(payload["point"], field="market fact point")
+        stop_level = cls._finite_number(payload["stop_level"], field="market fact stop_level")
+        freeze_level = cls._finite_number(payload["freeze_level"], field="market fact freeze_level")
+        tick_value = cls._finite_number(payload["tick_value"], field="market fact tick_value")
+        tick_size = cls._finite_number(payload["tick_size"], field="market fact tick_size")
+        contract_size = cls._finite_number(payload["contract_size"], field="market fact contract_size")
+
+        digits_raw = payload["digits"]
+        if isinstance(digits_raw, bool):
+            raise ProviderError("K_AI market fact digits must be an integer")
         try:
-            bid = float(payload["bid"])
-            ask = float(payload["ask"])
-            point = float(payload["point"])
-            tick_value = float(payload["tick_value"])
-            tick_size = float(payload["tick_size"])
-            contract_size = float(payload["contract_size"])
+            digits = int(digits_raw)
+            digits_numeric = float(digits_raw)
         except (TypeError, ValueError) as exc:
-            raise ProviderError("K_AI market facts must be numeric") from exc
+            raise ProviderError("K_AI market fact digits must be an integer") from exc
+        if not math.isfinite(digits_numeric) or digits_numeric != digits or not 0 <= digits <= 12:
+            raise ProviderError("K_AI market fact digits must be an integer in [0, 12]")
+
         if bid <= 0 or ask < bid or point <= 0 or tick_value <= 0 or tick_size <= 0 or contract_size <= 0:
             raise ProviderError("K_AI market facts violate positive-price/size invariants")
+        if spread < 0 or stop_level < 0 or freeze_level < 0:
+            raise ProviderError("K_AI market facts violate non-negative spread/level invariants")
+
         for field in ("trade_allowed", "terminal_connected", "market_open"):
             if not isinstance(payload[field], bool):
                 raise ProviderError(f"K_AI market fact {field} must be boolean")
 
     @staticmethod
-    def _validate_scope(scope: str, data: Any) -> None:
+    def _parse_source_time(value: Any, *, field: str) -> datetime:
+        text = str(value or "").strip()
+        if not text:
+            raise ProviderError(f"K_AI {field} is missing")
+        try:
+            return datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ProviderError(f"K_AI {field} must be ISO-8601 compatible") from exc
+
+    @classmethod
+    def _validate_scope(cls, scope: str, data: Any) -> None:
         if not isinstance(data, dict) or data.get("timeframe") != scope:
             raise ProviderError(f"Invalid K_AI {scope} scope")
         depth = int(data.get("bar_depth") or 0)
@@ -149,18 +189,53 @@ class KAIMT4MarketContextAdapter:
         if depth <= 0 or not isinstance(bars, list) or len(bars) != depth:
             raise ProviderError(f"K_AI {scope} bar depth/count mismatch")
 
-        times: list[str] = []
+        times: list[datetime] = []
+        time_texts: list[str] = []
         for index, bar in enumerate(bars):
             if not isinstance(bar, dict):
                 raise ProviderError(f"K_AI {scope} bar {index} is invalid")
             for field in ("time", "open", "high", "low", "close", "volume"):
                 if field not in bar:
                     raise ProviderError(f"K_AI {scope} bar {index} missing {field}")
-            times.append(str(bar["time"]))
-        if times != sorted(times) or len(times) != len(set(times)):
+
+            bar_time_text = str(bar["time"])
+            bar_time = cls._parse_source_time(bar_time_text, field=f"{scope} bar {index} time")
+            open_ = cls._finite_number(bar["open"], field=f"{scope} bar {index} open")
+            high = cls._finite_number(bar["high"], field=f"{scope} bar {index} high")
+            low = cls._finite_number(bar["low"], field=f"{scope} bar {index} low")
+            close = cls._finite_number(bar["close"], field=f"{scope} bar {index} close")
+            volume = cls._finite_number(bar["volume"], field=f"{scope} bar {index} volume")
+
+            if high < low or high < max(open_, close) or low > min(open_, close):
+                raise ProviderError(f"K_AI {scope} bar {index} violates OHLC invariants")
+            if volume < 0:
+                raise ProviderError(f"K_AI {scope} bar {index} volume must be non-negative")
+
+            times.append(bar_time)
+            time_texts.append(bar_time_text)
+
+        try:
+            ordered = times == sorted(times)
+            unique = len(times) == len(set(times))
+        except TypeError as exc:
+            raise ProviderError(f"K_AI {scope} bar times mix timezone-aware and naive values") from exc
+        if not ordered or not unique:
             raise ProviderError(f"K_AI {scope} bars are not strictly chronological")
-        if str(data.get("latest_closed_bar_time") or "") != times[-1]:
+
+        latest_text = str(data.get("latest_closed_bar_time") or "")
+        if latest_text != time_texts[-1]:
             raise ProviderError(f"K_AI {scope} latest_closed_bar_time mismatch")
+        latest = cls._parse_source_time(latest_text, field=f"{scope} latest_closed_bar_time")
+        current = cls._parse_source_time(data.get("current_bar_time"), field=f"{scope} current_bar_time")
+        try:
+            if current <= latest:
+                raise ProviderError(
+                    f"K_AI {scope} current_bar_time must be after latest_closed_bar_time"
+                )
+        except TypeError as exc:
+            raise ProviderError(
+                f"K_AI {scope} current/latest bar times mix timezone-aware and naive values"
+            ) from exc
 
     async def close(self) -> None:
         if self._owns_client:
