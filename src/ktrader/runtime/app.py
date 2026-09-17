@@ -7,6 +7,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from ktrader.api.app import create_app
+from ktrader.api.kai_mt4_context import KAIMT4MarketContextSource
 from ktrader.api.state import ApiReadModel
 from ktrader.market.universe import UniverseConfig
 from ktrader.operations import RuntimeMaintenance, RuntimeMaintenanceConfig
@@ -88,6 +89,27 @@ def build_runtime_app():
         )
     )
 
+    kai_mt4_source = None
+    if _env_bool("KTRADER_KAI_MT4_ACTION_ENABLED", False):
+        delivery_token = os.getenv("KAI_MARKET_CONTEXT_DELIVERY_TOKEN", "").strip()
+        uds_path = os.getenv(
+            "KTRADER_KAI_MT4_UDS_PATH",
+            "/run/kai-mt4/delivery.sock",
+        ).strip()
+        if not delivery_token:
+            raise RuntimeError(
+                "KTRADER_KAI_MT4_ACTION_ENABLED requires KAI_MARKET_CONTEXT_DELIVERY_TOKEN"
+            )
+        if not uds_path:
+            raise RuntimeError(
+                "KTRADER_KAI_MT4_ACTION_ENABLED requires KTRADER_KAI_MT4_UDS_PATH"
+            )
+        kai_mt4_source = KAIMT4MarketContextSource(
+            auth_token=delivery_token,
+            uds_path=uds_path,
+            timeout_seconds=float(os.getenv("KTRADER_KAI_MT4_TIMEOUT_SECONDS", "70")),
+        )
+
     @asynccontextmanager
     async def lifespan(_app):
         coordinator_task = asyncio.create_task(
@@ -109,6 +131,7 @@ def build_runtime_app():
         lifespan=lifespan,
         action_api_key=os.getenv("KTRADER_ACTION_API_KEY") or None,
         health_max_scan_age_seconds=health_max_scan_age_seconds,
+        kai_mt4_source=kai_mt4_source,
     )
     app.state.coordinator = coordinator
     app.state.repository = repository

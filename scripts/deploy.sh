@@ -10,15 +10,15 @@ PREVIOUS=""
 command -v docker >/dev/null 2>&1 || { echo "docker is required" >&2; exit 1; }
 docker compose version >/dev/null 2>&1 || { echo "docker compose plugin is required" >&2; exit 1; }
 
-for path in "$ROOT" "$ROOT/releases" "$ROOT/data" "$ROOT/caddy_data" "$ROOT/caddy_config"; do
+for path in "$ROOT" "$ROOT/releases" "$ROOT/data" "$ROOT/caddy_data" "$ROOT/caddy_config" "$ROOT/run"; do
     mkdir -p "$path" 2>/dev/null || {
         echo "cannot create $path; pre-provision /opt/k-trader for the runner user" >&2
         exit 1
     }
 done
 
-if [ ! -w "$ROOT/data" ]; then
-    echo "runner user cannot write $ROOT/data; fix production data ownership before deployment" >&2
+if [ ! -w "$ROOT/data" ] || [ ! -w "$ROOT/run" ]; then
+    echo "runner user cannot write $ROOT/data or $ROOT/run; fix production data ownership before deployment" >&2
     exit 1
 fi
 
@@ -38,7 +38,14 @@ export KTRADER_RUNTIME_GID="${KTRADER_RUNTIME_GID:-$(id -g)}"
 
 PROFILE_ARGS=""
 if [ -n "${KTRADER_DOMAIN:-}" ]; then
-    PROFILE_ARGS="--profile https"
+    PROFILE_ARGS="$PROFILE_ARGS --profile https"
+fi
+if [ "${KTRADER_KAI_MT4_ACTION_ENABLED:-false}" = "true" ]; then
+    if [ -z "${KAI_MARKET_CONTEXT_DELIVERY_TOKEN:-}" ]; then
+        echo "KTRADER_KAI_MT4_ACTION_ENABLED requires KAI_MARKET_CONTEXT_DELIVERY_TOKEN" >&2
+        exit 1
+    fi
+    PROFILE_ARGS="$PROFILE_ARGS --profile kai-mt4"
 fi
 
 rollback() {
