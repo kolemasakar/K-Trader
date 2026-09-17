@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import math
 
-import httpx
 import pytest
 
 from ktrader.providers.base import ProviderError
@@ -92,8 +91,7 @@ def test_schema_1_0_is_backward_compatible_without_m15_requirement() -> None:
 def test_schema_1_0_fails_when_m15_is_required() -> None:
     with pytest.raises(ProviderError, match="M15 requires"):
         KAIMT4MarketContextAdapter.validate_market_context(
-            _payload("1.0"),
-            require_m15=True,
+            _payload("1.0"), require_m15=True
         )
 
 
@@ -121,8 +119,12 @@ def test_schema_1_1_rejects_timezone_on_top_level_source_time(field: str) -> Non
 
 def test_schema_1_1_rejects_timezone_on_scope_time() -> None:
     payload = _payload("1.1")
-    payload["scopes"]["M15"] = _scope("M15", ["2026-09-17T10:00:00+03:00"])
-    payload["scopes"]["M15"]["current_bar_time"] = "2026-09-17T10:15:00+03:00"
+    payload["scopes"]["M15"] = _scope(
+        "M15", ["2026-09-17T10:00:00+03:00"]
+    )
+    payload["scopes"]["M15"]["current_bar_time"] = (
+        "2026-09-17T10:15:00+03:00"
+    )
     with pytest.raises(ProviderError, match="opaque broker-server wall-clock"):
         KAIMT4MarketContextAdapter.validate_market_context(payload)
 
@@ -133,16 +135,21 @@ def test_schema_1_1_enforces_expected_m15_depth_when_configured() -> None:
     expected["M15"] = 300
     with pytest.raises(ProviderError, match="M15 bar_depth mismatch"):
         KAIMT4MarketContextAdapter.validate_market_context(
-            payload,
-            expected_bar_depths=expected,
+            payload, expected_bar_depths=expected
         )
+
+
+def test_rejects_missing_snapshot_id() -> None:
+    payload = _payload("1.1")
+    payload["scopes"]["M15"]["snapshot_id"] = ""
+    with pytest.raises(ProviderError, match="missing snapshot_id"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
 
 
 def test_rejects_non_chronological_scope() -> None:
     payload = _payload("1.1")
     payload["scopes"]["M15"] = _scope(
-        "M15",
-        ["2026-09-17T10:15:00", "2026-09-17T10:00:00"],
+        "M15", ["2026-09-17T10:15:00", "2026-09-17T10:00:00"]
     )
     with pytest.raises(ProviderError, match="strictly chronological"):
         KAIMT4MarketContextAdapter.validate_market_context(payload)
@@ -157,11 +164,7 @@ def test_rejects_invalid_market_facts() -> None:
 
 @pytest.mark.parametrize(
     ("field", "value"),
-    [
-        ("spread", -1),
-        ("stop_level", -1),
-        ("freeze_level", -1),
-    ],
+    [("spread", -1), ("stop_level", -1), ("freeze_level", -1)],
 )
 def test_rejects_negative_market_levels(field: str, value: float) -> None:
     payload = _payload("1.1")
@@ -223,59 +226,24 @@ def test_rejects_invalid_bar_timestamp() -> None:
         KAIMT4MarketContextAdapter.validate_market_context(payload)
 
 
-@pytest.mark.asyncio
-async def test_acquire_posts_only_symbol_and_market_and_validates_response() -> None:
+def test_accept_market_context_returns_validated_payload() -> None:
     payload = _payload("1.1")
-
-    async def handler(request: httpx.Request) -> httpx.Response:
-        assert request.method == "POST"
-        assert request.url.path == "/v1/market-context/acquire"
-        assert request.content == b'{"symbol":"USDTRY","market":"forex"}'
-        return httpx.Response(200, json=payload)
-
-    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
-    adapter = KAIMT4MarketContextAdapter(
-        base_url="http://127.0.0.1:8765",
-        expected_bar_depths=UNIT_DEPTHS,
-        client=client,
+    adapter = KAIMT4MarketContextAdapter(expected_bar_depths=UNIT_DEPTHS)
+    result = adapter.accept_market_context(
+        payload,
+        symbol="USDTRY",
+        market="forex",
+        require_m15=True,
     )
-    try:
-        result = await adapter.acquire_market_context(
-            "USDTRY",
-            "forex",
+    assert result is payload
+
+
+def test_default_accept_rejects_noncanonical_fixture_depths() -> None:
+    adapter = KAIMT4MarketContextAdapter()
+    with pytest.raises(ProviderError, match="bar_depth mismatch"):
+        adapter.accept_market_context(
+            _payload("1.1"),
+            symbol="USDTRY",
+            market="forex",
             require_m15=True,
         )
-    finally:
-        await client.aclose()
-
-    assert result == payload
-
-
-@pytest.mark.asyncio
-async def test_acquire_default_contract_rejects_noncanonical_m15_depth() -> None:
-    payload = _payload("1.1")
-
-    async def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json=payload)
-
-    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
-    adapter = KAIMT4MarketContextAdapter(base_url="http://127.0.0.1:8765", client=client)
-    try:
-        with pytest.raises(ProviderError, match="bar_depth mismatch"):
-            await adapter.acquire_market_context("USDTRY", "forex", require_m15=True)
-    finally:
-        await client.aclose()
-
-
-@pytest.mark.asyncio
-async def test_http_failure_is_provider_error() -> None:
-    async def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(503, json={"detail": "bridge unavailable"})
-
-    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
-    adapter = KAIMT4MarketContextAdapter(base_url="http://127.0.0.1:8765", client=client)
-    try:
-        with pytest.raises(ProviderError, match="request failed"):
-            await adapter.acquire_market_context("USDTRY", "forex")
-    finally:
-        await client.aclose()
