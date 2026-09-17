@@ -102,9 +102,7 @@ class KAIMT4MarketContextSource:
             raise KAIMT4ContextUnavailable("K_AI MT4 context failed validation") from exc
 
 
-def serialize_kai_mt4_context(payload: dict[str, Any]) -> dict[str, Any]:
-    """Expose an Action-friendly view while preserving canonical source scopes."""
-
+def _base_action_fields(payload: dict[str, Any]) -> dict[str, Any]:
     return {
         "provider_id": "kai_mt4",
         "source_name": payload.get("source_name"),
@@ -118,6 +116,14 @@ def serialize_kai_mt4_context(payload: dict[str, Any]) -> dict[str, Any]:
         "timestamp_semantics": payload.get("timestamp_semantics"),
         "utc_offset_minutes": payload.get("utc_offset_minutes"),
         "closed_bars_only": payload.get("closed_bars_only"),
+    }
+
+
+def serialize_kai_mt4_context(payload: dict[str, Any]) -> dict[str, Any]:
+    """Expose the full validated context for backend/E2E use."""
+
+    return {
+        **_base_action_fields(payload),
         "bid": payload.get("bid"),
         "ask": payload.get("ask"),
         "spread": payload.get("spread"),
@@ -137,4 +143,75 @@ def serialize_kai_mt4_context(payload: dict[str, Any]) -> dict[str, Any]:
         "swap_long": payload.get("swap_long"),
         "swap_short": payload.get("swap_short"),
         "scopes": payload.get("scopes"),
+    }
+
+
+def serialize_kai_mt4_context_summary(payload: dict[str, Any]) -> dict[str, Any]:
+    """Compact Action-safe context metadata without candle arrays."""
+
+    scopes = payload.get("scopes") or {}
+    scope_summary: dict[str, dict[str, Any]] = {}
+    for timeframe in ("D1", "H1", "M15", "M5"):
+        scope = scopes.get(timeframe) or {}
+        scope_summary[timeframe] = {
+            "timeframe": scope.get("timeframe"),
+            "snapshot_id": scope.get("snapshot_id"),
+            "bar_depth": scope.get("bar_depth"),
+            "latest_closed_bar_time": scope.get("latest_closed_bar_time"),
+            "current_bar_time": scope.get("current_bar_time"),
+            "bars_available": len(scope.get("bars") or ()),
+        }
+
+    return {
+        **_base_action_fields(payload),
+        "bid": payload.get("bid"),
+        "ask": payload.get("ask"),
+        "spread": payload.get("spread"),
+        "digits": payload.get("digits"),
+        "point": payload.get("point"),
+        "tick_value": payload.get("tick_value"),
+        "tick_size": payload.get("tick_size"),
+        "contract_size": payload.get("contract_size"),
+        "min_lot": payload.get("min_lot"),
+        "max_lot": payload.get("max_lot"),
+        "lot_step": payload.get("lot_step"),
+        "stop_level": payload.get("stop_level"),
+        "freeze_level": payload.get("freeze_level"),
+        "trade_allowed": payload.get("trade_allowed"),
+        "terminal_connected": payload.get("terminal_connected"),
+        "market_open": payload.get("market_open"),
+        "swap_long": payload.get("swap_long"),
+        "swap_short": payload.get("swap_short"),
+        "scopes": scope_summary,
+    }
+
+
+def serialize_kai_mt4_candles(
+    payload: dict[str, Any],
+    *,
+    timeframe: str,
+    limit: int,
+) -> dict[str, Any]:
+    """Return a bounded tail of one validated MT4 timeframe for ChatGPT Actions."""
+
+    canonical_timeframe = timeframe.strip().upper()
+    scopes = payload.get("scopes") or {}
+    if canonical_timeframe not in {"D1", "H1", "M15", "M5"}:
+        raise ValueError("timeframe must be one of D1, H1, M15, M5")
+    if limit < 1 or limit > 120:
+        raise ValueError("limit must be between 1 and 120")
+    scope = scopes.get(canonical_timeframe)
+    if not isinstance(scope, dict):
+        raise ValueError(f"timeframe {canonical_timeframe} is unavailable")
+    bars = list(scope.get("bars") or ())
+    selected = bars[-limit:]
+    return {
+        **_base_action_fields(payload),
+        "timeframe": canonical_timeframe,
+        "snapshot_id": scope.get("snapshot_id"),
+        "bar_depth": scope.get("bar_depth"),
+        "latest_closed_bar_time": scope.get("latest_closed_bar_time"),
+        "current_bar_time": scope.get("current_bar_time"),
+        "count": len(selected),
+        "bars": selected,
     }
