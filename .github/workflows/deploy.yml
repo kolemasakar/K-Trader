@@ -2,6 +2,10 @@ name: Deploy Production
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "ops/deploy_requests/2026-09-17_kai_mt4_action"
 
 permissions:
   contents: read
