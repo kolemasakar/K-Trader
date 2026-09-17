@@ -9,6 +9,9 @@ from ktrader.providers.base import ProviderError
 from ktrader.providers.kai_mt4 import KAIMT4MarketContextAdapter
 
 
+UNIT_DEPTHS = {"D1": 1, "H1": 1, "M15": 1, "M5": 1}
+
+
 def _scope(name: str, times: list[str] | None = None) -> dict:
     times = times or ["2026-09-17T10:00:00"]
     bars = [
@@ -36,7 +39,7 @@ def _payload(schema: str = "1.1") -> dict:
     scopes = {"D1": _scope("D1"), "H1": _scope("H1"), "M5": _scope("M5")}
     if schema == "1.1":
         scopes["M15"] = _scope("M15")
-    return {
+    payload = {
         "schema_version": schema,
         "report_type": "MARKET_CONTEXT",
         "run_id": "KTRADER-TEST-1",
@@ -63,6 +66,10 @@ def _payload(schema: str = "1.1") -> dict:
         "closed_bars_only": True,
         "scopes": scopes,
     }
+    if schema == "1.1":
+        payload["timestamp_semantics"] = "BROKER_SERVER_WALL_CLOCK_OPAQUE"
+        payload["utc_offset_minutes"] = None
+    return payload
 
 
 def test_schema_1_1_accepts_native_m15() -> None:
@@ -87,6 +94,47 @@ def test_schema_1_0_fails_when_m15_is_required() -> None:
         KAIMT4MarketContextAdapter.validate_market_context(
             _payload("1.0"),
             require_m15=True,
+        )
+
+
+def test_schema_1_1_requires_opaque_timestamp_semantics() -> None:
+    payload = _payload("1.1")
+    payload.pop("timestamp_semantics")
+    with pytest.raises(ProviderError, match="timestamp_semantics"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+def test_schema_1_1_requires_null_utc_offset() -> None:
+    payload = _payload("1.1")
+    payload["utc_offset_minutes"] = 180
+    with pytest.raises(ProviderError, match="utc_offset_minutes must be null"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+@pytest.mark.parametrize("field", ["captured_at", "last_tick_time"])
+def test_schema_1_1_rejects_timezone_on_top_level_source_time(field: str) -> None:
+    payload = _payload("1.1")
+    payload[field] = f"{payload[field]}Z"
+    with pytest.raises(ProviderError, match="opaque broker-server wall-clock"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+def test_schema_1_1_rejects_timezone_on_scope_time() -> None:
+    payload = _payload("1.1")
+    payload["scopes"]["M15"] = _scope("M15", ["2026-09-17T10:00:00+03:00"])
+    payload["scopes"]["M15"]["current_bar_time"] = "2026-09-17T10:15:00+03:00"
+    with pytest.raises(ProviderError, match="opaque broker-server wall-clock"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+def test_schema_1_1_enforces_expected_m15_depth_when_configured() -> None:
+    payload = _payload("1.1")
+    expected = dict(UNIT_DEPTHS)
+    expected["M15"] = 300
+    with pytest.raises(ProviderError, match="M15 bar_depth mismatch"):
+        KAIMT4MarketContextAdapter.validate_market_context(
+            payload,
+            expected_bar_depths=expected,
         )
 
 
@@ -188,6 +236,7 @@ async def test_acquire_posts_only_symbol_and_market_and_validates_response() -> 
     client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
     adapter = KAIMT4MarketContextAdapter(
         base_url="http://127.0.0.1:8765",
+        expected_bar_depths=UNIT_DEPTHS,
         client=client,
     )
     try:
@@ -200,6 +249,22 @@ async def test_acquire_posts_only_symbol_and_market_and_validates_response() -> 
         await client.aclose()
 
     assert result == payload
+
+
+@pytest.mark.asyncio
+async def test_acquire_default_contract_rejects_noncanonical_m15_depth() -> None:
+    payload = _payload("1.1")
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=payload)
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    adapter = KAIMT4MarketContextAdapter(base_url="http://127.0.0.1:8765", client=client)
+    try:
+        with pytest.raises(ProviderError, match="bar_depth mismatch"):
+            await adapter.acquire_market_context("USDTRY", "forex", require_m15=True)
+    finally:
+        await client.aclose()
 
 
 @pytest.mark.asyncio
