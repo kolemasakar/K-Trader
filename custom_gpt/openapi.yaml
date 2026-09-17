@@ -1,15 +1,14 @@
 openapi: 3.1.0
 info:
   title: K-Trader Read-only API
-  version: phase10-production-v1
+  version: phase10-production-v2
   description: >-
-    Read-only market scanner API for K_Trader. It exposes confirmed public
-    market data, canonical Trading Engine results, and validated read-only MT4
-    market context. It cannot place, modify, or cancel orders and exposes no
-    exchange-account endpoints.
+    Read-only K-Trader Action API. MT4 market context is exposed to ChatGPT only
+    through bounded compact endpoints; the full canonical MT4 context remains a
+    backend/E2E route and is intentionally omitted from this Action schema.
 servers:
   - url: https://ktrader-api.duckdns.org
-    description: Accepted Phase 10 production HTTPS origin.
+    description: Accepted production HTTPS origin.
 security:
   - BearerAuth: []
 paths:
@@ -23,21 +22,18 @@ paths:
           description: API/scanner health state
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Health'
+              schema: {$ref: '#/components/schemas/Health'}
   /v1/scanner/status:
     get:
       operationId: getScannerStatus
       summary: Get scanner runtime status and data readiness
       responses:
         '200':
-          description: Scanner runtime state
+          description: Scanner runtime status
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ScannerStatus'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+              schema: {$ref: '#/components/schemas/ScannerStatus'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
   /v1/universe:
     get:
       operationId: listUniverse
@@ -46,9 +42,6 @@ paths:
         - name: provider_id
           in: query
           required: false
-          description: >-
-            Provider identifier such as binance_usdm or bybit_linear. Required when
-            the same canonical symbol is available from more than one provider.
           schema: {type: string}
         - name: limit
           in: query
@@ -56,7 +49,7 @@ paths:
           schema: {type: integer, minimum: 1, maximum: 200, default: 50}
       responses:
         '200':
-          description: Ranked universe with market metadata and freshness
+          description: Ranked universe
           content:
             application/json:
               schema: {$ref: '#/components/schemas/UniverseList'}
@@ -64,12 +57,11 @@ paths:
   /v1/market/{symbol}:
     get:
       operationId: getMarketSnapshot
-      summary: Get the latest normalized market snapshot for a scanner symbol
+      summary: Get the latest normalized scanner market snapshot
       parameters:
         - name: symbol
           in: path
           required: true
-          description: Canonical K-Trader scanner symbol, for example SUIUSDT.
           schema: {type: string}
         - name: provider_id
           in: query
@@ -77,46 +69,77 @@ paths:
           schema: {type: string}
       responses:
         '200':
-          description: Latest scanner market snapshot
+          description: Scanner market snapshot
           content:
             application/json:
-              schema: {$ref: '#/components/schemas/UniverseCandidate'}
+              schema: {type: object, additionalProperties: true}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/NotFound'}
         '409': {$ref: '#/components/responses/Ambiguous'}
-  /v1/mt4/market-context/{symbol}:
+  /v1/mt4/market-context-summary/{symbol}:
     get:
-      operationId: getMT4MarketContext
-      summary: Acquire fresh validated read-only MT4 market context for a symbol
+      operationId: getMT4MarketContextSummary
+      summary: Get compact fresh validated MT4 market context without candle arrays
       description: >-
-        Uses the bounded K_AI/MT4 market-context bridge. This route is independent
-        of the Binance scanner universe and does not activate trading or register
-        MT4 as the production scanner provider. Broker-server timestamps are opaque
-        wall-clock strings and must not be interpreted as UTC.
+        Preferred MT4 entry point for ChatGPT. Returns market facts plus D1/H1/M15/M5
+        scope metadata only. BrokerServer timestamps are opaque wall-clock strings and
+        must not be interpreted as UTC.
       parameters:
         - name: symbol
           in: path
           required: true
-          description: MT4 broker symbol or accepted canonical alias, for example USDTRY.
+          description: MT4 broker symbol, for example USDTRY.
           schema: {type: string}
         - name: market
           in: query
           required: false
-          description: K_AI market classification passed to the MT4 context bridge.
           schema: {type: string, default: forex}
       responses:
         '200':
-          description: Fresh schema 1.1 MT4 market context accepted by K-Trader
+          description: Compact schema 1.1 MT4 context
           content:
             application/json:
-              schema: {$ref: '#/components/schemas/MT4MarketContext'}
+              schema: {$ref: '#/components/schemas/MT4MarketContextSummary'}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '422': {description: Invalid symbol or market request}
-        '503': {description: MT4 market-context route disabled, misconfigured, busy, or temporarily unavailable}
+        '503': {description: MT4 market context disabled, busy, or temporarily unavailable}
+  /v1/mt4/candles/{symbol}:
+    get:
+      operationId: getMT4Candles
+      summary: Get a bounded tail of one validated MT4 timeframe
+      description: >-
+        Use after getMT4MarketContextSummary. Returns at most 120 closed candles from
+        exactly one of D1, H1, M15, M5 to stay within ChatGPT Action response limits.
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema: {type: string}
+        - name: market
+          in: query
+          required: false
+          schema: {type: string, default: forex}
+        - name: timeframe
+          in: query
+          required: false
+          schema: {type: string, enum: [D1, H1, M15, M5], default: M5}
+        - name: limit
+          in: query
+          required: false
+          schema: {type: integer, minimum: 1, maximum: 120, default: 60}
+      responses:
+        '200':
+          description: Bounded closed MT4 candles
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MT4CandleSeries'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '422': {description: Invalid symbol, market, timeframe, or limit}
+        '503': {description: MT4 market context disabled, busy, or temporarily unavailable}
   /v1/candles/{symbol}:
     get:
       operationId: getCandles
-      summary: Get confirmed normalized scanner candles for a symbol and timeframe
+      summary: Get confirmed normalized scanner candles
       parameters:
         - name: symbol
           in: path
@@ -136,17 +159,17 @@ paths:
           schema: {type: integer, minimum: 1, maximum: 500, default: 100}
       responses:
         '200':
-          description: Confirmed candle series including provider/aggregate provenance
+          description: Scanner candle series
           content:
             application/json:
-              schema: {$ref: '#/components/schemas/CandleSeries'}
+              schema: {type: object, additionalProperties: true}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/NotFound'}
         '409': {$ref: '#/components/responses/Ambiguous'}
   /v1/analysis/{symbol}:
     get:
       operationId: getAnalysis
-      summary: Get the best current Trading Engine decision for a scanner symbol
+      summary: Get the current Trading Engine decision for a scanner symbol
       parameters:
         - name: symbol
           in: path
@@ -158,17 +181,17 @@ paths:
           schema: {type: string}
       responses:
         '200':
-          description: Canonical TradingDecision
+          description: Trading decision
           content:
             application/json:
-              schema: {$ref: '#/components/schemas/TradingDecision'}
+              schema: {type: object, additionalProperties: true}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/NotFound'}
         '409': {$ref: '#/components/responses/Ambiguous'}
   /v1/candidates:
     get:
       operationId: listCandidates
-      summary: List ranked current setup candidates, including NO_TRADE results
+      summary: List ranked current setup candidates including NO_TRADE
       parameters:
         - name: provider_id
           in: query
@@ -184,15 +207,15 @@ paths:
           schema: {type: integer, minimum: 1, maximum: 200, default: 50}
       responses:
         '200':
-          description: Ranked candidate decisions
+          description: Candidate decisions
           content:
             application/json:
-              schema: {$ref: '#/components/schemas/DecisionList'}
+              schema: {type: object, additionalProperties: true}
         '401': {$ref: '#/components/responses/Unauthorized'}
   /v1/signals:
     get:
       operationId: listSignals
-      summary: List only currently tradable A or A+ LONG/SHORT signals
+      summary: List currently tradable A or A+ scanner signals
       parameters:
         - name: provider_id
           in: query
@@ -204,17 +227,17 @@ paths:
           schema: {type: integer, minimum: 1, maximum: 200, default: 50}
       responses:
         '200':
-          description: Current tradable signals only
+          description: Tradable scanner signals
           content:
             application/json:
-              schema: {$ref: '#/components/schemas/DecisionList'}
+              schema: {type: object, additionalProperties: true}
         '401': {$ref: '#/components/responses/Unauthorized'}
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
-      description: Configure the Action with the same API key stored as KTRADER_ACTION_API_KEY on the server.
+      description: Configure with the production KTRADER_ACTION_API_KEY value.
   responses:
     Unauthorized: {description: Missing or invalid Bearer API key}
     NotFound: {description: Requested scanner symbol or analysis is not available}
@@ -224,7 +247,7 @@ components:
       type: object
       required: [status, mode, api_version, data_ready, scanner_status, action_auth_enabled, generated_at]
       properties:
-        status: {type: string, enum: [ok, degraded]}
+        status: {type: string}
         mode: {type: string, enum: [read_only]}
         api_version: {type: string}
         data_ready: {type: boolean}
@@ -234,7 +257,6 @@ components:
         generated_at: {type: string, format: date-time}
     ScannerStatus:
       type: object
-      required: [status, universe_size, data_ready, cycle_id, symbols_ready, symbols_failed, live_streaming, started_at]
       properties:
         status: {type: string}
         provider_id: {type: [string, 'null']}
@@ -250,61 +272,12 @@ components:
         started_at: {type: string, format: date-time}
     UniverseList:
       type: object
-      required: [count, items]
       properties:
         count: {type: integer}
         provider_id: {type: [string, 'null']}
-        items: {type: array, items: {$ref: '#/components/schemas/UniverseCandidate'}}
-    UniverseCandidate:
+        items: {type: array, items: {type: object, additionalProperties: true}}
+    MT4Base:
       type: object
-      properties:
-        provider_id: {type: string}
-        canonical_symbol: {type: string}
-        provider_symbol: {type: string}
-        market_type: {type: string}
-        contract_type: {type: string}
-        status: {type: string}
-        base_asset: {type: string}
-        quote_asset: {type: string}
-        price_tick: {type: [string, 'null']}
-        quantity_step: {type: [string, 'null']}
-        last_price: {type: string}
-        quote_volume_24h: {type: [string, 'null']}
-        base_volume_24h: {type: [string, 'null']}
-        trade_count_24h: {type: [integer, 'null']}
-        bid_price: {type: [string, 'null']}
-        ask_price: {type: [string, 'null']}
-        spread_bps: {type: [string, 'null']}
-        open_interest: {type: [string, 'null']}
-        liquidity_score: {type: string}
-        data_time: {type: string, format: date-time}
-        data_age_seconds: {type: number}
-    CandleSeries:
-      type: object
-      properties:
-        provider_id: {type: string}
-        canonical_symbol: {type: string}
-        interval: {type: string}
-        source_kind: {type: string}
-        count: {type: integer}
-        candles: {type: array, items: {$ref: '#/components/schemas/Candle'}}
-    Candle:
-      type: object
-      properties:
-        provider_id: {type: string}
-        canonical_symbol: {type: string}
-        interval: {type: string}
-        open_time: {type: string}
-        close_time: {type: string}
-        open: {type: string}
-        high: {type: string}
-        low: {type: string}
-        close: {type: string}
-        volume: {type: string}
-        closed: {type: boolean}
-    MT4MarketContext:
-      type: object
-      required: [provider_id, source_name, symbol, market, schema_version, run_id, closed_bars_only, bid, ask, spread, digits, point, scopes]
       properties:
         provider_id: {type: string, enum: [kai_mt4]}
         source_name: {type: string, enum: [MT4]}
@@ -318,45 +291,64 @@ components:
         timestamp_semantics: {type: string, enum: [BROKER_SERVER_WALL_CLOCK_OPAQUE]}
         utc_offset_minutes: {type: 'null'}
         closed_bars_only: {type: boolean, enum: [true]}
-        bid: {type: number}
-        ask: {type: number}
-        spread: {type: number}
-        digits: {type: integer}
-        point: {type: number}
-        tick_value: {type: number}
-        tick_size: {type: number}
-        contract_size: {type: number}
-        min_lot: {type: number}
-        max_lot: {type: number}
-        lot_step: {type: number}
-        stop_level: {type: number}
-        freeze_level: {type: number}
-        trade_allowed: {type: boolean}
-        terminal_connected: {type: boolean}
-        market_open: {type: boolean}
-        swap_long: {type: number}
-        swap_short: {type: number}
-        scopes:
-          type: object
-          required: [D1, H1, M15, M5]
+    MT4MarketContextSummary:
+      allOf:
+        - $ref: '#/components/schemas/MT4Base'
+        - type: object
+          required: [provider_id, source_name, symbol, market, schema_version, run_id, closed_bars_only, bid, ask, spread, digits, point, scopes]
           properties:
-            D1: {$ref: '#/components/schemas/MT4Scope'}
-            H1: {$ref: '#/components/schemas/MT4Scope'}
-            M15: {$ref: '#/components/schemas/MT4Scope'}
-            M5: {$ref: '#/components/schemas/MT4Scope'}
-          additionalProperties: false
-    MT4Scope:
+            bid: {type: number}
+            ask: {type: number}
+            spread: {type: number}
+            digits: {type: integer}
+            point: {type: number}
+            tick_value: {type: [number, 'null']}
+            tick_size: {type: [number, 'null']}
+            contract_size: {type: [number, 'null']}
+            min_lot: {type: [number, 'null']}
+            max_lot: {type: [number, 'null']}
+            lot_step: {type: [number, 'null']}
+            stop_level: {type: [number, 'null']}
+            freeze_level: {type: [number, 'null']}
+            trade_allowed: {type: [boolean, 'null']}
+            terminal_connected: {type: [boolean, 'null']}
+            market_open: {type: [boolean, 'null']}
+            swap_long: {type: [number, 'null']}
+            swap_short: {type: [number, 'null']}
+            scopes:
+              type: object
+              required: [D1, H1, M15, M5]
+              properties:
+                D1: {$ref: '#/components/schemas/MT4ScopeSummary'}
+                H1: {$ref: '#/components/schemas/MT4ScopeSummary'}
+                M15: {$ref: '#/components/schemas/MT4ScopeSummary'}
+                M5: {$ref: '#/components/schemas/MT4ScopeSummary'}
+              additionalProperties: false
+    MT4ScopeSummary:
       type: object
-      required: [timeframe, snapshot_id, bar_depth, latest_closed_bar_time, current_bar_time, bars]
       properties:
         timeframe: {type: string, enum: [D1, H1, M15, M5]}
-        snapshot_id: {type: string}
-        bar_depth: {type: integer}
-        latest_closed_bar_time: {type: string, description: Opaque BrokerServer wall-clock timestamp; not UTC.}
-        current_bar_time: {type: string, description: Opaque BrokerServer wall-clock timestamp; not UTC.}
-        bars:
-          type: array
-          items: {$ref: '#/components/schemas/MT4Bar'}
+        snapshot_id: {type: [string, 'null']}
+        bar_depth: {type: [integer, 'null']}
+        bars_available: {type: integer}
+        latest_closed_bar_time: {type: [string, 'null'], description: Opaque BrokerServer wall-clock timestamp; not UTC.}
+        current_bar_time: {type: [string, 'null'], description: Opaque BrokerServer wall-clock timestamp; not UTC.}
+    MT4CandleSeries:
+      allOf:
+        - $ref: '#/components/schemas/MT4Base'
+        - type: object
+          required: [provider_id, source_name, symbol, market, schema_version, run_id, closed_bars_only, timeframe, bar_depth, count, bars]
+          properties:
+            timeframe: {type: string, enum: [D1, H1, M15, M5]}
+            snapshot_id: {type: [string, 'null']}
+            bar_depth: {type: integer}
+            latest_closed_bar_time: {type: string, description: Opaque BrokerServer wall-clock timestamp; not UTC.}
+            current_bar_time: {type: string, description: Opaque BrokerServer wall-clock timestamp; not UTC.}
+            count: {type: integer, minimum: 0, maximum: 120}
+            bars:
+              type: array
+              maxItems: 120
+              items: {$ref: '#/components/schemas/MT4Bar'}
     MT4Bar:
       type: object
       required: [time, open, high, low, close, volume]
@@ -367,51 +359,3 @@ components:
         low: {type: number}
         close: {type: number}
         volume: {type: number}
-    DecisionList:
-      type: object
-      properties:
-        count: {type: integer}
-        items: {type: array, items: {$ref: '#/components/schemas/TradingDecision'}}
-    TradingDecision:
-      type: object
-      properties:
-        provider_id: {type: string}
-        exchange: {type: string}
-        canonical_symbol: {type: string}
-        provider_symbol: {type: string}
-        market_type: {type: string}
-        side: {type: string, enum: [LONG, SHORT, NO_TRADE]}
-        grade: {type: string, enum: [A+, A, B, C]}
-        setup_score: {type: integer}
-        raw_score: {type: integer}
-        setup_type: {type: string}
-        market_regime: {type: string}
-        trend_context: {type: string}
-        liquidity_rank: {type: integer}
-        liquidity_score: {type: [string, 'null']}
-        sessions: {type: array, items: {type: string}}
-        session_overlap: {type: boolean}
-        strength: {type: string}
-        primary_level_id: {type: [string, 'null']}
-        primary_level_strength: {type: [string, 'null']}
-        trap_state: {type: [string, 'null']}
-        vsa_events: {type: array, items: {type: string}}
-        entry: {type: [string, 'null']}
-        luft: {type: [string, 'null']}
-        stop: {type: [string, 'null']}
-        target: {type: [string, 'null']}
-        rr: {type: [string, 'null']}
-        atr5d: {type: [string, 'null']}
-        atr_used_pct: {type: [string, 'null']}
-        atr_state: {type: [string, 'null']}
-        position_size: {type: [string, 'null']}
-        risk_amount: {type: [string, 'null']}
-        risk_percent: {type: [string, 'null']}
-        reason_codes: {type: array, items: {type: string}}
-        data_time: {type: string}
-        last_closed_bar: {type: string}
-        data_age_seconds: {type: number}
-        freshness_status: {type: string, enum: [FRESH, STALE]}
-        generated_at: {type: string}
-        engine_version: {type: string}
-        estimated_probability: {type: [number, 'null']}

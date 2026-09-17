@@ -12,7 +12,9 @@ from ktrader.api.kai_mt4_context import (
     KAIMT4ContextMisconfigured,
     KAIMT4ContextUnavailable,
     KAIMT4MarketContextSource,
+    serialize_kai_mt4_candles,
     serialize_kai_mt4_context,
+    serialize_kai_mt4_context_summary,
 )
 from ktrader.api.rate_limit import FixedWindowRateLimitMiddleware
 from ktrader.api.serialization import (
@@ -31,6 +33,7 @@ from ktrader.api.state import (
 API_VERSION = "phase8-v1"
 ALLOWED_INTERVALS = {"5m", "15m", "1h", "4h", "1d"}
 ALLOWED_GRADES = {"A+", "A", "B", "C"}
+ALLOWED_MT4_TIMEFRAMES = {"D1", "H1", "M15", "M5"}
 PRIVACY_POLICY_TEXT = """K-Trader Action Privacy Policy
 
 K-Trader exposes read-only public derivatives market data and deterministic scanner results to the K_Trader Custom GPT. It does not accept exchange credentials, does not access exchange accounts, and cannot place, modify, or cancel orders.
@@ -115,6 +118,27 @@ def create_app(
             },
         )
 
+    def acquire_mt4_context(symbol: str, market: str) -> dict:
+        if kai_mt4_source is None:
+            raise HTTPException(
+                status_code=503,
+                detail="MT4 market-context route is not enabled",
+            )
+        try:
+            return kai_mt4_source.acquire(symbol=symbol, market=market)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except KAIMT4ContextMisconfigured as exc:
+            raise HTTPException(
+                status_code=503,
+                detail="MT4 market-context authentication is unavailable",
+            ) from exc
+        except KAIMT4ContextUnavailable as exc:
+            raise HTTPException(
+                status_code=503,
+                detail="MT4 market context is temporarily unavailable",
+            ) from exc
+
     @app.get("/health", operation_id="getHealth")
     def health() -> dict:
         status = state.get_status()
@@ -182,26 +206,39 @@ def create_app(
         symbol: str,
         market: str = Query(default="forex", min_length=1, max_length=32),
     ) -> dict:
-        if kai_mt4_source is None:
+        return serialize_kai_mt4_context(acquire_mt4_context(symbol, market))
+
+    @app.get(
+        "/v1/mt4/market-context-summary/{symbol}",
+        operation_id="getMT4MarketContextSummary",
+    )
+    def mt4_market_context_summary(
+        symbol: str,
+        market: str = Query(default="forex", min_length=1, max_length=32),
+    ) -> dict:
+        return serialize_kai_mt4_context_summary(acquire_mt4_context(symbol, market))
+
+    @app.get("/v1/mt4/candles/{symbol}", operation_id="getMT4Candles")
+    def mt4_candles(
+        symbol: str,
+        market: str = Query(default="forex", min_length=1, max_length=32),
+        timeframe: str = Query(default="M5", min_length=2, max_length=3),
+        limit: int = Query(default=60, ge=1, le=120),
+    ) -> dict:
+        canonical_timeframe = timeframe.strip().upper()
+        if canonical_timeframe not in ALLOWED_MT4_TIMEFRAMES:
             raise HTTPException(
-                status_code=503,
-                detail="MT4 market-context route is not enabled",
+                status_code=422,
+                detail="timeframe must be one of D1, H1, M15, M5",
             )
         try:
-            payload = kai_mt4_source.acquire(symbol=symbol, market=market)
+            return serialize_kai_mt4_candles(
+                acquire_mt4_context(symbol, market),
+                timeframe=canonical_timeframe,
+                limit=limit,
+            )
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
-        except KAIMT4ContextMisconfigured as exc:
-            raise HTTPException(
-                status_code=503,
-                detail="MT4 market-context authentication is unavailable",
-            ) from exc
-        except KAIMT4ContextUnavailable as exc:
-            raise HTTPException(
-                status_code=503,
-                detail="MT4 market context is temporarily unavailable",
-            ) from exc
-        return serialize_kai_mt4_context(payload)
 
     @app.get("/v1/candles/{symbol}", operation_id="getCandles")
     def candles(
