@@ -42,7 +42,21 @@ def _payload(schema: str = "1.1") -> dict:
         "symbol": "USDTRY",
         "market": "forex",
         "captured_at": "2026-09-17T10:15:01",
+        "last_tick_time": "2026-09-17T10:15:00",
         "time_source": "BrokerServer",
+        "bid": 41.10,
+        "ask": 41.11,
+        "spread": 10.0,
+        "digits": 3,
+        "point": 0.001,
+        "stop_level": 0,
+        "freeze_level": 0,
+        "tick_value": 1.0,
+        "tick_size": 0.001,
+        "contract_size": 100000.0,
+        "trade_allowed": True,
+        "terminal_connected": True,
+        "market_open": True,
         "data_quality_flag": "VALID",
         "closed_bars_only": True,
         "scopes": scopes,
@@ -50,9 +64,8 @@ def _payload(schema: str = "1.1") -> dict:
 
 
 def test_schema_1_1_accepts_native_m15() -> None:
-    payload = _payload("1.1")
     KAIMT4MarketContextAdapter.validate_market_context(
-        payload,
+        _payload("1.1"),
         expected_symbol="USDTRY",
         expected_market="forex",
         require_m15=True,
@@ -82,6 +95,13 @@ def test_rejects_non_chronological_scope() -> None:
         ["2026-09-17T10:15:00", "2026-09-17T10:00:00"],
     )
     with pytest.raises(ProviderError, match="strictly chronological"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+def test_rejects_invalid_market_facts() -> None:
+    payload = _payload("1.1")
+    payload["ask"] = 40.0
+    with pytest.raises(ProviderError, match="positive-price/size invariants"):
         KAIMT4MarketContextAdapter.validate_market_context(payload)
 
 
