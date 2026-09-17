@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import httpx
 import pytest
 
@@ -102,6 +104,74 @@ def test_rejects_invalid_market_facts() -> None:
     payload = _payload("1.1")
     payload["ask"] = 40.0
     with pytest.raises(ProviderError, match="positive-price/size invariants"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("spread", -1),
+        ("stop_level", -1),
+        ("freeze_level", -1),
+    ],
+)
+def test_rejects_negative_market_levels(field: str, value: float) -> None:
+    payload = _payload("1.1")
+    payload[field] = value
+    with pytest.raises(ProviderError, match="non-negative spread/level invariants"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+@pytest.mark.parametrize("value", [3.5, -1, 13, True])
+def test_rejects_invalid_digits(value: object) -> None:
+    payload = _payload("1.1")
+    payload["digits"] = value
+    with pytest.raises(ProviderError, match="digits must be"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+def test_rejects_non_finite_market_fact() -> None:
+    payload = _payload("1.1")
+    payload["spread"] = math.inf
+    with pytest.raises(ProviderError, match="must be finite"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+def test_rejects_ohlc_invariant_violation() -> None:
+    payload = _payload("1.1")
+    payload["scopes"]["M15"]["bars"][0]["high"] = 1.05
+    with pytest.raises(ProviderError, match="OHLC invariants"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+def test_rejects_negative_volume() -> None:
+    payload = _payload("1.1")
+    payload["scopes"]["M15"]["bars"][0]["volume"] = -1
+    with pytest.raises(ProviderError, match="volume must be non-negative"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+def test_rejects_non_finite_bar_value() -> None:
+    payload = _payload("1.1")
+    payload["scopes"]["M15"]["bars"][0]["close"] = math.nan
+    with pytest.raises(ProviderError, match="must be finite"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+def test_rejects_current_bar_not_after_latest_closed_bar() -> None:
+    payload = _payload("1.1")
+    payload["scopes"]["M15"]["current_bar_time"] = payload["scopes"]["M15"][
+        "latest_closed_bar_time"
+    ]
+    with pytest.raises(ProviderError, match="current_bar_time must be after"):
+        KAIMT4MarketContextAdapter.validate_market_context(payload)
+
+
+def test_rejects_invalid_bar_timestamp() -> None:
+    payload = _payload("1.1")
+    payload["scopes"]["M15"]["bars"][0]["time"] = "not-a-time"
+    payload["scopes"]["M15"]["latest_closed_bar_time"] = "not-a-time"
+    with pytest.raises(ProviderError, match="ISO-8601 compatible"):
         KAIMT4MarketContextAdapter.validate_market_context(payload)
 
 
