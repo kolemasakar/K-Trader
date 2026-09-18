@@ -96,8 +96,8 @@ def test_active_custom_gpt_v14_contains_operational_mt4_workflow():
 def test_builder_docs_reference_v14_and_ten_operations():
     guide = Path("custom_gpt/ACTION_GUIDE.md").read_text(encoding="utf-8")
     checklist = Path("custom_gpt/BUILDER_CHECKLIST.md").read_text(encoding="utf-8")
-    assert "SYSTEM_K_TRADER_v1_4_COMPACT.md" in guide
-    assert "SYSTEM_K_TRADER_v1_4_COMPACT.md" in checklist
+    assert "SYSTEM_K_TRADER_v1_4_1_COMPACT.md" in guide
+    assert "SYSTEM_K_TRADER_v1_4_1_COMPACT.md" in checklist
     assert "всі десять операцій" in checklist
     assert "getMT4MarketContextSummary" in checklist
     assert "getMT4Candles" in checklist
