@@ -62,3 +62,19 @@ def test_render_action_schema_replaces_current_server_origin():
 def test_action_server_rejects_unsafe_origin(url):
     with pytest.raises(ValueError):
         validate_server_url(url)
+
+
+def test_gpt_builder_object_schemas_declare_properties():
+    schema = yaml.safe_load(SCHEMA_PATH.read_text(encoding="utf-8"))
+
+    def walk(node, path="root"):
+        if isinstance(node, dict):
+            if node.get("type") == "object":
+                assert "properties" in node, f"object schema missing properties at {path}"
+            for key, value in node.items():
+                walk(value, f"{path}.{key}")
+        elif isinstance(node, list):
+            for index, value in enumerate(node):
+                walk(value, f"{path}[{index}]")
+
+    walk(schema)
