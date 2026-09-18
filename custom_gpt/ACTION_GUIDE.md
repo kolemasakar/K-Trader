@@ -95,11 +95,11 @@ python scripts/phase10_action_acceptance.py --base-url https://ktrader-api.duckd
 python scripts/render_custom_gpt_openapi.py --server https://REAL_HOST --output /tmp/k-trader-openapi.yaml
 ```
 
-У GPT Builder використовувати `custom_gpt/SYSTEM_K_TRADER_v1_4_COMPACT.md` як активні Instructions.
+У GPT Builder використовувати `custom_gpt/SYSTEM_K_TRADER_v1_4_1_COMPACT.md` як активні Instructions.
 
 У Knowledge обов'язково завантажити/оновити `custom_gpt/00_KNOWLEDGE_PRIORITY.md` і дотримуватися визначеного ним пріоритету knowledge-файлів.
 
-Не залишати `SYSTEM_K_TRADER_v1_2_COMPACT.md` або `SYSTEM_K_TRADER_v1_3_COMPACT.md` активною після переходу на затверджену v1.4.
+Не залишати `SYSTEM_K_TRADER_v1_2_COMPACT.md` або `SYSTEM_K_TRADER_v1_3_COMPACT.md` активною після переходу на затверджену v1.4.1.
 
 Опис GPT не повинен містити поріг ймовірності на кшталт `≥60%`.
 

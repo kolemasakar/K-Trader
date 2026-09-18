@@ -96,8 +96,24 @@ def test_active_custom_gpt_v14_contains_operational_mt4_workflow():
 def test_builder_docs_reference_v14_and_ten_operations():
     guide = Path("custom_gpt/ACTION_GUIDE.md").read_text(encoding="utf-8")
     checklist = Path("custom_gpt/BUILDER_CHECKLIST.md").read_text(encoding="utf-8")
-    assert "SYSTEM_K_TRADER_v1_4_COMPACT.md" in guide
-    assert "SYSTEM_K_TRADER_v1_4_COMPACT.md" in checklist
+    assert "SYSTEM_K_TRADER_v1_4_1_COMPACT.md" in guide
+    assert "SYSTEM_K_TRADER_v1_4_1_COMPACT.md" in checklist
     assert "всі десять операцій" in checklist
     assert "getMT4MarketContextSummary" in checklist
     assert "getMT4Candles" in checklist
+
+
+def test_active_custom_gpt_v141_fits_builder_limit_and_preserves_mt4_workflow():
+    instructions = Path("custom_gpt/SYSTEM_K_TRADER_v1_4_1_COMPACT.md").read_text(encoding="utf-8")
+    assert len(instructions) <= 8000
+    assert "getMT4MarketContextSummary" in instructions
+    assert "getMT4Candles" in instructions
+    assert "D1 limit=60" in instructions
+    assert "H1 limit=120" in instructions
+    assert "M15 limit=120" in instructions
+    assert "M5 limit=120" in instructions
+    assert "BROKER_SERVER_WALL_CLOCK_OPAQUE" in instructions
+    assert "WATCHLIST ONLY" in instructions
+    assert "SETUP CANDIDATE" in instructions
+    assert "RR >= 3" in instructions
+    assert "Holdout" in instructions
