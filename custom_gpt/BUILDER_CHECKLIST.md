@@ -1,13 +1,13 @@
-# K-Trader — контрольний список GPT Builder v1.5
+# K-Trader — контрольний список GPT Builder v1.6
 
 > **Platform transition notice — 2026-09-16**  
 > OpenAI оголосила retirement Custom GPTs і перехід до Plugins. Цей checklist залишається чинним лише для підтримки поточного legacy GPT до retirement. Він **не є довгостроковим deployment target**. Стратегічний напрямок K-Trader зафіксовано в `docs/OPENAI_CUSTOM_GPT_TO_PLUGIN_TRANSITION_2026-09-16.md`: Instructions → Plugin skill/workflow; OpenAPI Action → supported App/Connector/custom MCP integration. Не видаляти цей checklist, доки legacy GPT ще використовується.
 
-Статус: Phase 10 COMPLETE для поточного single-provider production scope — production Action, GPT Builder configuration, reachable Preview acceptance і вибраний режим поширення перевірені 2026-09-07. Governance instructions оновлено до затвердженої v1.3.
+Статус: Phase 10 COMPLETE для поточного single-provider production scope — production Action, GPT Builder configuration, reachable Preview acceptance і вибраний режим поширення перевірені 2026-09-07. Governance instructions оновлено до затвердженої v1.4.
 
 ## Етап A — поведінка GPT
 1. Відкрити редактор існуючого K_Trader GPT.
-2. Активні Instructions: `custom_gpt/SYSTEM_K_TRADER_v1_3_COMPACT.md`.
+2. Активні Instructions: `custom_gpt/SYSTEM_K_TRADER_v1_4_COMPACT.md`.
 3. У Knowledge обов'язково завантажити/оновити `custom_gpt/00_KNOWLEDGE_PRIORITY.md`; він визначає пріоритет канонічних knowledge-файлів і не замінює Instructions.
 4. Опис GPT:
 
@@ -42,8 +42,8 @@
 4. Production one-click schema endpoint: `https://ktrader-api.duckdns.org/action-openapi.yaml`.
 5. Автентифікація: API key → Bearer.
 6. Privacy Policy URL: `https://ktrader-api.duckdns.org/privacy`.
-7. GPT Builder розпізнає всі вісім операцій: `getHealth`, `getScannerStatus`, `listUniverse`, `getMarketSnapshot`, `getCandles`, `getAnalysis`, `listCandidates`, `listSignals`.
-8. Усі вісім reachable production operations пройшли Preview acceptance 2026-09-07.
+7. GPT Builder розпізнає всі десять операцій: `getHealth`, `getScannerStatus`, `listUniverse`, `getMarketSnapshot`, `getMT4MarketContextSummary`, `getMT4Candles`, `getCandles`, `getAnalysis`, `listCandidates`, `listSignals`.
+8. Базові production operations пройшли Preview acceptance; compact MT4 operations додатково підтверджені live на `EURUSD` та `USDTRY` після production promotion 2026-09-18.
 9. Provider ambiguity HTTP 409: backend contract покритий regression test; GPT-side live 409 retry стає blocking gate перед Phase 12 multi-provider activation.
 10. Автоперемикання перевірено: канонічні дані доступні → canonical mode; канонічний analysis/OHLCV недоступний → `WATCHLIST ONLY`.
 
@@ -57,13 +57,25 @@
 Обов'язкові governance/product файли для актуальної конфігурації:
 
 - `custom_gpt/00_KNOWLEDGE_PRIORITY.md`;
-- `custom_gpt/SYSTEM_K_TRADER_v1_3_COMPACT.md` використовується як **Instructions**, а не як дубль Knowledge;
+- `custom_gpt/SYSTEM_K_TRADER_v1_4_COMPACT.md` використовується як **Instructions**, а не як дубль Knowledge;
 - канонічні knowledge-файли, перелічені в `00_KNOWLEDGE_PRIORITY.md`, мають відповідати його пріоритету і статусам.
 
-Не залишати активну v1.2 після переходу на затверджену v1.3.
+Не залишати активну v1.2 або v1.3 після переходу на затверджену v1.4.
 
 ## Acceptance evidence
 
 Канонічний checkpoint: `docs/PHASE_10_PRODUCT_ACCEPTANCE.md`.
 
 Phase 10 вважається завершеним для поточного read-only single-provider K-Trader v1 scope. Автоматичне виконання угод, exchange-account access, multi-provider ambiguity activation і statistical win probability не входять у цей acceptance; ambiguity Preview стає blocking gate перед Phase 12.
+
+
+## MT4 operational Preview acceptance
+
+1. Простий запит `проаналізуй USDTRY` сам запускає compact MT4 workflow без ручного переліку Actions.
+2. Перший виклик: `getMT4MarketContextSummary(symbol=USDTRY, market=forex)`.
+3. Далі GPT отримує `getMT4Candles` для D1/H1/M15/M5 у bounded limits.
+4. Повний `getMT4MarketContext` не присутній у Action schema і не використовується.
+5. Результат містить `WATCHLIST ONLY` та operational state `NO TRADE/WATCH/SETUP CANDIDATE`, якщо engine signal відсутній.
+6. Binance `scanner_status=DEGRADED` не підміняє і не блокує валідний MT4 context.
+7. BrokerServer timestamps не трактуються як UTC.
+8. Spread/cost і `trade_allowed` відображаються як warnings, але market-context analysis не видається за engine signal.
