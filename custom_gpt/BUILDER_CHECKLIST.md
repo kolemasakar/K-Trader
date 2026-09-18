@@ -3,11 +3,11 @@
 > **Platform transition notice — 2026-09-16**  
 > OpenAI оголосила retirement Custom GPTs і перехід до Plugins. Цей checklist залишається чинним лише для підтримки поточного legacy GPT до retirement. Він **не є довгостроковим deployment target**. Стратегічний напрямок K-Trader зафіксовано в `docs/OPENAI_CUSTOM_GPT_TO_PLUGIN_TRANSITION_2026-09-16.md`: Instructions → Plugin skill/workflow; OpenAPI Action → supported App/Connector/custom MCP integration. Не видаляти цей checklist, доки legacy GPT ще використовується.
 
-Статус: Phase 10 COMPLETE для поточного single-provider production scope — production Action, GPT Builder configuration, reachable Preview acceptance і вибраний режим поширення перевірені 2026-09-07. Governance instructions оновлено до затвердженої v1.4.
+Статус: Phase 10 COMPLETE для поточного single-provider production scope — production Action, GPT Builder configuration, reachable Preview acceptance і вибраний режим поширення перевірені 2026-09-07. Governance instructions оновлено до затвердженої v1.4.1.
 
 ## Етап A — поведінка GPT
 1. Відкрити редактор існуючого K_Trader GPT.
-2. Активні Instructions: `custom_gpt/SYSTEM_K_TRADER_v1_4_COMPACT.md`.
+2. Активні Instructions: `custom_gpt/SYSTEM_K_TRADER_v1_4_1_COMPACT.md`.
 3. У Knowledge обов'язково завантажити/оновити `custom_gpt/00_KNOWLEDGE_PRIORITY.md`; він визначає пріоритет канонічних knowledge-файлів і не замінює Instructions.
 4. Опис GPT:
 
@@ -60,7 +60,7 @@
 - `custom_gpt/SYSTEM_K_TRADER_v1_4_COMPACT.md` використовується як **Instructions**, а не як дубль Knowledge;
 - канонічні knowledge-файли, перелічені в `00_KNOWLEDGE_PRIORITY.md`, мають відповідати його пріоритету і статусам.
 
-Не залишати активну v1.2 або v1.3 після переходу на затверджену v1.4.
+Не залишати активну v1.2 або v1.3 після переходу на затверджену v1.4.1.
 
 ## Acceptance evidence
 
