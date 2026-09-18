@@ -72,7 +72,7 @@ paths:
           description: Scanner market snapshot
           content:
             application/json:
-              schema: {type: object, additionalProperties: true}
+              schema: {$ref: '#/components/schemas/UniverseCandidate'}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/NotFound'}
         '409': {$ref: '#/components/responses/Ambiguous'}
@@ -162,7 +162,7 @@ paths:
           description: Scanner candle series
           content:
             application/json:
-              schema: {type: object, additionalProperties: true}
+              schema: {$ref: '#/components/schemas/CandleSeries'}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/NotFound'}
         '409': {$ref: '#/components/responses/Ambiguous'}
@@ -184,7 +184,7 @@ paths:
           description: Trading decision
           content:
             application/json:
-              schema: {type: object, additionalProperties: true}
+              schema: {$ref: '#/components/schemas/TradingDecision'}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/NotFound'}
         '409': {$ref: '#/components/responses/Ambiguous'}
@@ -210,7 +210,7 @@ paths:
           description: Candidate decisions
           content:
             application/json:
-              schema: {type: object, additionalProperties: true}
+              schema: {$ref: '#/components/schemas/DecisionList'}
         '401': {$ref: '#/components/responses/Unauthorized'}
   /v1/signals:
     get:
@@ -230,7 +230,7 @@ paths:
           description: Tradable scanner signals
           content:
             application/json:
-              schema: {type: object, additionalProperties: true}
+              schema: {$ref: '#/components/schemas/DecisionList'}
         '401': {$ref: '#/components/responses/Unauthorized'}
 components:
   securitySchemes:
@@ -275,7 +275,54 @@ components:
       properties:
         count: {type: integer}
         provider_id: {type: [string, 'null']}
-        items: {type: array, items: {type: object, additionalProperties: true}}
+        items: {type: array, items: {$ref: '#/components/schemas/UniverseCandidate'}}
+    UniverseCandidate:
+      type: object
+      properties:
+        provider_id: {type: string}
+        canonical_symbol: {type: string}
+        provider_symbol: {type: string}
+        market_type: {type: string}
+        contract_type: {type: string}
+        status: {type: string}
+        base_asset: {type: string}
+        quote_asset: {type: string}
+        price_tick: {type: [string, 'null']}
+        quantity_step: {type: [string, 'null']}
+        last_price: {type: string}
+        quote_volume_24h: {type: [string, 'null']}
+        base_volume_24h: {type: [string, 'null']}
+        trade_count_24h: {type: [integer, 'null']}
+        bid_price: {type: [string, 'null']}
+        ask_price: {type: [string, 'null']}
+        spread_bps: {type: [string, 'null']}
+        open_interest: {type: [string, 'null']}
+        liquidity_score: {type: string}
+        data_time: {type: string, format: date-time}
+        data_age_seconds: {type: number}
+    CandleSeries:
+      type: object
+      properties:
+        provider_id: {type: string}
+        canonical_symbol: {type: string}
+        interval: {type: string}
+        source_kind: {type: string}
+        count: {type: integer}
+        candles: {type: array, items: {$ref: '#/components/schemas/Candle'}}
+    Candle:
+      type: object
+      properties:
+        provider_id: {type: string}
+        canonical_symbol: {type: string}
+        interval: {type: string}
+        open_time: {type: string}
+        close_time: {type: string}
+        open: {type: string}
+        high: {type: string}
+        low: {type: string}
+        close: {type: string}
+        volume: {type: string}
+        closed: {type: boolean}
     MT4Base:
       type: object
       properties:
@@ -359,3 +406,51 @@ components:
         low: {type: number}
         close: {type: number}
         volume: {type: number}
+DecisionList:
+      type: object
+      properties:
+        count: {type: integer}
+        items: {type: array, items: {$ref: '#/components/schemas/TradingDecision'}}
+    TradingDecision:
+      type: object
+      properties:
+        provider_id: {type: string}
+        exchange: {type: string}
+        canonical_symbol: {type: string}
+        provider_symbol: {type: string}
+        market_type: {type: string}
+        side: {type: string, enum: [LONG, SHORT, NO_TRADE]}
+        grade: {type: string, enum: [A+, A, B, C]}
+        setup_score: {type: integer}
+        raw_score: {type: integer}
+        setup_type: {type: string}
+        market_regime: {type: string}
+        trend_context: {type: string}
+        liquidity_rank: {type: integer}
+        liquidity_score: {type: [string, 'null']}
+        sessions: {type: array, items: {type: string}}
+        session_overlap: {type: boolean}
+        strength: {type: string}
+        primary_level_id: {type: [string, 'null']}
+        primary_level_strength: {type: [string, 'null']}
+        trap_state: {type: [string, 'null']}
+        vsa_events: {type: array, items: {type: string}}
+        entry: {type: [string, 'null']}
+        luft: {type: [string, 'null']}
+        stop: {type: [string, 'null']}
+        target: {type: [string, 'null']}
+        rr: {type: [string, 'null']}
+        atr5d: {type: [string, 'null']}
+        atr_used_pct: {type: [string, 'null']}
+        atr_state: {type: [string, 'null']}
+        position_size: {type: [string, 'null']}
+        risk_amount: {type: [string, 'null']}
+        risk_percent: {type: [string, 'null']}
+        reason_codes: {type: array, items: {type: string}}
+        data_time: {type: string}
+        last_closed_bar: {type: string}
+        data_age_seconds: {type: number}
+        freshness_status: {type: string, enum: [FRESH, STALE]}
+        generated_at: {type: string}
+        engine_version: {type: string}
+        estimated_probability: {type: [number, 'null']}
