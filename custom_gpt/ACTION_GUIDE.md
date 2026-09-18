@@ -1,4 +1,4 @@
-# K-Trader — посібник з Custom GPT Action v1.4
+# K-Trader — посібник з Custom GPT Action v1.5
 
 ## Роль
 Action — канал лише для читання між K_Trader Custom GPT і API сканера K-Trader. Він не може відкривати, змінювати або скасовувати ордери.
@@ -14,9 +14,9 @@ Action — канал лише для читання між K_Trader Custom GPT 
 3. `listCandidates` для ширшого відбору або якщо A/A+ немає.
 
 Для одного активу:
-1. `getAnalysis` — канонічний торговий висновок.
-2. `getMarketSnapshot` — останній нормалізований ринковий стан.
-3. `getCandles` — підтверджені свічки, зокрема для VSA.
+1. Для canonical scanner-активу: `getAnalysis` → `getMarketSnapshot` → `getCandles`.
+2. Для Forex/MT4 або scanner-unknown символу: `getMT4MarketContextSummary` → `getMT4Candles` по D1/H1/M15/M5.
+3. Не використовувати Binance snapshot як заміну MT4 context і не викликати backend-only повний `getMT4MarketContext` із GPT.
 
 ## Резервна поведінка
 Якщо Action недоступний, автентифікація не проходить, `data_ready=false` або канонічні OHLCV/VSA застарілі чи неповні:
@@ -95,10 +95,21 @@ python scripts/phase10_action_acceptance.py --base-url https://ktrader-api.duckd
 python scripts/render_custom_gpt_openapi.py --server https://REAL_HOST --output /tmp/k-trader-openapi.yaml
 ```
 
-У GPT Builder використовувати `custom_gpt/SYSTEM_K_TRADER_v1_3_COMPACT.md` як активні Instructions.
+У GPT Builder використовувати `custom_gpt/SYSTEM_K_TRADER_v1_4_COMPACT.md` як активні Instructions.
 
 У Knowledge обов'язково завантажити/оновити `custom_gpt/00_KNOWLEDGE_PRIORITY.md` і дотримуватися визначеного ним пріоритету knowledge-файлів.
 
-Не залишати `SYSTEM_K_TRADER_v1_2_COMPACT.md` активною після переходу на затверджену v1.3.
+Не залишати `SYSTEM_K_TRADER_v1_2_COMPACT.md` або `SYSTEM_K_TRADER_v1_3_COMPACT.md` активною після переходу на затверджену v1.4.
 
 Опис GPT не повинен містити поріг ймовірності на кшталт `≥60%`.
+
+
+## MT4 operational workflow
+
+Для запиту `проаналізуй USDTRY` або іншого Forex/MT4 активу GPT має самостійно:
+- отримати `getMT4MarketContextSummary`;
+- отримати closed candles D1=60, H1=120, M15=120, M5=120 через `getMT4Candles`;
+- перевірити spread/cost, data coherence, `market_open`, `terminal_connected`, `trade_allowed`;
+- побудувати D1 → H1 → M15 → M5 сценарій;
+- повернути `WATCHLIST ONLY` з operational state `NO TRADE`, `WATCH` або `SETUP CANDIDATE`;
+- не видавати цей market-context analysis за canonical engine signal.
