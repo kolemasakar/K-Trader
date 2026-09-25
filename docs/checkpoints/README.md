@@ -2,7 +2,13 @@
 
 This directory contains accepted snapshots used to recover the exact project state between work sessions/chats.
 
-## Current checkpoint
+## Current checkpoint (2026-09-25, pre-transition-generator)
+
+`2026-09-25_CHAT_TRANSITION_HISTORY_FIRST.md`
+
+History-first research priority, existing independent OCI-only prospective collector + non-notifying monitor, honest latest server-verified timestamp, Actions quota/HP-OMEN restrictions, and next H0/H1 gates are recorded here. The owner will supply a separate generator for the new-chat bootstrap. Use the new generated handoff *after* it is actually created; do not imply one exists yet.
+
+## Historical 2026-09-17 checkpoint (superseded as current)
 
 `2026-09-17_0230Z_PRE_PAUSE_AUTOMATION.md`
 
