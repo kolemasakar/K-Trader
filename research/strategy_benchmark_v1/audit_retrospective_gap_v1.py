@@ -53,8 +53,11 @@ def assess_window(
     """Use only causal closed bars; return separate structure/ingest-timing results."""
     step = STEPS_MS[tf]
     # A bar that opens at cutoff is NOT closed. Last valid bar closes at cutoff-1ms.
-    expected_last_close = cutoff_ms // step * step - 1
-    idx = bisect_left(opens, cutoff_ms)
+    expected_last_open = (cutoff_ms // step - 1) * step
+    expected_last_close = expected_last_open + step - 1
+    # H1/4H/D1 bars opened before the M15 cutoff can still be in progress.
+    # Never include any bar opening after the last FULLY closed interval.
+    idx = bisect_right(opens, expected_last_open)
     window = rows[max(0, idx - required_depth):idx]
     reasons: list[str] = []
     if len(window) != required_depth:
@@ -97,7 +100,18 @@ def self_test() -> None:
     assert snapshot_choice([t-timedelta(seconds=300)], t)[1] == "VALID_CONTEXT"
     assert snapshot_choice([t-timedelta(seconds=301)], t)[1] == "STALE_CONTEXT"
     assert snapshot_choice([t+timedelta(seconds=1)], t)[1] == "MISSING_CONTEXT"
-    print("SELF_TEST=PASS (7 checks)")
+    # The 10:00 hourly bar is still OPEN at 10:15; the last closed is 09:00.
+    hstep = STEPS_MS["1h"]
+    m15_cutoff = 10 * hstep + STEPS_MS["15m"]
+    hrows = [(i*hstep,(i+1)*hstep-1,(i+1)*hstep+1000,"provider") for i in range(7,11)]
+    ok, why, _ = assess_window([x[0] for x in hrows], hrows, m15_cutoff, "1h", 3)
+    assert ok and not why
+    dstep = STEPS_MS["1d"]
+    dcutoff = 10*dstep + STEPS_MS["15m"]
+    drows = [(i*dstep,(i+1)*dstep-1,(i+1)*dstep+1000,"provider") for i in range(7,11)]
+    ok, why, _ = assess_window([x[0] for x in drows], drows, dcutoff, "1d", 3)
+    assert ok and not why
+    print("SELF_TEST=PASS (9 checks)")
 
 
 def run(args: argparse.Namespace) -> dict:
