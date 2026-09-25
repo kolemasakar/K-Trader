@@ -1,0 +1,15 @@
+PHASE11G_EPOCH_ACTIVATION_REQUEST_V1
+approved_by_user=go
+approval_date=2026-09-25
+server=k-trader-prod-vnic
+repo=kolemasakar/K-Trader
+epoch_id=epoch_20260925T114500Z_v1
+first_cutoff_utc=2026-09-25T11:45:00Z
+last_cutoff_utc=2026-09-26T11:30:00Z
+registration_sha256=b67a2d4c587995d4b58649ea136e99306dfe5927a178565cc176b82f36b7ef9e
+recorder_sha256=3ff7d5ff85f315e785fb5eca8b28ef04fc6fa150374c85edfd0db10b67465213
+host_mode=read_only
+data_mode=forward_first_seen_only
+admitted_new_prospective_families=0
+hp_omen=PROHIBITED
+trading=NOT_AUTHORIZED
