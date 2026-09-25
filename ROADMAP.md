@@ -2,6 +2,8 @@
 
 Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, FAST M5/60m is production-validated, corrected historical Windows #1-#4 are closed, INTRADAY/M15 universal TTL remains unresolved after broader time-split validation, and MEDIUM/H1 8-12h is time-split validated as a research-only lifecycle design band.
 
+**Current execution priority (2026-09-25):** historical Binance USD-M recovery is the primary research path for strategy development/backtesting/robustness, beginning with H0 inventory and bounded H1 5×5 pilot, then staged expansion toward up to six months where contract history exists. The separate first-seen current-data epoch remains data-only and is retained for contemporary market-quality diagnostics and later independently approved shadow validation of frozen historical candidates. GitHub Actions quota is unavailable until 2026-10-01; local exact-SHA validation on independent OCI is the temporary gate. HP-OMEN remains excluded and live trading is not authorized.
+
 ## Phase 0 - Foundation
 
 Status: COMPLETE.
