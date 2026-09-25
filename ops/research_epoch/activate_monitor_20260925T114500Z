@@ -1,0 +1,15 @@
+PHASE11G_MONITOR_ACTIVATION_REQUEST_V1
+owner_approval=2026-09-25: approve hourly, deep, final automatic server checks; no reminders
+repository=kolemasakar/K-Trader
+host=k-trader-prod-vnic
+epoch_id=epoch_20260925T114500Z_v1
+monitor_sha256=8a6e4f5558aa7fd6e714e0ba280b037395d4600c458246a0c86676eeb2b7a4e9
+registration_sha256=b67a2d4c587995d4b58649ea136e99306dfe5927a178565cc176b82f36b7ef9e
+activation=one_shot_approved_self_hosted_runner
+schedule=hourly_06;deep_4h_51;final_2026-09-26T11:36:00Z
+past_checks=log_MISSED_BEFORE_MONITOR_ACTIVATION_no_backfill
+monitor_scope=read_only_diagnostics_durable_server_log
+reminders=NONE
+hp_omen=PROHIBITED
+live_trading=NOT_AUTHORIZED
+strategy_outcomes=NOT_AUTHORIZED
