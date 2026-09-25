@@ -1,4 +1,6 @@
-# K-Trader Roadmap v1.18
+# K-Trader Roadmap v1.19
+
+**2026-09-25 owner-approved mandate overrides older priorities:** K-Trader is research/scenario-only; K_AI handles execution. Prioritize asset eligibility, internet strategy catalogue, >=1-year history-first testing of daily/weekly level rejection/breakout/false-breakout and controls, K_AI MT4/MT5 read-only data interoperability, then forward validation and scenario publication. Initial approved screening/history cohort BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT; eligibility check precedes isolated download. See [mandate](docs/research/K_TRADER_OWNER_RESEARCH_MANDATE_20260925.md) and [implementation plan](docs/research/PHASE11G_HISTORY_FIRST_LEVEL_STRATEGY_PLAN_20260925.md). Historical six-month-first priority and prospective-first interpretation below are superseded. Frozen legacy and current first-seen collection remain separate.
 
 Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, FAST M5/60m is production-validated, corrected historical Windows #1-#4 are closed, INTRADAY/M15 universal TTL remains unresolved after broader time-split validation, and MEDIUM/H1 8-12h is time-split validated as a research-only lifecycle design band.
 
