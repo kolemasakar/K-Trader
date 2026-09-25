@@ -22,15 +22,23 @@
 - Phase 11G original frozen `candidate_rule_set_v2_2`, harness SHA256 `b8471af989090375dec9e25daae184814674a776ab9b46b45e660e35b368be08`, protocol SHA256 `ba671cbed71fdc79380f37a72b75f93e75aa3ee895f5385ef433f497165de5a3`, offline resolver v1.3, ledger v1.2, original accepted cohort **54/100 resolved** at **2026-09-18T06:15:00Z**; original 06:30Z partial recovery remains immutable. **No new eligible prospective family outcomes admitted** from the newer raw epoch, holdout unopened, no trade execution.
 - Original accepted state SHA256 `30d0510da10d3d8b40684f8bf97c9ae568a6b3b8a7b43289c6b8cd41543a997b`; original immutable ledger SHA256 `c0c1b261a6684d1f9381e820736f9dd702319947e3e7f78fb38b607508dcfade`. Independently reverify before any future work.
 
-## Runtime status — last successfully verified snapshot, not an inferred live claim
+## Runtime status — final verified snapshot before transition
 
-Existing independent server `k-trader-prod-vnic`; Docker container `k-trader-ktrader-1`. At approximately **2026-09-25T13:55Z** the server reported HTTP health `ok`, `mode=read_only`, `provider_id=binance_usdm`, `data_ready=true`, `scanner_status=DEGRADED` (known readiness issue). Last observed new data-only epoch status at that read: `PASS`, **9 completed M15 cutoff directories**, latest **2026-09-25T13:45Z**, 14/19 ready and 5/19 rejected on latest cutoff. The new raw-only epoch is pre-registered for first cutoff 2026-09-25T11:45Z through final inclusive cutoff **2026-09-26T11:30Z**. Each fixed top-19 panel member has five intervals (5m/15m/1h/4h/1d) with independent arrival checks.
+Final independent read-only host check completed at approximately **2026-09-25T15:23Z** on `k-trader-prod-vnic`; Docker container `k-trader-ktrader-1`.
 
-At **2026-09-25T13:19:59Z**, a verified server check showed one live collector PID `119664`, one monitor PID `121255`, exact SHA256 for the monitor `8a6e4f5558aa7fd6e714e0ba280b037395d4600c458246a0c86676eeb2b7a4e9`, and a baseline **6/6 PASS** with 380 verified raw files, six original frozen SHA pins unchanged. Hourly reports for 12:06Z and 13:06Z were correctly logged `MISSED_BEFORE_MONITOR_ACTIVATION`; they are NOT evidence of scheduled execution. First real hourly post-activation report due 14:06Z; first deep report due 15:51Z (18:51 Kyiv); final due 2026-09-26T11:36Z (14:36 Kyiv). **No claim is made here that any later check already passed**.
+Verified facts:
+- HTTP health `status=ok`, `mode=read_only`, `provider_id=binance_usdm`, `data_ready=true`; scanner remains `DEGRADED` because of known first-seen readiness variability rather than a production write authorization.
+- Exactly one first-seen collector process, PID `119664`, and one non-notifying monitor process, PID `121255`.
+- **15 completed M15 first-seen cutoff directories**, first `2026-09-25T11:45Z`, latest `2026-09-25T15:15Z`.
+- Latest collector state: `PASS`, `admitted_new_prospective_families=0`, `full_depth_ready_slots=5`, `failed_slots=14`.
+- Monitor durable reports: pre-activation `12:06Z` and `13:06Z` correctly recorded `MISSED_BEFORE_MONITOR_ACTIVATION`; post-activation `14:06Z` **PASS** and `15:06Z` **PASS**; baseline remains **PASS**.
+- Original accepted state SHA256 `30d0510da10d3d8b40684f8bf97c9ae568a6b3b8a7b43289c6b8cd41543a997b` and original ledger SHA256 `c0c1b261a6684d1f9381e820736f9dd702319947e3e7f78fb38b607508dcfade` were reverified unchanged.
+- Approx. **31.78 GiB** remained available in the research filesystem during the final check.
+- Historical recovery root `/data/research/phase11g/historical_recovery_v1/` has **not** yet been created or populated; next work remains H0 inventory before H1 collection.
 
-Historical market data API was read-only tested from independent OCI on Sep25 and returned a correctly formed Binance USD-M XRPUSDT/15m sample. Approx. **31.82 GiB** free in the research volume was reported around 13:59Z, subject to new capacity check before H1/H2.
+Registered prospective epoch boundaries remain first cutoff `2026-09-25T11:45Z` through final inclusive cutoff **2026-09-26T11:30Z**. Deep monitor reports remain scheduled at 15:51Z, 19:51Z, 23:51Z, 03:51Z and 07:51Z; final audit at 11:36Z. **Do not restart or retrofit data if later checks fail; diagnose and preserve immutable first-seen evidence.**
 
-**Open verification issue at transition:** fresh SentinelX execution/ping calls during the final chat-freeze attempt failed with an internal tool error. This is an **unverified connector/tool condition**, not evidence that the K-Trader host/collector/monitor went down. On next chat start, query independent host health, live exact processes and monitor's 14:06Z report; verify cutoff continuity and deeper scheduled reports when due. Do not repair or restart anything simply because the connector returned an error.
+The earlier transient SentinelX internal-tool errors were not host failures: subsequent independent host calls succeeded and produced the final snapshot above.
 
 **Known separate data-quality anomaly**: fixed-rank cutoff `2026-09-25T13:15Z` had only 1/19 timely-complete instruments (18/19 flagged missing latest M15/M5 closed candles). At a later read-only SQLite probe, some bars showed actual ingest times around 13:20:48–13:20:50Z, past the 13:20:00Z cutoff+300s hard deadline. Later Binance retrieval can support retrospective gap analysis, **never change those immutable first-seen failure outcomes**.
 
