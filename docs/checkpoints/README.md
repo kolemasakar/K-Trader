@@ -6,7 +6,7 @@ This directory contains accepted snapshots used to recover the exact project sta
 
 `2026-09-25_CHAT_TRANSITION_HISTORY_FIRST.md`
 
-History-first research priority, existing independent OCI-only prospective collector + non-notifying monitor, honest latest server-verified timestamp, Actions quota/HP-OMEN restrictions, and next H0/H1 gates are recorded here. The owner will supply a separate generator for the new-chat bootstrap. Use the new generated handoff *after* it is actually created; do not imply one exists yet.
+History-first research priority, independent OCI-only prospective collector + non-notifying monitor, final verified runtime at approximately 2026-09-25T15:23Z, post-activation hourly PASS reports at 14:06Z and 15:06Z, Actions quota/HP-OMEN restrictions, and next H0/H1 gates are recorded here. The owner will supply a separate generator for the new-chat bootstrap. Use the newly generated handoff only after it is actually created; do not imply one exists yet.
 
 ## Historical 2026-09-17 checkpoint (superseded as current)
 
