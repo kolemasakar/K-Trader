@@ -1,5 +1,7 @@
 # K-Trader Current State
 
+> **New server-only first-seen epoch activated (2026-09-25 11:18 UTC), awaiting first future data cutoff:** [activation checkpoint](checkpoints/2026-09-25_PHASE11G_NEW_EPOCH_1145Z_ACTIVATED.md). Activation and all Research CI gates PASS; start 11:45Z; first capture requires post-11:48Z verification. Legacy resolved families remain **54/100** and no new outcomes are admitted. HP-OMEN remains prohibited.
+
 > **New server-only first-seen epoch preregistered (2026-09-25 11:11 UTC):** [bounded future data-only epoch checkpoint](checkpoints/2026-09-25_PHASE11G_NEW_EPOCH_1145Z_PREREG.md), first cutoff 11:45Z; old 54/100 accepted families and first-seen ledger remain immutable. New epoch selection uses independently recorded top-19 Binance ranks, with no strategy outcomes admitted until a separate isolation/compatibility acceptance gate. No HP-OMEN use.
 
 > **Server-only retrospective audit completed (2026-09-25):** the 2026-09-18 06:30Z → 2026-09-25 10:15Z historical gap was assessed separately against an integrity-checked frozen K-Trader SQLite copy. Result: 688/688 universe-context cutoffs verified; 13,072 ranked slots; 9,717 structurally replayable with present historical data; 31 slots with compatible present-state ingest timestamps, **none admitted as prospective evidence**. The current Path A count remains **54/100**. See [auditor results and limitations](research/recovery_retrospective/2026-09-25T1015Z/README.md). New prospective epoch remains a separate unapproved gate. **HP-OMEN remains prohibited.**
