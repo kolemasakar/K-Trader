@@ -50,5 +50,11 @@ jobs:
           tests/test_phase11g_replay_consistency.py
           tests/test_plugin_surface_guard.py
 
+      - name: Compile isolated retrospective auditor
+        run: python -m py_compile research/strategy_benchmark_v1/audit_retrospective_gap_v1.py
+
+      - name: Test isolated retrospective auditor
+        run: python -m pytest -q research/strategy_benchmark_v1/tests/test_audit_retrospective_gap_v1.py
+
       - name: Assert frozen production boundary in OpenAPI
         run: python scripts/plugin_surface_guard.py custom_gpt/openapi.yaml

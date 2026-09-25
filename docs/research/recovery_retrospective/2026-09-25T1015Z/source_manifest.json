@@ -1,0 +1,15 @@
+{
+  "captured_candle_rows_all_providers": 331691,
+  "classification": "RECOVERY_RETROSPECTIVE",
+  "cutoff_end": "2026-09-25T10:15:00Z",
+  "holdout_opened": false,
+  "integrity_check": "ok",
+  "journal_mode": "delete",
+  "production_action": false,
+  "prospective_ledger_written": false,
+  "schema_version": "ktrader.phase11g.recovery_retrospective.sqlite_source_manifest.v1",
+  "snapshot_captured_at_utc": "2026-09-25T10:48:40.513024+00:00",
+  "source": "/data/ktrader.db",
+  "sqlite_sha256": "d456f2e0cd9aeb7284f69ae9ca5fe740f54f38fdeb9a3e0521e9f6fc235a583d",
+  "sqlite_size_bytes": 94691328
+}
