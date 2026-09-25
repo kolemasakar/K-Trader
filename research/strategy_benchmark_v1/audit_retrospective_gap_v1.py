@@ -36,6 +36,12 @@ def milliseconds(d: datetime) -> int:
     return int(d.timestamp() * 1000)
 
 
+def archive_file_timestamp(filename: str) -> datetime:
+    # Immutable per-snapshot capture filename, e.g. 20260925T101039123329Z_<id>.jsonl.
+    stamp = filename.split("_", 1)[0]
+    return datetime.strptime(stamp, "%Y%m%dT%H%M%S%fZ").replace(tzinfo=timezone.utc)
+
+
 def snapshot_choice(times: list[datetime], cutoff: datetime, max_age_seconds: int = 300):
     i = bisect_right(times, cutoff) - 1
     if i < 0:
@@ -100,6 +106,8 @@ def self_test() -> None:
     assert snapshot_choice([t-timedelta(seconds=300)], t)[1] == "VALID_CONTEXT"
     assert snapshot_choice([t-timedelta(seconds=301)], t)[1] == "STALE_CONTEXT"
     assert snapshot_choice([t+timedelta(seconds=1)], t)[1] == "MISSING_CONTEXT"
+    assert archive_file_timestamp("20260925T101039123329Z_abc.jsonl") < t
+    assert archive_file_timestamp("20260925T102039123329Z_abc.jsonl") > t
     # The 10:00 hourly bar is still OPEN at 10:15; the last closed is 09:00.
     hstep = STEPS_MS["1h"]
     m15_cutoff = 10 * hstep + STEPS_MS["15m"]
@@ -111,7 +119,7 @@ def self_test() -> None:
     drows = [(i*dstep,(i+1)*dstep-1,(i+1)*dstep+1000,"provider") for i in range(7,11)]
     ok, why, _ = assess_window([x[0] for x in drows], drows, dcutoff, "1d", 3)
     assert ok and not why
-    print("SELF_TEST=PASS (9 checks)")
+    print("SELF_TEST=PASS (11 checks)")
 
 
 def run(args: argparse.Namespace) -> dict:
@@ -147,8 +155,18 @@ def run(args: argparse.Namespace) -> dict:
     manifest_hash = hashlib.sha256()
     first_config = None
     for f in files:
-        raw = f.read_bytes()
         relative = f.relative_to(root).as_posix()
+        try:
+            file_time = archive_file_timestamp(f.name)
+        except ValueError:
+            if len(archive_errors) < 20:
+                archive_errors.append({"file": relative, "error": "INVALID_ARCHIVE_FILENAME"})
+            continue
+        # Strictly bound the input manifest to a FIXED interval; otherwise
+        # later ongoing production captures mutate its digest between reruns.
+        if not (start - timedelta(minutes=10) <= file_time <= end):
+            continue
+        raw = f.read_bytes()
         digest = hashlib.sha256(raw).hexdigest()
         manifest_hash.update(json.dumps([relative, digest], ensure_ascii=True, separators=(",", ":")).encode("ascii") + b"\n")
         archive_file_count += 1
@@ -161,8 +179,8 @@ def run(args: argparse.Namespace) -> dict:
             if verified.config != first_config:
                 raise ValueError("universe config drift")
             snap = verified.snapshots[0]
-            if snap.captured_at <= start - timedelta(minutes=10) or snap.captured_at > end:
-                continue
+            if snap.captured_at != file_time:
+                raise ValueError("archive filename and canonical captured_at mismatch")
             if snapshot_times and snap.captured_at <= snapshot_times[-1]:
                 raise ValueError("non-increasing/duplicate snapshot timestamp")
             snapshot_times.append(snap.captured_at)
