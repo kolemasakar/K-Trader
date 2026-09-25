@@ -62,5 +62,11 @@ jobs:
       - name: Test isolated forward-only epoch recorder
         run: python -m pytest -q research/strategy_benchmark_v1/tests/test_prospective_epoch_capture_v1.py
 
+      - name: Compile isolated Phase 11G monitoring
+        run: python -m py_compile scripts/phase11g_epoch_monitor_v1.py
+
+      - name: Test isolated hourly, deep and final monitoring
+        run: python -m pytest -q tests/test_phase11g_epoch_monitor_v1.py
+
       - name: Assert frozen production boundary in OpenAPI
         run: python scripts/plugin_surface_guard.py custom_gpt/openapi.yaml
