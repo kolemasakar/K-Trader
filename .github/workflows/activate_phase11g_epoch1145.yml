@@ -1,0 +1,69 @@
+name: Phase 11G isolated epoch 1145 activation
+
+on:
+  push:
+    branches: [research-strategy-benchmark-v1]
+    paths:
+      - ops/research_epoch/activate_20260925T114500Z
+
+permissions:
+  contents: read
+
+concurrency:
+  group: k-trader-phase11g-epoch-20260925T114500Z
+  cancel-in-progress: false
+
+jobs:
+  activate:
+    if: github.ref == 'refs/heads/research-strategy-benchmark-v1'
+    runs-on: [self-hosted, linux, k-trader-prod-arm64]
+    timeout-minutes: 8
+    steps:
+      - name: Check isolated server registration and read-only production boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(hostname)" = "k-trader-prod-vnic"
+          command -v docker
+          docker ps --filter name=k-trader-ktrader-1 --format '{{.Names}} {{.Status}}'
+          EPOCH=/data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1
+          docker exec k-trader-ktrader-1 python "$EPOCH/prospective_epoch_capture_v1.py" --preflight --registration "$EPOCH/registration.json"
+          docker exec k-trader-ktrader-1 python -c '
+          from pathlib import Path
+          from datetime import datetime,timezone
+          import hashlib,json
+          e=Path("/data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1")
+          reg=e/"registration.json"
+          r=json.loads(reg.read_text())
+          sh=lambda f: hashlib.sha256(f.read_bytes()).hexdigest()
+          assert sh(reg)=="b67a2d4c587995d4b58649ea136e99306dfe5927a178565cc176b82f36b7ef9e"
+          assert sh(e/"prospective_epoch_capture_v1.py")=="3ff7d5ff85f315e785fb5eca8b28ef04fc6fa150374c85edfd0db10b67465213"
+          assert r["start_cutoff_utc"]=="2026-09-25T11:45:00Z"
+          assert r["end_cutoff_utc"]=="2026-09-26T11:30:00Z"
+          assert datetime.now(timezone.utc)<datetime.fromisoformat(r["start_cutoff_utc"].replace("Z","+00:00"))
+          assert not (e/"runner.lock").exists(), "prior runner lock exists"
+          assert not (e/"cutoffs").exists(), "prior cutoff output exists"
+          print("REGISTRATION_IMMUTABLE=PASS; FIRST_CUTOFF_STILL_FUTURE=PASS")
+          '
+
+      - name: Activate bounded forward-only data recorder
+        shell: bash
+        run: |
+          set -euo pipefail
+          EPOCH=/data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1
+          docker exec -d k-trader-ktrader-1 sh -c \
+            'exec python /data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1/prospective_epoch_capture_v1.py --run --registration /data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1/registration.json >> /data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1/runner.log 2>&1'
+          sleep 4
+          docker exec k-trader-ktrader-1 python -c '
+          from pathlib import Path
+          import json
+          e=Path("/data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1")
+          assert (e/"runner.lock").is_file(), "runner lock not created"
+          assert (e/"cutoffs").is_dir(), "isolated cutoff root not created"
+          events=[json.loads(line) for line in (e/"events.jsonl").read_text().splitlines() if line]
+          assert events and events[0]["event"]=="REGISTERED_RUNNER_START", "startup event absent"
+          assert events[0]["first_cutoff"]=="2026-09-25T11:45:00Z"
+          log=(e/"runner.log").read_text()
+          assert "WAITING" in log, "runner did not enter future-only waiting state"
+          print("ISOLATED_EPOCH_RUNNING=PASS; FIRST_FUTURE_CUTOFF=2026-09-25T11:45:00Z")
+          '
