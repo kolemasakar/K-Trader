@@ -80,3 +80,31 @@ def test_asof_must_be_utc_closed_m15_boundary():
                   "2026-09-25T10:15:00", "2026-09-25T10:15:00+03:00"]:
         with pytest.raises(ValueError):
             mod.parse_utc(value)
+
+
+def test_frozen_sqlite_manifest_hash_and_cutoff_are_fail_closed(tmp_path):
+    import hashlib
+    import json
+    dbfile = tmp_path / "source_sqlite_snapshot.db"
+    dbfile.write_bytes(b"fixture snapshot bytes")
+    manifest = tmp_path / "source_manifest.json"
+    payload = {
+        "schema_version": "ktrader.phase11g.recovery_retrospective.sqlite_source_manifest.v1",
+        "classification": "RECOVERY_RETROSPECTIVE",
+        "cutoff_end": "2026-09-25T10:15:00Z",
+        "holdout_opened": False,
+        "production_action": False,
+        "prospective_ledger_written": False,
+        "integrity_check": "ok",
+        "journal_mode": "delete",
+        "sqlite_sha256": hashlib.sha256(dbfile.read_bytes()).hexdigest(),
+        "snapshot_captured_at_utc": "2026-09-25T10:48:40Z",
+    }
+    manifest.write_text(json.dumps(payload), encoding="utf-8")
+    checked = mod.verify_frozen_source(manifest, dbfile, payload["cutoff_end"])
+    assert checked["frozen_sqlite_sha256"] == payload["sqlite_sha256"]
+    with pytest.raises(ValueError):
+        mod.verify_frozen_source(manifest, dbfile, "2026-09-25T10:30:00Z")
+    dbfile.write_bytes(b"source changed")
+    with pytest.raises(ValueError):
+        mod.verify_frozen_source(manifest, dbfile, payload["cutoff_end"])
