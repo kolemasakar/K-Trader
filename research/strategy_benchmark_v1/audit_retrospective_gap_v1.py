@@ -42,6 +42,39 @@ def archive_file_timestamp(filename: str) -> datetime:
     return datetime.strptime(stamp, "%Y%m%dT%H%M%S%fZ").replace(tzinfo=timezone.utc)
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        while block := source.read(1024 * 1024):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def verify_frozen_source(manifest_path: Path, db_path: Path, end: str) -> dict:
+    raw = manifest_path.read_bytes()
+    manifest = json.loads(raw)
+    if manifest.get("classification") != "RECOVERY_RETROSPECTIVE":
+        raise ValueError("frozen source has wrong classification")
+    if manifest.get("schema_version") != "ktrader.phase11g.recovery_retrospective.sqlite_source_manifest.v1":
+        raise ValueError("unsupported frozen source manifest")
+    if manifest.get("cutoff_end") != end:
+        raise ValueError("frozen source bound to a different historical cutoff")
+    if any(manifest.get(k) is not False for k in ("holdout_opened","production_action","prospective_ledger_written")):
+        raise ValueError("frozen source violates research safety flags")
+    if manifest.get("integrity_check") != "ok" or manifest.get("journal_mode") != "delete":
+        raise ValueError("frozen source integrity or journaling status mismatch")
+    if db_path.resolve() != (manifest_path.parent/"source_sqlite_snapshot.db").resolve():
+        raise ValueError("frozen source path mismatch")
+    if sha256_file(db_path) != manifest.get("sqlite_sha256"):
+        raise ValueError("frozen SQLite SHA256 mismatch")
+    return {
+        "source_manifest_sha256": hashlib.sha256(raw).hexdigest(),
+        "frozen_sqlite_sha256": manifest["sqlite_sha256"],
+        "frozen_sqlite_captured_at_utc": manifest["snapshot_captured_at_utc"],
+        "frozen_source_path": db_path.as_posix(),
+    }
+
+
 def snapshot_choice(times: list[datetime], cutoff: datetime, max_age_seconds: int = 300):
     i = bisect_right(times, cutoff) - 1
     if i < 0:
@@ -133,6 +166,7 @@ def run(args: argparse.Namespace) -> dict:
     if args.settlement_seconds < 0:
         raise ValueError("negative settlement not supported")
 
+    frozen_source = verify_frozen_source(Path(args.source_manifest), Path(args.sqlite_db), args.end) if args.source_manifest else None
     root = Path(args.research_root)
     source = root / "universe" / PROVIDER
     if not source.is_dir():
@@ -277,6 +311,8 @@ def run(args: argparse.Namespace) -> dict:
         conn.rollback()  # query-only transaction; never persist any mutations
     finally:
         conn.close()
+    if frozen_source and sha256_file(Path(args.sqlite_db)) != frozen_source["frozen_sqlite_sha256"]:
+        raise ValueError("frozen SQLite changed during retrospective read-only audit")
 
     # Source-integrity errors invalidate admission even if descriptive counts
     # below remain useful diagnostics.
@@ -306,6 +342,8 @@ def run(args: argparse.Namespace) -> dict:
         "selected_symbol_union_size": len(symbols),
         "closed_candle_rows_examined": source_rows,
         "current_db_candle_rows_sha256": source_rows_sha.hexdigest(),
+        "source_mode": "FROZEN_SQLITE_BACKUP" if frozen_source else "LIVE_SQLITE_UNFROZEN_PRELIMINARY",
+        "frozen_source": frozen_source,
         "counts": dict(sorted(overall.items())),
         "history_fail_reasons_by_tf": dict(sorted(reason_counts.items())),
         "ingestion_timing_warnings_by_tf": dict(sorted(provenance_counts.items())),
@@ -325,6 +363,7 @@ def main() -> int:
     p.add_argument("--end", default="2026-09-25T10:15:00Z")
     p.add_argument("--research-root", default="/data/research")
     p.add_argument("--sqlite-db", default="/data/ktrader.db")
+    p.add_argument("--source-manifest", help="Required for authoritative reproducible reports")
     p.add_argument("--panel-size", type=int, default=19)
     p.add_argument("--settlement-seconds", type=int, default=180)
     p.add_argument("--self-test", action="store_true")
