@@ -1,0 +1,118 @@
+name: Phase 11G isolated epoch monitor activation
+
+on:
+  push:
+    branches: [research-strategy-benchmark-v1]
+    paths:
+      - ops/research_epoch/activate_monitor_20260925T114500Z
+
+permissions:
+  contents: read
+
+concurrency:
+  group: k-trader-phase11g-epoch-20260925-monitor-once
+  cancel-in-progress: false
+
+jobs:
+  activate-monitor:
+    if: github.ref == 'refs/heads/research-strategy-benchmark-v1'
+    runs-on: [self-hosted, linux, k-trader-prod-arm64]
+    timeout-minutes: 8
+    env:
+      CONTAINER: k-trader-ktrader-1
+      EPOCH: /data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1
+      MONITOR_SHA256: 8a6e4f5558aa7fd6e714e0ba280b037395d4600c458246a0c86676eeb2b7a4e9
+      REGISTRATION_SHA256: b67a2d4c587995d4b58649ea136e99306dfe5927a178565cc176b82f36b7ef9e
+    steps:
+      - name: Checkout approved repository code only
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Verify authorized host, exact source and immutable preregistration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(hostname)" = "k-trader-prod-vnic"
+          echo "APPROVED_GITHUB_SHA=$(git rev-parse HEAD)"
+          echo "$MONITOR_SHA256  scripts/phase11g_epoch_monitor_v1.py" | sha256sum -c -
+          docker exec "$CONTAINER" python -c '
+          from pathlib import Path
+          import hashlib,json,urllib.request
+          e=Path("/data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1")
+          sh=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+          assert sh(e/"registration.json")=="b67a2d4c587995d4b58649ea136e99306dfe5927a178565cc176b82f36b7ef9e"
+          assert sh(e/"prospective_epoch_capture_v1.py")=="3ff7d5ff85f315e785fb5eca8b28ef04fc6fa150374c85edfd0db10b67465213"
+          assert not (e/"phase11g_epoch_monitor_v1.py").exists(), "monitor already installed"
+          assert not (e/"checks").exists(), "monitor already initialized"
+          assert not (e/"monitor.log").exists(), "previous monitor log exists"
+          assert (e/"cutoffs").is_dir(), "epoch not started"
+          status=json.loads((e/"status.json").read_text())
+          assert status.get("status")=="PASS" and status.get("admitted_new_prospective_families")==0
+          health=json.load(urllib.request.urlopen("http://127.0.0.1:8000/health",timeout=5))
+          assert health.get("status")=="ok" and health.get("mode")=="read_only"
+          assert health.get("data_ready") is True and health.get("provider_id")=="binance_usdm"
+          pids=[]
+          for p in Path("/proc").iterdir():
+              if not p.name.isdigit():continue
+              try:
+                  argv=(p/"cmdline").read_bytes().split(b"\0")
+                  if len(argv)>2 and argv[1].endswith(b"/prospective_epoch_capture_v1.py") and b"--run" in argv:
+                      pids.append(int(p.name))
+              except (OSError,PermissionError):pass
+          assert len(pids)==1,"data collector must be uniquely active"
+          print("IMMUTABLE_EPOCH_AND_RECORDER_PREFLIGHT=PASS",pids)
+          '
+
+      - name: Install approved monitor in isolated epoch, then validate without writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker cp scripts/phase11g_epoch_monitor_v1.py "$CONTAINER:$EPOCH/phase11g_epoch_monitor_v1.py"
+          docker exec "$CONTAINER" python -c '
+          from pathlib import Path
+          import hashlib
+          p=Path("/data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1/phase11g_epoch_monitor_v1.py")
+          assert hashlib.sha256(p.read_bytes()).hexdigest()=="8a6e4f5558aa7fd6e714e0ba280b037395d4600c458246a0c86676eeb2b7a4e9"
+          print("INSTALLED_MONITOR_SHA256_PASS")
+          '
+          docker exec "$CONTAINER" python "$EPOCH/phase11g_epoch_monitor_v1.py" --self-test
+          BASELINE="$(docker exec "$CONTAINER" python "$EPOCH/phase11g_epoch_monitor_v1.py" --baseline)"
+          echo "$BASELINE"
+          printf '%s\n' "$BASELINE" | grep -q '"status": "PASS"'
+          printf '%s\n' "$BASELINE" | grep -q '"notifications_scheduled": false'
+          printf '%s\n' "$BASELINE" | grep -q '"prospective_families_admitted": 0'
+
+      - name: Launch bounded non-notifying monitor and verify immutable baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker exec -d "$CONTAINER" sh -c             'exec python /data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1/phase11g_epoch_monitor_v1.py --run >>/data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1/monitor.log 2>&1'
+          sleep 4
+          docker exec "$CONTAINER" python -c '
+          from pathlib import Path
+          import json
+          e=Path("/data/research/phase11g/prospective_epochs/epoch_20260925T114500Z_v1")
+          checks=e/"checks"
+          baseline=checks/"baseline.json"
+          assert baseline.is_file(),"monitor baseline not written"
+          report=json.loads(baseline.read_text())
+          assert report.get("status")=="PASS" and report.get("failed_cutoffs")==0,report
+          assert report.get("notifications_scheduled") is False
+          assert report.get("prospective_families_admitted")==0
+          assert all(report["frozen_pins"].values()),report["frozen_pins"]
+          processes=[]
+          for p in Path("/proc").iterdir():
+              if not p.name.isdigit():continue
+              try:
+                  argv=(p/"cmdline").read_bytes().split(b"\0")
+                  if len(argv)>2 and argv[1].endswith(b"/phase11g_epoch_monitor_v1.py") and b"--run" in argv:
+                      processes.append(int(p.name))
+              except (OSError,PermissionError):pass
+          assert len(processes)==1,"monitor process missing or duplicated"
+          print("MONITOR_START_AND_BASELINE_PASS",json.dumps({
+              "pid":processes[0],"expected_cutoffs":report["expected_cutoffs"],
+              "pass_cutoffs":report["pass_cutoffs"],"raw_files_hashed":report["raw_files_hashed"],
+              "notifications_scheduled":False},sort_keys=True))
+          '
