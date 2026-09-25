@@ -86,3 +86,67 @@ Remain unchanged:
 5. Do not execute a catch-up pipeline, promote hypotheses, open holdout, change production or use HP-OMEN before the relevant validation/authorization gates are met.
 
 This checkpoint is documentation of an observed fail-closed state, **not** acceptance of additional prospective outcomes.
+
+## Follow-up reproducibility and readiness gate — 2026-09-25, 10:15Z
+
+This follow-up was performed entirely on independently operated K-Trader server-local storage, in **read-only** mode. No HP-OMEN or HP-OMEN-backed route was accessed.
+
+### Integrity and existing accepted evidence
+
+- recovery bundle `predeploy_20260917T1925Z`: manifest SHA-256 checks **58/58 match**, zero missing or mismatched;
+- the archived `2026-09-18T06:15:00Z` bundles passed the pinned Phase 11G data-quality watchdog: **95 interval files checked, 0 errors, PASS**;
+- source-hash checks of the accepted state remain **5/5 MATCH**;
+- no new prospective family was accepted, no immutable event was rewritten, and the partial `06:30Z` output remains untouched.
+
+### Point-in-time server-only readiness — not prospective evidence
+
+The independent K-Trader `binance_usdm` recorded universe snapshot at `2026-09-25T10:10:39.123329Z` is the newest inspected source snapshot before logical cutoff `2026-09-25T10:15:00Z`. Its age is approximately **261 seconds**, inside the existing `<=300s` context-age boundary. The selection consists of the **first 19 members in recorded liquidity order**, without replacing any failed member with a lower-ranked symbol.
+
+A read-only SQLite query against `/data/ktrader.db` checked the required historical depth, sequence contiguity and latest closed-bar availability at that cutoff:
+
+- `1d=20`;
+- `4h=80`;
+- `1h=300`;
+- `15m=400`;
+- `5m=20`.
+
+Result: **14/19 PASS**, **5/19 fail closed**.
+
+PASS in original recorded rank order:
+
+```text
+1  XRPUSDT
+2  ONDOUSDT
+3  DOGEUSDT
+4  SUIUSDT
+5  LSKUSDT
+6  1000PEPEUSDT
+7  ENAUSDT
+10 NILUSDT
+11 WLDUSDT
+12 ADAUSDT
+13 XLMUSDT
+14 AKEUSDT
+15 ARBUSDT
+18 ONEUSDT
+```
+
+Failed, with observed reasons:
+
+- rank 8, `SAGAUSDT`: one gap in the latest 400 `15m` bars;
+- rank 9, `XPLUSDT`: one gap each in the latest 300 `1h` and 400 `15m` bars;
+- rank 16, `龙虾USDT`: insufficient `1d/4h/1h` depth and multiple gaps, including `15m`;
+- rank 17, `BROCCOLI714USDT`: insufficient `1h` (267/300) and `15m` (316/400) depth;
+- rank 19, `BTWUSDT`: insufficient depth, multiple gaps and stale `4h` close.
+
+The earlier accepted panel from `2026-09-18T06:15Z` is a different set from this recorded top-19. Nine symbols from that historical panel met all five current point-in-time bar checks; this **does not** establish readiness for the frozen old panel, nor authorize a changed prospectively counted sample.
+
+### Operational outcome and next gate
+
+- **Recovery bundle integrity:** PASS.
+- **Last accepted archive quality:** PASS.
+- **Fresh point-in-time full-panel readiness:** **FAIL_CLOSED (14/19)** under the no-substitution rule.
+- **Prospective continuation from 06:15Z through the 7-day interruption:** NOT AUTHORIZED / NOT ESTABLISHED.
+- **Holdout, Phase 12, trade execution, strategy modification, risk-policy promotion and HP-OMEN use:** NOT AUTHORIZED.
+
+Next bounded work: prepare a *versioned, server-only restart/recovery protocol* separating (a) any retrospective investigation of the downtime from (b) a newly preregistered prospective epoch using future fully closed M15 boundaries. Maintain first-seen ledger v1.2 semantics and do not silently bridge the interruption or count retrospectively recovered data toward the frozen prospective `54/100` total. Resolve or explicitly fail-closed the five recorded current top-19 history deficits; do not change rank selection to manufacture a full panel.
