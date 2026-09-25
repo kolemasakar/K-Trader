@@ -190,7 +190,7 @@ def review(root: Path, due: datetime, kind: str, now: datetime | None = None) ->
     issues = []
     if not all(paths.values()):
         issues.append("IMMUTABLE_PIN_DRIFT")
-    if health.get("mode") != "read_only" or health.get("provider") != "binance_usdm":
+    if health.get("status") != "ok" or health.get("mode") != "read_only" or health.get("provider") != "binance_usdm" or health.get("data_ready") is not True:
         issues.append("SERVER_READONLY_OR_PROVIDER_FAILURE")
     if kind != "FINAL" and len(runner) != 1:
         issues.append("RUNNER_COUNT_NOT_ONE")
