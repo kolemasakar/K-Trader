@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import pytest
 
-MODULE = Path(__file__).resolve().parents[1] / "phase11g_epoch_monitor_v1.py"
+MODULE = Path(__file__).resolve().parents[1] / "scripts" / "phase11g_epoch_monitor_v1.py"
 SPEC = importlib.util.spec_from_file_location("phase11g_monitor", MODULE)
 monitor = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(monitor)
