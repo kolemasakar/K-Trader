@@ -1,5 +1,7 @@
 # K-Trader Current State
 
+> **Mandatory host restriction (2026-09-25):** HP-OMEN is **prohibited for all K-Trader use** (including indirect K_AI/MT4-backed data, diagnostics, CI, scripts, research and backups) until a separate explicit user instruction. Work only on verified independent K-Trader server/repository resources. If a step depends on HP-OMEN, mark it BLOCKED rather than substituting it. See [`docs/operations/K_TRADER_HP_OMEN_EXCLUSION_2026-09-25.md`](operations/K_TRADER_HP_OMEN_EXCLUSION_2026-09-25.md). This operational update does not change the historical Phase 11G evidence snapshot recorded below.
+
 Updated: 2026-09-11
 
 Canonical transition checkpoint:
