@@ -69,7 +69,8 @@ def test_no_future_bars_affect_past_asof():
     later = filtered_atr5(newer + data)
     assert asof["atr5"] == filtered_atr5((newer + data)[1:])["atr5"]
     assert asof["accepted"] == filtered_atr5((newer + data)[1:])["accepted"]
-    assert later["accepted"][0]["timestamp"] != asof["accepted"][0]["timestamp"]
+    assert later["rejected"][0]["timestamp"] == "2026-09-29"
+    assert later["accepted"][0]["timestamp"] == asof["accepted"][0]["timestamp"]
 
 
 def test_result_deterministic():
