@@ -41,18 +41,14 @@ def confirm_pairs(levels, as_of, luft_by_symbol):
         weekly = [x for x in eligible if x.symbol == symbol and x.timeframe == '1w']
         for d in daily:
             matches = [w for w in weekly if abs(Decimal(d.price) - Decimal(w.price)) <= luft
-                       and w.formation_event_id != d.formation_event_id
-                       and (_utc(d.source_closed_at) <= _utc(w.source_opened_at)
-                            or _utc(w.source_closed_at) <= _utc(d.source_opened_at))]
+                       and w.formation_event_id != d.formation_event_id]
             # Avoid claiming unique confirmation if several weekly candidates overlap.
             if len(matches) != 1:
                 continue
             w = matches[0]
             reciprocal = [other for other in daily
                           if abs(Decimal(other.price) - Decimal(w.price)) <= luft
-                          and other.formation_event_id != w.formation_event_id
-                          and (_utc(other.source_closed_at) <= _utc(w.source_opened_at)
-                               or _utc(w.source_closed_at) <= _utc(other.source_opened_at))]
+                          and other.formation_event_id != w.formation_event_id]
             if len(reciprocal) != 1:
                 continue
             result.append({
