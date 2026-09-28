@@ -6,9 +6,16 @@ and does not infer intrabar touch order.
 from collections import defaultdict
 from decimal import Decimal
 from .gerchik_cross_tf_v0_1 import _utc
+from .gerchik_structural_review_gate_v0_1 import verify_reviewed_extremum
 
 
-def historical_candidates(events, as_of, min_independent=2):
+def historical_candidates(items, as_of, min_independent=2):
+    """Public entrypoint: accepts complete source-bar/review bundles, never bare events."""
+    events = []
+    for item in items:
+        if not isinstance(item, dict) or set(item) != {'event', 'source_bar', 'review'}:
+            raise ValueError('Complete event/source_bar/review bundle required')
+        events.append(verify_reviewed_extremum(item['event'], item['source_bar'], item['review'], as_of))
     if not isinstance(min_independent, int) or min_independent < 2:
         raise ValueError('Require at least two independent qualified events')
     cutoff = _utc(as_of)
@@ -21,7 +28,7 @@ def historical_candidates(events, as_of, min_independent=2):
             raise ValueError('Missing upstream event provenance')
         if e['timeframe'] not in ('1d', '1w') or e['source_field'] not in ('high', 'low'):
             raise ValueError('D1/W1 HIGH/LOW only')
-        if not e['structural_qualification']:
+        if e['structural_qualification'] != 'INDEPENDENT_REVIEW_VERIFIED':
             raise ValueError('Raw/unqualified pivot not permitted')
         observed = _utc(e['observed_at'])
         if observed > cutoff:
