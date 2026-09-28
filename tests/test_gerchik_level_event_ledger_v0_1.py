@@ -56,3 +56,21 @@ def test_asof_visibility():
     level = make(ledger)
     assert ledger.as_of("2026-08-31T23:59:59Z") == []
     assert ledger.as_of("2026-09-01T00:00:00Z") == [level]
+
+
+def test_reject_non_utc_formation_and_asof():
+    ledger = LevelLedger()
+    for bad in ("2026-09-01T00:00:00", "2026-09-01T03:00:00+03:00", "invalid"):
+        with pytest.raises(ValueError):
+            make(ledger, formed_at=bad)
+    make(ledger)
+    for bad in ("2026-09-01T00:00:00", "2026-09-01T03:00:00+03:00", "invalid"):
+        with pytest.raises(ValueError):
+            ledger.as_of(bad)
+
+
+def test_utc_equivalent_evidence_timestamp():
+    ledger = LevelLedger()
+    level = make(ledger)
+    ledger.add_evidence(level, Evidence("e2", "TOUCH", "2026-09-01T00:00:01+00:00", "bar2"))
+    assert ledger.as_of("2026-09-01T00:00:00+00:00") == [level]
