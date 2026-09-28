@@ -10,8 +10,10 @@ Research-only script: scripts/research/historical_level_builder.py. It emits per
 ## Track B: EQUITIES + FOREX
 Separate market profiles and outputs. Do not fabricate prices or re-use crypto candles. Historical equity/Forex OHLCV coverage was **not confirmed** in the K-Trader server's reviewed research bundle; verify the K_AI MT4 watchlist and existing authorized archive, symbol suffix, broker, session, timezone, adjusted corporate actions for equities, tick value/quote currency for Forex before running. Distinguish regular/extended stock sessions and weekend/holiday gaps; Forex spot tick volume is not consolidated exchange volume. Run only against verified local authorized historical data converted to the documented schema.
 
-## Critical methodological gate
-On-server btc_h1_zone_width_methodology_audit.json says accepted-only ATR baseline rejects 58.32% and 63.90% of bars in two BTC H1 yearly samples; 266 and 257 five-reject alerts. It is marked BLOCKED_FOR_PARAMETER_APPROVAL. Therefore this script **does not cluster pivots into ATR-based zones, score level reliability, or claim calibrated level widths**. Prior reference radii .05/.10/.15 ATR5 and legacy .25 are only candidates. Structural TF weights W1=5 D1=4 H4=3 H1=2 M30/M15=1 are organizational weights, not success probabilities.
+## Corrected methodology: ATR is prohibited in level construction
+User correction 2026-09-28: anomalously large candles can establish strong levels. Preserve all raw OHLC candles, including outliers. Level candidates derive from market structure, extremal prices, repeated price reactions, consolidation, and verified volume when available. **No ATR for level detection, candidate exclusion, zone merging, zone width or level strength.** The present script outputs confirmed pivots only; future structural clustering must use price-action evidence, not ATR.
+
+ATR research, including the earlier unstable accepted-only baseline and .05/.10/.15/.25 ATR zone-width experiments, is **removed from this level-engine decision path**. Those experiments are historical research artifacts, not current level-engine requirements. Maintain a separate ATR Energy Engine used only after a trade setup exists, to compare realized movement with historical typical range. ATR never guarantees remaining movement or direction.
 
 ## Execution and acceptance
 For crypto, in an approved read-only research environment with the archive mounted:
