@@ -4,9 +4,9 @@ from scripts.research.gerchik_reviewed_historical_pipeline_v0_1 import reviewed_
 def bundle(eid, barid, day):
     return {'event': {'event_id':eid,'symbol':'SUIUSDT','timeframe':'1d',
                       'source_field':'high','source_bar_id':barid,'price':'2.125',
-                      'tick_size':'0.001','observed_at':day+'T00:00:00Z'},
+                      'tick_size':'0.001','observed_at':day+'T00:00:01Z'},
             'source_bar': {'bar_id':barid,'symbol':'SUIUSDT','timeframe':'1d',
-                           'high':'2.125','low':'2.000','closed_at':day+'T00:00:00Z'},
+                           'high':'2.125','low':'2.000','opened_at':day+'T00:00:00Z','closed_at':day+'T00:00:01Z'},
             'review': {'event_id':eid,'reviewer_id':'reviewer-1',
                        'decision':'APPROVED','reviewed_at':day+'T12:00:00Z'}}
 
