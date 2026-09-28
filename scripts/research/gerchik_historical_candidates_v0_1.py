@@ -52,5 +52,5 @@ def historical_candidates(items, as_of, min_independent=2):
                        'state': 'CANDIDATE', 'qualification': 'UPSTREAM_REQUIRED',
                        'event_ids': sorted(e['event_id'] for e in group),
                        'independent_bar_count': len(independent),
-                       'available_at': max(e['observed_at'] for e in group)})
+                       'available_at': max(_utc(e['observed_at']) for e in group).isoformat()})
     return result
