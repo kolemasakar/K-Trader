@@ -24,6 +24,11 @@ def confirm_pairs(levels, as_of, luft_by_symbol):
             raise ValueError('Off-tick candidate')
         if not getattr(level, 'structurally_qualified', False):
             continue
+        if not getattr(level, 'source_opened_at', None) or not getattr(level, 'source_closed_at', None):
+            raise ValueError('Qualified candidate requires source bar interval')
+        opened, closed = _utc(level.source_opened_at), _utc(level.source_closed_at)
+        if opened >= closed or closed > _utc(level.formed_at):
+            raise ValueError('Invalid or noncausal source bar interval')
         eligible.append(level)
     result = []
     for symbol in sorted({x.symbol for x in eligible}):
@@ -36,14 +41,18 @@ def confirm_pairs(levels, as_of, luft_by_symbol):
         weekly = [x for x in eligible if x.symbol == symbol and x.timeframe == '1w']
         for d in daily:
             matches = [w for w in weekly if abs(Decimal(d.price) - Decimal(w.price)) <= luft
-                       and w.formation_event_id != d.formation_event_id]
+                       and w.formation_event_id != d.formation_event_id
+                       and (_utc(d.source_closed_at) <= _utc(w.source_opened_at)
+                            or _utc(w.source_closed_at) <= _utc(d.source_opened_at))]
             # Avoid claiming unique confirmation if several weekly candidates overlap.
             if len(matches) != 1:
                 continue
             w = matches[0]
             reciprocal = [other for other in daily
                           if abs(Decimal(other.price) - Decimal(w.price)) <= luft
-                          and other.formation_event_id != w.formation_event_id]
+                          and other.formation_event_id != w.formation_event_id
+                          and (_utc(other.source_closed_at) <= _utc(w.source_opened_at)
+                               or _utc(w.source_closed_at) <= _utc(other.source_opened_at))]
             if len(reciprocal) != 1:
                 continue
             result.append({
