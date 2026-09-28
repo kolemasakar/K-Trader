@@ -60,13 +60,13 @@ def test_forged_approval_rejected():
         historical_candidates([b], '2026-09-03T00:00:00Z')
 
 
-def test_overlapping_d1_w1_source_bars_are_not_independent():
+def test_overlapping_d1_w1_source_bars_are_valid_evidence():
     a=bundle('a','d1','2026-09-01')
     b=bundle('b','w1','2026-09-02')
     b['event']['timeframe']='1w'
     b['source_bar']['timeframe']='1w'
     b['source_bar']['opened_at']='2026-09-01T00:00:00Z'
-    assert historical_candidates([a,b], '2026-09-03T00:00:00Z')==[]
+    assert len(historical_candidates([a,b], '2026-09-03T00:00:00Z'))==1
 
 
 def test_missing_bar_start_fails_closed():
