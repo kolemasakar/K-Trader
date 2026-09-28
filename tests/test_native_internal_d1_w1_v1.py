@@ -21,9 +21,9 @@ def source(path,start,days):
 
 def test_complete_utc_weeks_only(tmp_path):
     start=datetime(2026,9,1,tzinfo=timezone.utc) # Tuesday
-    p=tmp_path/"1d.jsonl";source(p,start,19)
+    p=tmp_path/"1d.jsonl";source(p,start,20)
     d=m.native_d1(p);w=m.complete_w1(d)
-    assert len(d)==19 and len(w)==2
+    assert len(d)==20 and len(w)==2
     assert all(x["close_t"]-x["t"]==7*m.DAY_MS-1 for x in w)
 
 def test_reject_missing_day(tmp_path):
