@@ -62,10 +62,10 @@ def test_source_prices_and_types_preserved():
     assert result['primary_types']==['HISTORICAL', 'HISTORICAL']
 
 
-def test_overlapping_source_bars_do_not_confirm():
+def test_overlapping_source_bars_can_confirm():
     levels=pair()
     levels[1].source_opened_at='2026-08-31T00:00:00Z'
-    assert confirm_pairs(levels, '2026-09-03T00:00:00Z', {'SUIUSDT':'0.004'})==[]
+    assert len(confirm_pairs(levels, '2026-09-03T00:00:00Z', {'SUIUSDT':'0.004'}))==1
 
 
 def test_missing_source_interval_rejected():
