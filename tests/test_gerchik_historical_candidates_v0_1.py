@@ -5,11 +5,11 @@ from scripts.research.gerchik_historical_candidates_v0_1 import historical_candi
 def bundle(eid, barid, day='2026-09-01', **changes):
     event=dict(event_id=eid, symbol='SUIUSDT', timeframe='1d', source_field='high',
                source_bar_id=barid, price='2.125', tick_size='0.001',
-               observed_at=day+'T00:00:00Z')
+               observed_at=day+'T00:00:01Z')
     event.update(changes)
     return dict(event=event,
                 source_bar=dict(bar_id=barid, symbol='SUIUSDT', timeframe='1d',
-                                high='2.125', low='2.000', closed_at=day+'T00:00:00Z'),
+                                high='2.125', low='2.000', opened_at=day+'T00:00:00Z', closed_at=day+'T00:00:01Z'),
                 review=dict(event_id=eid, reviewer_id='independent-reviewer',
                             decision='APPROVED', reviewed_at=day+'T12:00:00Z'))
 
@@ -58,3 +58,19 @@ def test_forged_approval_rejected():
     b['review']['decision']='REJECTED'
     with pytest.raises(ValueError):
         historical_candidates([b], '2026-09-03T00:00:00Z')
+
+
+def test_overlapping_d1_w1_source_bars_are_not_independent():
+    a=bundle('a','d1','2026-09-01')
+    b=bundle('b','w1','2026-09-02')
+    b['event']['timeframe']='1w'
+    b['source_bar']['timeframe']='1w'
+    b['source_bar']['opened_at']='2026-09-01T00:00:00Z'
+    assert historical_candidates([a,b], '2026-09-03T00:00:00Z')==[]
+
+
+def test_missing_bar_start_fails_closed():
+    a=bundle('a','d1')
+    del a['source_bar']['opened_at']
+    with pytest.raises(ValueError, match='opened_at'):
+        historical_candidates([a], '2026-09-03T00:00:00Z')
