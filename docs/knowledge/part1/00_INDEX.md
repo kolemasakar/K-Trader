@@ -30,3 +30,7 @@
 - [Торговий алгоритм, 43 сторінки](14_source_material_2_trading_algorithm.md)
 - [Чекліст входу, 4 сторінки](15_source_material_2_entry_checklist.md)
 - [Методичка Cartel, 38 сторінок](16_source_material_2_cartel_manual.md)
+
+## Додатки №3
+- [Чекліст входу з прикладами: звірка з матеріалами №2](17_source_material_3_entry_checklist.md)
+- [Поводирі на різних ринках: ринковий контекст та відносна сила](18_source_material_3_market_leaders.md)
