@@ -43,3 +43,6 @@
 - [Тематичний аудит: Курс активного трейдера, 282 с.](21_gerchik_course_thematic_audit.md)
 - [Тематичний аудит: 50 shades of Forex, 219 с.](22_fifty_shades_forex_thematic_audit.md)
 - [Візуальний аудит: Все про торгівлю від рівнів, 16 с.](23_levels_pdf_visual_audit.md)
+
+## Єдиний упорядкований покажчик
+- [Зміст 13 категорій, індекс 13 першоджерел, стратегій і ENERGY](24_ordered_contents_and_source_index.md)
