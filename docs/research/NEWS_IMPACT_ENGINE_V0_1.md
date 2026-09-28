@@ -29,3 +29,6 @@ Prototype does not yet implement scheduled-event windows, provider polling, sour
 
 ## Acceptance gates before any deployment
 KGM interface audit; signed-off source/exposure taxonomy; calendar/revision and time-window tests; quality/provenance checks; incident fail-closed policy; deterministic replay; independent historical evaluation **only after separate user approval**; explicit live integration authorization.
+
+## KGM repository preflight (2026-09-28)
+Read `kolemasakar/K-Geopolitical-Monitor/docs/state/CURRENT_PROJECT_STATE.json` (canonical, ahead of stale README). State reports P23.3 validated but **zero corroboration population**; P23.4 ready, production_live NOT_OPERATIONAL, backend_https NOT_DEPLOYED, persistent owner operation NOT_ACTIVATED, shared runtime BLOCKED, paid providers NONE_APPROVED. Thus KGM cannot yet be treated as a live authoritative news feed. Use a **future export-only, read-only adapter** after explicit interface validation and source-quality review. Keep project-local storage separated; do not silently activate KGM, introduce shared runtime or weaken corroboration policy. Until then, use offline normalized event fixtures and keep NEWS feed health UNKNOWN.
