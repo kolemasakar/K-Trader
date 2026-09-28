@@ -15,7 +15,7 @@ def classify(zone, bar):
     close=low<=bar["c"]<=high
     score=(bar["c"]-low)/(center-low) if bar["c"]<center else (
         (high-bar["c"])/(high-center) if bar["c"]>center else 1.0)
-    return {"width":"nonzero","range_cross":intersects,"close_inside":close,
+    # Directional candle extreme is the observation price: Low for support, High for resistance.\n    # It is not a newly identified structural pivot and does not reveal intrabar ordering.\n    kind=zone.get("kind")\n    if kind not in ("support","resistance"):\n        raise ValueError("zone kind required for directional extreme")\n    extreme=bar["l"] if kind=="support" else bar["h"]\n    extreme_inside=low<=extreme<=high\n    extreme_score=(extreme-low)/(center-low) if extreme<center else (\n        (high-extreme)/(high-center) if extreme>center else 1.0)\n    return {"width":"nonzero","range_cross":intersects,"close_inside":close,\n            "directional_extreme":extreme,"extreme_inside":extreme_inside,\n            "extreme_group":("center" if extreme_score>=.75 else "edge" if extreme_score<=.25\n                             else "middle") if extreme_inside else None,
             "range_center_cross":center_cross,
             "range_edge_only":intersects and not center_cross,
             "close_group":("center" if score>=.75 else "edge" if score<=.25
@@ -37,7 +37,7 @@ def count_opportunities(daily,pivots,gradient_module,identity_fn,band=.003,horiz
     zones=[];cursor=0
     counters={k:0 for k in ("all_zone_days","nonzero_zone_days","range_intersects",
               "range_center_cross","range_edge_only","close_in_zone","close_center",
-              "close_edge","close_middle","singleton_range_cross","singleton_close_exact")}
+              "close_edge","close_middle","extreme_inside","extreme_center","extreme_edge",\n              "extreme_middle","singleton_range_cross","singleton_close_exact")}
     for i in range(len(daily)-horizon-1):
         asof=daily[i]["close_t"]
         while cursor<len(incoming) and incoming[cursor]["confirmed_close_ms"]<=asof:
