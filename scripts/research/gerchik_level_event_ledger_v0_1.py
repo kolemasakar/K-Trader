@@ -46,7 +46,7 @@ class LevelLedger:
 
     def record_formation(self, *, symbol, timeframe, price, tick_size,
                          primary_type, formed_at, formation_event_id,
-                         source_field, confirmed=False):
+                         source_field):
         if timeframe not in ("1d", "1w") or source_field not in ("high", "low"):
             raise ValueError("Only D1/W1 HIGH/LOW formation sources are allowed")
         if primary_type not in LEVEL_TYPES:
@@ -65,7 +65,7 @@ class LevelLedger:
             raise ValueError("Level already exists: add evidence, not another primary type")
         level = Level(symbol, timeframe, int(units), str(tick), primary_type,
                       formed_at, formation_event_id,
-                      state="CONFIRMED" if confirmed else "CANDIDATE")
+                      state="CANDIDATE")
         self._levels[key] = level
         return level
 
