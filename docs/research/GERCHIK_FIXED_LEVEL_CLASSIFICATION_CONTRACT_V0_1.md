@@ -11,12 +11,6 @@ Sources: Alexander Gerchik, *Kurs aktivnogo treydera*, ch. 2 pp. 56-66 and ch. 9
 - D1 subsequent bars may test contacts with existing levels even if they do not source new levels. D1 OHLC does not reveal intraday touch order.
 - ATR remains DISABLED for level identification, zone geometry and level significance as an algorithm simplification explicitly chosen by the user. This is NOT a conceptual incompatibility: historical ATR can legitimately describe an abnormal candle for level identification, whereas estimating future movement potential is a distinct task. Do not confuse the two. For now, paranormal-bar detection must use a separately approved non-ATR rule (the book also describes >=2x average bar size), with its reference window documented; otherwise remain PENDING. In normal stable volatility ATR(5) is a useful near-proxy for typical bar size, but its use for level construction remains deliberately disabled.
 
-## Mandatory volatility-regime exclusion (user decision, 2026-09-28)
-- In normal, stable volatility, the typical bar size is closely approximated by ATR(5). This is an explanatory observation, NOT permission to use ATR for level creation.
-- **Volatility-transition / boundary states are NO-TRADE and NO-ANALYSIS**: do not discover, classify, strengthen, score, backtest, or infer level reaction statistics from bars in these excluded periods. Distinguish this regime gate from level geometry and future movement-potential estimation.
-- No quantitative boundary threshold or lookback was supplied. The volatility-transition detector is **SPECIFICATION PENDING**; do not invent an ATR(5) percentage threshold or quietly declare historical samples valid. Until a causal regime gate is approved and tested, all newly computed Gerchik level metrics remain preliminary and may not be promoted to trading decisions.
-- ATR is NOT permitted as a future-movement potential predictor in this level-classification module. Any separate volatility-regime gate using ATR(5), if later approved, must be independently documented and must not feed level price, zone width, level-strength weights, or future-move projections.
-
 ## Fixed-level labels and confirmation evidence
 1. TREND_BREAK: high/low at meaningful reversal and subsequent significant new swing high/low (perelou/perhigh). Distinguish genuine trend reversal from countertrend first technical pullback. Strongest base type in book, but must have several confirmations.
 2. HISTORICAL: recurring same-price key structural points in visible history. Exact repetition at instrument tick precision; an unconfirmed candidate is weak/air, not a fixed level.
@@ -37,7 +31,7 @@ Book's base order ch. 9: trend break, mirror, historical, false breakout, limit,
 ## Implementation gates
 G1: exact tick-size and exchange/session metadata; confirm BOS/CHoCH and meaningful swing/pullback semantics.
 G2: causal historical, mirror, limit, consolidation, gap pattern detectors and provenance tests.
-G3: implement paranormal bar using a documented, separately approved non-ATR average-bar baseline; keep ATR disabled for level construction by user choice. Separately specify and validate the causal volatility-transition exclusion gate before any new historical sample is treated as analyzable.
+G3: implement paranormal bar using a documented, separately approved non-ATR average-bar baseline; keep ATR disabled for level construction by user choice.
 G4: blinded human-labelled D1/W1 examples and independent review, then run full internal-history reanalysis. Previous 1,260 zones and 1,157 first contacts are **break-anchor-only** exploratory results and must not be represented as Gerchik-classified results.
 G5: out-of-sample validation before using any significance signal in trading.
 
@@ -46,3 +40,6 @@ The user supersedes all previous research level-selection and contact-analysis a
 
 ## Clarification: classification and strengthening
 A level has ONE primary type determined by its formation event. Later qualifying events from other Gerchik categories do not relabel it as multiple independent primary types; they are additional **strengthening features** with provenance, not new level identities. Do not double-count touches or source extrema shared by strengthening patterns.
+
+## Volatility-transition rule withdrawn
+By user instruction, the proposed no-trade/no-analysis exclusion during changing volatility is CANCELLED and must not be implemented as a gate. No ATR(5) transition threshold is needed. Existing choice to avoid ATR in level creation remains unchanged. This cancellation does not assert that any volatility regime is inherently safe to trade.
