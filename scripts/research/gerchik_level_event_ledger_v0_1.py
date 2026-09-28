@@ -4,6 +4,7 @@ A validated upstream detector must supply an independently qualified formation e
 This module only enforces identity, chronology and one immutable primary type.
 """
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Literal
 
@@ -38,6 +39,18 @@ class Level:
         return self.price_ticks * Decimal(self.tick_size)
 
 
+def utc_time(value):
+    if not isinstance(value, str):
+        raise ValueError("Expected UTC ISO timestamp")
+    try:
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("Invalid ISO timestamp") from exc
+    if dt.tzinfo is None or dt.utcoffset().total_seconds() != 0:
+        raise ValueError("Timestamp must use UTC")
+    return dt.astimezone(timezone.utc)
+
+
 class LevelLedger:
     """No archived pivot ingestion; callers must independently validate formations."""
 
@@ -53,6 +66,7 @@ class LevelLedger:
             raise ValueError("Unknown Gerchik primary type")
         if not symbol or not formed_at or not formation_event_id:
             raise ValueError("Missing provenance")
+        utc_time(formed_at)
         tick = Decimal(str(tick_size))
         value = Decimal(str(price))
         if not tick.is_finite() or tick <= 0 or not value.is_finite() or value <= 0:
@@ -70,7 +84,7 @@ class LevelLedger:
         return level
 
     def add_evidence(self, level, evidence):
-        if evidence.observed_at < level.formed_at:
+        if utc_time(evidence.observed_at) < utc_time(level.formed_at):
             raise ValueError("Cannot backdate strengthening evidence")
         if not evidence.event_id or not evidence.source_bar_id:
             raise ValueError("Missing evidence provenance")
@@ -83,4 +97,5 @@ class LevelLedger:
         level.evidence.append(evidence)
 
     def as_of(self, timestamp):
-        return [level for level in self._levels.values() if level.formed_at <= timestamp]
+        cutoff = utc_time(timestamp)
+        return [level for level in self._levels.values() if utc_time(level.formed_at) <= cutoff]
