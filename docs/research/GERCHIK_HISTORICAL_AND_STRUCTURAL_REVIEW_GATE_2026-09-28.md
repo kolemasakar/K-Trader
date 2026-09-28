@@ -1,0 +1,7 @@
+# Gerchik historical candidate gate: verification and structural review — 2026-09-28
+
+Historical candidate module `gerchik_historical_candidates_v0_1.py`: isolated pytest **8 passed in 0.09 s**. The test module and historical candidate logic were recreated from connector-returned GitHub contents; `_utc` dependency was recreated with the same functional implementation, not a byte-identical repository checkout.
+
+New `gerchik_structural_review_gate_v0_1.py` validates an independently approved structural-extremum review against the actual D1/W1 source-bar HIGH/LOW, tick precision, event/source identity, closed-bar chronology, reviewer identity and review time. Only then does it issue `INDEPENDENT_REVIEW_VERIFIED`; eligibility begins at review time, not earlier. Its 10-case test file has been committed but **not yet executed** at this checkpoint.
+
+This is a provenance/review gate, NOT an automatic swing, BOS/CHoCH or meaningful trend-reversal classifier. Review approval alone is not proof that the human judgment is correct. Independent label audits and fully causal detector semantics remain required. The existing historical candidate module still accepts arbitrary nonempty `structural_qualification` assertions if called directly; production integration must enforce the review gate at the API boundary or tighten the downstream accepted value to prevent bypass. No live trading or ATR-based level construction.
