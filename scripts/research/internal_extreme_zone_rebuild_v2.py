@@ -15,7 +15,7 @@ def rebuild(daily,pivots,gradient_module,identity_fn,band=.003,horizon=5):
         k=identity_fn(p,daily)
         if k not in independent or p["confirmed_close_ms"]<independent[k]["confirmed_close_ms"]:
             q=dict(p);q["independent_event_id"]=repr(k);independent[k]=q
-    events=sorted(independent.values(),key=lambda x:(x["confirmed_close_ms"],x["kind"],x["price"]))
+    events=sorted(independent.values(),key=lambda x:(x["confirmed_close_ms"],gradient_module.event_id(x),x["kind"],x["price"]))
     zones=[];cursor=0;revision_count=0;first_contact=set()
     counts=Counter();observations=[];changes=[]
     for i in range(len(daily)-horizon-1):
