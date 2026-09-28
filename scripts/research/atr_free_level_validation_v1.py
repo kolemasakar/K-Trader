@@ -102,7 +102,7 @@ if __name__=="__main__":
     p=argparse.ArgumentParser()
     p.add_argument("--root",required=True)
     p.add_argument("--symbols",nargs="+",required=True)
-    p.add_argument("--timeframes",nargs="+",default=["1d","4h","1h"])
+    p.add_argument("--timeframes",nargs="+",default=["1d","1w"])
     p.add_argument("--output",required=True)
     a=p.parse_args()
     result=run(a.root,a.symbols,a.timeframes)
