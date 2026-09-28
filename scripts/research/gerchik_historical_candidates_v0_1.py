@@ -12,10 +12,21 @@ from .gerchik_structural_review_gate_v0_1 import verify_reviewed_extremum
 def historical_candidates(items, as_of, min_independent=2):
     """Public entrypoint: accepts complete source-bar/review bundles, never bare events."""
     events = []
+    source_intervals = {}
     for item in items:
         if not isinstance(item, dict) or set(item) != {'event', 'source_bar', 'review'}:
             raise ValueError('Complete event/source_bar/review bundle required')
-        events.append(verify_reviewed_extremum(item['event'], item['source_bar'], item['review'], as_of))
+        event = verify_reviewed_extremum(item['event'], item['source_bar'], item['review'], as_of)
+        bar = item['source_bar']
+        if not bar.get('opened_at'):
+            raise ValueError('Source bar opened_at required for cross-timeframe independence')
+        start, end = _utc(bar['opened_at']), _utc(bar['closed_at'])
+        if start >= end:
+            raise ValueError('Invalid source bar interval')
+        if not start <= _utc(event['observed_at']):
+            raise ValueError('Noncausal source bar')
+        source_intervals[(event['symbol'], event['event_id'])] = (start, end)
+        events.append(event)
     if not isinstance(min_independent, int) or min_independent < 2:
         raise ValueError('Require at least two independent qualified events')
     cutoff = _utc(as_of)
@@ -45,6 +56,14 @@ def historical_candidates(items, as_of, min_independent=2):
         groups[(e['symbol'], price)].append(e)
     result = []
     for (symbol, price), group in sorted(groups.items()):
+        # Different TF bar IDs do not prove independent physical market events.
+        # Conservatively reject groups containing any overlapping source intervals.
+        intervals = [(e, source_intervals[(e['symbol'], e['event_id'])]) for e in group]
+        if any(a['source_bar_id'] == b['source_bar_id'] or
+               (start_a < end_b and start_b < end_a)
+               for i, (a, (start_a, end_a)) in enumerate(intervals)
+               for b, (start_b, end_b) in intervals[i + 1:]):
+            continue
         independent = {e['source_bar_id'] for e in group}
         if len(independent) < min_independent:
             continue
