@@ -37,3 +37,37 @@ def test_duplicate():
     data[1] = data[0]
     with pytest.raises(ValueError):
         filtered_atr5(data)
+
+
+def test_thresholds_are_inclusive_with_candidate_in_reference():
+    # Candidate-inclusive five-bar reference: (x + 4*10)/5.
+    # x=16 -> reference=11.2, not large; x=80 -> reference=24, large.
+    # Exact large boundary solves x = 2*(x+40)/5 -> x = 80/3.
+    large = 80.0 / 3.0
+    result = filtered_atr5(bars([large] + [10] * 15))
+    assert result["rejected"][0]["reason"] == "LARGE"
+    # Exact small boundary solves x = (x+40)/15 -> x = 20/7.
+    small = 20.0 / 7.0
+    result = filtered_atr5(bars([small] + [10] * 15))
+    assert result["rejected"][0]["reason"] == "SMALL"
+
+
+def test_accepted_are_five_distinct_completed_bars():
+    result = filtered_atr5(bars([40, 10, 10, 1] + [10] * 15))
+    accepted = result["accepted"]
+    assert len(accepted) == 5
+    assert len({item["timestamp"] for item in accepted}) == 5
+    assert all(item["timestamp"] <= bars([40])[0].timestamp for item in accepted)
+    assert result["inspected"] == len(accepted) + len(result["rejected"])
+
+
+def test_rejects_non_descending_timestamps():
+    data = bars([10] * 9)
+    data[0], data[1] = data[1], data[0]
+    with pytest.raises(ValueError, match="newest-to-oldest"):
+        filtered_atr5(data)
+
+
+def test_no_normal_bootstrap_fails_closed():
+    with pytest.raises(InsufficientHistory):
+        filtered_atr5(bars([1000, 1, 1000, 1, 1000]))
