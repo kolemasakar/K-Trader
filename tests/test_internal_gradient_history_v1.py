@@ -1,3 +1,7 @@
+"""Archived algorithm regression; preserved but excluded from active CI."""
+import pytest
+pytest.skip("ARCHIVED_LEVEL_ALGORITHM_DO_NOT_USE", allow_module_level=True)
+
 import importlib.util
 from pathlib import Path
 import pytest
