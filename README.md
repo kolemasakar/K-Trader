@@ -276,6 +276,8 @@ No exchange credentials are used by the market-data/research path.
 
 ## Canonical documentation
 
+- `docs/VERIFIED_RESEARCH_DATASET_POLICY_2026-10-01.md` — owner amendment #33: version-pinned Phase 11G research reuse, immutable source/provenance, separate results and independent-holdout restriction.
+
 Start recovery/current-state reading here:
 
 - `docs/CURRENT_STATE.md`
