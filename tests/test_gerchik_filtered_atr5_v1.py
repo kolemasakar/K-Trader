@@ -71,3 +71,27 @@ def test_rejects_non_descending_timestamps():
 def test_insufficient_older_replacements_fails_closed():
     with pytest.raises(InsufficientHistory):
         filtered_atr5(bars([10] * 5))
+
+
+def test_causal_prefix_invariance():
+    # Appending older observations must not alter an already-resolved window.
+    prefix = [40, 10, 10, 1] + [10] * 9
+    first = filtered_atr5(bars(prefix))
+    extended = filtered_atr5(bars(prefix + [100, 1, 200, 2, 100]))
+    assert first == extended
+
+
+def test_consecutive_large_anomalies_replaced():
+    result = filtered_atr5(bars([40, 40] + [10] * 14))
+    assert [r["reason"] for r in result["rejected"][:2]] == ["LARGE", "LARGE"]
+    assert result["atr5"] == 10
+
+
+def test_book_boundary_values_and_nearby_values():
+    # Candidate-inclusive initial five-bar reference; exact boundary cases.
+    large = 80 / 3
+    small = 20 / 7
+    assert filtered_atr5(bars([large] + [10] * 15))["rejected"][0]["reason"] == "LARGE"
+    assert filtered_atr5(bars([small] + [10] * 15))["rejected"][0]["reason"] == "SMALL"
+    assert not filtered_atr5(bars([large - 0.01] + [10] * 15))["rejected"]
+    assert not filtered_atr5(bars([small + 0.01] + [10] * 15))["rejected"]
