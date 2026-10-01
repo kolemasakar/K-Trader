@@ -16,7 +16,7 @@ This creates a narrow exception to the prior **production-runner manual-deploy-o
 - No source copying; no archive write, production application modification or production container restart. Inputs and file SHA-256 remain inspectable in the result manifest.
 
 ## Self-service entry point
-GitHub Actions → **Verified Research Archive (isolated)** → Run workflow on **main**.
+K-Trader can independently launch through its connected GitHub app by posting exactly `/verify-research-archive` as repository owner `kolemasakar` to the dedicated [request issue #91](https://github.com/kolemasakar/K-Trader/issues/91). The workflow accepts only this issue number, exact command and owner account; it runs the fixed verifier, **not** arbitrary comment text. The existing alternative is GitHub Actions → **Verified Research Archive (isolated)** → Run workflow on **main**.
 
 First activation is the initial marker `ops/research_requests/2026-10-01_initial_archive_access`, which triggers once when this feature is merged to main. Later manual `workflow_dispatch` runs verify exactly the same approved source version. The job is serialized with `k-trader-production` to prevent overlap with production deployments. A change of source bytes or archive version requires a separately reviewed manifest/digest update; not per-research permission.
 
@@ -36,8 +36,16 @@ The existing `ktrader` host user is already in the `docker` group. This is a hig
 ## Scientific status
 `VERIFIED RESEARCH DATASET` refers only to the approved digest/provenance/access version. It is internal development data, not automatically an independent final holdout. Output artifacts must remain separate; no execution or trading-model validation is implied.
 
+## Observed first-run acceptance (2026-10-01)
+- Reviewed PR #90 was merged to `main` after Python 3.12, Python 3.14, AMD64, ARM64 and canonical CI gates passed.
+- Isolated archive workflow run `36902541039` succeeded with source mounted enforced read-only.
+- Output exists at `/opt/k-trader/data/research_results/verified_dataset/36902541039/verification.json`.
+- Verified 19 bundles, 138 files, 84,503,013 bytes and matching pinned SHA-256 `b7c030bdd71a93a8733574e285b05a8093f23f5efcecd9a4edc5fdde8f914aa6`.
+- Productive K-Trader and K_AI relay containers were observed healthy afterward. This verifies the read-only **fixed verification job**, not arbitrary future backtest execution.
+- The GitHub issue-comment independent launch route is separately gated by the PR that adds it; do not call this second entry point accepted until a successful owner-only trigger run.
+
 ## Validation gates
 1. Hosted CI + code review must pass before merging this workflow to main.
 2. Initial trusted-main one-shot verification workflow must pass on the self-hosted K-Trader runner.
 3. Confirm `verification.json` and unaffected production container health.
-4. Until step 2 passes, status is `SELF_SERVICE_CONFIGURED / ISOLATED_RUNTIME_PENDING`, not `ISOLATED_RUNTIME_ACCEPTED`.
+4. Initial self-hosted runtime acceptance: `ISOLATED_RUNTIME_ACCEPTED` for the fixed verification workflow and pinned dataset only. Future new research scripts and future source versions require their own validation gates.
