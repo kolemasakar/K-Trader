@@ -2,6 +2,8 @@ name: Verified Research Archive (isolated)
 
 on:
   workflow_dispatch:
+  issue_comment:
+    types: [created]
   push:
     branches: [main]
     paths:
@@ -18,7 +20,15 @@ concurrency:
 
 jobs:
   research-archive-access:
-    if: github.ref == 'refs/heads/main' && github.repository == 'kolemasakar/K-Trader'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      github.repository == 'kolemasakar/K-Trader' &&
+      (github.event_name != 'issue_comment' ||
+       (github.actor == 'kolemasakar' &&
+        github.event.issue.number == 91 &&
+        !github.event.issue.pull_request &&
+        github.event.comment.user.login == 'kolemasakar' &&
+        github.event.comment.body == '/verify-research-archive'))
     runs-on: [self-hosted, linux, k-trader-prod-arm64]
     timeout-minutes: 10
     steps:
