@@ -121,3 +121,18 @@ def test_recheck_all_five_after_each_replacement():
 def test_replacement_requires_older_completed_bar():
     with pytest.raises(InsufficientHistory):
         filtered_atr5(bars([100, 100, 10, 10, 10, 10]))
+
+
+def test_deep_lookback_diagnostic_is_non_mutating_and_explicitly_non_trading():
+    from scripts.research.gerchik_filtered_atr5_v1 import atr5_quality_diagnostic
+    result = filtered_atr5(bars([100, 100] + [10] * 14))
+    original_atr = result["atr5"]
+    quality = atr5_quality_diagnostic(result, deep_lookback_threshold=6)
+    assert quality["inspected_bars"] == 7
+    assert quality["rejected_bars"] == 2
+    assert quality["deep_lookback"]
+    assert quality["policy"] == "RESEARCH_DIAGNOSTIC_ONLY_NO_TRADE_GATE"
+    assert result["atr5"] == original_atr
+    assert not atr5_quality_diagnostic(result, deep_lookback_threshold=7)["deep_lookback"]
+    with pytest.raises(ValueError):
+        atr5_quality_diagnostic(result, deep_lookback_threshold=4)
