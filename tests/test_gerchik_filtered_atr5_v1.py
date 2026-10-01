@@ -39,7 +39,7 @@ def test_duplicate():
         filtered_atr5(data)
 
 
-def test_thresholds_are_inclusive_with_candidate_in_reference():
+def test_thresholds_are_inclusive_with_initial_five_bar_mean():
     # Candidate-inclusive five-bar reference: (x + 4*10)/5.
     # x=16 -> reference=11.2, not large; x=80 -> reference=24, large.
     # Exact large boundary solves x = 2*(x+40)/5 -> x = 80/3.
@@ -70,7 +70,7 @@ def test_rejects_non_descending_timestamps():
 
 def test_insufficient_older_replacements_fails_closed():
     with pytest.raises(InsufficientHistory):
-        filtered_atr5(bars([10] * 5))
+        filtered_atr5(bars([40] + [10] * 4))
 
 
 def test_same_cutoff_independent_of_irrelevant_older_history():
@@ -88,8 +88,8 @@ def test_consecutive_large_anomalies_replaced():
     assert result["atr5"] == 10
 
 
-def test_book_boundary_values_and_nearby_values():
-    # Candidate-inclusive initial five-bar reference; exact boundary cases.
+def test_iterative_initial_boundary_values_and_nearby_values():
+    # Initial five-selected-bar reference; exact boundary cases.
     large = 80 / 3
     small = 20 / 7
     assert filtered_atr5(bars([large] + [10] * 15))["rejected"][0]["reason"] == "LARGE"
@@ -108,3 +108,16 @@ def test_atr5_recalculates_when_new_completed_bar_arrives():
     assert before["atr5"] == 10
     assert after["atr5"] == 10.8
     assert after["accepted"][0]["timestamp"] == next_day
+
+
+def test_recheck_all_five_after_each_replacement():
+    # Replacing a large bar changes the mean, so a different bar must be
+    # reconsidered against the updated five-bar mean.
+    result = filtered_atr5(bars([10, 40, 10, 1] + [10] * 15))
+    assert [x["reason"] for x in result["rejected"]] == ["LARGE", "SMALL"]
+    assert result["atr5"] == 10
+
+
+def test_replacement_requires_older_completed_bar():
+    with pytest.raises(InsufficientHistory):
+        filtered_atr5(bars([100, 100, 10, 10, 10, 10]))
