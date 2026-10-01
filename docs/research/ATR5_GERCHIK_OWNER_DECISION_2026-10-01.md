@@ -1,0 +1,15 @@
+# ATR5 — owner decision (2026-10-01)
+
+Status: APPROVED RESEARCH POLICY; implementation and historical validation PENDING.
+
+Primary source: A. Gerchik, *Kurs aktivnogo treydera*, p. 101 and ATR discussion p. 214 (owner-supplied project PDF). Use this book over conflicting third-party notes.
+
+- ATR5 is the arithmetic mean of high-minus-low ranges of five accepted **completed** bars, with abnormal bars excluded and replaced by neighboring normal bars from older history. Never include the currently forming bar or future data.
+- Abnormal thresholds from the book: large bar >= 2 × reference ATR; small bar <= 1/3 × reference ATR. Both thresholds inclusive. Supersedes earlier experimental 30%/150% owner thresholds. The book describes 3–5 preceding days; **five** is the owner's chosen K-Trader configuration.
+- K-Trader owner-approved iteration: begin at the most recent completed bar, form an initial five-bar reference, test first candidate after five consecutive completed bars are available, replace rejected candidates with older normal bars, then test the remaining candidates to collect five accepted bars. Recompute as required. This exact candidate/reference update formula is a K-Trader implementation choice; do NOT attribute it verbatim to Gerchik. Specify and test reference semantics before declaring the implementation compliant.
+- Use ATR5 for market energy and trade parameters, not for constructing price levels. Do not reinstate the withdrawn transitional-volatility no-trade rule.
+- Current experimental `scripts/research/gerchik_filtered_atr5_v1.py` uses the book's 2× and 1/3 thresholds, but its candidate-inclusive rolling-reference behavior requires explicit comparison against the approved five-bar replacement sequence. Do not label it validated merely because the numeric thresholds match.
+
+Implementation gates (in order): (1) write deterministic examples and boundary tests, including insufficient history, consecutive anomalies, five accepted bars, no future leakage; (2) reconcile/refactor filtered ATR5 and its tests in the research branch; (3) run CI and peer-check semantics against the source; (4) run bounded read-only causal historical audit via the deployed Landlock launcher, writing only to an isolated results directory; (5) report per-symbol completeness, exclusions and source/code hashes; (6) backtest approved strategies S1,S2,S3 (SL beyond level),S4,S5,S6 on at least six months of available history at 1R, then 3R; (7) assess results by asset, regime, drawdown and costs; (8) implement Level Strength v2 and validate on a genuinely independent holdout. No live orders, production trading configuration changes, or KGM involvement in these research steps. Maintain FREE_ONLY infrastructure and avoid archive duplication.
+
+Deployment context: main contains merged Landlock launcher PR #93; deployment SHA c1bb8b5e0fe314ab11e6eeb8a3f0dd601939cb91 was confirmed on prod and launcher self-test returned `source_read=true`, `source_write_denied=true`, `panel_size=19`. API health OK but scanner DEGRADED remains a separate diagnostic item. Full separate-container isolation is not yet implemented.
