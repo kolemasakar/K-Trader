@@ -73,8 +73,9 @@ def test_insufficient_older_replacements_fails_closed():
         filtered_atr5(bars([10] * 5))
 
 
-def test_causal_prefix_invariance():
-    # Appending older observations must not alter an already-resolved window.
+def test_same_cutoff_independent_of_irrelevant_older_history():
+    # Same cutoff only: adding irrelevant older bars cannot change a resolved ATR5.
+    # Advancing the cutoff by closing a NEW bar must trigger a fresh calculation.
     prefix = [40, 10, 10, 1] + [10] * 9
     first = filtered_atr5(bars(prefix))
     extended = filtered_atr5(bars(prefix + [100, 1, 200, 2, 100]))
