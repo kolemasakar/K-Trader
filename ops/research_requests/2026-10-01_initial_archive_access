@@ -1,0 +1,8 @@
+# Initial owner-authorized research access request
+
+One-time GitHub push-path trigger for the initial trusted-main-only research
+archive verification job. The archive is not copied or modified.
+
+For subsequent independent verification runs, use the workflow_dispatch entry
+point in .github/workflows/research-archive-access.yml. Never move the
+production runner to untrusted pull-request execution.
