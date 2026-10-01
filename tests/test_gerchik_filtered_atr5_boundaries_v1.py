@@ -1,4 +1,4 @@
-"""Additional boundary, causality and failure-mode tests for experimental ATR5 v1."""
+"""Boundary, causality and failure-mode tests for iterative five-selected-bar ATR5."""
 from datetime import date, timedelta
 import math
 import pytest
@@ -30,21 +30,22 @@ def test_just_inside_small_threshold_is_accepted():
     assert result["accepted"][0]["range"] == pytest.approx(2.01)
 
 
-def test_oldest_accepted_bar_requires_four_older_reference_bars():
+def test_exactly_five_completed_normal_bars_suffice():
+    assert filtered_atr5(bars([10] * 5))["atr5"] == 10
     with pytest.raises(InsufficientHistory):
-        filtered_atr5(bars([10] * 8))
-    assert filtered_atr5(bars([10] * 9))["atr5"] == 10
+        filtered_atr5(bars([10] * 4))
 
 
-def test_lookback_cap_is_enforced():
+def test_lookback_cap_is_enforced_when_replacement_needed():
+    data = bars([40] + [10] * 19)
     with pytest.raises(InsufficientHistory):
-        filtered_atr5(bars([10] * 20), max_lookback=8)
-    assert filtered_atr5(bars([10] * 20), max_lookback=9)["atr5"] == 10
+        filtered_atr5(data, max_lookback=5)
+    assert filtered_atr5(data, max_lookback=6)["atr5"] == 10
 
 
-def test_all_large_seed_candidates_cannot_bootstrap():
-    with pytest.raises(InsufficientHistory):
-        filtered_atr5(bars([40] * 5 + [10] * 3), max_lookback=8)
+def test_equal_large_bars_are_normal_relative_to_their_own_mean():
+    # Five equally sized bars are NOT outliers under the owner iterative rule.
+    assert filtered_atr5(bars([40] * 5 + [10] * 3), max_lookback=8)["atr5"] == 40
 
 
 def test_invalid_input_ranges():
