@@ -1,0 +1,71 @@
+name: Verified Research Archive (isolated)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "ops/research_requests/2026-10-01_initial_archive_access"
+
+permissions:
+  contents: read
+
+# Serialize with the existing manual production deploy: the research job
+# must not compete with deployment or start an unbounded long-running worker.
+concurrency:
+  group: k-trader-production
+  cancel-in-progress: false
+
+jobs:
+  research-archive-access:
+    if: github.ref == 'refs/heads/main' && github.repository == 'kolemasakar/K-Trader'
+    runs-on: [self-hosted, linux, k-trader-prod-arm64]
+    timeout-minutes: 10
+    steps:
+      - name: Checkout trusted main (no persisted credentials)
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Verify known host and fixed dataset
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = "aarch64" -o "$(uname -m)" = "arm64"
+          test "$(id -un)" = "ktrader"
+          test -f /opt/k-trader/DEPLOYED_SHA
+          test -f /opt/k-trader/data/research/phase11g/historical_expansion_v1_20260905T144500Z/dataset_summary.json
+          docker info --format '{{.ServerVersion}}' >/dev/null
+
+      - name: Verify source via independent, bounded, network-isolated reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=/opt/k-trader
+          SOURCE="$ROOT/data/research/phase11g/historical_expansion_v1_20260905T144500Z"
+          EXPECTED_SHA=b7c030bdd71a93a8733574e285b05a8093f23f5efcecd9a4edc5fdde8f914aa6
+          IMAGE_SHA="$(cat "$ROOT/DEPLOYED_SHA")"
+          [[ "$IMAGE_SHA" =~ ^[a-f0-9]{40}$ ]] || exit 1
+          OUT="$ROOT/data/research_results/verified_dataset/$GITHUB_RUN_ID"
+          test ! -e "$OUT" || { echo 'Refusing to overwrite an existing result'; exit 1; }
+          mkdir -p "$OUT"
+          chmod 0700 "$OUT"
+          docker run --rm \
+            --name "ktrader-research-verify-$GITHUB_RUN_ID" \
+            --network none \
+            --read-only \
+            --cpus 0.5 \
+            --memory 512m --memory-swap 512m --pids-limit 64 \
+            --cap-drop ALL --security-opt no-new-privileges \
+            --user "$(id -u):$(id -g)" \
+            --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m \
+            --mount "type=bind,src=$SOURCE,dst=/archive,readonly" \
+            --mount "type=bind,src=$OUT,dst=/results" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/scripts/verify_research_dataset.py,dst=/research/verify_research_dataset.py,readonly" \
+            --entrypoint python3 \
+            "k-trader:$IMAGE_SHA" \
+            /research/verify_research_dataset.py \
+            --archive /archive --results /results --expected-tree-sha "$EXPECTED_SHA"
+          test -s "$OUT/verification.json"
+          echo "Verified dataset version: $EXPECTED_SHA"
+          echo "Research output (separate from archive): $OUT/verification.json"
