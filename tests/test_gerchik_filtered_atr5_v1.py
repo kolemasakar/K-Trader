@@ -96,3 +96,15 @@ def test_book_boundary_values_and_nearby_values():
     assert filtered_atr5(bars([small] + [10] * 15))["rejected"][0]["reason"] == "SMALL"
     assert not filtered_atr5(bars([large - 0.01] + [10] * 15))["rejected"]
     assert not filtered_atr5(bars([small + 0.01] + [10] * 15))["rejected"]
+
+
+def test_atr5_recalculates_when_new_completed_bar_arrives():
+    older = bars([10] * 12)
+    before = filtered_atr5(older)
+    # A newly closed, non-anomalous bar enters the five-bar window.
+    from datetime import date, timedelta
+    next_day = (date.fromisoformat(older[0].timestamp) + timedelta(days=1)).isoformat()
+    after = filtered_atr5([DailyBar(next_day, 14., 0.)] + older)
+    assert before["atr5"] == 10
+    assert after["atr5"] == 10.8
+    assert after["accepted"][0]["timestamp"] == next_day
