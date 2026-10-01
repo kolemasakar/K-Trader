@@ -19,6 +19,8 @@ jobs:
     env:
       KTRADER_DOMAIN: ${{ vars.KTRADER_DOMAIN }}
       KTRADER_ACTION_API_KEY: ${{ secrets.KTRADER_ACTION_API_KEY }}
+      KTRADER_KAI_MT4_ACTION_ENABLED: "true"
+      KAI_MARKET_CONTEXT_DELIVERY_TOKEN: ${{ secrets.KAI_MARKET_CONTEXT_DELIVERY_TOKEN }}
     steps:
       - name: Checkout approved main
         uses: actions/checkout@v6

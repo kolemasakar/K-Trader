@@ -4,8 +4,9 @@ info:
   version: phase10-production-v1
   description: >-
     Read-only market scanner API for K_Trader. It exposes confirmed public
-    market data and canonical Trading Engine results. It cannot place, modify,
-    or cancel orders and exposes no exchange-account endpoints.
+    market data, canonical Trading Engine results, and validated read-only MT4
+    market context. It cannot place, modify, or cancel orders and exposes no
+    exchange-account endpoints.
 servers:
   - url: https://ktrader-api.duckdns.org
     description: Accepted Phase 10 production HTTPS origin.
@@ -48,141 +49,122 @@ paths:
           description: >-
             Provider identifier such as binance_usdm or bybit_linear. Required when
             the same canonical symbol is available from more than one provider.
-          schema:
-            type: string
+          schema: {type: string}
         - name: limit
           in: query
           required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 200
-            default: 50
+          schema: {type: integer, minimum: 1, maximum: 200, default: 50}
       responses:
         '200':
           description: Ranked universe with market metadata and freshness
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/UniverseList'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+              schema: {$ref: '#/components/schemas/UniverseList'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
   /v1/market/{symbol}:
     get:
       operationId: getMarketSnapshot
-      summary: Get the latest normalized market snapshot for a symbol
+      summary: Get the latest normalized market snapshot for a scanner symbol
       parameters:
         - name: symbol
           in: path
           required: true
-          description: Canonical K-Trader symbol, for example SUIUSDT.
-          schema:
-            type: string
+          description: Canonical K-Trader scanner symbol, for example SUIUSDT.
+          schema: {type: string}
         - name: provider_id
           in: query
           required: false
-          description: >-
-            Provider identifier such as binance_usdm or bybit_linear. Required when
-            the same canonical symbol is available from more than one provider.
-          schema:
-            type: string
+          schema: {type: string}
       responses:
         '200':
-          description: Latest market snapshot
+          description: Latest scanner market snapshot
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/UniverseCandidate'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Ambiguous'
+              schema: {$ref: '#/components/schemas/UniverseCandidate'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Ambiguous'}
+  /v1/mt4/market-context/{symbol}:
+    get:
+      operationId: getMT4MarketContext
+      summary: Acquire fresh validated read-only MT4 market context for a symbol
+      description: >-
+        Uses the bounded K_AI/MT4 market-context bridge. This route is independent
+        of the Binance scanner universe and does not activate trading or register
+        MT4 as the production scanner provider. Broker-server timestamps are opaque
+        wall-clock strings and must not be interpreted as UTC.
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          description: MT4 broker symbol or accepted canonical alias, for example USDTRY.
+          schema: {type: string}
+        - name: market
+          in: query
+          required: false
+          description: K_AI market classification passed to the MT4 context bridge.
+          schema: {type: string, default: forex}
+      responses:
+        '200':
+          description: Fresh schema 1.1 MT4 market context accepted by K-Trader
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MT4MarketContext'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '422': {description: Invalid symbol or market request}
+        '503': {description: MT4 market-context route disabled, misconfigured, busy, or temporarily unavailable}
   /v1/candles/{symbol}:
     get:
       operationId: getCandles
-      summary: Get confirmed normalized candles for a symbol and timeframe
+      summary: Get confirmed normalized scanner candles for a symbol and timeframe
       parameters:
         - name: symbol
           in: path
           required: true
-          description: Canonical K-Trader symbol, for example SUIUSDT.
-          schema:
-            type: string
+          schema: {type: string}
         - name: provider_id
           in: query
           required: false
-          description: >-
-            Provider identifier such as binance_usdm or bybit_linear. Required when
-            the same canonical symbol is available from more than one provider.
-          schema:
-            type: string
+          schema: {type: string}
         - name: interval
           in: query
           required: false
-          description: Canonical timeframe.
-          schema:
-            type: string
-            enum: [5m, 15m, 1h, 4h, 1d]
-            default: 5m
+          schema: {type: string, enum: [5m, 15m, 1h, 4h, 1d], default: 5m}
         - name: limit
           in: query
           required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 500
-            default: 100
+          schema: {type: integer, minimum: 1, maximum: 500, default: 100}
       responses:
         '200':
           description: Confirmed candle series including provider/aggregate provenance
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/CandleSeries'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Ambiguous'
+              schema: {$ref: '#/components/schemas/CandleSeries'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Ambiguous'}
   /v1/analysis/{symbol}:
     get:
       operationId: getAnalysis
-      summary: Get the best current Trading Engine decision for a symbol
-      description: >-
-        Returns LONG, SHORT or NO_TRADE plus Grade, Setup Score, Entry/SL/TP,
-        RR, ATR, evidence, reason codes and freshness. Setup Score is not a
-        statistical probability. Preserve the returned TradingDecision fields.
+      summary: Get the best current Trading Engine decision for a scanner symbol
       parameters:
         - name: symbol
           in: path
           required: true
-          description: Canonical K-Trader symbol, for example SUIUSDT.
-          schema:
-            type: string
+          schema: {type: string}
         - name: provider_id
           in: query
           required: false
-          description: >-
-            Provider identifier such as binance_usdm or bybit_linear. Required when
-            the same canonical symbol is available from more than one provider.
-          schema:
-            type: string
+          schema: {type: string}
       responses:
         '200':
           description: Canonical TradingDecision
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/TradingDecision'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Ambiguous'
+              schema: {$ref: '#/components/schemas/TradingDecision'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Ambiguous'}
   /v1/candidates:
     get:
       operationId: listCandidates
@@ -191,34 +173,22 @@ paths:
         - name: provider_id
           in: query
           required: false
-          description: >-
-            Provider identifier such as binance_usdm or bybit_linear. Required when
-            the same canonical symbol is available from more than one provider.
-          schema:
-            type: string
+          schema: {type: string}
         - name: grade
           in: query
           required: false
-          schema:
-            type: string
-            enum: [A+, A, B, C]
+          schema: {type: string, enum: [A+, A, B, C]}
         - name: limit
           in: query
           required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 200
-            default: 50
+          schema: {type: integer, minimum: 1, maximum: 200, default: 50}
       responses:
         '200':
           description: Ranked candidate decisions
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/DecisionList'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+              schema: {$ref: '#/components/schemas/DecisionList'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
   /v1/signals:
     get:
       operationId: listSignals
@@ -227,41 +197,28 @@ paths:
         - name: provider_id
           in: query
           required: false
-          description: >-
-            Provider identifier such as binance_usdm or bybit_linear. Required when
-            the same canonical symbol is available from more than one provider.
-          schema:
-            type: string
+          schema: {type: string}
         - name: limit
           in: query
           required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 200
-            default: 50
+          schema: {type: integer, minimum: 1, maximum: 200, default: 50}
       responses:
         '200':
           description: Current tradable signals only
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/DecisionList'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+              schema: {$ref: '#/components/schemas/DecisionList'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
-      description: Configure the GPT Action with the same API key stored as KTRADER_ACTION_API_KEY on the server.
+      description: Configure the Action with the same API key stored as KTRADER_ACTION_API_KEY on the server.
   responses:
-    Unauthorized:
-      description: Missing or invalid Bearer API key
-    NotFound:
-      description: Requested symbol or analysis is not available
-    Ambiguous:
-      description: Symbol exists on multiple providers; repeat with provider_id
+    Unauthorized: {description: Missing or invalid Bearer API key}
+    NotFound: {description: Requested scanner symbol or analysis is not available}
+    Ambiguous: {description: Symbol exists on multiple scanner providers; repeat with provider_id}
   schemas:
     Health:
       type: object
@@ -297,12 +254,9 @@ components:
       properties:
         count: {type: integer}
         provider_id: {type: [string, 'null']}
-        items:
-          type: array
-          items: {$ref: '#/components/schemas/UniverseCandidate'}
+        items: {type: array, items: {$ref: '#/components/schemas/UniverseCandidate'}}
     UniverseCandidate:
       type: object
-      required: [provider_id, canonical_symbol, provider_symbol, market_type, contract_type, status, base_asset, quote_asset, last_price, liquidity_score, data_time, data_age_seconds]
       properties:
         provider_id: {type: string}
         canonical_symbol: {type: string}
@@ -327,46 +281,99 @@ components:
         data_age_seconds: {type: number}
     CandleSeries:
       type: object
-      required: [provider_id, canonical_symbol, interval, source_kind, count, candles]
-      properties:
-        provider_id: {type: string}
-        canonical_symbol: {type: string}
-        interval: {type: string, enum: [5m, 15m, 1h, 4h, 1d]}
-        source_kind: {type: string, enum: [provider, aggregate, mixed]}
-        count: {type: integer}
-        candles:
-          type: array
-          items: {$ref: '#/components/schemas/Candle'}
-    Candle:
-      type: object
-      required: [provider_id, canonical_symbol, interval, open_time, close_time, open, high, low, close, volume, closed]
       properties:
         provider_id: {type: string}
         canonical_symbol: {type: string}
         interval: {type: string}
-        open_time: {type: string, format: date-time}
-        close_time: {type: string, format: date-time}
+        source_kind: {type: string}
+        count: {type: integer}
+        candles: {type: array, items: {$ref: '#/components/schemas/Candle'}}
+    Candle:
+      type: object
+      properties:
+        provider_id: {type: string}
+        canonical_symbol: {type: string}
+        interval: {type: string}
+        open_time: {type: string}
+        close_time: {type: string}
         open: {type: string}
         high: {type: string}
         low: {type: string}
         close: {type: string}
         volume: {type: string}
-        quote_volume: {type: [string, 'null']}
-        trade_count: {type: [integer, 'null']}
-        taker_buy_volume: {type: [string, 'null']}
-        taker_buy_quote_volume: {type: [string, 'null']}
         closed: {type: boolean}
+    MT4MarketContext:
+      type: object
+      required: [provider_id, source_name, symbol, market, schema_version, run_id, closed_bars_only, bid, ask, spread, digits, point, scopes]
+      properties:
+        provider_id: {type: string, enum: [kai_mt4]}
+        source_name: {type: string, enum: [MT4]}
+        symbol: {type: string}
+        market: {type: string}
+        schema_version: {type: string, enum: ['1.1']}
+        run_id: {type: string}
+        as_of: {type: [string, 'null'], description: Opaque BrokerServer wall-clock timestamp; not UTC.}
+        last_tick_time: {type: [string, 'null'], description: Opaque BrokerServer wall-clock timestamp; not UTC.}
+        time_source: {type: string, enum: [BrokerServer]}
+        timestamp_semantics: {type: string, enum: [BROKER_SERVER_WALL_CLOCK_OPAQUE]}
+        utc_offset_minutes: {type: 'null'}
+        closed_bars_only: {type: boolean, enum: [true]}
+        bid: {type: number}
+        ask: {type: number}
+        spread: {type: number}
+        digits: {type: integer}
+        point: {type: number}
+        tick_value: {type: number}
+        tick_size: {type: number}
+        contract_size: {type: number}
+        min_lot: {type: number}
+        max_lot: {type: number}
+        lot_step: {type: number}
+        stop_level: {type: number}
+        freeze_level: {type: number}
+        trade_allowed: {type: boolean}
+        terminal_connected: {type: boolean}
+        market_open: {type: boolean}
+        swap_long: {type: number}
+        swap_short: {type: number}
+        scopes:
+          type: object
+          required: [D1, H1, M15, M5]
+          properties:
+            D1: {$ref: '#/components/schemas/MT4Scope'}
+            H1: {$ref: '#/components/schemas/MT4Scope'}
+            M15: {$ref: '#/components/schemas/MT4Scope'}
+            M5: {$ref: '#/components/schemas/MT4Scope'}
+          additionalProperties: false
+    MT4Scope:
+      type: object
+      required: [timeframe, snapshot_id, bar_depth, latest_closed_bar_time, current_bar_time, bars]
+      properties:
+        timeframe: {type: string, enum: [D1, H1, M15, M5]}
+        snapshot_id: {type: string}
+        bar_depth: {type: integer}
+        latest_closed_bar_time: {type: string, description: Opaque BrokerServer wall-clock timestamp; not UTC.}
+        current_bar_time: {type: string, description: Opaque BrokerServer wall-clock timestamp; not UTC.}
+        bars:
+          type: array
+          items: {$ref: '#/components/schemas/MT4Bar'}
+    MT4Bar:
+      type: object
+      required: [time, open, high, low, close, volume]
+      properties:
+        time: {type: string, description: Opaque BrokerServer wall-clock timestamp; not UTC.}
+        open: {type: number}
+        high: {type: number}
+        low: {type: number}
+        close: {type: number}
+        volume: {type: number}
     DecisionList:
       type: object
-      required: [count, items]
       properties:
         count: {type: integer}
-        items:
-          type: array
-          items: {$ref: '#/components/schemas/TradingDecision'}
+        items: {type: array, items: {$ref: '#/components/schemas/TradingDecision'}}
     TradingDecision:
       type: object
-      required: [provider_id, exchange, canonical_symbol, provider_symbol, market_type, side, grade, setup_score, raw_score, setup_type, market_regime, trend_context, liquidity_rank, sessions, session_overlap, strength, reason_codes, data_time, last_closed_bar, data_age_seconds, freshness_status, generated_at, engine_version, estimated_probability]
       properties:
         provider_id: {type: string}
         exchange: {type: string}
@@ -375,7 +382,7 @@ components:
         market_type: {type: string}
         side: {type: string, enum: [LONG, SHORT, NO_TRADE]}
         grade: {type: string, enum: [A+, A, B, C]}
-        setup_score: {type: integer, minimum: 0, maximum: 100}
+        setup_score: {type: integer}
         raw_score: {type: integer}
         setup_type: {type: string}
         market_regime: {type: string}
@@ -401,10 +408,10 @@ components:
         risk_amount: {type: [string, 'null']}
         risk_percent: {type: [string, 'null']}
         reason_codes: {type: array, items: {type: string}}
-        data_time: {type: string, format: date-time}
-        last_closed_bar: {type: string, format: date-time}
+        data_time: {type: string}
+        last_closed_bar: {type: string}
         data_age_seconds: {type: number}
         freshness_status: {type: string, enum: [FRESH, STALE]}
-        generated_at: {type: string, format: date-time}
+        generated_at: {type: string}
         engine_version: {type: string}
         estimated_probability: {type: [number, 'null']}

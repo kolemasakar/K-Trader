@@ -21,6 +21,10 @@ services:
       KTRADER_SCAN_INTERVAL_SECONDS: ${KTRADER_SCAN_INTERVAL_SECONDS:-60}
       KTRADER_BOOTSTRAP_CONCURRENCY: ${KTRADER_BOOTSTRAP_CONCURRENCY:-2}
       KTRADER_ACTION_API_KEY: ${KTRADER_ACTION_API_KEY:-}
+      KTRADER_KAI_MT4_ACTION_ENABLED: ${KTRADER_KAI_MT4_ACTION_ENABLED:-false}
+      KTRADER_KAI_MT4_UDS_PATH: /run/kai-mt4/delivery.sock
+      KTRADER_KAI_MT4_TIMEOUT_SECONDS: ${KTRADER_KAI_MT4_TIMEOUT_SECONDS:-70}
+      KAI_MARKET_CONTEXT_DELIVERY_TOKEN: ${KAI_MARKET_CONTEXT_DELIVERY_TOKEN:-}
       KTRADER_RESEARCH_CAPTURE_ENABLED: ${KTRADER_RESEARCH_CAPTURE_ENABLED:-true}
       KTRADER_RESEARCH_CAPTURE_INTERVAL_SECONDS: ${KTRADER_RESEARCH_CAPTURE_INTERVAL_SECONDS:-300}
       KTRADER_RESEARCH_ROOT: /data/research/universe
@@ -33,6 +37,7 @@ services:
       KTRADER_HEALTH_MAX_SCAN_AGE_SECONDS: ${KTRADER_HEALTH_MAX_SCAN_AGE_SECONDS:-180}
     volumes:
       - ${KTRADER_ROOT:-/opt/k-trader}/data:/data
+      - ${KTRADER_ROOT:-/opt/k-trader}/run:/run/kai-mt4:ro
     ports:
       - "127.0.0.1:8000:8000"
     read_only: true
@@ -53,6 +58,36 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+
+  kai-mt4-relay:
+    profiles: ["kai-mt4"]
+    image: k-trader:${KTRADER_IMAGE_TAG:-local}
+    restart: unless-stopped
+    init: true
+    network_mode: host
+    command:
+      - python
+      - /app/scripts/kai_mt4_uds_relay.py
+      - --socket
+      - /run/kai-mt4/delivery.sock
+      - --target-host
+      - 127.0.0.1
+      - --target-port
+      - "18765"
+    volumes:
+      - ${KTRADER_ROOT:-/opt/k-trader}/run:/run/kai-mt4
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
 
   caddy:
     image: caddy:2-alpine

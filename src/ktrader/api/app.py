@@ -8,6 +8,12 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, PlainTextResponse, Response
 
+from ktrader.api.kai_mt4_context import (
+    KAIMT4ContextMisconfigured,
+    KAIMT4ContextUnavailable,
+    KAIMT4MarketContextSource,
+    serialize_kai_mt4_context,
+)
 from ktrader.api.rate_limit import FixedWindowRateLimitMiddleware
 from ktrader.api.serialization import (
     serialize_candle_series,
@@ -53,6 +59,7 @@ def create_app(
     action_api_key: str | None = None,
     health_max_scan_age_seconds: float | None = None,
     action_openapi_path: str | Path | None = None,
+    kai_mt4_source: KAIMT4MarketContextSource | None = None,
 ) -> FastAPI:
     state = read_model or ApiReadModel()
     secret = action_api_key.strip() if action_api_key and action_api_key.strip() else None
@@ -73,6 +80,7 @@ def create_app(
     app.state.read_model = state
     app.state.action_auth_enabled = secret is not None
     app.state.health_max_scan_age_seconds = health_max_scan_age_seconds
+    app.state.kai_mt4_source = kai_mt4_source
     app.add_middleware(
         FixedWindowRateLimitMiddleware,
         max_requests=rate_limit_requests,
@@ -168,6 +176,32 @@ def create_app(
             state.resolve_market(symbol, provider_id=provider_id),
             now=now,
         )
+
+    @app.get("/v1/mt4/market-context/{symbol}", operation_id="getMT4MarketContext")
+    def mt4_market_context(
+        symbol: str,
+        market: str = Query(default="forex", min_length=1, max_length=32),
+    ) -> dict:
+        if kai_mt4_source is None:
+            raise HTTPException(
+                status_code=503,
+                detail="MT4 market-context route is not enabled",
+            )
+        try:
+            payload = kai_mt4_source.acquire(symbol=symbol, market=market)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except KAIMT4ContextMisconfigured as exc:
+            raise HTTPException(
+                status_code=503,
+                detail="MT4 market-context authentication is unavailable",
+            ) from exc
+        except KAIMT4ContextUnavailable as exc:
+            raise HTTPException(
+                status_code=503,
+                detail="MT4 market context is temporarily unavailable",
+            ) from exc
+        return serialize_kai_mt4_context(payload)
 
     @app.get("/v1/candles/{symbol}", operation_id="getCandles")
     def candles(
