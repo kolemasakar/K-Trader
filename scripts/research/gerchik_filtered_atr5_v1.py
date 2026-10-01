@@ -58,3 +58,24 @@ def filtered_atr5(closed_bars, max_lookback=250):
         selected[position] = next_older
         selected.sort()
         next_older += 1
+
+
+def atr5_quality_diagnostic(result, *, deep_lookback_threshold=20):
+    """Non-trading research metadata; never changes ATR5 selection or value.
+
+    Threshold 20 is an experimental reporting cutoff, NOT an owner-approved
+    trading restriction. Consumers must not silently turn it into a trade gate.
+    """
+    if isinstance(deep_lookback_threshold, bool) or not isinstance(deep_lookback_threshold, int) or deep_lookback_threshold < 5:
+        raise ValueError("deep_lookback_threshold must be an integer >= 5")
+    if not isinstance(result, dict) or len(result.get("accepted", [])) != 5:
+        raise ValueError("A completed five-accepted-bar ATR5 result is required")
+    inspected = result["inspected"]
+    rejected = result["rejected"]
+    if inspected != len(rejected) + 5:
+        raise ValueError("Inconsistent ATR5 rejection and inspection counts")
+    return dict(inspected_bars=inspected, rejected_bars=len(rejected),
+                oldest_accepted_timestamp=result["accepted"][-1]["timestamp"],
+                deep_lookback=inspected > deep_lookback_threshold,
+                deep_lookback_threshold=deep_lookback_threshold,
+                policy="RESEARCH_DIAGNOSTIC_ONLY_NO_TRADE_GATE")
