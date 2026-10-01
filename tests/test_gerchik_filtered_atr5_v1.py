@@ -68,6 +68,6 @@ def test_rejects_non_descending_timestamps():
         filtered_atr5(data)
 
 
-def test_no_normal_bootstrap_fails_closed():
+def test_insufficient_older_replacements_fails_closed():
     with pytest.raises(InsufficientHistory):
-        filtered_atr5(bars([1000, 1, 1000, 1, 1000]))
+        filtered_atr5(bars([10] * 5))
