@@ -82,7 +82,7 @@ def test_causal_prefix_invariance():
 
 
 def test_consecutive_large_anomalies_replaced():
-    result = filtered_atr5(bars([40, 40] + [10] * 14))
+    result = filtered_atr5(bars([100, 100] + [10] * 14))
     assert [r["reason"] for r in result["rejected"][:2]] == ["LARGE", "LARGE"]
     assert result["atr5"] == 10
 
