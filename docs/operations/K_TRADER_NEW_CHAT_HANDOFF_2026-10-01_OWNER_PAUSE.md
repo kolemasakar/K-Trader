@@ -1,5 +1,7 @@
 # K-Trader authoritative new-chat handoff — 2026-10-01 — owner pause and approved development sequence
 
+> **RESEARCH RESUMED (2026-10-02):** Owner explicitly instructed «продовж реалізацію». The dated owner-pause snapshot below is preserved as history; research implementation and relevant checks are resumed. Latest checkpoint: [2026-10-02_RESEARCH_RESUME_ATR5_TRADE_EVALUATION.md](../checkpoints/2026-10-02_RESEARCH_RESUME_ATR5_TRADE_EVALUATION.md). ATR5 v2 remains binding, v3 experimental. First research-only trade-evaluation diagnostic added; 11 synthetic checks passed, no market backtest or complete CI acceptance. PR #94 remains draft/unmerged; no production activation or live orders authorized. FREE_ONLY / no HP-OMEN remain binding.
+
 **Owner instruction:** Freeze current state and documentation for chat transition. DO NOT run further tests, experiments, deployments, CI triggers or server operations until explicit owner instruction. Existing automatic CI may run due to earlier commits; do not interpret pending as passed. This document is a documentation-only handoff, not approval to activate experimental research.
 
 ## Repository and operational separation
