@@ -1,0 +1,21 @@
+# K-Trader research checkpoint — 2026-10-01, Gerchik ATR5 and isolated research
+
+Status: CHECKPOINT / RESEARCH ONLY / NOT MERGED. Authoritative for the 2026-10-01 research handoff alongside `docs/research/ATR5_GERCHIK_OWNER_DECISION_2026-10-01.md`. Do not interpret this as a production trading approval.
+
+## Verified facts
+- Main includes merged PR #93 Landlock research launcher; deployed production SHA observed `c1bb8b5e0fe314ab11e6eeb8a3f0dd601939cb91`. Production container reported healthy; API `status=ok`, `mode=read_only`, `data_ready=true`, but `scanner_status=DEGRADED` at last observation. Historical scanner reasons in older docs are not proof of the current reason.
+- In the deployed K-Trader container, isolated results directory `/data/research/isolated_results/landlock-smoke-20261001` was created and bounded launcher self-test returned `{\"source_read\": true, \"source_write_denied\": true, \"panel_size\": 19}` (exit 0). This is per-process Landlock protection, NOT separate-container or cumulative cgroup isolation.
+- Existing archive source: `/data/research/phase11g/historical_expansion_v1_20260905T144500Z`; do not duplicate or mutate it. Existing archive is internal research data, not automatically independent holdout.
+- Owner approved **the book** A. Gerchik, *Kurs aktivnogo treydera*, p. 101 (owner-supplied PDF) as primary ATR5 source. Abnormal bars: >= 2 ATR or <= 1/3 ATR (inclusive). Exclude current unclosed bar; take five accepted bars, replace abnormal with neighboring older normal bars; use arithmetic mean of accepted High-Low ranges. The exact initial-reference/recalculation sequence is an explicitly K-Trader-specific implementation and remains subject to semantic verification. Book states 3–5 days; owner config fixes 5. See owner decision doc. ATR5 is for energy/trade parameters, not level construction. Transitional-volatility blanket no-trade rule remains withdrawn.
+- Research branch: `research/dual-market-historical-levels-v0-1`; draft PR #94 `https://github.com/kolemasakar/K-Trader/pull/94`. Four deliberately archived level-algorithm guard stubs were repaired from literal escaped newlines; four obsolete test modules were explicitly skipped at module level while retained for provenance. ATR5 regression tests were extended for threshold boundaries, five distinct accepted bars, ordering and insufficient history.
+- GitHub CI run `36912021468` on research commit `5d5ee0caab0a31dc66da2a37a49bff4dacb18c1b`: SUCCESS; `pytest-py312`, `pytest-py314`, `docker-amd64`, `docker-arm64`, `canonical-merge-gate` all success. Earlier run `36911848456` failed before these repairs. Passing tests do NOT prove ATR5 reference semantics, independent historical quality, strategy profitability or absence of lookahead in untested paths.
+
+## Immediate gates
+1. Audit reference formation and replacement sequence against owner policy; add targeted deterministic tests including sequential anomalies and causal historical prefixes; update implementation if necessary.
+2. Check archived and current level tests separately, keep deprecated algorithms disabled; audit D1/W1 causal visibility.
+3. After semantics and CI review, run bounded, low-priority, read-only historical audit via Landlock; results only in separate ktrader-owned directory, with per-symbol coverage, archive hash and code/config identity. Do not assume launcher offers aggregate cgroup resource guarantees.
+4. Review available six-month coverage by symbol and prepare 1R then 3R backtests for owner-approved S1,S2,S3 (SL beyond level),S4,S5,S6; measure costs, drawdown, regimes; only then Level Strength v2 and genuinely independent holdout.
+5. Separately diagnose current `scanner_status=DEGRADED` via authorized read-only diagnostics; do not change production scanner or trading settings as part of research.
+
+## Operating restrictions
+FREE_ONLY; no HP-OMEN for K-Trader; no KGM participation in this work; no live orders, no production research-branch deployment, no source archive copies, no broadening SentinelX permissions. PR #94 stays draft until explicit semantic review and separate merge decision. Canonical deployment remains PR/CI/manual approved deploy with acceptance/rollback.
