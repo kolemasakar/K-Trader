@@ -26,3 +26,7 @@ Old server S6 code also adds H1 TR14 proximity and a 6-bar-extreme stop. Those d
 - Run analysis, then Level Strength v2 and independent reserved control. K-Trader does not place orders; K_AI owns execution.
 
 The confirmed family identities are restored. Full numeric/boolean strategy migration to the current level/ATR engine is still incomplete; no six-strategy profitability claim follows. [Prepared backtest protocol](GERCHIK_BACKTEST_PROTOCOL_V0_1_2026-10-04.md).
+
+
+## Executable pattern candidates (2026-10-04)
+All six LONG/SHORT pattern kernels are now implemented with explicit tick-based parameters and declared engineering confirmation alternatives: [executable candidate specification](GERCHIK_EXECUTABLE_PATTERN_CANDIDATES_V0_1_2026-10-04.md). They preserve restored IDs and S3 stop-beyond-level, reject future/gapped input, and hand candidate setups to the separate execution simulator. This is not a frozen numeric migration or automatic confirmed-level engine. The candidate protocol retains per-strategy unresolved decisions; no market outcomes were computed. 60 combined synthetic tests passed.

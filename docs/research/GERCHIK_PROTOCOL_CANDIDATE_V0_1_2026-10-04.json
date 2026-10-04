@@ -41,55 +41,91 @@
       "family": "LEVEL_REJECTION",
       "executable_spec_sha256": null,
       "unresolved": [
-        "current_executable_specification_and_numeric_port"
+        "complete_BSU_BPU_confirmation_policy",
+        "entry_tolerance_and_stop_units_values",
+        "numeric_migration"
       ],
-      "parameter_migration": null
+      "parameter_migration": null,
+      "candidate_code_path": "scripts/research/gerchik_strategy_patterns_v0_1.py",
+      "candidate_code_sha256": "3c0653fda7e87b6202ead847f4a58ce1af5db1d452ae53d0b1a726bf972014a4",
+      "candidate_specification_path": "docs/research/GERCHIK_EXECUTABLE_PATTERN_CANDIDATES_V0_1_2026-10-04.md",
+      "candidate_specification_sha256": "4f2b8fd2f48f2e772bfd85f29d4fe729ab1dffae31bbb1042a598c36b20bccb6"
     },
     {
       "id": "S2",
       "family": "BREAKOUT_CONTINUATION",
       "executable_spec_sha256": null,
       "unresolved": [
-        "current_executable_specification_and_numeric_port"
+        "continuation_confirmation_policy",
+        "breakout_distance_and_stop_units_values",
+        "numeric_migration"
       ],
-      "parameter_migration": null
+      "parameter_migration": null,
+      "candidate_code_path": "scripts/research/gerchik_strategy_patterns_v0_1.py",
+      "candidate_code_sha256": "3c0653fda7e87b6202ead847f4a58ce1af5db1d452ae53d0b1a726bf972014a4",
+      "candidate_specification_path": "docs/research/GERCHIK_EXECUTABLE_PATTERN_CANDIDATES_V0_1_2026-10-04.md",
+      "candidate_specification_sha256": "4f2b8fd2f48f2e772bfd85f29d4fe729ab1dffae31bbb1042a598c36b20bccb6"
     },
     {
       "id": "S3",
       "family": "BREAKOUT_RETEST",
       "executable_spec_sha256": null,
       "unresolved": [
-        "current_executable_specification_and_numeric_port"
+        "retest_and_resume_policy",
+        "retest_tolerance_and_stop_units_values",
+        "numeric_migration"
       ],
       "parameter_migration": null,
-      "stop_basis": "BEYOND_LEVEL"
+      "stop_basis": "BEYOND_LEVEL",
+      "candidate_code_path": "scripts/research/gerchik_strategy_patterns_v0_1.py",
+      "candidate_code_sha256": "3c0653fda7e87b6202ead847f4a58ce1af5db1d452ae53d0b1a726bf972014a4",
+      "candidate_specification_path": "docs/research/GERCHIK_EXECUTABLE_PATTERN_CANDIDATES_V0_1_2026-10-04.md",
+      "candidate_specification_sha256": "4f2b8fd2f48f2e772bfd85f29d4fe729ab1dffae31bbb1042a598c36b20bccb6"
     },
     {
       "id": "S4",
       "family": "SINGLE_FALSE_BREAKOUT",
       "executable_spec_sha256": null,
       "unresolved": [
-        "current_executable_specification_and_numeric_port"
+        "penetration_distance_and_stop_units_values",
+        "numeric_migration"
       ],
-      "parameter_migration": null
+      "parameter_migration": null,
+      "candidate_code_path": "scripts/research/gerchik_strategy_patterns_v0_1.py",
+      "candidate_code_sha256": "3c0653fda7e87b6202ead847f4a58ce1af5db1d452ae53d0b1a726bf972014a4",
+      "candidate_specification_path": "docs/research/GERCHIK_EXECUTABLE_PATTERN_CANDIDATES_V0_1_2026-10-04.md",
+      "candidate_specification_sha256": "4f2b8fd2f48f2e772bfd85f29d4fe729ab1dffae31bbb1042a598c36b20bccb6"
     },
     {
       "id": "S5",
       "family": "MULTIBAR_FALSE_BREAKOUT",
       "executable_spec_sha256": null,
       "unresolved": [
-        "current_executable_specification_and_numeric_port"
+        "baseline_or_six_bar_structure_variant",
+        "stop_units_values",
+        "numeric_migration"
       ],
-      "parameter_migration": null
+      "parameter_migration": null,
+      "candidate_code_path": "scripts/research/gerchik_strategy_patterns_v0_1.py",
+      "candidate_code_sha256": "3c0653fda7e87b6202ead847f4a58ce1af5db1d452ae53d0b1a726bf972014a4",
+      "candidate_specification_path": "docs/research/GERCHIK_EXECUTABLE_PATTERN_CANDIDATES_V0_1_2026-10-04.md",
+      "candidate_specification_sha256": "4f2b8fd2f48f2e772bfd85f29d4fe729ab1dffae31bbb1042a598c36b20bccb6"
     },
     {
       "id": "S6",
       "family": "TREND_RANGE_BREAKOUT",
       "executable_spec_sha256": null,
       "unresolved": [
-        "current_executable_specification_and_numeric_port"
+        "EMA_trend_seed_policy",
+        "local_extreme_or_ATR_stop_branch",
+        "local_window_or_ATR_distance_units_values",
+        "numeric_migration"
       ],
-      "parameter_migration": null
+      "parameter_migration": null,
+      "candidate_code_path": "scripts/research/gerchik_strategy_patterns_v0_1.py",
+      "candidate_code_sha256": "3c0653fda7e87b6202ead847f4a58ce1af5db1d452ae53d0b1a726bf972014a4",
+      "candidate_specification_path": "docs/research/GERCHIK_EXECUTABLE_PATTERN_CANDIDATES_V0_1_2026-10-04.md",
+      "candidate_specification_sha256": "4f2b8fd2f48f2e772bfd85f29d4fe729ab1dffae31bbb1042a598c36b20bccb6"
     }
   ],
   "execution": {

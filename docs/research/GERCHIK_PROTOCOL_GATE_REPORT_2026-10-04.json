@@ -42,7 +42,7 @@
     "RESOURCE_TIMEOUT_SECONDS",
     "RESEARCH_OUTPUT_LOCATION"
   ],
-  "comparison_sha256": "b3fa38dafd320eb081263f09899d8c58de45291a6875a25e4e5b1499e7f573c5",
+  "comparison_sha256": "ec74e1682b65424b1ffc8111149b56fb0ecfbb4b5cf814d45cbafbb244c15a57",
   "artifact_verification": "NOT_PERFORMED",
   "cost_basis": null,
   "study_claim": "EXPLORATORY"
