@@ -1,7 +1,8 @@
 """Research D1/W1 cross-timeframe confirmation within approved symmetric luft.
 
 Only independently qualified upstream formation events can confirm. Luft is
-provided by upstream stop policy (20% BaseStop, tick-rounded); ATR is not used here.
+provided by an explicitly documented contextual price/instrument policy;
+no ATR or stop-derived default is selected here. Physical source overlap is allowed.
 """
 from decimal import Decimal
 from .gerchik_cross_tf_v0_1 import _utc
