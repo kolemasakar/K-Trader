@@ -112,13 +112,18 @@
           }
         },
         "us_equities": {
-          "mode": "CALCULATED_WITH_TECHNICAL_FALLBACK",
+          "mode": "TECHNICAL_PRIORITY_WITH_CALCULATED_REFERENCE",
           "condition": "CALCULATED_STOP_DISTANCE_GREATER_THAN_0_20_ATR5",
           "fallback": "TECHNICAL_STOP_BEYOND_PROTECTIVE_LEVEL",
           "fixed_cents_proposal": "NOT_ADOPTED",
-          "calculated_formula_status": "PENDING",
+          "calculated_formula_status": "OWNER_AGREED",
           "technical_offset_status": "PENDING",
-          "specific_fallback_size_cap_status": "PENDING"
+          "specific_fallback_size_cap_status": "PENDING",
+          "calculated_formula": "S=0.002*LEVEL_PRICE",
+          "calculated_price_fraction": "0.002",
+          "technical_priority": "PREFERRED_BEYOND_LEVEL_OR_STRUCTURE_INCLUDING_WHEN_SMALLER_THAN_CALCULATED",
+          "previous_atr_threshold_rule": "PRESERVED_CALCULATED_STOP_GREATER_THAN_0_20_ATR5_REQUIRES_TECHNICAL",
+          "latest_decision_time": "2026-10-04T21:57:35+03:00"
         }
       },
       "next_strategy_gate": "COMPLETE_ALL_S1_PARAMETERS_BEFORE_S2"
