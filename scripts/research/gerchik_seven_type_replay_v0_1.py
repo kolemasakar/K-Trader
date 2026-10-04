@@ -8,6 +8,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from .gerchik_cohort_readiness_v0_1 import rebuild_closed_weeks
+from .gerchik_methodology_audit_v0_1 import witness_check
 from .gerchik_seven_types_v0_1 import ResearchPolicy, detect_all, provisional_rating
 
 
@@ -77,10 +78,15 @@ def replay(root, policy, previous, *, start_ms, end_ms):
                 x = dict(x, symbol=symbol)
                 x['source_bar_id'] = tf+':'+str(x['source_open_ms'])
                 x['witness_bars'] = [rows[j] for j in x['witness_indices']]
+                x['secondary_witness_audit'] = witness_check(rows, x, asdict(policy))
                 x['first_close_beyond_ms'] = next((r[6]+1 for r in rows
                     if r[0] >= x['known_at_ms'] and
                     (Decimal(r[4]) > Decimal(x['price']) if x['side'] == 'RESISTANCE'
                      else Decimal(r[4]) < Decimal(x['price']))), None)
+                x['first_limit_penetration_ms'] = next((r[6]+1 for r in rows
+                    if x['primary_type']=='LIMIT' and r[0]>=x['known_at_ms'] and
+                    (Decimal(r[2])>Decimal(x['price']) if x['side']=='RESISTANCE'
+                     else Decimal(r[3])<Decimal(x['price']))), None)
                 all_levels.append(x)
         for x in all_levels:
             x['rating_at_birth'] = provisional_rating(data[x['timeframe']], x, all_levels,
@@ -124,6 +130,8 @@ def replay(root, policy, previous, *, start_ms, end_ms):
     report['counts'] = dict(Counter(x['primary_type'] for x in report['levels']))
     report['previous_automated_pass'] = sum(x['verification']['status']=='AUTOMATED_PATTERN_PASS'
                                           for x in report['previous_candidates'])
+    report['secondary_witness_counts'] = dict(Counter(x['secondary_witness_audit']['status'] for x in report['levels']))
+    report['methodology_acceptance'] = 'ENGINEERING_CHECKS_COMPLETE_FOR_STRATEGY_DESIGN_ONLY' if all(x['secondary_witness_audit']['status']=='SECOND_IMPLEMENTATION_PASS' for x in report['levels']) else 'AUDIT_FAILED'
     return report
 
 

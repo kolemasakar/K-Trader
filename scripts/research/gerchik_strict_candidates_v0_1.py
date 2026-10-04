@@ -8,7 +8,8 @@ Same-price/TF identity retains its earliest type; simultaneous types ambiguous.
 from decimal import Decimal
 
 
-def detect(rows, timeframe):
+def formations(rows, timeframe):
+    """All causal formation episodes; an ongoing LIMIT run emits once."""
     previous = None
     for r in rows:
         o, h, l, c = map(Decimal, r[1:5])
@@ -19,12 +20,13 @@ def detect(rows, timeframe):
         if previous is not None and r[0] != previous + 1:
             raise ValueError('noncontiguous candles')
         previous = r[6]
-    found = {}
+    events = []
     for i, bar in enumerate(rows):
         for field, side in ((2, 'RESISTANCE'), (3, 'SUPPORT')):
             p = Decimal(bar[field])
             patterns = []
-            if i >= 2 and all(Decimal(r[field]) == p for r in rows[i-2:i+1]):
+            if (i >= 2 and all(Decimal(r[field]) == p for r in rows[i-2:i+1])
+                    and (i == 2 or Decimal(rows[i-3][field]) != p)):
                 patterns.append(('LIMIT', i-2))
             # Nearest prior touch; any penetration terminates the interval.
             for j in range(i-1, -1, -1):
@@ -35,14 +37,21 @@ def detect(rows, timeframe):
                     if i-j-1 >= 3:
                         patterns.append(('CONSOLIDATION', j))
                     break
-            if patterns and str(p.normalize()) not in found:
-                found[str(p.normalize())] = dict(
+            if patterns:
+                events.append(dict(
                     price=str(p), timeframe=timeframe, side=side,
                     primary_type=patterns[0][0] if len(patterns)==1 else 'AMBIGUOUS',
                     source_open_ms=rows[patterns[0][1]][0],
                     known_at_ms=bar[6]+1, confirmation_index=i,
                     status='RESEARCH_CANDIDATE', tick_compliance='PENDING',
-                    independent_review='PENDING')
+                    independent_review='PENDING'))
+    return events
+
+
+def detect(rows, timeframe):
+    found = {}
+    for event in formations(rows, timeframe):
+        found.setdefault(Decimal(event['price']), event)
     return list(found.values())
 
 

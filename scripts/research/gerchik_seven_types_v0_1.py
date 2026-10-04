@@ -7,7 +7,7 @@ extreme beyond the preceding leg. Trend-break additionally needs two defenses.
 """
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
-from .gerchik_strict_candidates_v0_1 import detect as strict_detect
+from .gerchik_strict_candidates_v0_1 import formations as strict_formations
 from .gerchik_level_strength_v0_1 import BASE
 
 
@@ -72,7 +72,7 @@ def detect_all(rows, timeframe, policy):
     policy.validate()
     if timeframe not in ('D1', 'W1'):
         raise ValueError('D1/W1 only')
-    strict = strict_detect(rows, timeframe)  # validates OHLC/contiguity
+    strict = strict_formations(rows, timeframe)  # validates OHLC/contiguity
     step = 86400000 if timeframe == 'D1' else 604800000
     if any(r[0] % 86400000 or r[6]+1-r[0] != step for r in rows):
         raise ValueError('complete UTC bars required')
@@ -129,7 +129,7 @@ def detect_all(rows, timeframe, policy):
         if any(x['origin'] == point['origin'] for x in group):
             continue
         group.append(point)
-        if len(group) == policy.historical_repetitions:
+        if len(group) >= policy.historical_repetitions:
             witnesses = [j for x in group for j in range(x['start'], x['known']+1)]
             claims.append(_claim(rows, timeframe, point['price'], point['side'],
                                  'HISTORICAL', group[0]['origin'], point['known'], witnesses))
@@ -270,6 +270,8 @@ def provisional_rating(rows, level, other_levels, *, as_of_ms):
             continue
         # Prevent already-breached opposite-TF records from reinforcing current strength.
         if x.get('first_close_beyond_ms') is not None and x['first_close_beyond_ms'] <= as_of_ms:
+            continue
+        if x.get('first_limit_penetration_ms') is not None and x['first_limit_penetration_ms'] <= as_of_ms:
             continue
         reinforcement.append(dict(timeframe=x['timeframe'], known_at_ms=x['known_at_ms']))
     components = dict(primary_type=Decimal(BASE[level['primary_type']]),

@@ -155,3 +155,18 @@ class SevenTypesTests(unittest.TestCase):
         proof=Proof('P','TOUCH','touch','RESISTANCE',4*DAY,4*DAY,'synthetic-reviewer','APPROVED')
         score=rate(level,[source,touch],[proof],Policy('synthetic',0,0,None,0,''),as_of=4*DAY)
         self.assertEqual(preview['provisional_score'],score['score'])
+
+    def test_later_limit_episode_is_evidence_not_new_identity(self):
+        r=rows([(10,15,8,12),(12,14,9,13),(13,14,10,12),(12,13,10,11),
+                (12,15,9,13),(13,15,10,12),(12,15,9,13),(13,15,10,12)])
+        x=next(x for x in detect_all(r,'D1',POLICY) if x['price']=='15')
+        self.assertEqual(x['primary_type'],'CONSOLIDATION')
+        limits=[e for e in x['additional_patterns'] if e['type']=='LIMIT']
+        self.assertEqual(len(limits),1)
+        self.assertEqual(limits[0]['known_at_ms'],7*DAY)
+
+    def test_penetrated_limit_cannot_reinforce_other_timeframe(self):
+        r=rows([(10,15,8,12),(12,15,9,13),(13,15,10,12)])
+        x=next(x for x in detect_all(r,'D1',POLICY) if x['price']=='15')
+        other=dict(x,timeframe='W1',first_close_beyond_ms=None,first_limit_penetration_ms=3*DAY)
+        self.assertEqual(provisional_rating(r,x,[other],as_of_ms=3*DAY)['provisional_score'],20)
