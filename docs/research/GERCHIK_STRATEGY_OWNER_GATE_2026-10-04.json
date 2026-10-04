@@ -33,10 +33,67 @@
       ],
       "numeric_parameters_status": "PENDING",
       "execution_reproduction_status": "PENDING",
-      "market_runs_authorized": false
+      "market_runs_authorized": false,
+      "stop_decision": {
+        "status": "OWNER_AGREED",
+        "time": "2026-10-04T21:45:39+03:00",
+        "variant": 2,
+        "policy": "TECHNICAL_STOP_WITH_SIZE_CONTROL",
+        "atr_reference_fraction": "0.20",
+        "maximum_technical_to_reference_ratio": "1.20",
+        "technical_offset_status": "PENDING",
+        "oversized_technical_stop": "SKIP_DO_NOT_MOVE_INSIDE_STRUCTURE",
+        "fixed_stop_exception": "OWNER_REQUESTED_FOR_BOOK_LISTED_ASSETS",
+        "fixed_book_source_page": 108,
+        "fixed_book_ranges": {
+          "US_EQUITIES": {
+            "stop_usd": [
+              "0.03",
+              "0.07"
+            ],
+            "includes_entry_tolerance": true
+          },
+          "FOREX": {
+            "stop_book_points": [
+              15,
+              25
+            ],
+            "entry_tolerance_book_points": [
+              2,
+              3
+            ],
+            "GBPUSD_upper_end": true,
+            "point_mapping_status": "PENDING"
+          },
+          "GOLD": {
+            "stop_usd": [
+              "2",
+              "3"
+            ],
+            "entry_tolerance_usd": [
+              "0.10",
+              "0.15"
+            ]
+          },
+          "OIL": {
+            "stop_usd": [
+              "0.15",
+              "0.20"
+            ],
+            "entry_tolerance_usd": [
+              "0.02",
+              "0.03"
+            ]
+          }
+        },
+        "fixed_exact_values_status": "PENDING",
+        "fixed_versus_technical_execution_precedence": "PENDING_EXPLICIT_SPECIFICATION",
+        "market_runs_authorized": false
+      },
+      "next_strategy_gate": "COMPLETE_ALL_S1_PARAMETERS_BEFORE_S2"
     },
     "S2": {
-      "logic_status": "PENDING"
+      "logic_status": "DEFERRED_UNTIL_S1_COMPLETE"
     },
     "S3": {
       "logic_status": "PENDING"
