@@ -141,7 +141,15 @@
             "book_points": 28
           }
         },
-        "technical_point_mapping": "PLATFORM_SYMBOL_POINT_APPROVED_HISTORICAL_VALUES_PENDING"
+        "technical_point_mapping": "PLATFORM_SYMBOL_POINT_APPROVED_HISTORICAL_VALUES_PENDING",
+        "entry_tolerance_policy": {
+          "general_fraction_of_level": "0.0004",
+          "GOLD_quote_usd": "0.15",
+          "OIL_quote_usd": "0.03",
+          "FOREX_platform_points": 3,
+          "GBPUSD_platform_points": 3,
+          "status": "OWNER_AGREED_EXCEPTIONS_PRESERVED"
+        }
       },
       "next_strategy_gate": "COMPLETE_ALL_S1_PARAMETERS_BEFORE_S2",
       "analysis_scope": {
@@ -268,7 +276,7 @@
         "technical_offset_book_points": 3,
         "technical_max_actual_distance": "NO_GREATER_THAN_CALCULATED_STOP",
         "technical_point_mapping": "PENDING",
-        "first_hour_exceptions": "AS_GERCHIK_PENDING_EXACT_CONJUNCTION_AND_SESSIONS",
+        "first_hour_exceptions": "OWNER_AGREED_CONJUNCTION_AND_NEW_POST_FALSE_BREAK_MODEL",
         "order_submission_seconds_before_bpu2_close": 30,
         "cancellation_two_stops_anchor": "LEVEL_PRICE",
         "single_trade_deposit_risk_fraction": "0.005",
@@ -283,7 +291,23 @@
         "technical_cap_distance": "FULL_ENTRY_TO_SL",
         "equity_entry_tolerance_fraction_of_level": "0.0004",
         "entry_tolerance_general_fraction": "0.0004",
-        "prior_fixed_asset_tolerances": "PRESERVED_PENDING_CLARIFICATION_WHETHER_NEW_GENERAL_RULE_OVERRIDES"
+        "prior_fixed_asset_tolerances": "OWNER_EXPLICITLY_PRESERVED"
+      },
+      "session_decision": {
+        "owner_time": "2026-10-04T23:06:50+03:00",
+        "first_hour_exception_status": "OWNER_AGREED",
+        "exception_conjunction": "STRONG_DAILY_LEVEL_AND_LIMIT_LEVEL_WITH_FALSE_BREAK_IN_FIRST_HOUR",
+        "post_false_break": "NEW_VALID_REJECTION_MODEL_REQUIRED",
+        "prior_model_revival": false,
+        "regional_assets_anchor": "REGIONAL_TRADING_SESSION_OPEN",
+        "regional_calendar_values_status": "PENDING_SYMBOL_AND_EXCHANGE_CALENDAR",
+        "forex_anchor": "END_OF_DAILY_TRADING_BREAK_IN_BROKER_SYMBOL_CALENDAR",
+        "forex_hour_break": "OWNER_DESCRIBED_ONE_HOUR_REQUIRE_VERIFY_ACTUAL_CALENDAR_NOT_UNIVERSAL_ASSUMPTION",
+        "crypto_daily_timezone": "GMT_UTC",
+        "crypto_daily_anchor": "00:00",
+        "crypto_first_hour_interval": "00:00_INCLUSIVE_TO_01:00_EXCLUSIVE_UTC",
+        "enhanced_activity_context": "RELEVANT_EXCHANGE_SESSIONS_FOR_FOREX_AND_CRYPTO",
+        "enhanced_activity_threshold_status": "PENDING_NO_NEW_AUTOMATIC_VETO"
       }
     },
     "S2": {
