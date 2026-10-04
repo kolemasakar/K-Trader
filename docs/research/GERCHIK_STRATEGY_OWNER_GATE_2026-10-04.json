@@ -86,9 +86,40 @@
             ]
           }
         },
-        "fixed_exact_values_status": "PENDING",
-        "fixed_versus_technical_execution_precedence": "PENDING_EXPLICIT_SPECIFICATION",
-        "market_runs_authorized": false
+        "fixed_exact_values_status": "OWNER_AGREED_FOR_GOLD_OIL_FOREX",
+        "fixed_versus_technical_execution_precedence": "FIXED_STOP_EXCEPTION_FOR_GOLD_OIL_FOREX_US_EQUITIES_SEPARATE_OWNER_RULE",
+        "market_runs_authorized": false,
+        "latest_asset_decision_time": "2026-10-04T21:50:14+03:00",
+        "fixed_asset_values": {
+          "GOLD": {
+            "stop_quote_usd": "3.00",
+            "entry_tolerance_quote_usd": "0.15"
+          },
+          "OIL": {
+            "stop_quote_usd": "0.20",
+            "entry_tolerance_quote_usd": "0.03"
+          },
+          "FOREX": {
+            "stop_book_points": 20,
+            "entry_tolerance_book_points": 3,
+            "point_mapping_status": "PENDING"
+          },
+          "GBPUSD": {
+            "stop_book_points": 25,
+            "entry_tolerance_book_points": 3,
+            "entry_tolerance_authority": "COMMON_FOREX_RULE",
+            "point_mapping_status": "PENDING"
+          }
+        },
+        "us_equities": {
+          "mode": "CALCULATED_WITH_TECHNICAL_FALLBACK",
+          "condition": "CALCULATED_STOP_DISTANCE_GREATER_THAN_0_20_ATR5",
+          "fallback": "TECHNICAL_STOP_BEYOND_PROTECTIVE_LEVEL",
+          "fixed_cents_proposal": "NOT_ADOPTED",
+          "calculated_formula_status": "PENDING",
+          "technical_offset_status": "PENDING",
+          "specific_fallback_size_cap_status": "PENDING"
+        }
       },
       "next_strategy_gate": "COMPLETE_ALL_S1_PARAMETERS_BEFORE_S2"
     },
