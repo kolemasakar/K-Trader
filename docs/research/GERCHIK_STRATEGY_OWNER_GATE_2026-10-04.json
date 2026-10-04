@@ -308,6 +308,62 @@
         "crypto_first_hour_interval": "00:00_INCLUSIVE_TO_01:00_EXCLUSIVE_UTC",
         "enhanced_activity_context": "RELEVANT_EXCHANGE_SESSIONS_FOR_FOREX_AND_CRYPTO",
         "enhanced_activity_threshold_status": "PENDING_NO_NEW_AUTOMATIC_VETO"
+      },
+      "calendar_activity_proposal": {
+        "status": "DRAFT_AWAITING_OWNER_AGREEMENT",
+        "date": "2026-10-04",
+        "calendars": {
+          "US_EQUITIES": {
+            "opening_local": "09:30",
+            "closing_local": "16:00",
+            "timezone": "America/New_York",
+            "calendar": "PRIMARY_EXCHANGE_HOLIDAYS_EARLY_CLOSES"
+          },
+          "UK_EQUITIES": {
+            "opening_local": "08:00",
+            "closing_local": "16:30",
+            "timezone": "Europe/London",
+            "calendar": "LSE"
+          },
+          "JAPAN_EQUITIES": {
+            "opening_local": "09:00",
+            "timezone": "Asia/Tokyo",
+            "calendar": "JPX",
+            "afternoon_open": "12:30",
+            "afternoon_first_hour_restart_status": "NOT_DEFINED"
+          },
+          "METALS_ENERGY": {
+            "calendar": "ACTUAL_CONTRACT_VENUE_OR_BROKER_PROFILE_NOT_GENERIC_ASSET_NAME"
+          },
+          "FOREX": {
+            "daily_first_hour_anchor": "ACTUAL_BROKER_SYMBOL_DAILY_BREAK_END",
+            "numeric_break_times": "NOT_AVAILABLE"
+          },
+          "CRYPTO": {
+            "daily_anchor": "00:00_UTC",
+            "weekends": "OPEN_UNLESS_VENUE_MAINTENANCE"
+          }
+        },
+        "session_context": {
+          "regional_open_windows_minutes": 60,
+          "regional_calendar_holidays": "APPLY",
+          "london_us_core_overlap": "TAG",
+          "resets_forex_or_crypto_daily_first_hour": false
+        },
+        "activity": {
+          "timeframe": "M5",
+          "metric": "CURRENT_COMPLETED_HIGH_LOW_DIVIDED_BY_MEAN_PREVIOUS_20_HIGH_LOW",
+          "exclude_observation_from_reference": true,
+          "normal_lt": "1.5",
+          "elevated_ge": "1.5",
+          "extreme_ge": "2.0",
+          "bpu2_veto_ge": "2.0_OWNER_ALREADY_AGREED",
+          "missing_reference": "UNKNOWN",
+          "purpose": "PRICE_ACTIVITY_CONTEXT_NOT_LIQUIDITY_CERTIFICATION",
+          "effect": "TAG_ONLY_NO_EXTRA_ENTRY_OR_STOP_CHANGES"
+        },
+        "historical_calendars": "USE_RULES_FOR_ACTUAL_TEST_DATES",
+        "production_changed": false
       }
     },
     "S2": {
