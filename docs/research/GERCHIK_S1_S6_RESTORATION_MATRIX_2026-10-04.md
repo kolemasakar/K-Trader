@@ -1,5 +1,5 @@
 # S1–S6 restoration matrix — 2026-10-04
-Status: RECOVERY_CONSISTENCY_WARNING / EXACT STRATEGY SPECIFICATION NOT FROZEN.
+Status: PRIMARY OWNER-APPROVED IDENTITIES RECOVERED / CURRENT EXECUTABLE PORT NOT FROZEN.
 
 This records independently observed sources, not a newly approved mapping. The draft catalogue at research HEAD fe5ec24 and the 2026-09-25 historical plan use different IDs. Neither a historical implementation nor an assistant draft can establish the owner's intended current strategy identities by itself.
 
@@ -33,3 +33,19 @@ D1/W1 High/Low-based confirmed levels and equal-significance symmetric zones; no
 
 ## Minimum missing information
 A single authoritative executable mapping for S1–S6 with precise triggers and confirmations. Freeze percentage-price/time anchor, instrument tick rounding, entry-model precision, SL buffer and horizons explicitly. Forex point definition only blocks Forex implementation; crypto data inventory proceeds independently. Real historical costs/funding and a demonstrably uninspected independent control dataset remain separate requirements.
+
+## Primary owner approval recovered after the first inventory
+Personal Context retrieval returned the original assistant specification at 2026-09-25T17:54:51Z and owner's approval at 2026-09-25T18:01:55Z in «16 PH-11». These retrieved primary interaction excerpts resolve the strategy ID dispute; the conflicting active draft is corrected. Retrieval is an excerpted context record, not a downloaded full conversation export.
+
+| ID | Restored owner-approved family | Historical specification excerpt |
+|---|---|---|
+| S1 | Відбій від рівня | Touch plus confirmation; SL beyond reaction extreme plus 0.15 ATR; target 2R or nearer opposite level |
+| S2 | Пробій із продовженням | Close beyond level >=0.15 ATR plus confirmation; SL beyond level with 0.15 ATR buffer |
+| S3 | Пробій і повторне тестування | Return to level within 6 candles and resumed movement; owner changes SL to beyond level |
+| S4 | Одинарний хибний пробій | One candle penetrates >=0.15 ATR and closes back into prior range; SL beyond false-break extreme |
+| S5 | Багатобарний хибний пробій | 2–4 consecutive candles beyond level then return; allow structures up to 6 candles; SL beyond furthest structure extreme |
+| S6 | Трендовий вихід із діапазону | Break past prior 20 completed candle highs/lows in EMA50 direction; SL local extreme or 1.5 ATR; trailing sensitivity separate |
+
+Historical common profile: H1 signals, additional M15/M30/H4; ATR14; daily/weekly prior completed period extrema; 0.15 ATR tolerance; 2R; <=12-hour H1 holding. Later binding decisions supersede old ATR-based level geometry and the mandatory 2R target. Preserve historical identity and trigger provenance; do not quietly convert every 0.15 ATR14 coefficient to 0.15 daily ATR5, as scale/timeframe differ.
+
+Remaining formalization: precise confirmation predicates for S1–S3, tick and entry-tolerance semantics, S5 2–4 baseline versus up-to-6 variant, S6 local-stop/trailing branch rules; reconcile H1 research profile with separately approved M5/M15 intraday execution model. Mandatory current upstream: confirmed Gerchik D1/W1 ledger, not all prior daily highs/lows or archived pivot clusters. Keep numerical migration proposed explicitly and frozen before outcome testing.

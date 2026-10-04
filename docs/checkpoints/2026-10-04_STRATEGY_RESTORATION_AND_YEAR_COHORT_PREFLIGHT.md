@@ -15,3 +15,6 @@ No new strategy backtest, level-strength validation or profitability claim. Prod
 
 ## Next required gate
 Restore one authoritative executable S1–S6 mapping and precise model parameters; replace obsolete level upstream with reviewed causal Gerchik ledger; freeze costs and untouched-control provenance. Continue through 1R -> 3R -> analysis -> Level Strength v2 -> independent validation. FREE_ONLY and no HP-OMEN persist.
+
+## Follow-up: primary approval recovered
+After the first inventory, Personal Context recovered original S1–S6 specification/approval timestamps. Identity dispute resolved in favor of the original 2026-09-25 approval (S2 continuation, S3 retest, S4 single false break, S5 multibar false break, S6 trend breakout). Corrected the draft catalogue; preserve the earlier recovery warning above as chronology of what was known before retrieval. Exact current-engine port still requires explicit confirmation/tolerance/ATR migration and execution/cost/control specifications.

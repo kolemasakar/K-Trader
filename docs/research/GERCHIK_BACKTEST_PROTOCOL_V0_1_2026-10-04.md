@@ -32,5 +32,5 @@ The year exceeds the minimum six-month requirement, but warmup reduces eligible 
 5. Develop Level Strength v2 only after baseline analysis, then retest and independently validate pre-reserved control. Avoid tuning on control outcomes.
 
 ## Current run blockers
-RECOVERY_CONSISTENCY_WARNING in S2–S5 identity mapping; exact reviewed S1–S5 executable definitions missing in inspected sources; obsolete S6 level builder; unresolved tolerance/stop/horizon parameters; historical costs/funding and untouched-control provenance not verified.
+Primary owner interaction subsequently restored S1–S6 identities and original historical parameter excerpts; the erroneous draft mapping is corrected. Remaining blockers: exact confirmation predicates/current numeric migration and variant definitions; obsolete S6 level builder; unresolved contextual tolerance/entry precision/stop parameters; historical costs/funding and untouched-control provenance not verified. H1 <=12h is recovered historical research profile; M5/M15 is the newer intraday execution-model layer and must not be conflated.
 This is a preparation gate, not strategy-performance evidence. Do not launch a supposedly approved six-strategy backtest using guessed definitions.
