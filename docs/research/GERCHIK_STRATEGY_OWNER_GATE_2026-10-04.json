@@ -14,7 +14,7 @@
   "research_levels_1_2_3_authorized": true,
   "strategy_decisions": {
     "S1": {
-      "logic_status": "OWNER_AGREED",
+      "logic_status": "PARTIALLY_AGREED_PRECONDITIONS_PENDING",
       "owner_response": "1",
       "decision_time": "2026-10-04T21:33:17+03:00",
       "approved_chat_revision": "68",
@@ -146,6 +146,42 @@
         "money_risk_budget_status": "NOT_SELECTED",
         "meaning": "ONE_TRADE_NOT_ONE_SHARE_OR_CONTRACT",
         "market_runs_authorized": false
+      },
+      "owner_status_correction_time": "2026-10-04T22:10:32+03:00",
+      "preconditions_review": {
+        "status": "BOOK_GROUNDED_DRAFT_NOT_OWNER_APPROVED",
+        "source_pages": [
+          89,
+          90,
+          120,
+          121,
+          124,
+          127,
+          231,
+          233,
+          234
+        ],
+        "items": [
+          "STRONG_D1_LEVEL_AND_NONCONTRADICTORY_LOCAL_DIRECTION",
+          "ROOM_TO_NEXT_LEVEL_AND_CALCULATED_ATR",
+          "TECHNICALLY_DEFENSIBLE_STOP",
+          "NO_ACTIVE_COMPRESSION_UNLESS_EQUALIZING_BAR",
+          "VALID_ADJACENT_BPU1_BPU2_NO_PENETRATION",
+          "BPU2_NOT_PARANORMALLY_LARGE",
+          "SESSION_FIRST_HOUR_RULE_WITH_UNFORMALIZED_EXCEPTIONS"
+        ],
+        "supporting_not_mandatory": [
+          "LARGE_BAR_APPROACH",
+          "MIRROR_LEVEL"
+        ],
+        "unresolved": [
+          "QUANTIFIED_COMPRESSION_AND_EQUALIZING_POLICY",
+          "LARGE_BAR_REFERENCE_AND_WINDOW",
+          "D1_DIRECTION_ZONE_FORMALIZATION",
+          "SESSION_DEFINITION_FOR_24_7",
+          "FIRST_HOUR_EXCEPTION_SEMANTICS",
+          "ORDER_CANCELLATION_LEVEL_VS_ENTRY_ANCHOR_DISCREPANCY"
+        ]
       }
     },
     "S2": {
