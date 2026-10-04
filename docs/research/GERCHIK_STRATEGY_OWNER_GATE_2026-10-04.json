@@ -333,11 +333,13 @@
             "afternoon_first_hour_restart_status": "NOT_DEFINED"
           },
           "METALS_ENERGY": {
-            "calendar": "ACTUAL_CONTRACT_VENUE_OR_BROKER_PROFILE_NOT_GENERIC_ASSET_NAME"
+            "calendar": "ACTUAL_CONTRACT_VENUE_OR_BROKER_PROFILE_NOT_GENERIC_ASSET_NAME",
+            "broker_binding": "CONFIGURABLE_REFERENCE_GERCHIK_CO"
           },
           "FOREX": {
             "daily_first_hour_anchor": "ACTUAL_BROKER_SYMBOL_DAILY_BREAK_END",
-            "numeric_break_times": "NOT_AVAILABLE"
+            "numeric_break_times": "NOT_AVAILABLE",
+            "broker_binding": "CONFIGURABLE_REFERENCE_GERCHIK_CO"
           },
           "CRYPTO": {
             "daily_anchor": "00:00_UTC",
@@ -363,6 +365,50 @@
           "effect": "TAG_ONLY_NO_EXTRA_ENTRY_OR_STOP_CHANGES"
         },
         "historical_calendars": "USE_RULES_FOR_ACTUAL_TEST_DATES",
+        "production_changed": false,
+        "reference_broker": "Gerchik & Co"
+      },
+      "broker_reference_decision": {
+        "status": "OWNER_AGREED",
+        "decision_time": "2026-10-04T23:22:22+03:00",
+        "owner_response": "Брокер і точні символи Forex, золота та нафти не фіксуємо; можливе використання різних брокерів. Поки орієнтуємось на Gerchik Co.",
+        "reference_broker": "Gerchik & Co",
+        "broker_exclusivity": false,
+        "exact_symbols_locked": false,
+        "scope": "REFERENCE_PROFILE_ONLY_NOT_APPROVAL_OF_ACTIVITY_THRESHOLDS_OR_ENTIRE_CALENDAR_PROPOSAL",
+        "profile_design": {
+          "status": "SPECIFICATION_PROPOSAL",
+          "fields": [
+            "broker",
+            "account_platform",
+            "canonical_instrument",
+            "broker_symbol",
+            "timezone_and_dst",
+            "session_schedule",
+            "daily_break",
+            "holiday_overrides",
+            "point",
+            "tick_size",
+            "tick_value",
+            "contract_size",
+            "volume_min_step_max",
+            "valid_from",
+            "valid_to",
+            "source"
+          ],
+          "historical_rule": "USE_PROFILE_VALID_AT_TEST_DATE",
+          "missing_required_metadata": "UNRESOLVED_DO_NOT_INVENT_NUMERIC_VALUES"
+        },
+        "public_source_check": {
+          "date": "2026-10-04",
+          "urls": [
+            "https://gerchik.co/en/for-trader/trading-terms/list-of-assets",
+            "https://gerchik.co/en/for-trader/trading-terms/trading-hours"
+          ],
+          "daily_break_numeric_times": "NOT_CONFIRMED_FROM_RETRIEVED_PAGES",
+          "point_and_contract_values": "NOT_CONFIRMED_FROM_RETRIEVED_PAGES"
+        },
+        "market_runs_authorized": false,
         "production_changed": false
       }
     },
