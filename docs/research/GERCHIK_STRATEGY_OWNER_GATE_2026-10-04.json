@@ -1,0 +1,15 @@
+{
+  "schema": "ktrader.strategy_owner_gate.v0.1",
+  "owner_instruction_date": "2026-10-04",
+  "instruction": "Стратегії - спочатку погодження і затвердження",
+  "scope": "CURRENT_S1_S6_DEFINITIONS_PARAMETERS_AND_MARKET_TEST_PROTOCOL",
+  "agreement_status": "PENDING",
+  "approval_status": "PENDING",
+  "market_strategy_runs_authorized": false,
+  "prior_identity_approvals": "PRESERVED_AS_HISTORY_NOT_CURRENT_NUMERIC_PROTOCOL_APPROVAL",
+  "required_before_strategy_runs": [
+    "OWNER_AGREEMENT_CURRENT_DEFINITIONS",
+    "OWNER_EXPLICIT_APPROVAL_PARAMETERS_AND_PROTOCOL"
+  ],
+  "research_levels_1_2_3_authorized": true
+}

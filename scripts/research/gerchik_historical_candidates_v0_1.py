@@ -1,61 +1,65 @@
-"""Strict causal research subset; raw Decimal prices, no tick or review approval.
+"""Research-only HISTORICAL candidate discovery from *upstream-qualified* D1/W1 extrema.
 
-LIMIT: three consecutive equal extrema. CONSOLIDATION: an extremum,
-at least three strictly one-sided bars, then an exact confirming extremum.
-The latter is a conservative engineering subset of the book description.
-Same-price/TF identity retains its earliest type; simultaneous types ambiguous.
+This is NOT a pivot qualifier: it refuses unqualified extrema, never confirms levels,
+and does not infer intrabar touch order.
 """
+from collections import defaultdict
 from decimal import Decimal
+from .gerchik_cross_tf_v0_1 import _utc
+from .gerchik_structural_review_gate_v0_1 import verify_reviewed_extremum
 
 
-def detect(rows, timeframe):
-    previous = None
-    for r in rows:
-        o, h, l, c = map(Decimal, r[1:5])
-        if not all(x.is_finite() and x > 0 for x in (o, h, l, c)):
-            raise ValueError('nonpositive or nonfinite price')
-        if not l <= min(o, c) <= max(o, c) <= h or r[6] < r[0]:
-            raise ValueError('invalid candle')
-        if previous is not None and r[0] != previous + 1:
-            raise ValueError('noncontiguous candles')
-        previous = r[6]
-    found = {}
-    for i, bar in enumerate(rows):
-        for field, side in ((2, 'RESISTANCE'), (3, 'SUPPORT')):
-            p = Decimal(bar[field])
-            patterns = []
-            if i >= 2 and all(Decimal(r[field]) == p for r in rows[i-2:i+1]):
-                patterns.append(('LIMIT', i-2))
-            # Nearest prior touch; any penetration terminates the interval.
-            for j in range(i-1, -1, -1):
-                q = Decimal(rows[j][field])
-                if (field == 2 and q > p) or (field == 3 and q < p):
-                    break
-                if q == p:
-                    if i-j-1 >= 3:
-                        patterns.append(('CONSOLIDATION', j))
-                    break
-            if patterns and str(p.normalize()) not in found:
-                found[str(p.normalize())] = dict(
-                    price=str(p), timeframe=timeframe, side=side,
-                    primary_type=patterns[0][0] if len(patterns)==1 else 'AMBIGUOUS',
-                    source_open_ms=rows[patterns[0][1]][0],
-                    known_at_ms=bar[6]+1, confirmation_index=i,
-                    status='RESEARCH_CANDIDATE', tick_compliance='PENDING',
-                    independent_review='PENDING')
-    return list(found.values())
-
-
-def inspect_later(rows, candidate):
-    """Evidence only: wick penetration and close beyond are separate observations."""
-    p = Decimal(candidate['price'])
-    resistance = candidate['side'] == 'RESISTANCE'
-    tail = rows[candidate['confirmation_index']+1:]
-    field = 2 if resistance else 3
-    beyond = lambda x: x > p if resistance else x < p
-    touches = [r[6]+1 for r in tail if Decimal(r[field]) == p]
-    penetrations = [r[6]+1 for r in tail if beyond(Decimal(r[field]))]
-    closes = [r[6]+1 for r in tail if beyond(Decimal(r[4]))]
-    return dict(exact_later_touches=len(touches),
-                first_penetration_ms=next(iter(penetrations), None),
-                first_close_beyond_ms=next(iter(closes), None))
+def historical_candidates(items, as_of, min_independent=2):
+    """Public entrypoint: accepts complete source-bar/review bundles, never bare events."""
+    events = []
+    for item in items:
+        if not isinstance(item, dict) or set(item) != {'event', 'source_bar', 'review'}:
+            raise ValueError('Complete event/source_bar/review bundle required')
+        event = verify_reviewed_extremum(item['event'], item['source_bar'], item['review'], as_of)
+        bar = item['source_bar']
+        if not bar.get('opened_at'):
+            raise ValueError('Source bar opened_at required for chronology')
+        start, end = _utc(bar['opened_at']), _utc(bar['closed_at'])
+        if start >= end:
+            raise ValueError('Invalid source bar interval')
+        if not start <= _utc(event['observed_at']):
+            raise ValueError('Noncausal source bar')
+        events.append(event)
+    if not isinstance(min_independent, int) or min_independent < 2:
+        raise ValueError('Require at least two independent qualified events')
+    cutoff = _utc(as_of)
+    groups = defaultdict(list)
+    seen = set()
+    for e in events:
+        required = ('symbol', 'timeframe', 'source_field', 'price', 'tick_size',
+                    'observed_at', 'event_id', 'source_bar_id', 'structural_qualification')
+        if any(k not in e for k in required):
+            raise ValueError('Missing upstream event provenance')
+        if e['timeframe'] not in ('1d', '1w') or e['source_field'] not in ('high', 'low'):
+            raise ValueError('D1/W1 HIGH/LOW only')
+        if e['structural_qualification'] != 'INDEPENDENT_REVIEW_VERIFIED':
+            raise ValueError('Raw/unqualified pivot not permitted')
+        observed = _utc(e['observed_at'])
+        if observed > cutoff:
+            continue
+        price, tick = Decimal(str(e['price'])), Decimal(str(e['tick_size']))
+        if not price.is_finite() or not tick.is_finite() or tick <= 0 or price <= 0 or price / tick != (price / tick).to_integral_value():
+            raise ValueError('Invalid exact tick price')
+        identity = (e['symbol'], e['event_id'])
+        if not e['symbol'] or not e['event_id'] or not e['source_bar_id']:
+            raise ValueError('Empty provenance')
+        if identity in seen:
+            raise ValueError('Duplicate event ID')
+        seen.add(identity)
+        groups[(e['symbol'], price)].append(e)
+    result = []
+    for (symbol, price), group in sorted(groups.items()):
+        independent = {e['source_bar_id'] for e in group}
+        if len(independent) < min_independent:
+            continue
+        result.append({'symbol': symbol, 'price': str(price), 'type': 'HISTORICAL',
+                       'state': 'CANDIDATE', 'qualification': 'UPSTREAM_REQUIRED',
+                       'event_ids': sorted(e['event_id'] for e in group),
+                       'independent_bar_count': len(independent),
+                       'available_at': max(_utc(e['observed_at']) for e in group).isoformat()})
+    return result

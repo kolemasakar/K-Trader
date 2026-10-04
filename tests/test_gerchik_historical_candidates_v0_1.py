@@ -1,5 +1,5 @@
 import unittest
-from scripts.research.gerchik_historical_candidates_v0_1 import detect, inspect_later
+from scripts.research.gerchik_strict_candidates_v0_1 import detect, inspect_later
 
 
 def bars(highs):

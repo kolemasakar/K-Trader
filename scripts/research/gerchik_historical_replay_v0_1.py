@@ -1,7 +1,7 @@
 import json,hashlib,datetime
 from pathlib import Path
 from scripts.research.gerchik_cohort_readiness_v0_1 import rebuild_closed_weeks
-from scripts.research.gerchik_historical_candidates_v0_1 import detect, inspect_later
+from scripts.research.gerchik_strict_candidates_v0_1 import detect, inspect_later
 import argparse
 parser=argparse.ArgumentParser(description='Read-only historical candidate replay; JSON to stdout')
 parser.add_argument('--data-root', required=True)
