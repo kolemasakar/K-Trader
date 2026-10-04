@@ -126,7 +126,27 @@
           "latest_decision_time": "2026-10-04T21:57:35+03:00"
         }
       },
-      "next_strategy_gate": "COMPLETE_ALL_S1_PARAMETERS_BEFORE_S2"
+      "next_strategy_gate": "COMPLETE_ALL_S1_PARAMETERS_BEFORE_S2",
+      "analysis_scope": {
+        "owner_decision_time": "2026-10-04T22:03:08+03:00",
+        "scope": "SINGLE_TRADE_CALCULATION",
+        "included": [
+          "ENTRY",
+          "PROTECTIVE_STOP",
+          "PER_UNIT_RISK",
+          "POSITION_SIZE",
+          "TARGET",
+          "TRADE_COSTS"
+        ],
+        "excluded": [
+          "DAILY_RISK_ALLOCATION",
+          "PORTFOLIO_RISK",
+          "CONSECUTIVE_LOSS_DAILY_STOP"
+        ],
+        "money_risk_budget_status": "NOT_SELECTED",
+        "meaning": "ONE_TRADE_NOT_ONE_SHARE_OR_CONTRACT",
+        "market_runs_authorized": false
+      }
     },
     "S2": {
       "logic_status": "DEFERRED_UNTIL_S1_COMPLETE"
