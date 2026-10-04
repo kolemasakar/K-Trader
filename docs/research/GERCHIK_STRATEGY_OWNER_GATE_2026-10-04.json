@@ -41,7 +41,7 @@
         "policy": "TECHNICAL_STOP_WITH_SIZE_CONTROL",
         "atr_reference_fraction": "0.20",
         "maximum_technical_to_reference_ratio": "1.00",
-        "technical_offset_status": "PENDING",
+        "technical_offset_status": "OWNER_AGREED_3_SYMBOL_POINT_MT4_MT5",
         "oversized_technical_stop": "SKIP_DO_NOT_MOVE_INSIDE_STRUCTURE",
         "fixed_stop_exception": "OWNER_REQUESTED_FOR_BOOK_LISTED_ASSETS",
         "fixed_book_source_page": 108,
@@ -117,13 +117,14 @@
           "fallback": "TECHNICAL_STOP_BEYOND_PROTECTIVE_LEVEL",
           "fixed_cents_proposal": "NOT_ADOPTED",
           "calculated_formula_status": "OWNER_AGREED",
-          "technical_offset_status": "PENDING",
-          "specific_fallback_size_cap_status": "OWNER_AGREED_NO_GREATER_THAN_CALCULATED_STOP",
+          "technical_offset_status": "OWNER_AGREED_3_SYMBOL_POINT_MT4_MT5",
+          "specific_fallback_size_cap_status": "FULL_ENTRY_TO_SL_NO_GREATER_THAN_CALCULATED_BASE_STOP",
           "calculated_formula": "S=0.002*LEVEL_PRICE",
           "calculated_price_fraction": "0.002",
           "technical_priority": "PREFERRED_BEYOND_LEVEL_OR_STRUCTURE_INCLUDING_WHEN_SMALLER_THAN_CALCULATED",
           "previous_atr_threshold_rule": "PRESERVED_CALCULATED_STOP_GREATER_THAN_0_20_ATR5_REQUIRES_TECHNICAL",
-          "latest_decision_time": "2026-10-04T21:57:35+03:00"
+          "latest_decision_time": "2026-10-04T21:57:35+03:00",
+          "entry_tolerance_fraction": "0.0004"
         },
         "fixed_values_distance_semantics": "BASE_DISTANCE_FROM_LEVEL_BEFORE_ADDING_ENTRY_TOLERANCE",
         "fixed_full_risk_distances": {
@@ -139,7 +140,8 @@
           "GBPUSD": {
             "book_points": 28
           }
-        }
+        },
+        "technical_point_mapping": "PLATFORM_SYMBOL_POINT_APPROVED_HISTORICAL_VALUES_PENDING"
       },
       "next_strategy_gate": "COMPLETE_ALL_S1_PARAMETERS_BEFORE_S2",
       "analysis_scope": {
@@ -205,7 +207,7 @@
           "support": "C1>C2>C3>=P_WITH_NO_BAR_PENETRATION",
           "state": "BLOCK_REJECTION_UNTIL_EQUALIZING_BAR",
           "equalizing_draft": "STRICTLY_FARTHER_CLOSE_WITH_NO_LEVEL_PENETRATION",
-          "equalizing_rule_status": "PENDING_EQUAL_CLOSE_VARIANT"
+          "equalizing_rule_status": "OWNER_AGREED_STRICT"
         },
         "channel": {
           "book_pages": [
@@ -244,16 +246,24 @@
             "library_file_id": "libfile_2cfe3401349c8191ae860884723e160a",
             "scope": "KRAVCHENKO_BREAKOUT_CONTEXT_NOT_REJECTION_PARAMETERS"
           }
-        ]
+        ],
+        "remaining_atr": {
+          "anchor": "LEVEL_PRICE",
+          "observed_close": "LAST_COMPLETED_M5",
+          "minimum_fraction": "0.60",
+          "direction": "TRADE_DIRECTION",
+          "calculation_draft": "A_MINUS_MAX_ZERO_DIRECTION_TIMES_CLOSE_MINUS_LEVEL",
+          "opposite_side_close_handling": "PENDING_DO_NOT_ASSUME_ENTRY_ELIGIBILITY"
+        }
       },
       "latest_owner_parameters": {
-        "time": "2026-10-04T22:32:23+03:00",
+        "time": "2026-10-04T22:56:09+03:00",
         "working_timeframe": "M5",
         "compression_close_count": 3,
         "remaining_atr_minimum_fraction": "0.60",
         "reverse_direction_budget": "RESTART_DIRECTIONAL_TRAVEL_AT_REVERSAL_NOT_RECALCULATE_ATR5",
         "trend_context_instruction": "H1_AND_M5_MOVE_IN_DAILY_TREND_DIRECTION_REMEMBER_REJECTION_REVERSES_DIRECTION",
-        "trend_phase_formalization": "PENDING",
+        "trend_phase_formalization": "OWNER_AGREED_DURING_APPROACH",
         "base_stop_before_entry_tolerance": true,
         "technical_offset_book_points": 3,
         "technical_max_actual_distance": "NO_GREATER_THAN_CALCULATED_STOP",
@@ -262,7 +272,18 @@
         "order_submission_seconds_before_bpu2_close": 30,
         "cancellation_two_stops_anchor": "LEVEL_PRICE",
         "single_trade_deposit_risk_fraction": "0.005",
-        "bpu2_paranormal_20_bar_rule": "NOT_APPROVED_OWNER_REQUESTED_EXPLANATION"
+        "bpu2_paranormal_20_bar_rule": "OWNER_AGREED_RANGE_GE_2_TIMES_MEAN_PREVIOUS_20_M5_EXCLUDING_BPU2",
+        "compression_equalizing": "STRICTLY_FARTHER_CLOSE_NO_EQUALITY",
+        "remaining_atr_anchor": "LEVEL_PRICE",
+        "remaining_atr_observation": "LAST_COMPLETED_M5_CLOSE",
+        "trend_direction_algorithm": "PENDING",
+        "forex_first_touch_tolerance_platform_points": 2,
+        "technical_offset_platform_points": 3,
+        "point_definition": "MT4_MT5_SYMBOL_POINT",
+        "technical_cap_distance": "FULL_ENTRY_TO_SL",
+        "equity_entry_tolerance_fraction_of_level": "0.0004",
+        "entry_tolerance_general_fraction": "0.0004",
+        "prior_fixed_asset_tolerances": "PRESERVED_PENDING_CLARIFICATION_WHETHER_NEW_GENERAL_RULE_OVERRIDES"
       }
     },
     "S2": {
