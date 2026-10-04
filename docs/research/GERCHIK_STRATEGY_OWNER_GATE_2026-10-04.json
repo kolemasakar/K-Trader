@@ -418,7 +418,86 @@
           "point_and_contract_values": "NOT_CONFIRMED_FROM_RETRIEVED_PAGES"
         },
         "market_runs_authorized": false,
-        "production_changed": false
+        "production_changed": false,
+        "calendar_and_numeric_metadata_status": "OWNER_EXPLICITLY_LEFT_OPEN"
+      },
+      "test_exit_decision": {
+        "status": "OWNER_AGREED_TARGET_MULTIPLES_OTHER_EXIT_RULES_PENDING",
+        "decision_time": "2026-10-04T23:56:25+03:00",
+        "non_crypto_target_R": 3,
+        "crypto_target_R": 1.5,
+        "stage": "TESTING",
+        "R_definition": "FULL_ACTUAL_ENTRY_TO_SL_PRICE_DISTANCE",
+        "take_profit_formula": "E + direction*k*abs(E-SL)",
+        "net_return": "REPORT_AFTER_COSTS_SEPARATELY",
+        "prior_1R_first_stage": "SUPERSEDED_FOR_S1_BY_CURRENT_OWNER_TARGET",
+        "partial_exit_trailing_breakeven_timeout": "NOT_APPROVED_BY_THIS_DECISION",
+        "market_runs_authorized": false
+      },
+      "direction_proposals": {
+        "status": "DRAFT_NOT_APPROVED",
+        "recommended": "CONFIRMED_SWING_STRUCTURE",
+        "options": [
+          {
+            "id": 1,
+            "name": "CONFIRMED_SWING_STRUCTURE",
+            "pivot_left": 2,
+            "pivot_right": 2,
+            "up": "LAST_TWO_CONFIRMED_HIGHS_AND_LOWS_STRICTLY_RISING",
+            "down": "LAST_TWO_CONFIRMED_HIGHS_AND_LOWS_STRICTLY_FALLING",
+            "other": "NEUTRAL",
+            "causality": "PIVOT_AVAILABLE_ONLY_AFTER_TWO_RIGHT_BARS_CLOSE"
+          },
+          {
+            "id": 2,
+            "name": "EMA20",
+            "up": "LAST_CLOSED_CLOSE_ABOVE_EMA20_AND_EMA20_ABOVE_PREVIOUS",
+            "down": "LAST_CLOSED_CLOSE_BELOW_EMA20_AND_EMA20_BELOW_PREVIOUS",
+            "other": "NEUTRAL"
+          },
+          {
+            "id": 3,
+            "name": "DAILY_LEVEL_CONTEXT_PLUS_LOCAL_STRUCTURE",
+            "daily": "CLOSE_AND_LAST_CONFIRMED_BROKEN_DAILY_LEVEL_DIRECTION",
+            "local": "CONFIRMED_SWING_STRUCTURE",
+            "limitation": "DAILY_ZONE_RULE_REQUIRES_FURTHER_SPECIFICATION"
+          }
+        ],
+        "alignment_phase": "APPROACH",
+        "no_indicator_formula_claimed_as_book_rule": true
+      },
+      "strong_level_review": {
+        "status": "D1_W1_OWNER_SPECIFIED_REMAINING_GATE_DRAFT",
+        "timeframes": [
+          "D1",
+          "W1"
+        ],
+        "volatility_decrease": "OWNER_SUGGESTION_NOT_NUMERICALLY_DEFINED_BOOK_CONTRADICTION_FLAGGED_WHEN_COMPRESSION",
+        "book_pages": [
+          64,
+          65,
+          66,
+          67,
+          89,
+          90,
+          120,
+          124,
+          231,
+          234
+        ],
+        "strength_evidence": [
+          "ADDITIONAL_TOUCHES",
+          "NEAR_MISS_BARS_WITHOUT_RELAXING_BPU1_RULE",
+          "HISTORICAL_FALSE_BREAKS",
+          "TREND_BREAK_FOLLOWED_BY_NEW_EXTREME",
+          "LONG_WICKS",
+          "ROUND_PRICE_CONTEXT",
+          "MIRROR_LOCAL_MODEL"
+        ],
+        "recommended_gate": "VALID_CONFIRMED_D1_W1_LEVEL_PLUS_AT_LEAST_ONE_REINFORCING_SIGN_PLUS_VALID_M5_MODEL_WITHOUT_ACTIVE_COMPRESSION",
+        "recommended_gate_status": "DRAFT_NOT_APPROVED",
+        "strength_and_approach_context_separate": true,
+        "ATR_strength_use": false
       }
     },
     "S2": {
