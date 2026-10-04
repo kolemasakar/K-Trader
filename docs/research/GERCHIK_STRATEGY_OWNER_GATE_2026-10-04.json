@@ -3,7 +3,7 @@
   "owner_instruction_date": "2026-10-04",
   "instruction": "Стратегії - спочатку погодження і затвердження",
   "scope": "CURRENT_S1_S6_DEFINITIONS_PARAMETERS_AND_MARKET_TEST_PROTOCOL",
-  "agreement_status": "PENDING",
+  "agreement_status": "PARTIAL_LOGIC_AGREEMENT",
   "approval_status": "PENDING",
   "market_strategy_runs_authorized": false,
   "prior_identity_approvals": "PRESERVED_AS_HISTORY_NOT_CURRENT_NUMERIC_PROTOCOL_APPROVAL",
@@ -11,5 +11,44 @@
     "OWNER_AGREEMENT_CURRENT_DEFINITIONS",
     "OWNER_EXPLICIT_APPROVAL_PARAMETERS_AND_PROTOCOL"
   ],
-  "research_levels_1_2_3_authorized": true
+  "research_levels_1_2_3_authorized": true,
+  "strategy_decisions": {
+    "S1": {
+      "logic_status": "OWNER_AGREED",
+      "owner_response": "1",
+      "decision_time": "2026-10-04T21:33:17+03:00",
+      "approved_chat_revision": "68",
+      "book_pages": [
+        95,
+        96,
+        104,
+        105,
+        106,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125
+      ],
+      "numeric_parameters_status": "PENDING",
+      "execution_reproduction_status": "PENDING",
+      "market_runs_authorized": false
+    },
+    "S2": {
+      "logic_status": "PENDING"
+    },
+    "S3": {
+      "logic_status": "PENDING"
+    },
+    "S4": {
+      "logic_status": "PENDING"
+    },
+    "S5": {
+      "logic_status": "PENDING"
+    },
+    "S6": {
+      "logic_status": "PENDING"
+    }
+  }
 }
