@@ -1,5 +1,7 @@
 # K-Trader research strategy catalogue — hypotheses, not approved trading rules
 
+> **RESTORATION WARNING (2026-10-04):** This draft's S2–S5 ID mapping differs from the dated history-first plan. Server-local approval confirms the six IDs and S3 SL beyond level but does not establish this draft's executable mapping. Do not treat the following hypotheses as restored exact approved definitions. See [restoration matrix](GERCHIK_S1_S6_RESTORATION_MATRIX_2026-10-04.md) and [backtest preparation protocol](GERCHIK_BACKTEST_PROTOCOL_V0_1_2026-10-04.md). Historical S6's ATR-based level builder is superseded. No six-strategy run is approved by a documentation label.
+
 Status: **DRAFT FOR RESEARCH**. K-Trader's Gerchik research model does **not** execute live orders. All hypothetical trades are evaluated only in historical simulation after validated causal level prerequisites; missing ATR is recorded as a data-quality condition, not a new blanket trade prohibition. No strategy is selected as optimal before out-of-sample comparison.
 
 ## Shared causal pipeline
