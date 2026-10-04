@@ -310,7 +310,7 @@
         "enhanced_activity_threshold_status": "PENDING_NO_NEW_AUTOMATIC_VETO"
       },
       "calendar_activity_proposal": {
-        "status": "DRAFT_AWAITING_OWNER_AGREEMENT",
+        "status": "ACTIVITY_OWNER_AGREED_CALENDAR_DETAILS_PENDING",
         "date": "2026-10-04",
         "calendars": {
           "US_EQUITIES": {
@@ -362,7 +362,16 @@
           "bpu2_veto_ge": "2.0_OWNER_ALREADY_AGREED",
           "missing_reference": "UNKNOWN",
           "purpose": "PRICE_ACTIVITY_CONTEXT_NOT_LIQUIDITY_CERTIFICATION",
-          "effect": "TAG_ONLY_NO_EXTRA_ENTRY_OR_STOP_CHANGES"
+          "effect": "TAG_ONLY_NO_EXTRA_ENTRY_OR_STOP_CHANGES",
+          "status": "OWNER_AGREED",
+          "decision_time": "2026-10-04T23:27:33+03:00",
+          "owner_response": "Шкала активності 1,5 / 2 - agreed",
+          "elevated_lt": "2.0",
+          "extreme_label": "НАДМІРНА",
+          "normal_label": "ЗВИЧАЙНА",
+          "elevated_label": "ПІДВИЩЕНА",
+          "zero_reference": "UNKNOWN",
+          "threshold_origin": "PROJECT_ENGINEERING_RULE_OWNER_AGREED_NOT_BOOK_QUOTE"
         },
         "historical_calendars": "USE_RULES_FOR_ACTUAL_TEST_DATES",
         "production_changed": false,
