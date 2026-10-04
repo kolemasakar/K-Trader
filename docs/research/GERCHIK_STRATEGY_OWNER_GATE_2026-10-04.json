@@ -32,7 +32,7 @@
         125
       ],
       "numeric_parameters_status": "PENDING",
-      "execution_reproduction_status": "PENDING",
+      "execution_reproduction_status": "APPROXIMATE_SCENARIO_ACCEPTED_DETAILED_PROTOCOL_PENDING",
       "market_runs_authorized": false,
       "stop_decision": {
         "status": "OWNER_AGREED",
@@ -175,7 +175,7 @@
       },
       "owner_status_correction_time": "2026-10-04T22:10:32+03:00",
       "preconditions_review": {
-        "status": "BOOK_GROUNDED_DRAFT_NOT_OWNER_APPROVED",
+        "status": "OWNER_AGREED_CORE_PRECONDITIONS_REMAINING_DETAILS_OPEN",
         "source_pages": [
           89,
           90,
@@ -284,7 +284,7 @@
         "compression_equalizing": "STRICTLY_FARTHER_CLOSE_NO_EQUALITY",
         "remaining_atr_anchor": "LEVEL_PRICE",
         "remaining_atr_observation": "LAST_COMPLETED_M5_CLOSE",
-        "trend_direction_algorithm": "PENDING",
+        "trend_direction_algorithm": "OWNER_AGREED_CONFIRMED_SWING_STRUCTURE_FOR_TESTING",
         "forex_first_touch_tolerance_platform_points": 2,
         "technical_offset_platform_points": 3,
         "point_definition": "MT4_MT5_SYMBOL_POINT",
@@ -435,7 +435,7 @@
         "market_runs_authorized": false
       },
       "direction_proposals": {
-        "status": "DRAFT_NOT_APPROVED",
+        "status": "OWNER_AGREED_BASELINE_FOR_TESTING_ALTERNATIVES_RETAINED",
         "recommended": "CONFIRMED_SWING_STRUCTURE",
         "options": [
           {
@@ -464,15 +464,22 @@
           }
         ],
         "alignment_phase": "APPROACH",
-        "no_indicator_formula_claimed_as_book_rule": true
+        "no_indicator_formula_claimed_as_book_rule": true,
+        "decision_time": "2026-10-05T00:05:16+03:00",
+        "selected_baseline": 1,
+        "alternatives": [
+          2,
+          3
+        ],
+        "alternative_testing": "SEPARATE_PREDECLARED_COMPARISONS_NOT_MIXED_WITH_BASELINE"
       },
       "strong_level_review": {
-        "status": "D1_W1_OWNER_SPECIFIED_REMAINING_GATE_DRAFT",
+        "status": "OWNER_AGREED_ADMISSION_GATE",
         "timeframes": [
           "D1",
           "W1"
         ],
-        "volatility_decrease": "OWNER_SUGGESTION_NOT_NUMERICALLY_DEFINED_BOOK_CONTRADICTION_FLAGGED_WHEN_COMPRESSION",
+        "volatility_decrease": "OWNER_WITHDREW_REJECTION_CRITERION_RELEVANT_TO_BREAKOUT_CONTEXT_ONLY_NO_S2_APPROVAL",
         "book_pages": [
           64,
           65,
@@ -495,9 +502,32 @@
           "MIRROR_LOCAL_MODEL"
         ],
         "recommended_gate": "VALID_CONFIRMED_D1_W1_LEVEL_PLUS_AT_LEAST_ONE_REINFORCING_SIGN_PLUS_VALID_M5_MODEL_WITHOUT_ACTIVE_COMPRESSION",
-        "recommended_gate_status": "DRAFT_NOT_APPROVED",
+        "recommended_gate_status": "OWNER_AGREED",
         "strength_and_approach_context_separate": true,
-        "ATR_strength_use": false
+        "ATR_strength_use": false,
+        "decision_time": "2026-10-05T00:05:16+03:00"
+      },
+      "test_execution_decision": {
+        "status": "OWNER_AGREED_PRICE_ROUNDING_AND_APPROXIMATE_SCENARIO_TESTING",
+        "decision_time": "2026-10-05T00:05:16+03:00",
+        "rounding": {
+          "protective_long": "DOWN_TO_ALLOWED_PRICE_STEP",
+          "protective_short": "UP_TO_ALLOWED_PRICE_STEP",
+          "entry": "MUST_REMAIN_WITHIN_AGREED_LUFT",
+          "point_vs_tick_size": "SEPARATE_SYMBOL_PROPERTIES",
+          "after_rounding": "RECOMPUTE_STOP_DISTANCE_AND_VOLUME_VERIFY_CAPS",
+          "cap_violation": "SKIP"
+        },
+        "approximate_intrabar": {
+          "accepted": true,
+          "exact_reproduction": false,
+          "submission": "30_SECONDS_BEFORE_BPU2_CLOSE_REMAINS_RULE",
+          "missing_intrabar_state": "DO_NOT_USE_FINAL_BPU2_HIGH_LOW_AS_IF_KNOWN_AT_SUBMISSION",
+          "scenario_policy": "DETAILED_PRICE_PATH_AND_AMBIGUITY_HANDLING_PENDING",
+          "reporting": "LABEL_APPROXIMATE_AND_REPORT_EXECUTION_ASSUMPTIONS"
+        },
+        "cost_model_status": "EXPLAINED_NOT_EXPLICITLY_APPROVED_IN_THIS_RESPONSE",
+        "scope": "PARAMETER_AGREEMENT_NOT_MARKET_RUN_PROTOCOL_APPROVAL"
       }
     },
     "S2": {
