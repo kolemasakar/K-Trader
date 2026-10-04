@@ -1,0 +1,116 @@
+{
+  "schema": "ktrader.gerchik.protocol.v0.1",
+  "purpose": "INCOMPLETE_RESEARCH_PREPARATION",
+  "code_commit": null,
+  "target_r": 1,
+  "data": {
+    "inventory_sha256": "cad098e6fac7f4898f4bdacf5af93929bf04652a4ac24c994f6331e7d355754f",
+    "inventory_path": "docs/research/GERCHIK_COHORT_READINESS_2026-10-04.json",
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "XRPUSDT",
+      "BNBUSDT",
+      "ADAUSDT",
+      "DOGEUSDT"
+    ],
+    "start_ms": 1758758400000,
+    "end_ms": 1790294400000
+  },
+  "study": {
+    "start_ms": null,
+    "end_ms": null,
+    "warmup_policy": null,
+    "claim": "EXPLORATORY"
+  },
+  "levels": {
+    "atr_used": false,
+    "atr_diagnostic": "ITERATIVE_D1_ATR5_V2",
+    "ledger_sha256": null,
+    "specification_sha256": null,
+    "tolerance_anchor": null,
+    "tick_rounding": null,
+    "causal_known_at_policy": null,
+    "entry_precision": null,
+    "week_policy": "COMPLETE_UTC_MON_SUN_FROM_D1"
+  },
+  "strategies": [
+    {
+      "id": "S1",
+      "family": "LEVEL_REJECTION",
+      "executable_spec_sha256": null,
+      "unresolved": [
+        "current_executable_specification_and_numeric_port"
+      ],
+      "parameter_migration": null
+    },
+    {
+      "id": "S2",
+      "family": "BREAKOUT_CONTINUATION",
+      "executable_spec_sha256": null,
+      "unresolved": [
+        "current_executable_specification_and_numeric_port"
+      ],
+      "parameter_migration": null
+    },
+    {
+      "id": "S3",
+      "family": "BREAKOUT_RETEST",
+      "executable_spec_sha256": null,
+      "unresolved": [
+        "current_executable_specification_and_numeric_port"
+      ],
+      "parameter_migration": null,
+      "stop_basis": "BEYOND_LEVEL"
+    },
+    {
+      "id": "S4",
+      "family": "SINGLE_FALSE_BREAKOUT",
+      "executable_spec_sha256": null,
+      "unresolved": [
+        "current_executable_specification_and_numeric_port"
+      ],
+      "parameter_migration": null
+    },
+    {
+      "id": "S5",
+      "family": "MULTIBAR_FALSE_BREAKOUT",
+      "executable_spec_sha256": null,
+      "unresolved": [
+        "current_executable_specification_and_numeric_port"
+      ],
+      "parameter_migration": null
+    },
+    {
+      "id": "S6",
+      "family": "TREND_RANGE_BREAKOUT",
+      "executable_spec_sha256": null,
+      "unresolved": [
+        "current_executable_specification_and_numeric_port"
+      ],
+      "parameter_migration": null
+    }
+  ],
+  "execution": {
+    "entry": "NEXT_OPEN",
+    "collision_policy": "AMBIGUOUS",
+    "interval_ms": null,
+    "horizon_bars": null,
+    "fee_rate": null,
+    "adverse_fill_cost": null,
+    "funding_cost_per_unit": null,
+    "cost_provenance": null,
+    "funding_estimate_policy": null,
+    "overlap_policy": null,
+    "calendar_metadata": null,
+    "cost_basis": null
+  },
+  "resources": {
+    "archive_read_only": true,
+    "free_only": true,
+    "memory_mb": null,
+    "timeout_seconds": null,
+    "output_location": null
+  }
+}
