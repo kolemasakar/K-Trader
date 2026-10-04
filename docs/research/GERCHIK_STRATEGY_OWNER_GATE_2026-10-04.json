@@ -14,7 +14,7 @@
   "research_levels_1_2_3_authorized": true,
   "strategy_decisions": {
     "S1": {
-      "logic_status": "PARTIALLY_AGREED_PRECONDITIONS_PENDING",
+      "logic_status": "PARTIALLY_AGREED_PRECONDITIONS_AND_EXECUTION_PENDING",
       "owner_response": "1",
       "decision_time": "2026-10-04T21:33:17+03:00",
       "approved_chat_revision": "68",
@@ -40,7 +40,7 @@
         "variant": 2,
         "policy": "TECHNICAL_STOP_WITH_SIZE_CONTROL",
         "atr_reference_fraction": "0.20",
-        "maximum_technical_to_reference_ratio": "1.20",
+        "maximum_technical_to_reference_ratio": "1.00",
         "technical_offset_status": "PENDING",
         "oversized_technical_stop": "SKIP_DO_NOT_MOVE_INSIDE_STRUCTURE",
         "fixed_stop_exception": "OWNER_REQUESTED_FOR_BOOK_LISTED_ASSETS",
@@ -118,12 +118,27 @@
           "fixed_cents_proposal": "NOT_ADOPTED",
           "calculated_formula_status": "OWNER_AGREED",
           "technical_offset_status": "PENDING",
-          "specific_fallback_size_cap_status": "PENDING",
+          "specific_fallback_size_cap_status": "OWNER_AGREED_NO_GREATER_THAN_CALCULATED_STOP",
           "calculated_formula": "S=0.002*LEVEL_PRICE",
           "calculated_price_fraction": "0.002",
           "technical_priority": "PREFERRED_BEYOND_LEVEL_OR_STRUCTURE_INCLUDING_WHEN_SMALLER_THAN_CALCULATED",
           "previous_atr_threshold_rule": "PRESERVED_CALCULATED_STOP_GREATER_THAN_0_20_ATR5_REQUIRES_TECHNICAL",
           "latest_decision_time": "2026-10-04T21:57:35+03:00"
+        },
+        "fixed_values_distance_semantics": "BASE_DISTANCE_FROM_LEVEL_BEFORE_ADDING_ENTRY_TOLERANCE",
+        "fixed_full_risk_distances": {
+          "GOLD": {
+            "quote_usd": "3.15"
+          },
+          "OIL": {
+            "quote_usd": "0.23"
+          },
+          "FOREX": {
+            "book_points": 23
+          },
+          "GBPUSD": {
+            "book_points": 28
+          }
         }
       },
       "next_strategy_gate": "COMPLETE_ALL_S1_PARAMETERS_BEFORE_S2",
@@ -143,9 +158,10 @@
           "PORTFOLIO_RISK",
           "CONSECUTIVE_LOSS_DAILY_STOP"
         ],
-        "money_risk_budget_status": "NOT_SELECTED",
+        "money_risk_budget_status": "OWNER_AGREED_0_5_PERCENT_DEPOSIT",
         "meaning": "ONE_TRADE_NOT_ONE_SHARE_OR_CONTRACT",
-        "market_runs_authorized": false
+        "market_runs_authorized": false,
+        "money_risk_fraction": "0.005"
       },
       "owner_status_correction_time": "2026-10-04T22:10:32+03:00",
       "preconditions_review": {
@@ -181,7 +197,72 @@
           "SESSION_DEFINITION_FOR_24_7",
           "FIRST_HOUR_EXCEPTION_SEMANTICS",
           "ORDER_CANCELLATION_LEVEL_VS_ENTRY_ANCHOR_DISCREPANCY"
+        ],
+        "compression": {
+          "timeframe": "M5",
+          "consecutive_closes": 3,
+          "resistance": "C1<C2<C3<=P_WITH_NO_BAR_PENETRATION",
+          "support": "C1>C2>C3>=P_WITH_NO_BAR_PENETRATION",
+          "state": "BLOCK_REJECTION_UNTIL_EQUALIZING_BAR",
+          "equalizing_draft": "STRICTLY_FARTHER_CLOSE_WITH_NO_LEVEL_PENETRATION",
+          "equalizing_rule_status": "PENDING_EQUAL_CLOSE_VARIANT"
+        },
+        "channel": {
+          "book_pages": [
+            117,
+            118,
+            119,
+            246
+          ],
+          "minimum_width_risk_multiples": 6,
+          "next_daily_from_daily_risk_multiples": 6,
+          "next_daily_from_intraday_risk_multiples": 4,
+          "middle_channel_strict_boundary": "BOOK_DIFFERS_AT_LEAST_FOUR_VS_MORE_THAN_FOUR_PENDING",
+          "risk_distance_definition": "FULL_ENTRY_TO_SL",
+          "remaining_atr_requirement": "OWNER_MINIMUM_60_PERCENT",
+          "required_signal": true
+        },
+        "additional_sources": [
+          {
+            "library_file_id": "libfile_f29a85b0aa048191bbe7957bdb592516",
+            "pages": [
+              27,
+              30,
+              39
+            ]
+          },
+          {
+            "library_file_id": "libfile_f037b10093ec81919fe826391cb97549",
+            "pages": [
+              2,
+              3,
+              4,
+              5
+            ]
+          },
+          {
+            "library_file_id": "libfile_2cfe3401349c8191ae860884723e160a",
+            "scope": "KRAVCHENKO_BREAKOUT_CONTEXT_NOT_REJECTION_PARAMETERS"
+          }
         ]
+      },
+      "latest_owner_parameters": {
+        "time": "2026-10-04T22:32:23+03:00",
+        "working_timeframe": "M5",
+        "compression_close_count": 3,
+        "remaining_atr_minimum_fraction": "0.60",
+        "reverse_direction_budget": "RESTART_DIRECTIONAL_TRAVEL_AT_REVERSAL_NOT_RECALCULATE_ATR5",
+        "trend_context_instruction": "H1_AND_M5_MOVE_IN_DAILY_TREND_DIRECTION_REMEMBER_REJECTION_REVERSES_DIRECTION",
+        "trend_phase_formalization": "PENDING",
+        "base_stop_before_entry_tolerance": true,
+        "technical_offset_book_points": 3,
+        "technical_max_actual_distance": "NO_GREATER_THAN_CALCULATED_STOP",
+        "technical_point_mapping": "PENDING",
+        "first_hour_exceptions": "AS_GERCHIK_PENDING_EXACT_CONJUNCTION_AND_SESSIONS",
+        "order_submission_seconds_before_bpu2_close": 30,
+        "cancellation_two_stops_anchor": "LEVEL_PRICE",
+        "single_trade_deposit_risk_fraction": "0.005",
+        "bpu2_paranormal_20_bar_rule": "NOT_APPROVED_OWNER_REQUESTED_EXPLANATION"
       }
     },
     "S2": {
