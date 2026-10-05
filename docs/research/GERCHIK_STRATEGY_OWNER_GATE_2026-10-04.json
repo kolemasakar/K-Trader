@@ -551,6 +551,57 @@
           "STOP_SIZE_LIMITS"
         ],
         "next_unresolved": "COST_MODEL_AND_APPROXIMATE_EXECUTION_PROTOCOL"
+      },
+      "execution_protocol_proposal": {
+        "status": "DRAFT_AWAITING_OWNER_AGREEMENT",
+        "date": "2026-10-05",
+        "costs": {
+          "known": "USE_DATED_SOURCE_OR_ARCHIVE",
+          "unknown": "REPORT_UNKNOWN_NO_NET_PROFITABILITY_CLAIM",
+          "spread": "BID_ASK_INCLUDED_IN_EXECUTION_NOT_DOUBLE_SUBTRACTED",
+          "commission": "OPEN_PLUS_CLOSE",
+          "stop_slippage": "ADVERSE_ACTUAL_OR_EXPLICIT_ASSUMPTION",
+          "carry": "ONLY_IF_APPLICABLE",
+          "risk": "POSITION_PLANNED_STOP_LOSS_PLUS_ESTIMATED_COSTS_LE_0_005_DEPOSIT",
+          "gross_and_net": "REPORT_SEPARATELY",
+          "R": "PRICE_DISTANCE_ACTUAL_ENTRY_TO_SL",
+          "zero_cost_run": "GROSS_REFERENCE_ONLY"
+        },
+        "intrabar": {
+          "priority": "ACTUAL_QUOTES_THEN_M1_THEN_M5",
+          "synthetic_paths": [
+            "O_H_L_C",
+            "O_L_H_C"
+          ],
+          "vertices_time_fraction": [
+            0,
+            0.3333333333333333,
+            0.6666666666666666,
+            1
+          ],
+          "interpolation": "LINEAR",
+          "comparison": "TWO_SEPARATE_FIXED_PATH_RUNS_NOT_OUTCOME_SELECTED_NOT_TRUE_BOUNDS",
+          "signal_information": "ONLY_CURRENT_SYNTHETIC_PREFIX_AT_SUBMISSION",
+          "submission_seconds_before_close": 30,
+          "previous_M5_ATR_travel": "LAST_FULLY_CLOSED_M5_ONLY",
+          "bpu2_reference": "PREVIOUS_20_COMPLETED_M5_EXCLUDING_CURRENT",
+          "limit_fill": "FIRST_POST_SUBMISSION_RELEVANT_QUOTE_TOUCH_OR_CROSS_AT_LIMIT_NO_PRICE_IMPROVEMENT_ASSUMED",
+          "liquidity_queue": "NOT_MODELLED_REPORT_LIMITATION",
+          "stop_target_order": "PATH_EVENT_TIME_ORDER",
+          "gap_stop": "FIRST_AVAILABLE_WORSE_EXECUTABLE_QUOTE",
+          "tp": "AT_TARGET_NO_FAVOURABLE_GAP_IMPROVEMENT",
+          "simultaneous_unresolved": "STOP_FIRST_AND_FLAG",
+          "broken_unfilled": "CANCEL_IMMEDIATELY",
+          "broken_filled": "PROTECTIVE_SL_CONTINUES_NO_NEW_DISCRETIONARY_EXIT",
+          "pending_cancel": "CLOSED_M5_DISTANCE_FROM_LEVEL_GE_2_FULL_STOPS",
+          "target_R": {
+            "other": 3,
+            "crypto": 1.5
+          },
+          "open_end": "CENSORED_NOT_ASSUMED_CLOSED",
+          "no_partial_trailing_breakeven_or_timeout": true
+        },
+        "scope": "S1_PROTOCOL_ONLY_NOT_MARKET_RUN_AUTHORIZATION"
       }
     },
     "S2": {
