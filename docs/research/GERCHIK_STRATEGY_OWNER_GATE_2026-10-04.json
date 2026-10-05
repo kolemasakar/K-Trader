@@ -3,8 +3,8 @@
   "owner_instruction_date": "2026-10-04",
   "instruction": "Стратегії - спочатку погодження і затвердження",
   "scope": "CURRENT_S1_S6_DEFINITIONS_PARAMETERS_AND_MARKET_TEST_PROTOCOL",
-  "agreement_status": "PARTIAL_LOGIC_AGREEMENT",
-  "approval_status": "PENDING",
+  "agreement_status": "S1_APPROVED_OTHER_STRATEGIES_PENDING",
+  "approval_status": "S1_APPROVED_OTHER_STRATEGIES_PENDING",
   "market_strategy_runs_authorized": false,
   "prior_identity_approvals": "PRESERVED_AS_HISTORY_NOT_CURRENT_NUMERIC_PROTOCOL_APPROVAL",
   "required_before_strategy_runs": [
@@ -14,7 +14,7 @@
   "research_levels_1_2_3_authorized": true,
   "strategy_decisions": {
     "S1": {
-      "logic_status": "PARTIALLY_AGREED_PRECONDITIONS_AND_EXECUTION_PENDING",
+      "logic_status": "OWNER_APPROVED_S1_STRATEGY_AND_EXECUTION_SCENARIO",
       "owner_response": "1",
       "decision_time": "2026-10-04T21:33:17+03:00",
       "approved_chat_revision": "68",
@@ -31,9 +31,9 @@
         124,
         125
       ],
-      "numeric_parameters_status": "PENDING",
-      "execution_reproduction_status": "APPROXIMATE_SCENARIO_ACCEPTED_DETAILED_PROTOCOL_PENDING",
-      "market_runs_authorized": false,
+      "numeric_parameters_status": "APPROVED_RULES_BROKER_METADATA_DEFERRED",
+      "execution_reproduction_status": "OWNER_APPROVED_APPROXIMATE_SCENARIO_PROTOCOL",
+      "market_runs_authorized": true,
       "stop_decision": {
         "status": "OWNER_AGREED",
         "time": "2026-10-04T21:45:39+03:00",
@@ -151,7 +151,7 @@
           "status": "OWNER_AGREED_EXCEPTIONS_PRESERVED"
         }
       },
-      "next_strategy_gate": "COMPLETE_ALL_S1_PARAMETERS_BEFORE_S2",
+      "next_strategy_gate": "S1_APPROVED_S2_MAY_BE_PRESENTED_AFTER_HANDOFF",
       "analysis_scope": {
         "owner_decision_time": "2026-10-04T22:03:08+03:00",
         "scope": "SINGLE_TRADE_CALCULATION",
@@ -171,7 +171,8 @@
         "money_risk_budget_status": "OWNER_AGREED_0_5_PERCENT_DEPOSIT",
         "meaning": "ONE_TRADE_NOT_ONE_SHARE_OR_CONTRACT",
         "market_runs_authorized": false,
-        "money_risk_fraction": "0.005"
+        "money_risk_fraction": "0.005",
+        "trade_costs_status": "OWNER_APPROVED"
       },
       "owner_status_correction_time": "2026-10-04T22:10:32+03:00",
       "preconditions_review": {
@@ -426,7 +427,7 @@
         "calendar_and_numeric_metadata_status": "OWNER_EXPLICITLY_LEFT_OPEN"
       },
       "test_exit_decision": {
-        "status": "OWNER_AGREED_TARGET_MULTIPLES_OTHER_EXIT_RULES_PENDING",
+        "status": "OWNER_APPROVED_SL_TP_AND_END_OF_DATA_CENSORING",
         "decision_time": "2026-10-04T23:56:25+03:00",
         "non_crypto_target_R": 3,
         "crypto_target_R": 1.5,
@@ -535,7 +536,7 @@
           "scenario_policy": "DETAILED_PRICE_PATH_AND_AMBIGUITY_HANDLING_PENDING",
           "reporting": "LABEL_APPROXIMATE_AND_REPORT_EXECUTION_ASSUMPTIONS"
         },
-        "cost_model_status": "EXPLAINED_NOT_EXPLICITLY_APPROVED_IN_THIS_RESPONSE",
+        "cost_model_status": "OWNER_APPROVED_WITH_SCENARIO",
         "scope": "PARAMETER_AGREEMENT_NOT_MARKET_RUN_PROTOCOL_APPROVAL"
       },
       "scope_clarification": {
@@ -553,7 +554,7 @@
         "next_unresolved": "COST_MODEL_AND_APPROXIMATE_EXECUTION_PROTOCOL"
       },
       "execution_protocol_proposal": {
-        "status": "DRAFT_AWAITING_OWNER_AGREEMENT",
+        "status": "OWNER_APPROVED",
         "date": "2026-10-05",
         "costs": {
           "known": "USE_DATED_SOURCE_OR_ARCHIVE",
@@ -601,7 +602,17 @@
           "open_end": "CENSORED_NOT_ASSUMED_CLOSED",
           "no_partial_trailing_breakeven_or_timeout": true
         },
-        "scope": "S1_PROTOCOL_ONLY_NOT_MARKET_RUN_AUTHORIZATION"
+        "scope": "OWNER_APPROVED_S1_TEST_PROTOCOL_EXECUTION_PAUSED_FOR_HANDOFF",
+        "approval_time": "2026-10-05T05:20:43+03:00"
+      },
+      "owner_final_approval": {
+        "status": "APPROVED",
+        "decision_time": "2026-10-05T05:20:43+03:00",
+        "owner_response": "Стратегію + сценарій погоджую. Збережи окремим документом в доках, Фіксуй проект, надам генератор, для переходу в новий чат",
+        "scope": "S1_ONLY_STRATEGY_AND_TEST_EXECUTION_SCENARIO",
+        "approved_document": "docs/research/GERCHIK_S1_REJECTION_APPROVED_2026-10-05.md",
+        "execution_state": "PAUSED_FOR_CHAT_HANDOFF_NO_RUN_STARTED",
+        "production_or_orders": false
       }
     },
     "S2": {
@@ -619,5 +630,11 @@
     "S6": {
       "logic_status": "PENDING"
     }
+  },
+  "project_pause": {
+    "status": "OWNER_REQUESTED_CHAT_HANDOFF",
+    "decision_time": "2026-10-05T05:20:43+03:00",
+    "next_action": "AWAIT_USER_TRANSITION_GENERATOR",
+    "market_runs_started": false
   }
 }
