@@ -230,7 +230,11 @@
           "middle_channel_strict_boundary": "BOOK_DIFFERS_AT_LEAST_FOUR_VS_MORE_THAN_FOUR_PENDING",
           "risk_distance_definition": "FULL_ENTRY_TO_SL",
           "remaining_atr_requirement": "OWNER_MINIMUM_60_PERCENT",
-          "required_signal": true
+          "required_signal": true,
+          "scope_status": "DEFERRED_TO_SEPARATE_CHANNEL_STRATEGY_APPROVAL",
+          "applies_as_S1_entry_gate": false,
+          "blocks_S1_completion": false,
+          "scope_decision_time": "2026-10-05T03:41:19+03:00"
         },
         "additional_sources": [
           {
@@ -505,7 +509,12 @@
         "recommended_gate_status": "OWNER_AGREED",
         "strength_and_approach_context_separate": true,
         "ATR_strength_use": false,
-        "decision_time": "2026-10-05T00:05:16+03:00"
+        "decision_time": "2026-10-05T00:05:16+03:00",
+        "numeric_criteria_authority": "EXISTING_OWNER_AGREED_LEVEL_DEFINITION_AND_STRENGTH_METHODOLOGY",
+        "numeric_criteria_scope_decision_time": "2026-10-05T03:41:19+03:00",
+        "strategy_specific_rethresholding": false,
+        "missing_approved_feature_rule": "DO_NOT_INVENT_OR_COUNT_UNSPECIFIED_FEATURE_AS_CONFIRMED",
+        "inheritance": "USE_CAUSALLY_AVAILABLE_LEVEL_FEATURES_AND_EVIDENCE_NO_FUTURE_DATA"
       },
       "test_execution_decision": {
         "status": "OWNER_AGREED_PRICE_ROUNDING_AND_APPROXIMATE_SCENARIO_TESTING",
@@ -528,6 +537,20 @@
         },
         "cost_model_status": "EXPLAINED_NOT_EXPLICITLY_APPROVED_IN_THIS_RESPONSE",
         "scope": "PARAMETER_AGREEMENT_NOT_MARKET_RUN_PROTOCOL_APPROVAL"
+      },
+      "scope_clarification": {
+        "decision_time": "2026-10-05T03:41:19+03:00",
+        "level_features": "REUSE_EXISTING_AGREED_LEVEL_RULES_NO_SEPARATE_S1_THRESHOLDS",
+        "channel_strategy": "SEPARATE_PENDING_APPROVAL_NO_S1_S6_RENUMBERING",
+        "current_S1_S6_has_named_channel_strategy": false,
+        "channel_book_rules_previously_discussed": true,
+        "preserved_S1_rules": [
+          "REMAINING_ATR_MINIMUM_60_PERCENT",
+          "VALID_LEVEL_ADMISSION",
+          "CORRECT_M5_REJECTION_MODEL",
+          "STOP_SIZE_LIMITS"
+        ],
+        "next_unresolved": "COST_MODEL_AND_APPROXIMATE_EXECUTION_PROTOCOL"
       }
     },
     "S2": {
