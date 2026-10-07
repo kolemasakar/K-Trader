@@ -621,7 +621,7 @@
       "decision_date": "2026-10-07",
       "specification": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md",
       "numeric_parameters_status": "PARTIALLY_DEFINED_EXECUTION_DETAILS_OPEN",
-      "execution_reproduction_status": "TAIL_OFFSET_APPROVED_ORDER_SIZE_SYNCHRONIZATION_PROTOCOL_OPEN",
+      "execution_reproduction_status": "TRIGGER_SEQUENCE_APPROVED_EXECUTION_METADATA_AND_FILL_PROTOCOL_OPEN",
       "market_runs_authorized": false,
       "implementation_status": "NOT_STARTED_IN_THIS_TASK",
       "working_timeframe": "M5",
@@ -643,6 +643,18 @@
         "combine_with_level_stop": "LONG_MIN_SHORT_MAX",
         "future_final_bar_extrema_allowed": false,
         "post_entry_stop_movement": "NOT_SPECIFIED"
+      },
+      "execution_sequence": {
+        "status": "OWNER_APPROVED",
+        "date": "2026-10-07",
+        "mode": "PROGRAMMATIC_STOP_TRIGGER",
+        "steps": [
+          "ENTRY_CONDITION_TRIGGER",
+          "DETERMINE_STOP",
+          "CALCULATE_VOLUME",
+          "SEND_ORDER"
+        ],
+        "future_final_extrema_allowed": false
       }
     },
     "S3": {
@@ -663,5 +675,15 @@
     "decision_time": "2026-10-05T05:20:43+03:00",
     "next_action": "AWAIT_USER_TRANSITION_GENERATOR",
     "market_runs_started": false
+  },
+  "common_owner_rules": {
+    "ATE": {
+      "status": "OWNER_APPROVED",
+      "date": "2026-10-07",
+      "scope": "ALL_MODELS",
+      "absence_of_forward_level_is_insufficient_data": false,
+      "continuation_condition": "PRECONDITIONS_AND_MODEL_DO_NOT_INDICATE_REJECTION_OR_FALSE_BREAK",
+      "specification": "docs/research/GERCHIK_ALL_MODELS_ATE_OWNER_RULE_2026-10-07.md"
+    }
   }
 }
