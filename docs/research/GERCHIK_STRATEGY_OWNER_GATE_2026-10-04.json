@@ -621,7 +621,7 @@
       "decision_date": "2026-10-07",
       "specification": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md",
       "numeric_parameters_status": "PARTIALLY_DEFINED_EXECUTION_DETAILS_OPEN",
-      "execution_reproduction_status": "NOT_APPROVED_OPEN_CAUSAL_BREAKOUT_TAIL_SEMANTICS",
+      "execution_reproduction_status": "TAIL_OFFSET_APPROVED_ORDER_SIZE_SYNCHRONIZATION_PROTOCOL_OPEN",
       "market_runs_authorized": false,
       "implementation_status": "NOT_STARTED_IN_THIS_TASK",
       "working_timeframe": "M5",
@@ -633,7 +633,17 @@
       "risk_fraction": "0.005",
       "target_r": 3,
       "crypto_target_r": 1.5,
-      "early_exit_on_return": false
+      "early_exit_on_return": false,
+      "tail_stop": {
+        "status": "OWNER_APPROVED",
+        "decision_date": "2026-10-07",
+        "long": "LOW_AS_KNOWN_AT_STOP_DETERMINATION_MINUS_2_TICK_SIZE",
+        "short": "HIGH_AS_KNOWN_AT_STOP_DETERMINATION_PLUS_2_TICK_SIZE",
+        "tick_definition": "INSTRUMENT_MINIMUM_PRICE_INCREMENT",
+        "combine_with_level_stop": "LONG_MIN_SHORT_MAX",
+        "future_final_bar_extrema_allowed": false,
+        "post_entry_stop_movement": "NOT_SPECIFIED"
+      }
     },
     "S3": {
       "logic_status": "PENDING"
