@@ -616,11 +616,11 @@
       }
     },
     "S2": {
-      "logic_status": "OWNER_APPROVED_MODEL",
+      "logic_status": "OWNER_APPROVED_S2_TEST_SPECIFICATION",
       "owner_response": "погоджую. Фіксуй модель в доках.",
       "decision_date": "2026-10-07",
       "specification": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md",
-      "numeric_parameters_status": "PARTIALLY_DEFINED_EXECUTION_DETAILS_OPEN",
+      "numeric_parameters_status": "APPROVED_FOR_TESTING_INSTRUMENT_METADATA_PENDING",
       "execution_reproduction_status": "TRIGGER_SEQUENCE_APPROVED_EXECUTION_METADATA_AND_FILL_PROTOCOL_OPEN",
       "market_runs_authorized": false,
       "implementation_status": "NOT_STARTED_IN_THIS_TASK",
@@ -655,7 +655,15 @@
           "SEND_ORDER"
         ],
         "future_final_extrema_allowed": false
-      }
+      },
+      "cancellation_status": "OWNER_APPROVED",
+      "cancellation": [
+        "NON_APPROACHING_NEXT_M5_CLOSE_INCLUDING_EQUAL_DISTANCE",
+        "D1_H1_M5_ALIGNMENT_LOST",
+        "ROOM_REQUIREMENTS_LOST",
+        "INSTRUMENT_TRADING_INTERVAL_END"
+      ],
+      "new_compression_after_cancel": true
     },
     "S3": {
       "logic_status": "PENDING"
@@ -684,6 +692,29 @@
       "absence_of_forward_level_is_insufficient_data": false,
       "continuation_condition": "PRECONDITIONS_AND_MODEL_DO_NOT_INDICATE_REJECTION_OR_FALSE_BREAK",
       "specification": "docs/research/GERCHIK_ALL_MODELS_ATE_OWNER_RULE_2026-10-07.md"
+    },
+    "testing_parameters": {
+      "status": "OWNER_APPROVED_FOR_ALL_SCENARIOS",
+      "decision_date": "2026-10-07",
+      "specification": "docs/research/GERCHIK_ALL_SCENARIOS_TEST_RULES_APPROVED_2026-10-07.md",
+      "tolerances": {
+        "equities_crypto_fraction": "0.0004",
+        "gold_quote": "0.15",
+        "oil_quote": "0.03",
+        "forex_platform_points": 3
+      },
+      "large_bar": {
+        "range_ge_mean_multiplier": 2,
+        "reference_previous_completed_m5": 20,
+        "exclude_observed_bar": true,
+        "S2_observation": "LAST_COMPLETED_COMPRESSION_BAR"
+      },
+      "remaining_move": {
+        "minimum_atr5_fraction": "0.60",
+        "target_r": 3,
+        "crypto_target_r": 1.5,
+        "ATE_exception": true
+      }
     }
   }
 }
