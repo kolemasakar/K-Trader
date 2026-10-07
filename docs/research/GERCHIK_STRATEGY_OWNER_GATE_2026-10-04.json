@@ -3,8 +3,8 @@
   "owner_instruction_date": "2026-10-04",
   "instruction": "Стратегії - спочатку погодження і затвердження",
   "scope": "CURRENT_S1_S6_DEFINITIONS_PARAMETERS_AND_MARKET_TEST_PROTOCOL",
-  "agreement_status": "S1_APPROVED_OTHER_STRATEGIES_PENDING",
-  "approval_status": "S1_APPROVED_OTHER_STRATEGIES_PENDING",
+  "agreement_status": "S1_S2_APPROVED_OTHER_STRATEGIES_PENDING",
+  "approval_status": "S1_S2_APPROVED_OTHER_STRATEGIES_PENDING",
   "market_strategy_runs_authorized": false,
   "prior_identity_approvals": "PRESERVED_AS_HISTORY_NOT_CURRENT_NUMERIC_PROTOCOL_APPROVAL",
   "required_before_strategy_runs": [
@@ -616,7 +616,24 @@
       }
     },
     "S2": {
-      "logic_status": "DEFERRED_UNTIL_S1_COMPLETE"
+      "logic_status": "OWNER_APPROVED_MODEL",
+      "owner_response": "погоджую. Фіксуй модель в доках.",
+      "decision_date": "2026-10-07",
+      "specification": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md",
+      "numeric_parameters_status": "PARTIALLY_DEFINED_EXECUTION_DETAILS_OPEN",
+      "execution_reproduction_status": "NOT_APPROVED_OPEN_CAUSAL_BREAKOUT_TAIL_SEMANTICS",
+      "market_runs_authorized": false,
+      "implementation_status": "NOT_STARTED_IN_THIS_TASK",
+      "working_timeframe": "M5",
+      "compression_close_count": 3,
+      "compression_scope": "ALL_BREAKOUT_MODELS_WHERE_COMPRESSION_IS_PART_OF_MODEL",
+      "entry": "LONG_L_PLUS_DELTA_SHORT_L_MINUS_DELTA",
+      "stop": "FARTHER_OF_OPPOSITE_LEVEL_TWO_TOLERANCES_OR_BEYOND_BREAKOUT_BAR_TAIL",
+      "position_size": "Rcash/ABS_ACTUAL_ENTRY_MINUS_SL_ROUNDED_DOWN_WITH_COSTS",
+      "risk_fraction": "0.005",
+      "target_r": 3,
+      "crypto_target_r": 1.5,
+      "early_exit_on_return": false
     },
     "S3": {
       "logic_status": "PENDING"
