@@ -10,16 +10,19 @@ TF = {"D1": "1d", "H1": "1h", "M5": "5m"}
 class CorpusError(ValueError):
     pass
 
-def ts(value, broker_timezone=None):
+def ts(value, broker_timezone=None, *, wall_clock_mode=False):
     d = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if d.tzinfo is None:
-        if broker_timezone is None:
+        if broker_timezone is None and not wall_clock_mode:
             raise CorpusError("opaque broker wall clock requires verified timezone mapping")
-        d = d.replace(tzinfo=broker_timezone)
+        d = d.replace(tzinfo=broker_timezone or timezone.utc)
     return d.astimezone(timezone.utc)
 
 class MT4ResearchCorpus:
-    def __init__(self, root, *, verified_broker_timezone=None):
+    def __init__(self, root, *, verified_broker_timezone=None, wall_clock_mode=False):
+        if wall_clock_mode and verified_broker_timezone:
+            raise CorpusError("choose either wall-clock or verified timezone mode")
+        self.wall_clock_mode = wall_clock_mode
         self.broker_timezone = ZoneInfo(verified_broker_timezone) if verified_broker_timezone else None
         self.root = Path(root).resolve(strict=True)
         manifest = self.root / "full_corpus_series_validation_20261009.csv"
@@ -49,12 +52,12 @@ class MT4ResearchCorpus:
             raise CorpusError("mapping incomplete")
 
     def iter_closed(self, symbol, timeframe, *, as_of):
-        """Only emit candles with close_time <= as_of. Source clock assumed UTC; verify broker timezone before backtesting."""
+        """Only emit closed candles at/before as_of. In wall_clock_mode, naive MT4 and naive as_of are compared in an artificial common clock, never interpreted as actual UTC."""
         key = (symbol, timeframe)
         if key not in self.paths:
             raise CorpusError("unknown series " + str(key))
-        cutoff = ts(as_of)
-        if self.broker_timezone is None:
+        cutoff = ts(as_of, wall_clock_mode=self.wall_clock_mode)
+        if self.broker_timezone is None and not self.wall_clock_mode:
             raise CorpusError("broker timezone unknown: cannot safely replay series")
         prev = None
         count = 0
@@ -64,7 +67,7 @@ class MT4ResearchCorpus:
                 r = json.loads(line)
                 if r.get("record_type") != "candle" or r.get("closed") is not True:
                     raise CorpusError("not a closed candle")
-                opened, closed = ts(r["open_time"], self.broker_timezone), ts(r["close_time"], self.broker_timezone)
+                opened, closed = ts(r["open_time"], self.broker_timezone, wall_clock_mode=self.wall_clock_mode), ts(r["close_time"], self.broker_timezone, wall_clock_mode=self.wall_clock_mode)
                 if closed <= opened or (prev is not None and opened <= prev):
                     raise CorpusError("invalid time ordering")
                 prev = opened
