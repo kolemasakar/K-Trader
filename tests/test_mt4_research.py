@@ -18,7 +18,7 @@ def make_source(tmp_path, corrupt=False):
         rows.append(dict(record_type="candle",closed=True,open_time=f"2026-01-01T00:{minute:02d}:00",
                          close_time=f"2026-01-01T00:{minute+5:02d}:00",open=1,high=2,low=0.5,close=1.5))
     if corrupt: rows[-1]["high"]=0.7
-    (path / "5m.jsonl").write_text("".join(json.dumps(x)+"\\n" for x in rows))
+    (path / "5m.jsonl").write_text("".join(json.dumps(x)+"\n" for x in rows))
     return root
 
 def test_no_lookahead(tmp_path):
