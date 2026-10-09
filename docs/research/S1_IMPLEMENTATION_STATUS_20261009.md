@@ -12,3 +12,11 @@ Important: latest CI must verify new commits; earlier CI #322 covers only earlie
 Pending before ACHC.us backtest: validated level detector, strength evidence, ATR5 v2, trend, BPU1/BPU2, calendar and timestamp mapping, broker symbol Point/tick, position sizing, costs, full execution/cancellation events, complete data scan and independent chronological checks.
 
 Do not claim success, trades, net profitability or release readiness until gates pass.
+
+## 2026-10-09 actual ACHC.us preflight
+
+Read-only M5 inspection: 2,198 rows, open_time strictly increasing, zero invalid OHLC geometries. Adjacent raw broker-wall-clock open timestamps: 2,153 gaps of 5m, 14 gaps of 10m, two gaps of 20m; numerous longer overnight/weekend session gaps. This does not establish missing-market-data defects until broker/exchange session calendar is grounded.
+
+**Critical source fact**: real MT4 JSONL header states `timestamp_semantics=BROKER_SERVER_WALL_CLOCK_OPAQUE`; no timezone, Point or tick-size provided in the inspected header. Treating naive MT4 timestamp as UTC is invalid. Updated adapter to reject read/replay until a verified broker timezone is explicitly provided; synthetic tests use explicit UTC only for fabricated fixtures. A verified timezone mapping also requires DST and session-boundary audit before release.
+
+No real S1 orders generated. Broker metadata and independently qualified D1/W1 strong levels not available for an honest ACHC.us S1 backtest. Status remains G2 partial; G3-G7 pending.
