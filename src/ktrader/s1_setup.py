@@ -93,6 +93,7 @@ def causal_candidate(*, level, side, bpu1, bpu2_observed, previous20, last_close
         if bpu2_observed.high>level or bpu2_observed.high<level-abs(level)*d("0.0004"):
             reasons.append("BPU2_OUTSIDE_RESISTANCE_LUFT")
     if session_status=="BLOCKED": reasons.append("SESSION_RESTRICTION")
-    elif session_status=="UNKNOWN": reasons.append("SESSION_NOT_EVALUATED")
+    elif session_status=="UNKNOWN": pass
     elif session_status!="PASS": raise ValueError("session status")
-    return {"eligible":not reasons,"reasons":reasons,"activity":str(k) if k is not None else None}
+    return {"eligible":not reasons,"reasons":reasons,"activity":str(k) if k is not None else None,
+            "session_verified":session_status=="PASS"}
