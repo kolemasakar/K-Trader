@@ -42,3 +42,13 @@ def test_opaque_clock_fails_closed(tmp_path):
     corpus=MT4ResearchCorpus(make_source(tmp_path))
     with pytest.raises(CorpusError, match="timezone"):
         list(corpus.iter_closed("SUIUSDt","M5",as_of="2026-01-01T00:10:00Z"))
+
+
+def test_explicit_artificial_wall_clock(tmp_path):
+    corpus=MT4ResearchCorpus(make_source(tmp_path), wall_clock_mode=True)
+    assert len(list(corpus.iter_closed("SUIUSDt","M5",as_of="2026-01-01T00:05:00")))==1
+    assert len(list(corpus.iter_closed("SUIUSDt","M5",as_of="2026-01-01T00:10:00")))==2
+
+def test_clock_modes_mutually_exclusive(tmp_path):
+    with pytest.raises(CorpusError, match="either"):
+        MT4ResearchCorpus(make_source(tmp_path),wall_clock_mode=True,verified_broker_timezone="UTC")
