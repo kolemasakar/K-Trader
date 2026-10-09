@@ -1,7 +1,7 @@
 """S1 research readiness runner: source-only, no trade execution."""
 import argparse
 import json
-from ktrader.mt4_research import MT4ResearchCorpus
+from ktrader.mt4_research import MT4ResearchCorpus, CorpusError
 from ktrader.s1_setup import inspect_readiness
 
 def main(argv=None):
@@ -12,9 +12,16 @@ def main(argv=None):
     a=p.parse_args(argv)
     corpus=MT4ResearchCorpus(a.root,wall_clock_mode=True)
     candles={}
+    unavailable=[]
     for tf in ("D1","H1","M5"):
-        candles[tf]=list(corpus.iter_closed(a.symbol,tf,as_of=a.as_of))
+        try:
+            candles[tf]=list(corpus.iter_closed(a.symbol,tf,as_of=a.as_of))
+        except CorpusError:
+            candles[tf]=[]
+            unavailable.append(tf)
     result=inspect_readiness(candles["M5"],candles["H1"],candles["D1"])
+    if unavailable:
+        result["reasons"].append("MISSING_OR_INVALID_SERIES:"+",".join(unavailable))
     result.update({"symbol":a.symbol,"clock":"BROKER_WALL_CLOCK_ARTIFICIAL",
                    "run_kind":"READ_ONLY_S1_READINESS_NOT_BACKTEST",
                    "trades":None,"returns":None,"source_unchanged":True})
