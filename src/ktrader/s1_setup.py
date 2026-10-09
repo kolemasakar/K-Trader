@@ -51,3 +51,48 @@ def inspect_readiness(m5,h1,d1,*, reviewed_levels=None,broker_point=None,tick_si
     reasons.append("ATR5_V2_NOT_INTEGRATED")
     reasons.append("BPU2_30SEC_CAUSAL_SIGNAL_GENERATOR_NOT_INTEGRATED")
     return {"eligible":not reasons,"reasons":reasons,"series_counts":{"M5":len(m5),"H1":len(h1),"D1":len(d1)}}
+
+
+def causal_candidate(*, level, side, bpu1, bpu2_observed, previous20, last_closed_m5,
+                     confirmed_d1, confirmed_h1, confirmed_m5,
+                     level_is_reviewed, strengthening_confirmed,
+                     filtered_atr5, broker_point=None, tick_size=None,
+                     no_compression=True, session_status="UNKNOWN"):
+    """Check known S1 gates at T-30s of BPU2. No future BPU2 close permitted.
+
+    bpu2_observed holds ONLY partial bar high/low at observation moment.
+    Returns independent hard reject reasons; unsupported session rule is labelled.
+    """
+    reasons=[]
+    side=int(side); level=d(level)
+    if side not in (1,-1): raise ValueError("side")
+    if not level_is_reviewed or not strengthening_confirmed:
+        reasons.append("UNVERIFIED_LEVEL_OR_STRENGTH")
+    required="DOWN" if side==1 else "UP"
+    if (confirmed_d1,confirmed_h1,confirmed_m5)!=(required,required,required):
+        reasons.append("TREND_MISALIGNMENT")
+    if broker_point is None or tick_size is None or d(broker_point)<=0 or d(tick_size)<=0:
+        reasons.append("MISSING_SYMBOL_POINT_TICK")
+    if filtered_atr5 is None or d(filtered_atr5)<=0:
+        reasons.append("UNKNOWN_FILTERED_ATR5")
+    else:
+        distance=max(d(0), d(side)*(d(last_closed_m5.close)-level))
+        if d(filtered_atr5)-distance < d("0.60")*d(filtered_atr5):
+            reasons.append("INSUFFICIENT_MOVE_RESERVE")
+    if not no_compression: reasons.append("ACTIVE_COMPRESSION")
+    k=activity(previous20,bpu2_observed)
+    if k is None: reasons.append("UNKNOWN_BPU2_ACTIVITY")
+    elif k>=2: reasons.append("BPU2_TOO_LARGE")
+    # For stocks the first confirming bar must touch exactly and must not pierce.
+    if side==1:
+        if bpu1.low!=level: reasons.append("BPU1_NOT_EXACT_TOUCH")
+        if bpu2_observed.low<level or bpu2_observed.low>level+abs(level)*d("0.0004"):
+            reasons.append("BPU2_OUTSIDE_SUPPORT_LUFT")
+    else:
+        if bpu1.high!=level: reasons.append("BPU1_NOT_EXACT_TOUCH")
+        if bpu2_observed.high>level or bpu2_observed.high<level-abs(level)*d("0.0004"):
+            reasons.append("BPU2_OUTSIDE_RESISTANCE_LUFT")
+    if session_status=="BLOCKED": reasons.append("SESSION_RESTRICTION")
+    elif session_status=="UNKNOWN": reasons.append("SESSION_NOT_EVALUATED")
+    elif session_status!="PASS": raise ValueError("session status")
+    return {"eligible":not reasons,"reasons":reasons,"activity":str(k) if k is not None else None}
