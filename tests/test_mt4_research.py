@@ -22,17 +22,23 @@ def make_source(tmp_path, corrupt=False):
     return root
 
 def test_no_lookahead(tmp_path):
-    corpus=MT4ResearchCorpus(make_source(tmp_path))
+    corpus=MT4ResearchCorpus(make_source(tmp_path), verified_broker_timezone="UTC")
     assert len(list(corpus.iter_closed("SUIUSDt","M5",as_of="2026-01-01T00:05:00Z")))==1
     assert len(list(corpus.iter_closed("SUIUSDt","M5",as_of="2026-01-01T00:10:00Z")))==2
     assert corpus.inventory()["assets"]==1
 
 def test_invalid_ohlc_fails_closed(tmp_path):
-    corpus=MT4ResearchCorpus(make_source(tmp_path,True))
+    corpus=MT4ResearchCorpus(make_source(tmp_path,True), verified_broker_timezone="UTC")
     with pytest.raises(CorpusError):
         list(corpus.iter_closed("SUIUSDt","M5",as_of="2026-01-02T00:00:00Z"))
 
 def test_cutoff_is_required(tmp_path):
-    corpus=MT4ResearchCorpus(make_source(tmp_path))
+    corpus=MT4ResearchCorpus(make_source(tmp_path), verified_broker_timezone="UTC")
     with pytest.raises(TypeError):
         list(corpus.iter_closed("SUIUSDt","M5"))
+
+
+def test_opaque_clock_fails_closed(tmp_path):
+    corpus=MT4ResearchCorpus(make_source(tmp_path))
+    with pytest.raises(CorpusError, match="timezone"):
+        list(corpus.iter_closed("SUIUSDt","M5",as_of="2026-01-01T00:10:00Z"))
