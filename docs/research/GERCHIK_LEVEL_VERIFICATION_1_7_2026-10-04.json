@@ -1,0 +1,108 @@
+{
+  "schema": "ktrader.gerchik_level_verification_1_7.v0.1",
+  "date": "2026-10-04",
+  "source_book": {
+    "name": "Курс активного трейдера (Александр Герчик) (2).pdf",
+    "pdf_pages": [
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213
+    ],
+    "basis": "primary provided PDF text reread, paraphrased; numeric weights are project choices"
+  },
+  "overall_status": "PARTIAL_VERIFICATION_NOT_MARKET_VALIDATED",
+  "steps": [
+    {
+      "step": 1,
+      "status": "PARTIAL",
+      "verified": {
+        "file_hashes": 42,
+        "bars": 447489,
+        "internal_gaps": 0,
+        "invalid_ohlc": 0,
+        "closed_weeks_per_symbol": 51
+      },
+      "remaining": [
+        "instrument tick-size provenance and instrument-specific calendar/percentage anchor metadata not verified"
+      ]
+    },
+    {
+      "step": 2,
+      "status": "MECHANICAL_CHECKS_PASSED_REAL_LABELS_PENDING",
+      "verified": "source High/Low identity, reviewer/event linkage, one primary type, no close-price source; synthetic integration",
+      "remaining": [
+        "no independently labelled current Gerchik formation ledger in checked input"
+      ]
+    },
+    {
+      "step": 3,
+      "status": "BOOK_RULES_RECONCILED_PATTERN_QUALIFICATION_PENDING",
+      "verified": "seven labels and source differences documented; rating refuses unreviewed formation",
+      "remaining": [
+        "automated full structural qualification and independent reviewed real formation patterns"
+      ]
+    },
+    {
+      "step": 4,
+      "status": "CAUSAL_REGRESSIONS_PASSED",
+      "verified": "source close->formation->review->availability and as-of future exclusion tested; 21 panels contain only closed D1/W1 before cutoff",
+      "remaining": [
+        "reviewed real-level replay pending"
+      ]
+    },
+    {
+      "step": 5,
+      "status": "CROSS_TF_INTEGRATION_PASSED_REAL_PAIRS_PENDING",
+      "verified": "overlapping D1/W1 allowed; distinct records, inclusive tolerance, causal reviews, original prices retained; synthetic tests",
+      "remaining": [
+        "freeze real-symbol tick/luft metadata and reviewed source pairs"
+      ]
+    },
+    {
+      "step": 6,
+      "status": "RATING_AND_LEDGER_REGRESSIONS_PASSED",
+      "verified": "0..100 auditable components, duplicate evidence rejection, immutable primary type, future exclusion, invalid-level no-score, explicit round-grid",
+      "remaining": [
+        "real-level strength history and outcome calibration"
+      ]
+    },
+    {
+      "step": 7,
+      "status": "REVIEW_PACKET_PREPARED_NOT_INDEPENDENTLY_REVIEWED",
+      "verified": {
+        "real_panels": 21,
+        "symbols": 7,
+        "sampling": "D1 indices 80,180,280; last45 D1 + last8 closed W1; no rating/outcome selection"
+      },
+      "remaining": [
+        "independent reviewer labels",
+        "genuinely untouched control not available/verified"
+      ],
+      "holdout": "previously inspected retrospective year must not be relabelled independent"
+    }
+  ],
+  "tests": {
+    "local_python": "3.12",
+    "combined_methods": 77,
+    "new_strength_and_integration_methods": 17,
+    "status": "PASS",
+    "market_strategy_tests": 0
+  },
+  "production_changed": false,
+  "orders_executed": false
+}
