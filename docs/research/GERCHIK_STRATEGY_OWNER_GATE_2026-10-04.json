@@ -1,0 +1,820 @@
+{
+  "schema": "ktrader.strategy_owner_gate.v0.1",
+  "owner_instruction_date": "2026-10-04",
+  "instruction": "Стратегії - спочатку погодження і затвердження",
+  "scope": "CURRENT_S1_S6_DEFINITIONS_PARAMETERS_AND_MARKET_TEST_PROTOCOL",
+  "agreement_status": "S1_S2_S3_S4_S5_APPROVED_S6_ABSORBED_IN_S2_CONSOLIDATION_PARAMETERS_PENDING",
+  "approval_status": "S1_S2_S3_S4_S5_APPROVED_S6_ABSORBED_IN_S2_CONSOLIDATION_PARAMETERS_PENDING",
+  "market_strategy_runs_authorized": false,
+  "prior_identity_approvals": "PRESERVED_AS_HISTORY_NOT_CURRENT_NUMERIC_PROTOCOL_APPROVAL",
+  "required_before_strategy_runs": [
+    "OWNER_AGREEMENT_CURRENT_DEFINITIONS",
+    "OWNER_EXPLICIT_APPROVAL_PARAMETERS_AND_PROTOCOL"
+  ],
+  "research_levels_1_2_3_authorized": true,
+  "strategy_decisions": {
+    "S1": {
+      "logic_status": "OWNER_APPROVED_S1_STRATEGY_AND_EXECUTION_SCENARIO",
+      "owner_response": "1",
+      "decision_time": "2026-10-04T21:33:17+03:00",
+      "approved_chat_revision": "68",
+      "book_pages": [
+        95,
+        96,
+        104,
+        105,
+        106,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125
+      ],
+      "numeric_parameters_status": "APPROVED_RULES_BROKER_METADATA_DEFERRED",
+      "execution_reproduction_status": "OWNER_APPROVED_APPROXIMATE_SCENARIO_PROTOCOL",
+      "market_runs_authorized": true,
+      "stop_decision": {
+        "status": "OWNER_AGREED",
+        "time": "2026-10-04T21:45:39+03:00",
+        "variant": 2,
+        "policy": "TECHNICAL_STOP_WITH_SIZE_CONTROL",
+        "atr_reference_fraction": "0.20",
+        "maximum_technical_to_reference_ratio": "1.00",
+        "technical_offset_status": "OWNER_AGREED_3_SYMBOL_POINT_MT4_MT5",
+        "oversized_technical_stop": "SKIP_DO_NOT_MOVE_INSIDE_STRUCTURE",
+        "fixed_stop_exception": "OWNER_REQUESTED_FOR_BOOK_LISTED_ASSETS",
+        "fixed_book_source_page": 108,
+        "fixed_book_ranges": {
+          "US_EQUITIES": {
+            "stop_usd": [
+              "0.03",
+              "0.07"
+            ],
+            "includes_entry_tolerance": true
+          },
+          "FOREX": {
+            "stop_book_points": [
+              15,
+              25
+            ],
+            "entry_tolerance_book_points": [
+              2,
+              3
+            ],
+            "GBPUSD_upper_end": true,
+            "point_mapping_status": "PENDING"
+          },
+          "GOLD": {
+            "stop_usd": [
+              "2",
+              "3"
+            ],
+            "entry_tolerance_usd": [
+              "0.10",
+              "0.15"
+            ]
+          },
+          "OIL": {
+            "stop_usd": [
+              "0.15",
+              "0.20"
+            ],
+            "entry_tolerance_usd": [
+              "0.02",
+              "0.03"
+            ]
+          }
+        },
+        "fixed_exact_values_status": "OWNER_AGREED_FOR_GOLD_OIL_FOREX",
+        "fixed_versus_technical_execution_precedence": "FIXED_STOP_EXCEPTION_FOR_GOLD_OIL_FOREX_US_EQUITIES_SEPARATE_OWNER_RULE",
+        "market_runs_authorized": false,
+        "latest_asset_decision_time": "2026-10-04T21:50:14+03:00",
+        "fixed_asset_values": {
+          "GOLD": {
+            "stop_quote_usd": "3.00",
+            "entry_tolerance_quote_usd": "0.15"
+          },
+          "OIL": {
+            "stop_quote_usd": "0.20",
+            "entry_tolerance_quote_usd": "0.03"
+          },
+          "FOREX": {
+            "stop_book_points": 20,
+            "entry_tolerance_book_points": 3,
+            "point_mapping_status": "PENDING"
+          },
+          "GBPUSD": {
+            "stop_book_points": 25,
+            "entry_tolerance_book_points": 3,
+            "entry_tolerance_authority": "COMMON_FOREX_RULE",
+            "point_mapping_status": "PENDING"
+          }
+        },
+        "us_equities": {
+          "mode": "TECHNICAL_PRIORITY_WITH_CALCULATED_REFERENCE",
+          "condition": "CALCULATED_STOP_DISTANCE_GREATER_THAN_0_20_ATR5",
+          "fallback": "TECHNICAL_STOP_BEYOND_PROTECTIVE_LEVEL",
+          "fixed_cents_proposal": "NOT_ADOPTED",
+          "calculated_formula_status": "OWNER_AGREED",
+          "technical_offset_status": "OWNER_AGREED_3_SYMBOL_POINT_MT4_MT5",
+          "specific_fallback_size_cap_status": "FULL_ENTRY_TO_SL_NO_GREATER_THAN_CALCULATED_BASE_STOP",
+          "calculated_formula": "S=0.002*LEVEL_PRICE",
+          "calculated_price_fraction": "0.002",
+          "technical_priority": "PREFERRED_BEYOND_LEVEL_OR_STRUCTURE_INCLUDING_WHEN_SMALLER_THAN_CALCULATED",
+          "previous_atr_threshold_rule": "PRESERVED_CALCULATED_STOP_GREATER_THAN_0_20_ATR5_REQUIRES_TECHNICAL",
+          "latest_decision_time": "2026-10-04T21:57:35+03:00",
+          "entry_tolerance_fraction": "0.0004"
+        },
+        "fixed_values_distance_semantics": "BASE_DISTANCE_FROM_LEVEL_BEFORE_ADDING_ENTRY_TOLERANCE",
+        "fixed_full_risk_distances": {
+          "GOLD": {
+            "quote_usd": "3.15"
+          },
+          "OIL": {
+            "quote_usd": "0.23"
+          },
+          "FOREX": {
+            "book_points": 23
+          },
+          "GBPUSD": {
+            "book_points": 28
+          }
+        },
+        "technical_point_mapping": "PLATFORM_SYMBOL_POINT_APPROVED_HISTORICAL_VALUES_PENDING",
+        "entry_tolerance_policy": {
+          "general_fraction_of_level": "0.0004",
+          "GOLD_quote_usd": "0.15",
+          "OIL_quote_usd": "0.03",
+          "FOREX_platform_points": 3,
+          "GBPUSD_platform_points": 3,
+          "status": "OWNER_AGREED_EXCEPTIONS_PRESERVED"
+        }
+      },
+      "next_strategy_gate": "S1_APPROVED_S2_MAY_BE_PRESENTED_AFTER_HANDOFF",
+      "analysis_scope": {
+        "owner_decision_time": "2026-10-04T22:03:08+03:00",
+        "scope": "SINGLE_TRADE_CALCULATION",
+        "included": [
+          "ENTRY",
+          "PROTECTIVE_STOP",
+          "PER_UNIT_RISK",
+          "POSITION_SIZE",
+          "TARGET",
+          "TRADE_COSTS"
+        ],
+        "excluded": [
+          "DAILY_RISK_ALLOCATION",
+          "PORTFOLIO_RISK",
+          "CONSECUTIVE_LOSS_DAILY_STOP"
+        ],
+        "money_risk_budget_status": "OWNER_AGREED_0_5_PERCENT_DEPOSIT",
+        "meaning": "ONE_TRADE_NOT_ONE_SHARE_OR_CONTRACT",
+        "market_runs_authorized": false,
+        "money_risk_fraction": "0.005",
+        "trade_costs_status": "OWNER_APPROVED"
+      },
+      "owner_status_correction_time": "2026-10-04T22:10:32+03:00",
+      "preconditions_review": {
+        "status": "OWNER_AGREED_CORE_PRECONDITIONS_REMAINING_DETAILS_OPEN",
+        "source_pages": [
+          89,
+          90,
+          120,
+          121,
+          124,
+          127,
+          231,
+          233,
+          234
+        ],
+        "items": [
+          "STRONG_D1_LEVEL_AND_NONCONTRADICTORY_LOCAL_DIRECTION",
+          "ROOM_TO_NEXT_LEVEL_AND_CALCULATED_ATR",
+          "TECHNICALLY_DEFENSIBLE_STOP",
+          "NO_ACTIVE_COMPRESSION_UNLESS_EQUALIZING_BAR",
+          "VALID_ADJACENT_BPU1_BPU2_NO_PENETRATION",
+          "BPU2_NOT_PARANORMALLY_LARGE",
+          "SESSION_FIRST_HOUR_RULE_WITH_UNFORMALIZED_EXCEPTIONS"
+        ],
+        "supporting_not_mandatory": [
+          "LARGE_BAR_APPROACH",
+          "MIRROR_LEVEL"
+        ],
+        "unresolved": [
+          "QUANTIFIED_COMPRESSION_AND_EQUALIZING_POLICY",
+          "LARGE_BAR_REFERENCE_AND_WINDOW",
+          "D1_DIRECTION_ZONE_FORMALIZATION",
+          "SESSION_DEFINITION_FOR_24_7",
+          "FIRST_HOUR_EXCEPTION_SEMANTICS",
+          "ORDER_CANCELLATION_LEVEL_VS_ENTRY_ANCHOR_DISCREPANCY"
+        ],
+        "compression": {
+          "timeframe": "M5",
+          "consecutive_closes": 3,
+          "resistance": "C1<C2<C3<=P_WITH_NO_BAR_PENETRATION",
+          "support": "C1>C2>C3>=P_WITH_NO_BAR_PENETRATION",
+          "state": "BLOCK_REJECTION_UNTIL_EQUALIZING_BAR",
+          "equalizing_draft": "STRICTLY_FARTHER_CLOSE_WITH_NO_LEVEL_PENETRATION",
+          "equalizing_rule_status": "OWNER_AGREED_STRICT"
+        },
+        "channel": {
+          "book_pages": [
+            117,
+            118,
+            119,
+            246
+          ],
+          "minimum_width_risk_multiples": 6,
+          "next_daily_from_daily_risk_multiples": 6,
+          "next_daily_from_intraday_risk_multiples": 4,
+          "middle_channel_strict_boundary": "BOOK_DIFFERS_AT_LEAST_FOUR_VS_MORE_THAN_FOUR_PENDING",
+          "risk_distance_definition": "FULL_ENTRY_TO_SL",
+          "remaining_atr_requirement": "OWNER_MINIMUM_60_PERCENT",
+          "required_signal": true,
+          "scope_status": "DEFERRED_TO_SEPARATE_CHANNEL_STRATEGY_APPROVAL",
+          "applies_as_S1_entry_gate": false,
+          "blocks_S1_completion": false,
+          "scope_decision_time": "2026-10-05T03:41:19+03:00"
+        },
+        "additional_sources": [
+          {
+            "library_file_id": "libfile_f29a85b0aa048191bbe7957bdb592516",
+            "pages": [
+              27,
+              30,
+              39
+            ]
+          },
+          {
+            "library_file_id": "libfile_f037b10093ec81919fe826391cb97549",
+            "pages": [
+              2,
+              3,
+              4,
+              5
+            ]
+          },
+          {
+            "library_file_id": "libfile_2cfe3401349c8191ae860884723e160a",
+            "scope": "KRAVCHENKO_BREAKOUT_CONTEXT_NOT_REJECTION_PARAMETERS"
+          }
+        ],
+        "remaining_atr": {
+          "anchor": "LEVEL_PRICE",
+          "observed_close": "LAST_COMPLETED_M5",
+          "minimum_fraction": "0.60",
+          "direction": "TRADE_DIRECTION",
+          "calculation_draft": "A_MINUS_MAX_ZERO_DIRECTION_TIMES_CLOSE_MINUS_LEVEL",
+          "opposite_side_close_handling": "PENDING_DO_NOT_ASSUME_ENTRY_ELIGIBILITY"
+        }
+      },
+      "latest_owner_parameters": {
+        "time": "2026-10-04T22:56:09+03:00",
+        "working_timeframe": "M5",
+        "compression_close_count": 3,
+        "remaining_atr_minimum_fraction": "0.60",
+        "reverse_direction_budget": "RESTART_DIRECTIONAL_TRAVEL_AT_REVERSAL_NOT_RECALCULATE_ATR5",
+        "trend_context_instruction": "H1_AND_M5_MOVE_IN_DAILY_TREND_DIRECTION_REMEMBER_REJECTION_REVERSES_DIRECTION",
+        "trend_phase_formalization": "OWNER_AGREED_DURING_APPROACH",
+        "base_stop_before_entry_tolerance": true,
+        "technical_offset_book_points": 3,
+        "technical_max_actual_distance": "NO_GREATER_THAN_CALCULATED_STOP",
+        "technical_point_mapping": "PENDING",
+        "first_hour_exceptions": "OWNER_AGREED_CONJUNCTION_AND_NEW_POST_FALSE_BREAK_MODEL",
+        "order_submission_seconds_before_bpu2_close": 30,
+        "cancellation_two_stops_anchor": "LEVEL_PRICE",
+        "single_trade_deposit_risk_fraction": "0.005",
+        "bpu2_paranormal_20_bar_rule": "OWNER_AGREED_RANGE_GE_2_TIMES_MEAN_PREVIOUS_20_M5_EXCLUDING_BPU2",
+        "compression_equalizing": "STRICTLY_FARTHER_CLOSE_NO_EQUALITY",
+        "remaining_atr_anchor": "LEVEL_PRICE",
+        "remaining_atr_observation": "LAST_COMPLETED_M5_CLOSE",
+        "trend_direction_algorithm": "OWNER_AGREED_CONFIRMED_SWING_STRUCTURE_FOR_TESTING",
+        "forex_first_touch_tolerance_platform_points": 2,
+        "technical_offset_platform_points": 3,
+        "point_definition": "MT4_MT5_SYMBOL_POINT",
+        "technical_cap_distance": "FULL_ENTRY_TO_SL",
+        "equity_entry_tolerance_fraction_of_level": "0.0004",
+        "entry_tolerance_general_fraction": "0.0004",
+        "prior_fixed_asset_tolerances": "OWNER_EXPLICITLY_PRESERVED"
+      },
+      "session_decision": {
+        "owner_time": "2026-10-04T23:06:50+03:00",
+        "first_hour_exception_status": "OWNER_AGREED",
+        "exception_conjunction": "STRONG_DAILY_LEVEL_AND_LIMIT_LEVEL_WITH_FALSE_BREAK_IN_FIRST_HOUR",
+        "post_false_break": "NEW_VALID_REJECTION_MODEL_REQUIRED",
+        "prior_model_revival": false,
+        "regional_assets_anchor": "REGIONAL_TRADING_SESSION_OPEN",
+        "regional_calendar_values_status": "PENDING_SYMBOL_AND_EXCHANGE_CALENDAR",
+        "forex_anchor": "END_OF_DAILY_TRADING_BREAK_IN_BROKER_SYMBOL_CALENDAR",
+        "forex_hour_break": "OWNER_DESCRIBED_ONE_HOUR_REQUIRE_VERIFY_ACTUAL_CALENDAR_NOT_UNIVERSAL_ASSUMPTION",
+        "crypto_daily_timezone": "GMT_UTC",
+        "crypto_daily_anchor": "00:00",
+        "crypto_first_hour_interval": "00:00_INCLUSIVE_TO_01:00_EXCLUSIVE_UTC",
+        "enhanced_activity_context": "RELEVANT_EXCHANGE_SESSIONS_FOR_FOREX_AND_CRYPTO",
+        "enhanced_activity_threshold_status": "PENDING_NO_NEW_AUTOMATIC_VETO"
+      },
+      "calendar_activity_proposal": {
+        "status": "ACTIVITY_OWNER_AGREED_CALENDAR_DETAILS_PENDING",
+        "date": "2026-10-04",
+        "calendars": {
+          "US_EQUITIES": {
+            "opening_local": "09:30",
+            "closing_local": "16:00",
+            "timezone": "America/New_York",
+            "calendar": "PRIMARY_EXCHANGE_HOLIDAYS_EARLY_CLOSES"
+          },
+          "UK_EQUITIES": {
+            "opening_local": "08:00",
+            "closing_local": "16:30",
+            "timezone": "Europe/London",
+            "calendar": "LSE"
+          },
+          "JAPAN_EQUITIES": {
+            "opening_local": "09:00",
+            "timezone": "Asia/Tokyo",
+            "calendar": "JPX",
+            "afternoon_open": "12:30",
+            "afternoon_first_hour_restart_status": "NOT_DEFINED"
+          },
+          "METALS_ENERGY": {
+            "calendar": "ACTUAL_CONTRACT_VENUE_OR_BROKER_PROFILE_NOT_GENERIC_ASSET_NAME",
+            "broker_binding": "CONFIGURABLE_REFERENCE_GERCHIK_CO"
+          },
+          "FOREX": {
+            "daily_first_hour_anchor": "ACTUAL_BROKER_SYMBOL_DAILY_BREAK_END",
+            "numeric_break_times": "NOT_AVAILABLE",
+            "broker_binding": "CONFIGURABLE_REFERENCE_GERCHIK_CO"
+          },
+          "CRYPTO": {
+            "daily_anchor": "00:00_UTC",
+            "weekends": "OPEN_UNLESS_VENUE_MAINTENANCE"
+          }
+        },
+        "session_context": {
+          "regional_open_windows_minutes": 60,
+          "regional_calendar_holidays": "APPLY",
+          "london_us_core_overlap": "TAG",
+          "resets_forex_or_crypto_daily_first_hour": false
+        },
+        "activity": {
+          "timeframe": "M5",
+          "metric": "CURRENT_COMPLETED_HIGH_LOW_DIVIDED_BY_MEAN_PREVIOUS_20_HIGH_LOW",
+          "exclude_observation_from_reference": true,
+          "normal_lt": "1.5",
+          "elevated_ge": "1.5",
+          "extreme_ge": "2.0",
+          "bpu2_veto_ge": "2.0_OWNER_ALREADY_AGREED",
+          "missing_reference": "UNKNOWN",
+          "purpose": "PRICE_ACTIVITY_CONTEXT_NOT_LIQUIDITY_CERTIFICATION",
+          "effect": "TAG_ONLY_NO_EXTRA_ENTRY_OR_STOP_CHANGES",
+          "status": "OWNER_AGREED",
+          "decision_time": "2026-10-04T23:27:33+03:00",
+          "owner_response": "Шкала активності 1,5 / 2 - agreed",
+          "elevated_lt": "2.0",
+          "extreme_label": "НАДМІРНА",
+          "normal_label": "ЗВИЧАЙНА",
+          "elevated_label": "ПІДВИЩЕНА",
+          "zero_reference": "UNKNOWN",
+          "threshold_origin": "PROJECT_ENGINEERING_RULE_OWNER_AGREED_NOT_BOOK_QUOTE"
+        },
+        "historical_calendars": "USE_RULES_FOR_ACTUAL_TEST_DATES",
+        "production_changed": false,
+        "reference_broker": "Gerchik & Co"
+      },
+      "broker_reference_decision": {
+        "status": "OWNER_AGREED",
+        "decision_time": "2026-10-04T23:22:22+03:00",
+        "owner_response": "Брокер і точні символи Forex, золота та нафти не фіксуємо; можливе використання різних брокерів. Поки орієнтуємось на Gerchik Co.",
+        "reference_broker": "Gerchik & Co",
+        "broker_exclusivity": false,
+        "exact_symbols_locked": false,
+        "scope": "REFERENCE_PROFILE_ONLY_NOT_APPROVAL_OF_ACTIVITY_THRESHOLDS_OR_ENTIRE_CALENDAR_PROPOSAL",
+        "profile_design": {
+          "status": "SPECIFICATION_PROPOSAL",
+          "fields": [
+            "broker",
+            "account_platform",
+            "canonical_instrument",
+            "broker_symbol",
+            "timezone_and_dst",
+            "session_schedule",
+            "daily_break",
+            "holiday_overrides",
+            "point",
+            "tick_size",
+            "tick_value",
+            "contract_size",
+            "volume_min_step_max",
+            "valid_from",
+            "valid_to",
+            "source"
+          ],
+          "historical_rule": "USE_PROFILE_VALID_AT_TEST_DATE",
+          "missing_required_metadata": "UNRESOLVED_DO_NOT_INVENT_NUMERIC_VALUES"
+        },
+        "public_source_check": {
+          "date": "2026-10-04",
+          "urls": [
+            "https://gerchik.co/en/for-trader/trading-terms/list-of-assets",
+            "https://gerchik.co/en/for-trader/trading-terms/trading-hours"
+          ],
+          "daily_break_numeric_times": "NOT_CONFIRMED_FROM_RETRIEVED_PAGES",
+          "point_and_contract_values": "NOT_CONFIRMED_FROM_RETRIEVED_PAGES"
+        },
+        "market_runs_authorized": false,
+        "production_changed": false,
+        "calendar_and_numeric_metadata_status": "OWNER_EXPLICITLY_LEFT_OPEN"
+      },
+      "test_exit_decision": {
+        "status": "OWNER_APPROVED_SL_TP_AND_END_OF_DATA_CENSORING",
+        "decision_time": "2026-10-04T23:56:25+03:00",
+        "non_crypto_target_R": 3,
+        "crypto_target_R": 1.5,
+        "stage": "TESTING",
+        "R_definition": "FULL_ACTUAL_ENTRY_TO_SL_PRICE_DISTANCE",
+        "take_profit_formula": "E + direction*k*abs(E-SL)",
+        "net_return": "REPORT_AFTER_COSTS_SEPARATELY",
+        "prior_1R_first_stage": "SUPERSEDED_FOR_S1_BY_CURRENT_OWNER_TARGET",
+        "partial_exit_trailing_breakeven_timeout": "NOT_APPROVED_BY_THIS_DECISION",
+        "market_runs_authorized": false
+      },
+      "direction_proposals": {
+        "status": "OWNER_AGREED_BASELINE_FOR_TESTING_ALTERNATIVES_RETAINED",
+        "recommended": "CONFIRMED_SWING_STRUCTURE",
+        "options": [
+          {
+            "id": 1,
+            "name": "CONFIRMED_SWING_STRUCTURE",
+            "pivot_left": 2,
+            "pivot_right": 2,
+            "up": "LAST_TWO_CONFIRMED_HIGHS_AND_LOWS_STRICTLY_RISING",
+            "down": "LAST_TWO_CONFIRMED_HIGHS_AND_LOWS_STRICTLY_FALLING",
+            "other": "NEUTRAL",
+            "causality": "PIVOT_AVAILABLE_ONLY_AFTER_TWO_RIGHT_BARS_CLOSE"
+          },
+          {
+            "id": 2,
+            "name": "EMA20",
+            "up": "LAST_CLOSED_CLOSE_ABOVE_EMA20_AND_EMA20_ABOVE_PREVIOUS",
+            "down": "LAST_CLOSED_CLOSE_BELOW_EMA20_AND_EMA20_BELOW_PREVIOUS",
+            "other": "NEUTRAL"
+          },
+          {
+            "id": 3,
+            "name": "DAILY_LEVEL_CONTEXT_PLUS_LOCAL_STRUCTURE",
+            "daily": "CLOSE_AND_LAST_CONFIRMED_BROKEN_DAILY_LEVEL_DIRECTION",
+            "local": "CONFIRMED_SWING_STRUCTURE",
+            "limitation": "DAILY_ZONE_RULE_REQUIRES_FURTHER_SPECIFICATION"
+          }
+        ],
+        "alignment_phase": "APPROACH",
+        "no_indicator_formula_claimed_as_book_rule": true,
+        "decision_time": "2026-10-05T00:05:16+03:00",
+        "selected_baseline": 1,
+        "alternatives": [
+          2,
+          3
+        ],
+        "alternative_testing": "SEPARATE_PREDECLARED_COMPARISONS_NOT_MIXED_WITH_BASELINE"
+      },
+      "strong_level_review": {
+        "status": "OWNER_AGREED_ADMISSION_GATE",
+        "timeframes": [
+          "D1",
+          "W1"
+        ],
+        "volatility_decrease": "OWNER_WITHDREW_REJECTION_CRITERION_RELEVANT_TO_BREAKOUT_CONTEXT_ONLY_NO_S2_APPROVAL",
+        "book_pages": [
+          64,
+          65,
+          66,
+          67,
+          89,
+          90,
+          120,
+          124,
+          231,
+          234
+        ],
+        "strength_evidence": [
+          "ADDITIONAL_TOUCHES",
+          "NEAR_MISS_BARS_WITHOUT_RELAXING_BPU1_RULE",
+          "HISTORICAL_FALSE_BREAKS",
+          "TREND_BREAK_FOLLOWED_BY_NEW_EXTREME",
+          "LONG_WICKS",
+          "ROUND_PRICE_CONTEXT",
+          "MIRROR_LOCAL_MODEL"
+        ],
+        "recommended_gate": "VALID_CONFIRMED_D1_W1_LEVEL_PLUS_AT_LEAST_ONE_REINFORCING_SIGN_PLUS_VALID_M5_MODEL_WITHOUT_ACTIVE_COMPRESSION",
+        "recommended_gate_status": "OWNER_AGREED",
+        "strength_and_approach_context_separate": true,
+        "ATR_strength_use": false,
+        "decision_time": "2026-10-05T00:05:16+03:00",
+        "numeric_criteria_authority": "EXISTING_OWNER_AGREED_LEVEL_DEFINITION_AND_STRENGTH_METHODOLOGY",
+        "numeric_criteria_scope_decision_time": "2026-10-05T03:41:19+03:00",
+        "strategy_specific_rethresholding": false,
+        "missing_approved_feature_rule": "DO_NOT_INVENT_OR_COUNT_UNSPECIFIED_FEATURE_AS_CONFIRMED",
+        "inheritance": "USE_CAUSALLY_AVAILABLE_LEVEL_FEATURES_AND_EVIDENCE_NO_FUTURE_DATA"
+      },
+      "test_execution_decision": {
+        "status": "OWNER_AGREED_PRICE_ROUNDING_AND_APPROXIMATE_SCENARIO_TESTING",
+        "decision_time": "2026-10-05T00:05:16+03:00",
+        "rounding": {
+          "protective_long": "DOWN_TO_ALLOWED_PRICE_STEP",
+          "protective_short": "UP_TO_ALLOWED_PRICE_STEP",
+          "entry": "MUST_REMAIN_WITHIN_AGREED_LUFT",
+          "point_vs_tick_size": "SEPARATE_SYMBOL_PROPERTIES",
+          "after_rounding": "RECOMPUTE_STOP_DISTANCE_AND_VOLUME_VERIFY_CAPS",
+          "cap_violation": "SKIP"
+        },
+        "approximate_intrabar": {
+          "accepted": true,
+          "exact_reproduction": false,
+          "submission": "30_SECONDS_BEFORE_BPU2_CLOSE_REMAINS_RULE",
+          "missing_intrabar_state": "DO_NOT_USE_FINAL_BPU2_HIGH_LOW_AS_IF_KNOWN_AT_SUBMISSION",
+          "scenario_policy": "DETAILED_PRICE_PATH_AND_AMBIGUITY_HANDLING_PENDING",
+          "reporting": "LABEL_APPROXIMATE_AND_REPORT_EXECUTION_ASSUMPTIONS"
+        },
+        "cost_model_status": "OWNER_APPROVED_WITH_SCENARIO",
+        "scope": "PARAMETER_AGREEMENT_NOT_MARKET_RUN_PROTOCOL_APPROVAL"
+      },
+      "scope_clarification": {
+        "decision_time": "2026-10-05T03:41:19+03:00",
+        "level_features": "REUSE_EXISTING_AGREED_LEVEL_RULES_NO_SEPARATE_S1_THRESHOLDS",
+        "channel_strategy": "SEPARATE_PENDING_APPROVAL_NO_S1_S6_RENUMBERING",
+        "current_S1_S6_has_named_channel_strategy": false,
+        "channel_book_rules_previously_discussed": true,
+        "preserved_S1_rules": [
+          "REMAINING_ATR_MINIMUM_60_PERCENT",
+          "VALID_LEVEL_ADMISSION",
+          "CORRECT_M5_REJECTION_MODEL",
+          "STOP_SIZE_LIMITS"
+        ],
+        "next_unresolved": "COST_MODEL_AND_APPROXIMATE_EXECUTION_PROTOCOL"
+      },
+      "execution_protocol_proposal": {
+        "status": "OWNER_APPROVED",
+        "date": "2026-10-05",
+        "costs": {
+          "known": "USE_DATED_SOURCE_OR_ARCHIVE",
+          "unknown": "REPORT_UNKNOWN_NO_NET_PROFITABILITY_CLAIM",
+          "spread": "BID_ASK_INCLUDED_IN_EXECUTION_NOT_DOUBLE_SUBTRACTED",
+          "commission": "OPEN_PLUS_CLOSE",
+          "stop_slippage": "ADVERSE_ACTUAL_OR_EXPLICIT_ASSUMPTION",
+          "carry": "ONLY_IF_APPLICABLE",
+          "risk": "POSITION_PLANNED_STOP_LOSS_PLUS_ESTIMATED_COSTS_LE_0_005_DEPOSIT",
+          "gross_and_net": "REPORT_SEPARATELY",
+          "R": "PRICE_DISTANCE_ACTUAL_ENTRY_TO_SL",
+          "zero_cost_run": "GROSS_REFERENCE_ONLY"
+        },
+        "intrabar": {
+          "priority": "ACTUAL_QUOTES_THEN_M1_THEN_M5",
+          "synthetic_paths": [
+            "O_H_L_C",
+            "O_L_H_C"
+          ],
+          "vertices_time_fraction": [
+            0,
+            0.3333333333333333,
+            0.6666666666666666,
+            1
+          ],
+          "interpolation": "LINEAR",
+          "comparison": "TWO_SEPARATE_FIXED_PATH_RUNS_NOT_OUTCOME_SELECTED_NOT_TRUE_BOUNDS",
+          "signal_information": "ONLY_CURRENT_SYNTHETIC_PREFIX_AT_SUBMISSION",
+          "submission_seconds_before_close": 30,
+          "previous_M5_ATR_travel": "LAST_FULLY_CLOSED_M5_ONLY",
+          "bpu2_reference": "PREVIOUS_20_COMPLETED_M5_EXCLUDING_CURRENT",
+          "limit_fill": "FIRST_POST_SUBMISSION_RELEVANT_QUOTE_TOUCH_OR_CROSS_AT_LIMIT_NO_PRICE_IMPROVEMENT_ASSUMED",
+          "liquidity_queue": "NOT_MODELLED_REPORT_LIMITATION",
+          "stop_target_order": "PATH_EVENT_TIME_ORDER",
+          "gap_stop": "FIRST_AVAILABLE_WORSE_EXECUTABLE_QUOTE",
+          "tp": "AT_TARGET_NO_FAVOURABLE_GAP_IMPROVEMENT",
+          "simultaneous_unresolved": "STOP_FIRST_AND_FLAG",
+          "broken_unfilled": "CANCEL_IMMEDIATELY",
+          "broken_filled": "PROTECTIVE_SL_CONTINUES_NO_NEW_DISCRETIONARY_EXIT",
+          "pending_cancel": "CLOSED_M5_DISTANCE_FROM_LEVEL_GE_2_FULL_STOPS",
+          "target_R": {
+            "other": 3,
+            "crypto": 1.5
+          },
+          "open_end": "CENSORED_NOT_ASSUMED_CLOSED",
+          "no_partial_trailing_breakeven_or_timeout": true
+        },
+        "scope": "OWNER_APPROVED_S1_TEST_PROTOCOL_EXECUTION_PAUSED_FOR_HANDOFF",
+        "approval_time": "2026-10-05T05:20:43+03:00"
+      },
+      "owner_final_approval": {
+        "status": "APPROVED",
+        "decision_time": "2026-10-05T05:20:43+03:00",
+        "owner_response": "Стратегію + сценарій погоджую. Збережи окремим документом в доках, Фіксуй проект, надам генератор, для переходу в новий чат",
+        "scope": "S1_ONLY_STRATEGY_AND_TEST_EXECUTION_SCENARIO",
+        "approved_document": "docs/research/GERCHIK_S1_REJECTION_APPROVED_2026-10-05.md",
+        "execution_state": "PAUSED_FOR_CHAT_HANDOFF_NO_RUN_STARTED",
+        "production_or_orders": false
+      }
+    },
+    "S2": {
+      "logic_status": "OWNER_APPROVED_S2_TEST_SPECIFICATION",
+      "owner_response": "погоджую. Фіксуй модель в доках.",
+      "decision_date": "2026-10-07",
+      "specification": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md",
+      "numeric_parameters_status": "APPROVED_FOR_TESTING_INSTRUMENT_METADATA_PENDING",
+      "execution_reproduction_status": "TRIGGER_SEQUENCE_APPROVED_EXECUTION_METADATA_AND_FILL_PROTOCOL_OPEN",
+      "market_runs_authorized": false,
+      "implementation_status": "NOT_STARTED_IN_THIS_TASK",
+      "working_timeframe": "M5",
+      "compression_close_count": 3,
+      "compression_scope": "ALL_BREAKOUT_MODELS_WHERE_COMPRESSION_IS_PART_OF_MODEL",
+      "entry": "LONG_L_PLUS_DELTA_SHORT_L_MINUS_DELTA",
+      "stop": "FARTHER_OF_OPPOSITE_LEVEL_TWO_TOLERANCES_OR_BEYOND_BREAKOUT_BAR_TAIL",
+      "position_size": "Rcash/ABS_ACTUAL_ENTRY_MINUS_SL_ROUNDED_DOWN_WITH_COSTS",
+      "risk_fraction": "0.005",
+      "target_r": 3,
+      "crypto_target_r": 1.5,
+      "early_exit_on_return": false,
+      "tail_stop": {
+        "status": "OWNER_APPROVED",
+        "decision_date": "2026-10-07",
+        "long": "LOW_AS_KNOWN_AT_STOP_DETERMINATION_MINUS_2_TICK_SIZE",
+        "short": "HIGH_AS_KNOWN_AT_STOP_DETERMINATION_PLUS_2_TICK_SIZE",
+        "tick_definition": "INSTRUMENT_MINIMUM_PRICE_INCREMENT",
+        "combine_with_level_stop": "LONG_MIN_SHORT_MAX",
+        "future_final_bar_extrema_allowed": false,
+        "post_entry_stop_movement": "NOT_SPECIFIED"
+      },
+      "execution_sequence": {
+        "status": "OWNER_APPROVED",
+        "date": "2026-10-07",
+        "mode": "PROGRAMMATIC_STOP_TRIGGER",
+        "steps": [
+          "ENTRY_CONDITION_TRIGGER",
+          "DETERMINE_STOP",
+          "CALCULATE_VOLUME",
+          "SEND_ORDER"
+        ],
+        "future_final_extrema_allowed": false
+      },
+      "cancellation_status": "OWNER_APPROVED",
+      "cancellation": [
+        "NON_APPROACHING_NEXT_M5_CLOSE_INCLUDING_EQUAL_DISTANCE",
+        "D1_H1_M5_ALIGNMENT_LOST",
+        "ROOM_REQUIREMENTS_LOST",
+        "INSTRUMENT_TRADING_INTERVAL_END"
+      ],
+      "new_compression_after_cancel": true,
+      "variants": {
+        "A": {
+          "name": "BASE_BREAKOUT",
+          "status": "OWNER_APPROVED_EXISTING_SPECIFICATION"
+        },
+        "B": {
+          "name": "BREAKOUT_AFTER_CONSOLIDATION",
+          "family_integration_status": "OWNER_APPROVED",
+          "numeric_consolidation_parameters_status": "PROPOSAL_NOT_SEPARATELY_APPROVED",
+          "shares_S2_execution": true,
+          "signal_subset_of": "S2_A",
+          "duplicate_orders_allowed": false
+        }
+      }
+    },
+    "S3": {
+      "logic_status": "OWNER_APPROVED_S3_TEST_SPECIFICATION",
+      "decision_date": "2026-10-10",
+      "owner_response": "згода, фіксуєм",
+      "specification": "docs/research/GERCHIK_S3_BREAKOUT_RETEST_APPROVED_2026-10-10.md",
+      "entry_model": "COMPLETED_BREAKOUT_THEN_MIRROR_RETEST_WITH_S1_LIMIT_ENTRY",
+      "confirmation_penetration_allowed": false,
+      "stop": {
+        "long": "L-2*delta",
+        "short": "L+2*delta",
+        "confirmation_extreme_plus_two_ticks": "REMOVED"
+      },
+      "money_risk_fraction": "0.005",
+      "common_test_rules": true,
+      "implementation_in_this_cycle": "NOT_STARTED",
+      "market_runs_authorized": false,
+      "wait_for_retest_deadline": "NOT_APPROVED"
+    },
+    "S4": {
+      "logic_status": "OWNER_APPROVED_S4_TEST_SPECIFICATION",
+      "decision_date": "2026-10-10",
+      "owner_response": "згоден з пропозиціями і формулами. Фіксуєм.",
+      "specification": "docs/research/GERCHIK_S4_SINGLE_BAR_FALSE_BREAK_APPROVED_2026-10-10.md",
+      "working_timeframe": "M5",
+      "entry_model": "PROGRAMMATIC_RETURN_STOP_TRIGGER_BEFORE_SAME_BAR_CLOSE",
+      "trade_direction": "WITH_CONFIRMED_D1_TREND",
+      "approach_D1_H1_M5_alignment_required": false,
+      "compression_required": false,
+      "minimum_penetration_ticks": 1,
+      "maximum_penetration_atr5_fraction": "1/3",
+      "stop": {
+        "long": "min(L-2*delta,Low(t)-2*tick_size)",
+        "short": "max(L+2*delta,High(t)+2*tick_size)",
+        "extrema": "KNOWN_AT_TRIGGER_NOT_FUTURE_FINAL"
+      },
+      "money_risk_fraction": "0.005",
+      "target_r": 3,
+      "crypto_target_r": 1.5,
+      "cancellation": {
+        "same_bar_deadline": true,
+        "unfilled_distance_from_trigger_gt_atr5": 1
+      },
+      "common_test_rules": true,
+      "implementation_in_this_cycle": "NOT_STARTED",
+      "market_runs_authorized": false
+    },
+    "S5": {
+      "logic_status": "OWNER_APPROVED_S5_A_B_TEST_SPECIFICATION",
+      "decision_date": "2026-10-10",
+      "owner_response": "1.",
+      "specification": "docs/research/GERCHIK_S5_MULTI_BAR_FALSE_BREAK_APPROVED_2026-10-10.md",
+      "working_timeframe": "M5",
+      "trade_direction": "WITH_CONFIRMED_D1_TREND",
+      "approach_D1_H1_M5_alignment_required": false,
+      "compression_required": false,
+      "subscenarios": {
+        "A": {
+          "type": "TWO_BAR",
+          "first_close": "BREAKOUT_SIDE",
+          "second_open": "BREAKOUT_SIDE",
+          "entry": "RETURN_DURING_SECOND_BAR",
+          "unfilled_deadline": "SECOND_BAR_CLOSE"
+        },
+        "B": {
+          "type": "COMPLEX",
+          "completed_bars_before_activation": 3,
+          "count_includes_initial_breakout": true,
+          "preparation_penetration_allowed": false,
+          "wick_touch_allowed": true,
+          "maximum_bars": null,
+          "cancel_on_next_confirmed_strong_level_touch_in_breakout_direction": true
+        }
+      },
+      "stop": {
+        "long": "min(L-2*delta,Low_structure(t)-2*tick_size)",
+        "short": "max(L+2*delta,High_structure(t)+2*tick_size)",
+        "extrema": "FULL_STRUCTURE_KNOWN_AT_TRIGGER"
+      },
+      "maximum_penetration_atr5_fraction": "1/3",
+      "large_bar_filter": "EACH_STRUCTURE_BAR_CURRENT_PREFIX_ONLY",
+      "money_risk_fraction": "0.005",
+      "target_r": 3,
+      "crypto_target_r": 1.5,
+      "separate_scenario_reporting": true,
+      "common_test_rules": true,
+      "implementation_in_this_cycle": "NOT_STARTED",
+      "market_runs_authorized": false
+    },
+    "S6": {
+      "logic_status": "ABSORBED_IN_S2_NOT_SEPARATE_STRATEGY",
+      "decision_date": "2026-10-10",
+      "owner_response": "оформити як варіант або узагальнити обидва варіанти і об'єднати",
+      "replacement": "S2_B_BREAKOUT_AFTER_CONSOLIDATION",
+      "specification": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md",
+      "numeric_parameters_status": "PROPOSAL_NOT_SEPARATELY_APPROVED",
+      "market_runs_authorized": false
+    }
+  },
+  "project_pause": {
+    "status": "OWNER_REQUESTED_CHAT_HANDOFF",
+    "decision_time": "2026-10-05T05:20:43+03:00",
+    "next_action": "AWAIT_USER_TRANSITION_GENERATOR",
+    "market_runs_started": false
+  },
+  "common_owner_rules": {
+    "ATE": {
+      "status": "OWNER_APPROVED",
+      "date": "2026-10-07",
+      "scope": "ALL_MODELS",
+      "absence_of_forward_level_is_insufficient_data": false,
+      "continuation_condition": "PRECONDITIONS_AND_MODEL_DO_NOT_INDICATE_REJECTION_OR_FALSE_BREAK",
+      "specification": "docs/research/GERCHIK_ALL_MODELS_ATE_OWNER_RULE_2026-10-07.md"
+    },
+    "testing_parameters": {
+      "status": "OWNER_APPROVED_FOR_ALL_SCENARIOS",
+      "decision_date": "2026-10-07",
+      "specification": "docs/research/GERCHIK_ALL_SCENARIOS_TEST_RULES_APPROVED_2026-10-07.md",
+      "tolerances": {
+        "equities_crypto_fraction": "0.0004",
+        "gold_quote": "0.15",
+        "oil_quote": "0.03",
+        "forex_platform_points": 3
+      },
+      "large_bar": {
+        "range_ge_mean_multiplier": 2,
+        "reference_previous_completed_m5": 20,
+        "exclude_observed_bar": true,
+        "S2_observation": "LAST_COMPLETED_COMPRESSION_BAR"
+      },
+      "remaining_move": {
+        "minimum_atr5_fraction": "0.60",
+        "target_r": 3,
+        "crypto_target_r": 1.5,
+        "ATE_exception": true
+      }
+    }
+  },
+  "latest_strategy_checkpoint": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md"
+}
