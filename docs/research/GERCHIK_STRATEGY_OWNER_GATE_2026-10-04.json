@@ -3,8 +3,8 @@
   "owner_instruction_date": "2026-10-04",
   "instruction": "Стратегії - спочатку погодження і затвердження",
   "scope": "CURRENT_S1_S6_DEFINITIONS_PARAMETERS_AND_MARKET_TEST_PROTOCOL",
-  "agreement_status": "S1_S2_APPROVED_OTHER_STRATEGIES_PENDING",
-  "approval_status": "S1_S2_APPROVED_OTHER_STRATEGIES_PENDING",
+  "agreement_status": "S1_S2_S3_APPROVED_OTHER_STRATEGIES_PENDING",
+  "approval_status": "S1_S2_S3_APPROVED_OTHER_STRATEGIES_PENDING",
   "market_strategy_runs_authorized": false,
   "prior_identity_approvals": "PRESERVED_AS_HISTORY_NOT_CURRENT_NUMERIC_PROTOCOL_APPROVAL",
   "required_before_strategy_runs": [
@@ -666,7 +666,22 @@
       "new_compression_after_cancel": true
     },
     "S3": {
-      "logic_status": "PENDING"
+      "logic_status": "OWNER_APPROVED_S3_TEST_SPECIFICATION",
+      "decision_date": "2026-10-10",
+      "owner_response": "згода, фіксуєм",
+      "specification": "docs/research/GERCHIK_S3_BREAKOUT_RETEST_APPROVED_2026-10-10.md",
+      "entry_model": "COMPLETED_BREAKOUT_THEN_MIRROR_RETEST_WITH_S1_LIMIT_ENTRY",
+      "confirmation_penetration_allowed": false,
+      "stop": {
+        "long": "L-2*delta",
+        "short": "L+2*delta",
+        "confirmation_extreme_plus_two_ticks": "REMOVED"
+      },
+      "money_risk_fraction": "0.005",
+      "common_test_rules": true,
+      "implementation_in_this_cycle": "NOT_STARTED",
+      "market_runs_authorized": false,
+      "wait_for_retest_deadline": "NOT_APPROVED"
     },
     "S4": {
       "logic_status": "PENDING"
@@ -716,5 +731,6 @@
         "ATE_exception": true
       }
     }
-  }
+  },
+  "latest_strategy_checkpoint": "docs/research/GERCHIK_S3_BREAKOUT_RETEST_APPROVED_2026-10-10.md"
 }
