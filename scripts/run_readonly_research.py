@@ -79,8 +79,11 @@ def validate_paths(archive: Path, results: Path) -> tuple[Path, Path]:
         raise ValueError("archive and results must not overlap")
     if results == Path("/tmp") or Path("/tmp") in archive.parents:
         raise ValueError("reserve /tmp for scratch, not canonical archive or results")
-    if not (archive / "dataset_summary.json").is_file():
-        raise ValueError("dataset_summary.json is missing; wrong archive")
+    classic = (archive / "dataset_summary.json").is_file()
+    mt4 = ((archive / "full_corpus_series_validation_20261009.csv").is_file()
+           and (archive / "research_max_available" / "normalized").is_dir())
+    if not (classic or mt4):
+        raise ValueError("unrecognized verified archive layout")
     if not os.access(archive, os.R_OK | os.X_OK):
         raise PermissionError("research user cannot read archive")
     if not os.access(results, os.W_OK | os.X_OK):
