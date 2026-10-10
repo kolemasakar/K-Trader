@@ -139,8 +139,9 @@ def main(argv: list[str] | None = None) -> int:
         script = (
             "import json,os,pathlib,errno;"
             "p=pathlib.Path(os.environ['KTRADER_RESEARCH_ARCHIVE']);"
-            "s=json.loads((p/'dataset_summary.json').read_text());"
-            "f=p/'dataset_summary.json';"
+            "f=(p/'dataset_summary.json' if (p/'dataset_summary.json').is_file() else p/'full_corpus_series_validation_20261009.csv');"
+            "s=json.loads(f.read_text()) if f.name=='dataset_summary.json' else {};"
+
             "blocked=False;"
             "\\ntry: fd=os.open(f,os.O_WRONLY);os.close(fd)"
             "\\nexcept OSError as e: blocked=e.errno in (errno.EPERM,errno.EACCES)"
