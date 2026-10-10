@@ -3,8 +3,8 @@
   "owner_instruction_date": "2026-10-04",
   "instruction": "Стратегії - спочатку погодження і затвердження",
   "scope": "CURRENT_S1_S6_DEFINITIONS_PARAMETERS_AND_MARKET_TEST_PROTOCOL",
-  "agreement_status": "S1_S2_S3_S4_S5_APPROVED_S6_PENDING",
-  "approval_status": "S1_S2_S3_S4_S5_APPROVED_S6_PENDING",
+  "agreement_status": "S1_S2_S3_S4_S5_APPROVED_S6_ABSORBED_IN_S2_CONSOLIDATION_PARAMETERS_PENDING",
+  "approval_status": "S1_S2_S3_S4_S5_APPROVED_S6_ABSORBED_IN_S2_CONSOLIDATION_PARAMETERS_PENDING",
   "market_strategy_runs_authorized": false,
   "prior_identity_approvals": "PRESERVED_AS_HISTORY_NOT_CURRENT_NUMERIC_PROTOCOL_APPROVAL",
   "required_before_strategy_runs": [
@@ -663,7 +663,21 @@
         "ROOM_REQUIREMENTS_LOST",
         "INSTRUMENT_TRADING_INTERVAL_END"
       ],
-      "new_compression_after_cancel": true
+      "new_compression_after_cancel": true,
+      "variants": {
+        "A": {
+          "name": "BASE_BREAKOUT",
+          "status": "OWNER_APPROVED_EXISTING_SPECIFICATION"
+        },
+        "B": {
+          "name": "BREAKOUT_AFTER_CONSOLIDATION",
+          "family_integration_status": "OWNER_APPROVED",
+          "numeric_consolidation_parameters_status": "PROPOSAL_NOT_SEPARATELY_APPROVED",
+          "shares_S2_execution": true,
+          "signal_subset_of": "S2_A",
+          "duplicate_orders_allowed": false
+        }
+      }
     },
     "S3": {
       "logic_status": "OWNER_APPROVED_S3_TEST_SPECIFICATION",
@@ -754,7 +768,13 @@
       "market_runs_authorized": false
     },
     "S6": {
-      "logic_status": "PENDING"
+      "logic_status": "ABSORBED_IN_S2_NOT_SEPARATE_STRATEGY",
+      "decision_date": "2026-10-10",
+      "owner_response": "оформити як варіант або узагальнити обидва варіанти і об'єднати",
+      "replacement": "S2_B_BREAKOUT_AFTER_CONSOLIDATION",
+      "specification": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md",
+      "numeric_parameters_status": "PROPOSAL_NOT_SEPARATELY_APPROVED",
+      "market_runs_authorized": false
     }
   },
   "project_pause": {
@@ -796,5 +816,5 @@
       }
     }
   },
-  "latest_strategy_checkpoint": "docs/research/GERCHIK_S5_MULTI_BAR_FALSE_BREAK_APPROVED_2026-10-10.md"
+  "latest_strategy_checkpoint": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md"
 }
