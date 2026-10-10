@@ -3,6 +3,7 @@ import argparse
 import json
 from ktrader.mt4_research import MT4ResearchCorpus, CorpusError
 from ktrader.s1_setup import inspect_readiness
+from ktrader.s1_equity_levels_replay import candidate_levels
 
 def main(argv=None):
     p=argparse.ArgumentParser()
@@ -22,6 +23,15 @@ def main(argv=None):
     result=inspect_readiness(candles["M5"],candles["H1"],candles["D1"])
     if unavailable:
         result["reasons"].append("MISSING_OR_INVALID_SERIES:"+",".join(unavailable))
+    if a.symbol.endswith(".us") and candles["D1"]:
+        try:
+            levels=candidate_levels(candles["D1"])
+            result["candidate_levels_D1"]=len(levels["D1"])
+            result["candidate_levels_W1"]=len(levels["W1"])
+            result["level_evidence_status"]=levels["level_evidence_status"]
+        except (ValueError, KeyError) as exc:
+            result["reasons"].append("LEVEL_REPLAY_INVALID:"+type(exc).__name__)
+            result["eligible"]=False
     result.update({"symbol":a.symbol,"clock":"BROKER_WALL_CLOCK_ARTIFICIAL",
                    "run_kind":"READ_ONLY_S1_READINESS_NOT_BACKTEST",
                    "trades":None,"returns":None,"source_unchanged":True})
