@@ -3,8 +3,8 @@
   "owner_instruction_date": "2026-10-04",
   "instruction": "Стратегії - спочатку погодження і затвердження",
   "scope": "CURRENT_S1_S6_DEFINITIONS_PARAMETERS_AND_MARKET_TEST_PROTOCOL",
-  "agreement_status": "S1_S2_S3_S4_APPROVED_OTHER_STRATEGIES_PENDING",
-  "approval_status": "S1_S2_S3_S4_APPROVED_OTHER_STRATEGIES_PENDING",
+  "agreement_status": "S1_S2_S3_S4_S5_APPROVED_S6_PENDING",
+  "approval_status": "S1_S2_S3_S4_S5_APPROVED_S6_PENDING",
   "market_strategy_runs_authorized": false,
   "prior_identity_approvals": "PRESERVED_AS_HISTORY_NOT_CURRENT_NUMERIC_PROTOCOL_APPROVAL",
   "required_before_strategy_runs": [
@@ -712,7 +712,46 @@
       "market_runs_authorized": false
     },
     "S5": {
-      "logic_status": "PENDING"
+      "logic_status": "OWNER_APPROVED_S5_A_B_TEST_SPECIFICATION",
+      "decision_date": "2026-10-10",
+      "owner_response": "1.",
+      "specification": "docs/research/GERCHIK_S5_MULTI_BAR_FALSE_BREAK_APPROVED_2026-10-10.md",
+      "working_timeframe": "M5",
+      "trade_direction": "WITH_CONFIRMED_D1_TREND",
+      "approach_D1_H1_M5_alignment_required": false,
+      "compression_required": false,
+      "subscenarios": {
+        "A": {
+          "type": "TWO_BAR",
+          "first_close": "BREAKOUT_SIDE",
+          "second_open": "BREAKOUT_SIDE",
+          "entry": "RETURN_DURING_SECOND_BAR",
+          "unfilled_deadline": "SECOND_BAR_CLOSE"
+        },
+        "B": {
+          "type": "COMPLEX",
+          "completed_bars_before_activation": 3,
+          "count_includes_initial_breakout": true,
+          "preparation_penetration_allowed": false,
+          "wick_touch_allowed": true,
+          "maximum_bars": null,
+          "cancel_on_next_confirmed_strong_level_touch_in_breakout_direction": true
+        }
+      },
+      "stop": {
+        "long": "min(L-2*delta,Low_structure(t)-2*tick_size)",
+        "short": "max(L+2*delta,High_structure(t)+2*tick_size)",
+        "extrema": "FULL_STRUCTURE_KNOWN_AT_TRIGGER"
+      },
+      "maximum_penetration_atr5_fraction": "1/3",
+      "large_bar_filter": "EACH_STRUCTURE_BAR_CURRENT_PREFIX_ONLY",
+      "money_risk_fraction": "0.005",
+      "target_r": 3,
+      "crypto_target_r": 1.5,
+      "separate_scenario_reporting": true,
+      "common_test_rules": true,
+      "implementation_in_this_cycle": "NOT_STARTED",
+      "market_runs_authorized": false
     },
     "S6": {
       "logic_status": "PENDING"
@@ -757,5 +796,5 @@
       }
     }
   },
-  "latest_strategy_checkpoint": "docs/research/GERCHIK_S4_SINGLE_BAR_FALSE_BREAK_APPROVED_2026-10-10.md"
+  "latest_strategy_checkpoint": "docs/research/GERCHIK_S5_MULTI_BAR_FALSE_BREAK_APPROVED_2026-10-10.md"
 }
