@@ -9,7 +9,7 @@ from decimal import Decimal
 def row_from_mt4(candle):
     opened=datetime.fromisoformat(candle["open_time"])
     closed=datetime.fromisoformat(candle["close_time"])
-    if opened.tzinfo or closed.tzinfo:
+    if opened.tzinfo is not None or closed.tzinfo is not None:
         raise ValueError("expect opaque naive broker-wall-clock input")
     if closed<=opened or candle.get("closed") is not True:
         raise ValueError("unclosed or invalid candle")
