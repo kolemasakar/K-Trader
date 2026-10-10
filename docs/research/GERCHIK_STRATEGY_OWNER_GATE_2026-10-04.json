@@ -3,8 +3,8 @@
   "owner_instruction_date": "2026-10-04",
   "instruction": "Стратегії - спочатку погодження і затвердження",
   "scope": "CURRENT_S1_S6_DEFINITIONS_PARAMETERS_AND_MARKET_TEST_PROTOCOL",
-  "agreement_status": "S1_S2_S3_APPROVED_OTHER_STRATEGIES_PENDING",
-  "approval_status": "S1_S2_S3_APPROVED_OTHER_STRATEGIES_PENDING",
+  "agreement_status": "S1_S2_S3_S4_APPROVED_OTHER_STRATEGIES_PENDING",
+  "approval_status": "S1_S2_S3_S4_APPROVED_OTHER_STRATEGIES_PENDING",
   "market_strategy_runs_authorized": false,
   "prior_identity_approvals": "PRESERVED_AS_HISTORY_NOT_CURRENT_NUMERIC_PROTOCOL_APPROVAL",
   "required_before_strategy_runs": [
@@ -684,7 +684,32 @@
       "wait_for_retest_deadline": "NOT_APPROVED"
     },
     "S4": {
-      "logic_status": "PENDING"
+      "logic_status": "OWNER_APPROVED_S4_TEST_SPECIFICATION",
+      "decision_date": "2026-10-10",
+      "owner_response": "згоден з пропозиціями і формулами. Фіксуєм.",
+      "specification": "docs/research/GERCHIK_S4_SINGLE_BAR_FALSE_BREAK_APPROVED_2026-10-10.md",
+      "working_timeframe": "M5",
+      "entry_model": "PROGRAMMATIC_RETURN_STOP_TRIGGER_BEFORE_SAME_BAR_CLOSE",
+      "trade_direction": "WITH_CONFIRMED_D1_TREND",
+      "approach_D1_H1_M5_alignment_required": false,
+      "compression_required": false,
+      "minimum_penetration_ticks": 1,
+      "maximum_penetration_atr5_fraction": "1/3",
+      "stop": {
+        "long": "min(L-2*delta,Low(t)-2*tick_size)",
+        "short": "max(L+2*delta,High(t)+2*tick_size)",
+        "extrema": "KNOWN_AT_TRIGGER_NOT_FUTURE_FINAL"
+      },
+      "money_risk_fraction": "0.005",
+      "target_r": 3,
+      "crypto_target_r": 1.5,
+      "cancellation": {
+        "same_bar_deadline": true,
+        "unfilled_distance_from_trigger_gt_atr5": 1
+      },
+      "common_test_rules": true,
+      "implementation_in_this_cycle": "NOT_STARTED",
+      "market_runs_authorized": false
     },
     "S5": {
       "logic_status": "PENDING"
@@ -732,5 +757,5 @@
       }
     }
   },
-  "latest_strategy_checkpoint": "docs/research/GERCHIK_S3_BREAKOUT_RETEST_APPROVED_2026-10-10.md"
+  "latest_strategy_checkpoint": "docs/research/GERCHIK_S4_SINGLE_BAR_FALSE_BREAK_APPROVED_2026-10-10.md"
 }
