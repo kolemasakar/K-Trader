@@ -8,7 +8,7 @@ Same-price/TF identity retains its earliest type; simultaneous types ambiguous.
 from decimal import Decimal
 
 
-def formations(rows, timeframe):
+def formations(rows, timeframe, *, session_calendar=False):
     """All causal formation episodes; an ongoing LIMIT run emits once."""
     previous = None
     for r in rows:
@@ -17,7 +17,7 @@ def formations(rows, timeframe):
             raise ValueError('nonpositive or nonfinite price')
         if not l <= min(o, c) <= max(o, c) <= h or r[6] < r[0]:
             raise ValueError('invalid candle')
-        if previous is not None and r[0] != previous + 1:
+        if previous is not None and (r[0] <= previous if session_calendar else r[0] != previous + 1):
             raise ValueError('noncontiguous candles')
         previous = r[6]
     events = []
