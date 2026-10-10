@@ -27,7 +27,7 @@ class ResearchPolicy:
                    self.historical_repetitions, self.mirror_defenses,
                    self.paranormal_reference_bars)
         if (not self.provenance or any(type(x) is not int or x < 2 for x in numbers)
-                or self.calendar != 'UTC_CONTINUOUS_24_7'):
+                or self.calendar not in ('UTC_CONTINUOUS_24_7', 'US_EQUITY_SESSION_WALL_CLOCK')):
             raise ValueError('explicit research parameters and supported calendar required')
         m = Decimal(self.paranormal_multiple)
         if not m.is_finite() or m < 2:
@@ -72,12 +72,18 @@ def detect_all(rows, timeframe, policy):
     policy.validate()
     if timeframe not in ('D1', 'W1'):
         raise ValueError('D1/W1 only')
-    strict = strict_formations(rows, timeframe)  # validates OHLC/contiguity
+    strict = strict_formations(rows, timeframe, session_calendar=(policy.calendar == 'US_EQUITY_SESSION_WALL_CLOCK'))  # validates OHLC and order
     step = 86400000 if timeframe == 'D1' else 604800000
-    if any(r[0] % 86400000 or r[6]+1-r[0] != step for r in rows):
-        raise ValueError('complete UTC bars required')
-    if timeframe == 'W1' and any((r[0]-4*86400000) % step for r in rows):
-        raise ValueError('Monday-start UTC weeks required')
+    if policy.calendar == 'UTC_CONTINUOUS_24_7':
+        if any(r[0] % 86400000 or r[6]+1-r[0] != step for r in rows):
+            raise ValueError('complete UTC bars required')
+        if timeframe == 'W1' and any((r[0]-4*86400000) % step for r in rows):
+            raise ValueError('Monday-start UTC weeks required')
+    else:
+        if any(r[6] < r[0] for r in rows):
+            raise ValueError('invalid session candle')
+        if any(a[6] >= b[0] for a,b in zip(rows, rows[1:])):
+            raise ValueError('non-increasing/overlapping session candles')
     prices = _prices(rows)
     claims = []
     for x in strict:
@@ -182,6 +188,8 @@ def detect_all(rows, timeframe, policy):
     # True traded-price gap: disjoint adjacent ranges in a contiguous 24/7 series.
     # Missing bars were rejected above. Both boundaries need their own later defense.
     for i in range(1, len(rows)):
+        if policy.calendar != "UTC_CONTINUOUS_24_7":
+            continue  # session gaps need separately reviewed exchange calendar
         a, b = prices[i-1], prices[i]
         boundaries = []
         if a[1] < b[2]:
