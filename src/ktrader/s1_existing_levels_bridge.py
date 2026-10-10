@@ -13,14 +13,14 @@ class ExistingLevelEngineUnavailable(RuntimeError):
 def detect_existing_levels(rows, timeframe, policy, *, asset_class, calendar):
     if timeframe not in ("D1", "W1"):
         raise ExistingLevelEngineUnavailable("D1/W1 required")
-    if asset_class != "crypto" or calendar != "UTC_CONTINUOUS_24_7":
+    if (asset_class, calendar) not in (("crypto", "UTC_CONTINUOUS_24_7"), ("us_equity", "US_EQUITY_SESSION_WALL_CLOCK")):
         raise ExistingLevelEngineUnavailable(
-            "existing Gerchik detector is not session-aware for US equities")
+            "unsupported asset/calendar pair")
     try:
         engine = import_module("scripts.research.gerchik_seven_types_v0_1")
     except ImportError as exc:
         raise ExistingLevelEngineUnavailable(
             "merge/cherry-pick approved existing detector dependencies before use") from exc
-    if not isinstance(policy, engine.ResearchPolicy):
+    if not isinstance(policy, engine.ResearchPolicy) or policy.calendar != calendar:
         raise ExistingLevelEngineUnavailable("existing ResearchPolicy required")
     return engine.detect_all(rows, timeframe, policy)
