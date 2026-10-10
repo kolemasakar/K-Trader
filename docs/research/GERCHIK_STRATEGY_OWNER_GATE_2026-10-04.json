@@ -3,8 +3,8 @@
   "owner_instruction_date": "2026-10-04",
   "instruction": "Стратегії - спочатку погодження і затвердження",
   "scope": "CURRENT_S1_S6_DEFINITIONS_PARAMETERS_AND_MARKET_TEST_PROTOCOL",
-  "agreement_status": "S1_S2_S3_S4_S5_APPROVED_S6_ABSORBED_IN_S2_CONSOLIDATION_PARAMETERS_PENDING",
-  "approval_status": "S1_S2_S3_S4_S5_APPROVED_S6_ABSORBED_IN_S2_CONSOLIDATION_PARAMETERS_PENDING",
+  "agreement_status": "S1_S2_S3_S4_S5_APPROVED_S6_ABSORBED_IN_S2_CONSOLIDATION_PARAMETERS_APPROVED",
+  "approval_status": "S1_S2_S3_S4_S5_APPROVED_S6_ABSORBED_IN_S2_CONSOLIDATION_PARAMETERS_APPROVED",
   "market_strategy_runs_authorized": false,
   "prior_identity_approvals": "PRESERVED_AS_HISTORY_NOT_CURRENT_NUMERIC_PROTOCOL_APPROVAL",
   "required_before_strategy_runs": [
@@ -627,7 +627,7 @@
       "working_timeframe": "M5",
       "compression_close_count": 3,
       "compression_scope": "ALL_BREAKOUT_MODELS_WHERE_COMPRESSION_IS_PART_OF_MODEL",
-      "entry": "LONG_L_PLUS_DELTA_SHORT_L_MINUS_DELTA",
+      "entry": "VARIANT_A_L_PLUS_MINUS_DELTA_VARIANT_B_MAX_L_U_PLUS_DELTA_OR_MIN_L_D_MINUS_DELTA",
       "stop": "FARTHER_OF_OPPOSITE_LEVEL_TWO_TOLERANCES_OR_BEYOND_BREAKOUT_BAR_TAIL",
       "position_size": "Rcash/ABS_ACTUAL_ENTRY_MINUS_SL_ROUNDED_DOWN_WITH_COSTS",
       "risk_fraction": "0.005",
@@ -672,10 +672,30 @@
         "B": {
           "name": "BREAKOUT_AFTER_CONSOLIDATION",
           "family_integration_status": "OWNER_APPROVED",
-          "numeric_consolidation_parameters_status": "PROPOSAL_NOT_SEPARATELY_APPROVED",
-          "shares_S2_execution": true,
-          "signal_subset_of": "S2_A",
-          "duplicate_orders_allowed": false
+          "numeric_consolidation_parameters_status": "OWNER_APPROVED_FOR_TEST_SPECIFICATION",
+          "duplicate_orders_allowed": false,
+          "shares_S2_execution_mechanics": true,
+          "decision_time": "2026-10-11T00:05:38+03:00",
+          "owner_response": "1",
+          "approved_chat_revision": "46",
+          "range_completed_M5_bars": 20,
+          "boundary_touches_minimum": 2,
+          "intervening_bars_minimum": 1,
+          "upper_touch": "HIGH_IN_U_MINUS_DELTA_TO_U",
+          "lower_touch": "LOW_IN_D_TO_D_PLUS_DELTA",
+          "width": "0_LT_U_MINUS_D_LE_ATR5_DIV_3",
+          "level_alignment": "LONG_ABS_U_MINUS_L_LE_DELTA_SHORT_ABS_D_MINUS_L_LE_DELTA",
+          "entry": {
+            "long": "MAX_L_U_PLUS_DELTA",
+            "short": "MIN_L_D_MINUS_DELTA"
+          },
+          "compression": {
+            "long": "C1_LT_C2_LT_C3_LE_U",
+            "short": "C1_GT_C2_GT_C3_GE_D"
+          },
+          "range_frozen_before_compression": true,
+          "execution_identity_with_A": false,
+          "numeric_source": "PROJECT_TEST_FORMALIZATION_NOT_GERCHIK_FORMULA"
         }
       }
     },
@@ -773,7 +793,7 @@
       "owner_response": "оформити як варіант або узагальнити обидва варіанти і об'єднати",
       "replacement": "S2_B_BREAKOUT_AFTER_CONSOLIDATION",
       "specification": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md",
-      "numeric_parameters_status": "PROPOSAL_NOT_SEPARATELY_APPROVED",
+      "numeric_parameters_status": "OWNER_APPROVED_IN_S2_B",
       "market_runs_authorized": false
     }
   },
