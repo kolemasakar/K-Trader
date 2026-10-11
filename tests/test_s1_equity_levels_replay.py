@@ -11,3 +11,15 @@ def test_equity_replay_reuses_detectors_without_review_claim():
     assert x["daily_bars"]==6
     assert x["closed_weekly_bars"]==1
     assert x["level_evidence_status"]=="AUTOMATED_RESEARCH_CANDIDATE_NOT_REVIEWED"
+
+def test_weekly_availability_is_not_backdated(monkeypatch):
+    import ktrader.s1_equity_levels_replay as module
+    from datetime import datetime,timezone
+    def detector(rows,tf,*args,**kwargs):
+        if tf=='D1':return []
+        return [dict(known_at_ms=rows[0][6]+1,confirmation_index=0,additional_patterns=[])]
+    monkeypatch.setattr(module,'detect_existing_levels',detector)
+    data=[candle('2026-10-01'),candle('2026-10-02'),candle('2026-10-05')]
+    report=module.candidate_levels(data)
+    expected=int(datetime.fromisoformat(data[-1]['close_time']).replace(tzinfo=timezone.utc).timestamp()*1000)
+    assert report['W1'][0]['known_at_ms']==expected

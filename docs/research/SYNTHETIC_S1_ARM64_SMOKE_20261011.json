@@ -1,0 +1,17 @@
+{
+  "legacy_strategy_used": false,
+  "run_kind": "SYNTHETIC_S1_EXECUTION_SMOKE_NOT_MARKET_BACKTEST",
+  "scenarios": {
+    "A": {
+      "deterministic": true,
+      "status": "TP",
+      "synthetic_orders": 1
+    },
+    "B": {
+      "deterministic": true,
+      "status": "TP",
+      "synthetic_orders": 1
+    }
+  },
+  "source_mutated": false
+}

@@ -1,0 +1,18 @@
+{
+  "status": "FROZEN_EXCLUDED_FROM_APPROVED_REPLAY",
+  "baseline_main": "c1bb8b5e0fe314ab11e6eeb8a3f0dd601939cb91",
+  "baseline_pr95": "63214fc1becb83be29adc3c10e3cb56ad8bd9153",
+  "excluded": [
+    "legacy next-Open strategy patterns",
+    "six-bar S3 timeout",
+    "separate S6 model",
+    "old benchmark outputs",
+    "archived raw-pivot/break-anchor/gradient level admission"
+  ],
+  "reused": [
+    "canonical approved ATR5 v2",
+    "current seven-type research-candidate detectors with independent admission gate",
+    "verified MT4 ingestion and Landlock launcher"
+  ],
+  "production_changed": false
+}

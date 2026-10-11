@@ -1,3 +1,9 @@
+## Поточний пріоритет — 11.10.2026
+
+Підготувати перевірений S1-прогін, завершити допуск D1/W1 і приймання S1–S5. Статус: підготовка ACHC.us виконана; реальний допуск заблоковано відсутніми independent labels/Point/tick. Новий код має 333 загальні локальні PASS, завершений market backtest не підтверджено. Умовний clock дозволений; legacy strategy і benchmark виключені.
+
+Чинний [протокол](research/APPROVED_BACKTEST_PROTOCOL_20261011.md) визначає порядок: допуск → реальний S1 → приймання → S2–S5 → інші класи/контрольна вибірка. Нижче збережено історичні milestones; вони не замінюють нові gates.
+
 # K-Trader Current State
 
 > **Mandatory host restriction (2026-09-25):** HP-OMEN is **prohibited for all K-Trader use** (including indirect K_AI/MT4-backed data, diagnostics, CI, scripts, research and backups) until a separate explicit user instruction. Work only on verified independent K-Trader server/repository resources. If a step depends on HP-OMEN, mark it BLOCKED rather than substituting it. See [`docs/operations/K_TRADER_HP_OMEN_EXCLUSION_2026-09-25.md`](operations/K_TRADER_HP_OMEN_EXCLUSION_2026-09-25.md). This operational update does not change the historical Phase 11G evidence snapshot recorded below.

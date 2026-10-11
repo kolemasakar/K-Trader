@@ -35,7 +35,32 @@ class MT4ResearchCorpus:
                 raise CorpusError("duplicate/unverified " + str(key))
             self.series[key] = r
         self.paths = {}
-        for p in (self.root / "research_max_available" / "normalized").glob("*/*/*.jsonl"):
+        normalized = self.root / "research_max_available" / "normalized"
+        paths = list(normalized.glob("*/*/*.jsonl"))
+        # The corpus retains noncanonical acquisition leftovers. Select only
+        # explicitly named authoritative manifests, never first-match glob order.
+        manifests = self.root / "research_max_available" / "manifests"
+        self.excluded_noncanonical = []
+        if manifests.is_dir():
+            selected = {}
+            for manifest_path in manifests.glob("*.json"):
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+                for result in manifest["results"]:
+                    key = (result["broker_symbol"], result["timeframe"])
+                    if key in selected or key not in self.series:
+                        raise CorpusError("ambiguous acquisition manifest " + str(key))
+                    rel = result["normalized_file"].replace(chr(92), "/").split("/normalized/", 1)[1]
+                    selected_path = (normalized / rel).resolve(strict=True)
+                    if normalized.resolve() not in selected_path.parents:
+                        raise CorpusError("acquisition path outside source")
+                    if result["normalized_content_sha256"] != self.series[key].get("normalized_sha256"):
+                        raise CorpusError("acquisition/CSV hash mismatch " + str(key))
+                    selected[key] = selected_path
+            if set(selected) != set(self.series):
+                raise CorpusError("acquisition mapping incomplete")
+            self.excluded_noncanonical = [str(p.relative_to(self.root)) for p in paths if p.resolve() not in selected.values()]
+            paths = list(selected.values())
+        for p in paths:
             with p.open(encoding="utf-8-sig") as f:
                 header = json.loads(next(f))
             key = (header.get("broker_symbol"), header.get("mt4_timeframe"))
@@ -59,6 +84,13 @@ class MT4ResearchCorpus:
         cutoff = ts(as_of, wall_clock_mode=self.wall_clock_mode)
         if self.broker_timezone is None and not self.wall_clock_mode:
             raise CorpusError("broker timezone unknown: cannot safely replay series")
+        expected_hash = self.series[key].get("normalized_sha256")
+        if expected_hash:
+            import hashlib
+            lines = self.paths[key].read_text(encoding="utf-8-sig").splitlines()
+            actual = hashlib.sha256(("\n".join(lines[1:])+"\n").encode()).hexdigest()
+            if actual != expected_hash:
+                raise CorpusError("content hash mismatch " + str(key))
         prev = None
         count = 0
         with self.paths[key].open(encoding="utf-8-sig") as f:
