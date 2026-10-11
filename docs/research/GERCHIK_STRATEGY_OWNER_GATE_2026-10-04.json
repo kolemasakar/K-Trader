@@ -810,6 +810,27 @@
       "specification": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md",
       "numeric_parameters_status": "OWNER_APPROVED_IN_S2_B",
       "market_runs_authorized": false
+    },
+    "CHANNEL": {
+      "logic_status": "OWNER_APPROVED_BASE_MODEL_NUMERIC_CHANNEL_PARAMETERS_PENDING",
+      "decision_time": "2026-10-11T04:18:49+03:00",
+      "owner_response": "1",
+      "approved_chat_revision": "55",
+      "specification": "docs/research/GERCHIK_CHANNEL_STRATEGY_BASE_APPROVED_2026-10-11.md",
+      "working_timeframe": "M5",
+      "type": "HORIZONTAL_CHANNEL_BOUNDARY_REJECTION",
+      "boundaries": "TWO_CONFIRMED_STRONG_LEVELS_D_U_KNOWN_BEFORE_SIGNAL",
+      "direction": "LONG_FROM_D_SHORT_FROM_U_INTO_CHANNEL",
+      "entry_stop_size": "INHERIT_S1",
+      "targets": {
+        "other": 3,
+        "crypto": 1.5
+      },
+      "inside_channel_entries": "DEFERRED_SEPARATE_VARIANT",
+      "numeric_channel_parameters_status": "NOT_YET_APPROVED",
+      "market_runs_authorized": false,
+      "implementation_in_this_cycle": "NOT_STARTED",
+      "renumber_S1_S6": false
     }
   },
   "project_pause": {
@@ -851,7 +872,7 @@
       }
     }
   },
-  "latest_strategy_checkpoint": "docs/research/GERCHIK_STRATEGY_PACKAGE_2026-10-11.md",
+  "latest_strategy_checkpoint": "docs/research/GERCHIK_CHANNEL_STRATEGY_BASE_APPROVED_2026-10-11.md",
   "current_documentation_scope": {
     "date": "2026-10-11",
     "strategy_specifications": "S1_S2_A_B_S3_S4_S5_A_B_OWNER_APPROVED",
@@ -859,6 +880,6 @@
     "market_runs_authorized": false,
     "prior_S1_run_flag": "HISTORICAL_APPROVAL_EXECUTION_PAUSED_NOT_AUTHORIZATION_FROM_THIS_DOCUMENTATION_CYCLE",
     "separate_backtest_work": "OUT_OF_SCOPE_AUTHORIZATION_UNCHANGED",
-    "channel_strategy": "SEPARATE_NOT_DEFINED_OR_APPROVED_IN_THIS_PACKAGE"
+    "channel_strategy": "BASE_MODEL_OWNER_APPROVED_NUMERIC_CHANNEL_PARAMETERS_PENDING"
   }
 }
