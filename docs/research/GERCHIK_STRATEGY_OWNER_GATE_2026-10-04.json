@@ -812,7 +812,7 @@
       "market_runs_authorized": false
     },
     "CHANNEL": {
-      "logic_status": "OWNER_APPROVED_BASE_MODEL_NUMERIC_CHANNEL_PARAMETERS_PENDING",
+      "logic_status": "OWNER_APPROVED_BASE_AND_80_PERCENT_ENTRY_SPACE_ADDITIONAL_CANCELLATION_PENDING",
       "decision_time": "2026-10-11T04:18:49+03:00",
       "owner_response": "1",
       "approved_chat_revision": "55",
@@ -827,20 +827,26 @@
         "crypto": 1.5
       },
       "inside_channel_entries": "DEFERRED_SEPARATE_VARIANT",
-      "numeric_channel_parameters_status": "NOT_YET_APPROVED",
+      "numeric_channel_parameters_status": "OWNER_APPROVED_80_PERCENT_WIDTH_FROM_ENTRY_WITH_TARGET_INSIDE_CHANNEL",
       "market_runs_authorized": false,
       "implementation_in_this_cycle": "NOT_STARTED",
       "renumber_S1_S6": false,
       "remaining_move_ATR60_required": false,
       "channel_profit_space": {
-        "status": "OWNER_DIRECTED_POLICY_EXACT_FORMALIZATION_PENDING",
-        "decision_time": "2026-10-11T04:23:43+03:00",
+        "status": "OWNER_APPROVED",
+        "decision_time": "2026-10-11T04:31:22+03:00",
         "width_fraction": "0.80",
         "reference": "CHANNEL_BOUNDARIES_AND_WIDTH",
-        "anchor": "PENDING_ENTRY_VS_BOUNDARY",
-        "six_stop_thresholds_status": "PROPOSAL_57_NOT_APPROVED",
-        "scope": "CHANNEL_ONLY_OTHER_S1_RULES_PRESERVED"
-      }
+        "anchor": "ENTRY_PRICE",
+        "six_stop_thresholds_status": "REPLACED_BY_APPROVED_80_PERCENT_RULE",
+        "scope": "CHANNEL_ONLY_OTHER_S1_RULES_PRESERVED",
+        "owner_response": "2",
+        "approved_chat_revision": "60",
+        "target_distance": "K_TIMES_FULL_ENTRY_TO_SL_LE_0_80_TIMES_U_MINUS_D",
+        "long": "ENTRY_PLUS_K_TIMES_D_LE_U",
+        "short": "ENTRY_MINUS_K_TIMES_D_GE_D_LOWER_BOUNDARY"
+      },
+      "additional_channel_cancellation_status": "PENDING_NEXT_PROPOSAL_S1_CANCELLATION_INHERITED"
     }
   },
   "project_pause": {
@@ -890,6 +896,6 @@
     "market_runs_authorized": false,
     "prior_S1_run_flag": "HISTORICAL_APPROVAL_EXECUTION_PAUSED_NOT_AUTHORIZATION_FROM_THIS_DOCUMENTATION_CYCLE",
     "separate_backtest_work": "OUT_OF_SCOPE_AUTHORIZATION_UNCHANGED",
-    "channel_strategy": "BASE_MODEL_OWNER_APPROVED_NUMERIC_CHANNEL_PARAMETERS_PENDING"
+    "channel_strategy": "OWNER_APPROVED_BASE_AND_80_PERCENT_ENTRY_SPACE_ADDITIONAL_CANCELLATION_PENDING"
   }
 }
