@@ -1,0 +1,9 @@
+{
+  "checked_date": "2026-10-04",
+  "source_root": "/data/research/phase11g/historical_recovery_v1/approved_seven_year_20260925",
+  "files": {
+    "strategy_approval_v1.json": "f6dec310ba754518e8dcbdf62400f058e2ee7abef4ab778446fa121f6893dc2a",
+    "backtests_approved_six_v1/exploratory_summary.json": "754482d1dc38e0496b1ef6eb5fa6e019787e5919cded2f67eac60e4cb8f3399b",
+    "s6_reproducible_offline_v1/s6_offline_reproduce.py": "f7d4f1a0984b6e0edbc5a036b613fb026f7b54dbcc5b6c2cc874947adc713784"
+  }
+}

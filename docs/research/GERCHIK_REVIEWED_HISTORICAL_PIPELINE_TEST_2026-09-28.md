@@ -1,0 +1,7 @@
+# Reviewed historical candidate pipeline — isolated verification
+
+Isolated pytest of reconstructed connector-returned logic: **14 passed** (10 structural review gate cases + 4 integrated reviewed-historical entrypoint cases). No production or HP-OMEN modifications. The isolated directory uses functionally equivalent recreated source and the `_utc` dependency, not byte-identical full GitHub checkout.
+
+New approved research entrypoint: `scripts/research/gerchik_reviewed_historical_pipeline_v0_1.py`. It requires a complete event + actual source bar + affirmative reviewer record, independently re-verifies each event, then invokes the historical candidate aggregator. A forged `structural_qualification` field with a rejected review is rejected. Eligibility starts only at actual review time.
+
+**Security/scope caveat:** the lower-level `historical_candidates()` still accepts caller-supplied qualification text when called directly. The wrapper prevents this bypass for callers that use it, but there is not yet a repository-wide guarantee that all callers are routed through the wrapper. Do not wire lower-level function to production. Review records are inputs, not cryptographically authenticated. Structural BOS/CHoCH semantics and independent labelled audit remain open. Historical aggregation currently matches exact price; approved symmetric luft matching has only been implemented in D1/W1 cross-timeframe confirmation, not in this historical aggregator.

@@ -1,0 +1,22 @@
+{
+  "schema": "ktrader.gerchik_review_input.v0.1",
+  "metadata": {},
+  "reviews": [],
+  "packet_sha256": "3622b7c25133323c846e34bb2fb545f514151a10ee56d022dfaec429049acb94",
+  "review_template": {
+    "case_id": null,
+    "packet_sha256": "3622b7c25133323c846e34bb2fb545f514151a10ee56d022dfaec429049acb94",
+    "reviewer_id": null,
+    "proposer_id": null,
+    "reviewed_at_ms": null,
+    "decision": null,
+    "rationale": null,
+    "levels": []
+  },
+  "metadata_template": {
+    "tick_size": null,
+    "effective_from_ms": null,
+    "effective_until_ms": null,
+    "provenance": null
+  }
+}
