@@ -830,7 +830,17 @@
       "numeric_channel_parameters_status": "NOT_YET_APPROVED",
       "market_runs_authorized": false,
       "implementation_in_this_cycle": "NOT_STARTED",
-      "renumber_S1_S6": false
+      "renumber_S1_S6": false,
+      "remaining_move_ATR60_required": false,
+      "channel_profit_space": {
+        "status": "OWNER_DIRECTED_POLICY_EXACT_FORMALIZATION_PENDING",
+        "decision_time": "2026-10-11T04:23:43+03:00",
+        "width_fraction": "0.80",
+        "reference": "CHANNEL_BOUNDARIES_AND_WIDTH",
+        "anchor": "PENDING_ENTRY_VS_BOUNDARY",
+        "six_stop_thresholds_status": "PROPOSAL_57_NOT_APPROVED",
+        "scope": "CHANNEL_ONLY_OTHER_S1_RULES_PRESERVED"
+      }
     }
   },
   "project_pause": {
