@@ -79,8 +79,11 @@ def validate_paths(archive: Path, results: Path) -> tuple[Path, Path]:
         raise ValueError("archive and results must not overlap")
     if results == Path("/tmp") or Path("/tmp") in archive.parents:
         raise ValueError("reserve /tmp for scratch, not canonical archive or results")
-    if not (archive / "dataset_summary.json").is_file():
-        raise ValueError("dataset_summary.json is missing; wrong archive")
+    classic = (archive / "dataset_summary.json").is_file()
+    mt4 = ((archive / "full_corpus_series_validation_20261009.csv").is_file()
+           and (archive / "research_max_available" / "normalized").is_dir())
+    if not (classic or mt4):
+        raise ValueError("unrecognized verified archive layout")
     if not os.access(archive, os.R_OK | os.X_OK):
         raise PermissionError("research user cannot read archive")
     if not os.access(results, os.W_OK | os.X_OK):
@@ -136,8 +139,9 @@ def main(argv: list[str] | None = None) -> int:
         script = (
             "import json,os,pathlib,errno;"
             "p=pathlib.Path(os.environ['KTRADER_RESEARCH_ARCHIVE']);"
-            "s=json.loads((p/'dataset_summary.json').read_text());"
-            "f=p/'dataset_summary.json';"
+            "f=(p/'dataset_summary.json' if (p/'dataset_summary.json').is_file() else p/'full_corpus_series_validation_20261009.csv');"
+            "s=json.loads(f.read_text()) if f.name=='dataset_summary.json' else {};"
+
             "blocked=False;"
             "\\ntry: fd=os.open(f,os.O_WRONLY);os.close(fd)"
             "\\nexcept OSError as e: blocked=e.errno in (errno.EPERM,errno.EACCES)"

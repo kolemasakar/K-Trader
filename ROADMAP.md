@@ -1,3 +1,14 @@
+# Чинний дослідницький рубіж — 11.10.2026
+
+Мета: завершений перевірений S1-прогін на ACHC.us, потім S2–S5 за погодженими специфікаціями. Реальна підготовка виконана: 68 D1/12 W1 кандидатів; ATR5 v2≈1,016; 6/6 вибіркових prefix checks. Допуск 0/80 через відсутні independent labels і historical Point/tick. Новий контур — 333 загальні локальні PASS; повний market replay не підтверджено. Умовний wall clock дозволений; legacy strategy/benchmark виключені.
+
+1) Завершити реальний допуск рівнів і verified symbol profile.
+2) Прийняти S1 lifecycle A/B і повторний deterministic replay.
+3) Послідовно S2-А/Б → S3 → S4 → S5-А/Б → канал.
+4) Порівняти класи активів і провести незалежний контроль після заморожування рішень.
+
+Чинний [протокол](docs/research/APPROVED_BACKTEST_PROTOCOL_20261011.md). Нижче — історичний roadmap; старі правила не керують новими тестами.
+
 # K-Trader Roadmap v1.18
 
 Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, FAST M5/60m is production-validated, corrected historical Windows #1-#4 are closed, INTRADAY/M15 universal TTL remains unresolved after broader time-split validation, and MEDIUM/H1 8-12h is time-split validated as a research-only lifecycle design band.
