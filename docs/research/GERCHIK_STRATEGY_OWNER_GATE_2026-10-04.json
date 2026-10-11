@@ -812,7 +812,7 @@
       "market_runs_authorized": false
     },
     "CHANNEL": {
-      "logic_status": "OWNER_APPROVED_BASE_AND_80_PERCENT_ENTRY_SPACE_ADDITIONAL_CANCELLATION_PENDING",
+      "logic_status": "OWNER_APPROVED_CHANNEL_TEST_SPECIFICATION",
       "decision_time": "2026-10-11T04:18:49+03:00",
       "owner_response": "1",
       "approved_chat_revision": "55",
@@ -846,7 +846,29 @@
         "long": "ENTRY_PLUS_K_TIMES_D_LE_U",
         "short": "ENTRY_MINUS_K_TIMES_D_GE_D_LOWER_BOUNDARY"
       },
-      "additional_channel_cancellation_status": "PENDING_NEXT_PROPOSAL_S1_CANCELLATION_INHERITED"
+      "additional_channel_cancellation_status": "OWNER_APPROVED",
+      "cancellation_decision": {
+        "status": "OWNER_APPROVED",
+        "decision_time": "2026-10-11T04:53:26+03:00",
+        "owner_response": "1",
+        "approved_chat_revision": "62",
+        "inherited_S1": [
+          "CONFIRMATION_PENETRATION_BREAKS_MODEL",
+          "COMPLETED_M5_ABS_CLOSE_MINUS_ENTRY_BOUNDARY_GE_TWO_FULL_STOPS"
+        ],
+        "additional": [
+          "INSTRUMENT_TRADING_INTERVAL_END",
+          "MANDATORY_MODEL_OR_TARGET_SPACE_CHECKS_LOST_BEFORE_FILL"
+        ],
+        "continuous_market_artificial_daily_close": false,
+        "post_fill": "SL_TP_NOT_PENDING_CANCELLATION"
+      },
+      "final_owner_approval": {
+        "status": "APPROVED",
+        "decision_time": "2026-10-11T04:53:26+03:00",
+        "scope": "CHANNEL_BOUNDARY_REJECTION_TEST_SPECIFICATION",
+        "specification": "docs/research/GERCHIK_CHANNEL_STRATEGY_BASE_APPROVED_2026-10-11.md"
+      }
     }
   },
   "project_pause": {
@@ -891,11 +913,11 @@
   "latest_strategy_checkpoint": "docs/research/GERCHIK_CHANNEL_STRATEGY_BASE_APPROVED_2026-10-11.md",
   "current_documentation_scope": {
     "date": "2026-10-11",
-    "strategy_specifications": "S1_S2_A_B_S3_S4_S5_A_B_OWNER_APPROVED",
+    "strategy_specifications": "S1_S2_A_B_S3_S4_S5_A_B_CHANNEL_OWNER_APPROVED",
     "S6": "ABSORBED_IN_S2_B",
     "market_runs_authorized": false,
     "prior_S1_run_flag": "HISTORICAL_APPROVAL_EXECUTION_PAUSED_NOT_AUTHORIZATION_FROM_THIS_DOCUMENTATION_CYCLE",
     "separate_backtest_work": "OUT_OF_SCOPE_AUTHORIZATION_UNCHANGED",
-    "channel_strategy": "OWNER_APPROVED_BASE_AND_80_PERCENT_ENTRY_SPACE_ADDITIONAL_CANCELLATION_PENDING"
+    "channel_strategy": "OWNER_APPROVED_CHANNEL_TEST_SPECIFICATION"
   }
 }
