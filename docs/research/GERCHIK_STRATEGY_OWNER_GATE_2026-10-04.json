@@ -613,7 +613,8 @@
         "approved_document": "docs/research/GERCHIK_S1_REJECTION_APPROVED_2026-10-05.md",
         "execution_state": "PAUSED_FOR_CHAT_HANDOFF_NO_RUN_STARTED",
         "production_or_orders": false
-      }
+      },
+      "specification": "docs/research/GERCHIK_S1_REJECTION_APPROVED_2026-10-05.md"
     },
     "S2": {
       "logic_status": "OWNER_APPROVED_S2_TEST_SPECIFICATION",
@@ -715,7 +716,21 @@
       "common_test_rules": true,
       "implementation_in_this_cycle": "NOT_STARTED",
       "market_runs_authorized": false,
-      "wait_for_retest_deadline": "NOT_APPROVED"
+      "wait_for_retest_deadline": "OWNER_APPROVED_INSTRUMENT_TRADING_INTERVAL_END_NO_BAR_CAP",
+      "wait_for_retest_decision": {
+        "status": "OWNER_APPROVED",
+        "decision_time": "2026-10-11T03:44:29+03:00",
+        "owner_response": "1",
+        "approved_chat_revision": "50",
+        "continuous_market_daily_cutoff": false,
+        "cancel_if": [
+          "MANDATORY_S3_PRECONDITIONS_LOST",
+          "REMAINING_MOVE_REQUIREMENT_LOST"
+        ],
+        "confirmation_penetration_cancels_model": true,
+        "pending_order_cancellation_rules": "UNCHANGED",
+        "scope": "WAIT_BEFORE_ENTRY_FORMATION"
+      }
     },
     "S4": {
       "logic_status": "OWNER_APPROVED_S4_TEST_SPECIFICATION",
@@ -836,5 +851,14 @@
       }
     }
   },
-  "latest_strategy_checkpoint": "docs/research/GERCHIK_S2_BREAKOUT_APPROVED_2026-10-07.md"
+  "latest_strategy_checkpoint": "docs/research/GERCHIK_STRATEGY_PACKAGE_2026-10-11.md",
+  "current_documentation_scope": {
+    "date": "2026-10-11",
+    "strategy_specifications": "S1_S2_A_B_S3_S4_S5_A_B_OWNER_APPROVED",
+    "S6": "ABSORBED_IN_S2_B",
+    "market_runs_authorized": false,
+    "prior_S1_run_flag": "HISTORICAL_APPROVAL_EXECUTION_PAUSED_NOT_AUTHORIZATION_FROM_THIS_DOCUMENTATION_CYCLE",
+    "separate_backtest_work": "OUT_OF_SCOPE_AUTHORIZATION_UNCHANGED",
+    "channel_strategy": "SEPARATE_NOT_DEFINED_OR_APPROVED_IN_THIS_PACKAGE"
+  }
 }
