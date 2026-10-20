@@ -13,13 +13,34 @@ import json
 from pathlib import Path
 from ktrader.mt4_research import MT4ResearchCorpus
 from ktrader.approved_models import Bar,Context,dec,luft,trend
-from ktrader.approved_scheduler import run_model
+from ktrader.approved_replay import run_model
 from ktrader.level_admission import admit
 from ktrader.s1_atr5 import filtered_atr5
 
 
 def epoch(value):
     return int(datetime.fromisoformat(value).replace(tzinfo=timezone.utc).timestamp()*1000)
+
+
+def code_manifest():
+    """Content identity, independent of checkout path and wall-clock time."""
+    base=Path(__file__).resolve().parents[1]
+    files=sorted([*base.glob('src/ktrader/**/*.py'),*base.glob('scripts/**/*.py')])
+    entries={str(p.relative_to(base)):hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
+    digest=hashlib.sha256(json.dumps(entries,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+    return {'sha256':digest,'files':entries}
+
+
+def logical_coordinates(record, offset):
+    """Preserve local indices; expose absolute M5 indices in the frozen series."""
+    result=dict(record)
+    result['logical_coordinates']={
+        'basis':'SOURCE_M5_INDEX',
+        'created_bar':offset+record['created_bar'],
+        'activation_fraction':record['activation_fraction'],
+        **{key:offset+record[key] for key in ('fill_bar','exit_bar') if key in record},
+    }
+    return result
 
 
 def main(argv=None):
@@ -116,9 +137,11 @@ def main(argv=None):
             replay=run_model([Bar.from_row(b) for b in candles['M5'][first_index:]],args.model,
                              context_at,scenario,seed_history=[Bar.from_row(b) for b in candles['M5'][:first_index]])
             for result in replay:
-                records.append({'level_id':admission.evidence_id,'scenario':scenario,**result})
+                records.append({'level_id':admission.evidence_id,'scenario':scenario,**logical_coordinates(result,first_index)})
     report={'status':'ALGORITHMIC_SCENARIO_RUN','schema':'ktrader.approved_models.replay.v1',
             'symbol':args.symbol,'model':args.model,'clock':'ALGORITHMIC_WALL_CLOCK',
+            'execution_driver':'SEQUENTIAL_HISTORICAL_REPLAY','scheduler_used':False,
+            'session_binding':'NONE','code_manifest':code_manifest(),
             'session_accuracy':'NOT_VERIFIED','source_content_sha256':hashes,
             'profile_sha256':hashlib.sha256(Path(args.profile).read_bytes()).hexdigest(),
             'evidence_sha256':hashlib.sha256(Path(args.evidence).read_bytes()).hexdigest(),

@@ -154,7 +154,7 @@ def test_admission_review_and_tick_cannot_be_fabricated():
     assert not admit(candidate,review,rows,as_of_ms=39,tick='.01',source_hash='test').admitted
     assert not admit(candidate,review,rows,as_of_ms=40,tick='.01',source_hash='other').admitted
 
-from ktrader.approved_scheduler import run_model
+from ktrader.approved_replay import run_model
 
 @pytest.mark.parametrize('scenario',['A','B'])
 def test_full_s1_event_loop(scenario):

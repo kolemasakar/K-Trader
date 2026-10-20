@@ -5,7 +5,7 @@ from dataclasses import replace
 from decimal import Decimal as D
 from pathlib import Path
 from ktrader.approved_models import Bar,Context
-from ktrader.approved_scheduler import run_model
+from ktrader.approved_replay import run_model
 
 
 def b(o=100,h=101,l=99,c=100):return Bar(*map(lambda x:D(str(x)),(o,h,l,c)))
