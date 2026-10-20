@@ -1,3 +1,7 @@
+## Завершений умовний S1 — рішення власника 20.10.2026
+
+Власник погодив окремий інженерний режим Point=0.02/tick=0.02 (попередня пропозиція0.01 не застосовується). Виконано прямий S1 A/B на ACHC.us із11 provisional рівнями;0 заявок уA іB; повторний повний прогін ідентичний. Source hashes до/після збіглися, Landlock self-test PASS;366 локальних тестів PASS. Historical/independent-human verification не заявляється; цей дозвіл змінює вимоги лише окремого engineering mode. [Повний результат і межі](ACHC_S1_ENGINEERING_ACCEPTANCE_20261020.md).
+
 ## Актуальне виконання — 20.10.2026
 
 Тестовий шлях переведено на прямий `approved_replay` без імпорту scheduler, із code hashes та умовними M5-координатами, без реальних сесій. Повний локальний набір: 342 PASS. Для 80 рівнів виконано окрему перевірку форми: 63 SHAPE_PASS_REVIEW_PENDING, 13 QUALITATIVE_REVIEW_REQUIRED, 4 POLICY_UNAPPROVED. Це не незалежний допуск; admitted=0. Point/Digits та історична геометрія залишаються непідтвердженими. Деталі: [звіт](S1_TEST_PATH_REVIEW_20261020.md).

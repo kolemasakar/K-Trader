@@ -9,7 +9,7 @@ from ktrader.approved_execution import vertices,prefix
 from ktrader.research_risk import size_position
 
 
-def run_model(bars, model, context_at, scenario, *, seed_history=(),deposit=None,risk_profile=None):
+def run_model(bars, model, context_at, scenario, *, seed_history=(),deposit=None,risk_profile=None,diagnostics=None):
     """context_at(index, history) uses only completed data at current bar open.
 
     Returns all setups, fills, cancellations, exits and censored positions.
@@ -21,9 +21,14 @@ def run_model(bars, model, context_at, scenario, *, seed_history=(),deposit=None
     active=[]
     compressed=False
     compression_since=-1
+    def count(reason):
+        if diagnostics is not None:
+            diagnostics[reason]=diagnostics.get(reason,0)+1
     for index,bar in enumerate(bars):
+        count('BARS_VISITED')
         ctx=context_at(index,tuple(history))
         if ctx is None:
+            count('CONTEXT_UNAVAILABLE')
             if state is not None and state.phase not in ('FILLED','CANCELLED'):
                 state.cancel('CONTEXT_UNAVAILABLE')
             # Already filled protection must still run even when context disappears.
@@ -94,6 +99,7 @@ def run_model(bars, model, context_at, scenario, *, seed_history=(),deposit=None
                     _,_,name,value=min(hits);finish(record,name,value,index);active.remove(record)
             if state and state.phase not in ('FILLED','CANCELLED') and history and fraction<1:
                 if model in ('S1','CHANNEL') and compressed:
+                    count('COMPRESSION_PREFIX_BLOCKED')
                     # No recovery of an old confirmation whose BPU1 predates equalization.
                     continue
                 before=state.order
@@ -104,12 +110,17 @@ def run_model(bars, model, context_at, scenario, *, seed_history=(),deposit=None
                     order=state.on_prefix(history,observed,previous,price,fraction,
                                           next_level_hit=next_level_hit)
                 except ValueError as exc:
+                    count('ORDER_GEOMETRY:'+str(exc))
                     state.cancel('ORDER_GEOMETRY:'+str(exc));order=None
+                if fraction == dec('.9') and order is None:
+                    for reason in state.reasons:
+                        count('ACTIVATION_REJECT:'+reason)
                 if order is not None and before is None:
                     record={'order':order,'created_bar':index,'activation_fraction':str(fraction),
                             'filled':False,'status':'PENDING','gross_r':None,'net_r':None,
                             'size':size_position(order.distance,deposit,risk_profile) if deposit is not None else {'status':'UNKNOWN_DEPOSIT','volume':None}}
                     orders.append(record);active.append(record)
+                    count('ORDERS_CREATED')
                     if order.kind=='PROGRAMMATIC_STOP' or order.side*(price-order.entry)<=0:
                         record['filled']=True;record['status']='OPEN';record['fill_bar']=index;state.phase='FILLED'
             previous=price
