@@ -1,0 +1,630 @@
+{
+  "m5_end": "2026-10-06T22:55:00",
+  "m5_price_range": [
+    "26.66",
+    "32.76"
+  ],
+  "m5_start": "2026-08-26T16:45:00",
+  "relevant_count": 21,
+  "results": [
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 398,
+      "close_beyond_count": 403,
+      "first_close_beyond_index": 264,
+      "id": "7085fd0c4390b1e68f16fa04d1506bc2a680b3709430918b606b6f533ccad6c4",
+      "known_at_ms": 1550707200000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 4,
+      "price": "27.47",
+      "primary_type": "MIRROR",
+      "side": "SUPPORT",
+      "subsequent_touches": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 500,
+      "close_beyond_count": 526,
+      "first_close_beyond_index": 296,
+      "id": "9712b864391ba5d7589b8e492aefd89c94246d77a3cf85b64f7dda30bfdc767d",
+      "known_at_ms": 1554854400000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 3,
+      "price": "29.89",
+      "primary_type": "MIRROR",
+      "side": "SUPPORT",
+      "subsequent_touches": [
+        {
+          "index": 649,
+          "row": [
+            1599091200000,
+            "30.9",
+            "31.42",
+            "29.89",
+            "30.18",
+            "3699",
+            1599177599999
+          ]
+        }
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 1192,
+      "close_beyond_count": 1192,
+      "first_close_beyond_index": 311,
+      "id": "a3300f24039b30bd69d3c5accee643154c1b6e2bb206c9b771fd9b1e40540480",
+      "known_at_ms": 1556668800000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 0,
+      "price": "32.55",
+      "primary_type": "CONSOLIDATION",
+      "side": "RESISTANCE",
+      "subsequent_touches": [
+        {
+          "index": 405,
+          "row": [
+            1568678400000,
+            "32.53",
+            "32.55",
+            "31.57",
+            "31.96",
+            "2029",
+            1568764799999
+          ]
+        }
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 588,
+      "close_beyond_count": 616,
+      "first_close_beyond_index": 365,
+      "id": "eeade6ea82ad7372087991a814d4ccc3517e903d0ed51a12e728f14bda391289",
+      "known_at_ms": 1559174400000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 1,
+      "price": "31.57",
+      "primary_type": "CONSOLIDATION",
+      "side": "SUPPORT",
+      "subsequent_touches": [
+        {
+          "index": 364,
+          "row": [
+            1563494400000,
+            "31.59",
+            "31.99",
+            "31.57",
+            "31.67",
+            "1595",
+            1563580799999
+          ]
+        },
+        {
+          "index": 405,
+          "row": [
+            1568678400000,
+            "32.53",
+            "32.55",
+            "31.57",
+            "31.96",
+            "2029",
+            1568764799999
+          ]
+        },
+        {
+          "index": 411,
+          "row": [
+            1569369600000,
+            "31.59",
+            "32.26",
+            "31.57",
+            "32.15",
+            "1758",
+            1569455999999
+          ]
+        }
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 596,
+      "close_beyond_count": 624,
+      "first_close_beyond_index": 364,
+      "id": "b8977e95847c27418e26c51d678b5040288c931a28fccb121219489bcea246fc",
+      "known_at_ms": 1563494400000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 0,
+      "price": "31.85",
+      "primary_type": "CONSOLIDATION",
+      "side": "SUPPORT",
+      "subsequent_touches": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 459,
+      "close_beyond_count": 485,
+      "first_close_beyond_index": 518,
+      "id": "a488f3ede5b689843ba25ce71636a6fd723a6147ddd565e2e292aeb1fa875fee",
+      "known_at_ms": 1571356800000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 0,
+      "price": "29.94",
+      "primary_type": "MIRROR",
+      "side": "SUPPORT",
+      "subsequent_touches": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 524,
+      "close_beyond_count": 552,
+      "first_close_beyond_index": 433,
+      "id": "b50041fdec072bfd444b6a16db86bc41c89b92fcfd737a9c24cb07c253c5f7de",
+      "known_at_ms": 1571875200000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 0,
+      "price": "31.26",
+      "primary_type": "MIRROR",
+      "side": "SUPPORT",
+      "subsequent_touches": [
+        {
+          "index": 516,
+          "row": [
+            1582675200000,
+            "32.34",
+            "32.72",
+            "31.26",
+            "31.46",
+            "3809",
+            1582761599999
+          ]
+        }
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 526,
+      "close_beyond_count": 554,
+      "first_close_beyond_index": 516,
+      "id": "f66633fd32d60db1e2aa892e5c8a69ac33231b128c4648160dacc771b7941b24",
+      "known_at_ms": 1579737600000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 0,
+      "price": "32.01",
+      "primary_type": "CONSOLIDATION",
+      "side": "SUPPORT",
+      "subsequent_touches": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 442,
+      "close_beyond_count": 468,
+      "first_close_beyond_index": 520,
+      "id": "3b01fb53655ba29aafaf785ff07672f84093a2eba73663a3aec067f9bf75deb4",
+      "known_at_ms": 1583193600000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 4,
+      "price": "29.44",
+      "primary_type": "TREND_BREAK",
+      "side": "SUPPORT",
+      "subsequent_touches": [
+        {
+          "index": 668,
+          "row": [
+            1601510400000,
+            "29.5",
+            "30.14",
+            "29.44",
+            "29.96",
+            "2855",
+            1601596799999
+          ]
+        }
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 1114,
+      "close_beyond_count": 1114,
+      "first_close_beyond_index": 631,
+      "id": "e67056904d5bcaa776b0f3c038628a13cf7ff4fffd9ddcee6e8b38b3aaa176ae",
+      "known_at_ms": 1583366400000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 0,
+      "price": "31.41",
+      "primary_type": "MIRROR",
+      "side": "RESISTANCE",
+      "subsequent_touches": [
+        {
+          "index": 646,
+          "row": [
+            1598832000000,
+            "30.52",
+            "31.41",
+            "30.52",
+            "30.92",
+            "1501",
+            1598918399999
+          ]
+        }
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 1113,
+      "close_beyond_count": 1113,
+      "first_close_beyond_index": 631,
+      "id": "6db922bd4705f7bac95f0fd11f776dbbd770056bbb3c950a2a627e7d0e3c2151",
+      "known_at_ms": 1583452800000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 0,
+      "price": "31.42",
+      "primary_type": "MIRROR",
+      "side": "RESISTANCE",
+      "subsequent_touches": [
+        {
+          "index": 649,
+          "row": [
+            1599091200000,
+            "30.9",
+            "31.42",
+            "29.89",
+            "30.18",
+            "3699",
+            1599177599999
+          ]
+        }
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 334,
+      "close_beyond_count": 359,
+      "first_close_beyond_index": 651,
+      "id": "52ee66a4081229ac35de216f35a3b7872c067a67dd972f0dc6ca83fb67822a55",
+      "known_at_ms": 1598054400000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 1,
+      "price": "29.02",
+      "primary_type": "MIRROR",
+      "side": "SUPPORT",
+      "subsequent_touches": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 1104,
+      "close_beyond_count": 1104,
+      "first_close_beyond_index": 673,
+      "id": "e4fe5e901313ca10c98f46b4a48a0381a7041c7f0c4161fcef532f5bae615b04",
+      "known_at_ms": 1601942400000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 0,
+      "price": "32.05",
+      "primary_type": "MIRROR",
+      "side": "RESISTANCE",
+      "subsequent_touches": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 314,
+      "close_beyond_count": 330,
+      "first_close_beyond_index": 1798,
+      "id": "bcf3d6f1d1c4942982124576542817179105b1b4a1516ed3a46a01a5172e7181",
+      "known_at_ms": 1742601600000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 13,
+      "price": "28.31",
+      "primary_type": "CONSOLIDATION",
+      "side": "SUPPORT",
+      "subsequent_touches": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 37,
+      "close_beyond_count": 53,
+      "first_close_beyond_index": 1801,
+      "id": "48f32c3edca4279fff3e920d2e01e6311b781217971b296e9a60a8e72a73dee1",
+      "known_at_ms": 1744156800000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 11,
+      "price": "28.02",
+      "primary_type": "MIRROR",
+      "side": "RESISTANCE",
+      "subsequent_touches": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 34,
+      "close_beyond_count": 41,
+      "first_close_beyond_index": 2107,
+      "id": "449b42f9bded9862101ab0dabf26ce8e00556bcfd56c400e4ebec2579764e019",
+      "known_at_ms": 1777334400000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 15,
+      "price": "28.46",
+      "primary_type": "CONSOLIDATION",
+      "side": "RESISTANCE",
+      "subsequent_touches": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 35,
+      "close_beyond_count": 56,
+      "first_close_beyond_index": 2107,
+      "id": "cb60a06cd57aeb466604a26231641b213662956d1300fc9888ca5fee4084c67b",
+      "known_at_ms": 1778716800000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 21,
+      "price": "27.71",
+      "primary_type": "CONSOLIDATION",
+      "side": "RESISTANCE",
+      "subsequent_touches": [
+        {
+          "index": 2106,
+          "row": [
+            1782691200000,
+            "27.07",
+            "27.71",
+            "26.35",
+            "27.57",
+            "2750",
+            1782777599999
+          ]
+        }
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 31,
+      "close_beyond_count": 33,
+      "first_close_beyond_index": 2108,
+      "id": "8af6ba7df22533ef348dd10866a0b32e1d0b18e6689b21c4fbf59d1dc65dc23d",
+      "known_at_ms": 1782864000000,
+      "last_closed_before_m5": [
+        1787616000000,
+        "28.85",
+        "29.91",
+        "28.56",
+        "29.79",
+        "1706",
+        1787702399999
+      ],
+      "m5_exact_boundary_touch_count": 1,
+      "price": "29.7",
+      "primary_type": "MIRROR",
+      "side": "RESISTANCE",
+      "subsequent_touches": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 109,
+      "close_beyond_count": 115,
+      "first_close_beyond_index": 107,
+      "id": "891ff0cdb2790f87a6c80f09d36452f305caca2bbe1b77646afd6cc513a6d85f",
+      "known_at_ms": 1580169600000,
+      "last_closed_before_m5": [
+        1786924800000,
+        "30.27",
+        "30.52",
+        "26.54",
+        "27.67",
+        "10500",
+        1787356799999
+      ],
+      "m5_exact_boundary_touch_count": 0,
+      "price": "32.01",
+      "primary_type": "CONSOLIDATION",
+      "side": "SUPPORT",
+      "subsequent_touches": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 69,
+      "close_beyond_count": 75,
+      "first_close_beyond_index": 137,
+      "id": "7e09587bd990add7f328b2e22fd0070d3a3095580bf277d3ee4d9566f09fe6e2",
+      "known_at_ms": 1598313600000,
+      "last_closed_before_m5": [
+        1786924800000,
+        "30.27",
+        "30.52",
+        "26.54",
+        "27.67",
+        "10500",
+        1787356799999
+      ],
+      "m5_exact_boundary_touch_count": 1,
+      "price": "29.02",
+      "primary_type": "MIRROR",
+      "side": "SUPPORT",
+      "subsequent_touches": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "close_beyond_before_m5_count": 9,
+      "close_beyond_count": 15,
+      "first_close_beyond_index": 429,
+      "id": "0cd8fcb964cc5febd7f4d111e39a20a5f2fd73dbd70d12e4bd4e0cbca5ca35d6",
+      "known_at_ms": 1776729600000,
+      "last_closed_before_m5": [
+        1786924800000,
+        "30.27",
+        "30.52",
+        "26.54",
+        "27.67",
+        "10500",
+        1787356799999
+      ],
+      "m5_exact_boundary_touch_count": 6,
+      "price": "27.49",
+      "primary_type": "TREND_BREAK",
+      "side": "RESISTANCE",
+      "subsequent_touches": [],
+      "timeframe": "W1"
+    }
+  ],
+  "scope": "REVIEW_TRIAGE_NOT_ADMISSION_OR_BACKTEST",
+  "source_content_sha256": {
+    "D1": "260e40db4e3a9c8fea80741915484d57f5d7f31ee2a0bae63a80857112d1b207",
+    "M5": "31b4bda61ef16be9d91bb2f221287e33260c5cce4940148f1708c56e64c8f5bf"
+  },
+  "panel_sha256": "e63270def2d97c1d9dff094a3a2fbf5de9445396d54079e9f38b194351369a98",
+  "method": "Select candidate price in full M5 min/max solely for retrospective review prioritization, not causal strategy filtering; count exact same-side D1/W1 boundary touches after known_at with defended close; count beyond-side closes as observations, NOT automatic invalidation."
+}
+

@@ -15,6 +15,7 @@ from ktrader.mt4_research import MT4ResearchCorpus
 from ktrader.approved_models import Bar,Context,dec,luft,trend
 from ktrader.approved_replay import run_model
 from ktrader.level_admission import admit
+from ktrader.price_profile import profile_blockers
 from ktrader.s1_atr5 import filtered_atr5
 
 
@@ -58,8 +59,7 @@ def main(argv=None):
         raise ValueError('source/results overlap')
     profile=json.loads(Path(args.profile).read_text())
     panels=json.loads(Path(args.evidence).read_text())
-    required=('point','tick_size','provenance','historical_price_geometry_verified','level_universe_reviewed')
-    missing=[k for k in required if not profile.get(k)]
+    missing=profile_blockers(profile,args.symbol)
     if missing:
         print(json.dumps({'status':'BLOCKED_PROFILE','missing':missing,'market_trades':None}));return 2
     if profile.get('broker_symbol')!=args.symbol:

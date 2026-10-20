@@ -1,0 +1,26 @@
+{
+  "schema": "ktrader.scenario_profile_proposal.v1",
+  "status": "PROPOSAL_NOT_APPROVED_NOT_EXECUTABLE",
+  "broker_symbol": "ACHC.us",
+  "asset_class": "us_equity",
+  "point": "0.01",
+  "digits": 2,
+  "tick_size": "0.01",
+  "point_basis": "EXPLICIT_EXPERIMENT_ASSUMPTION_PENDING_OWNER_DECISION",
+  "tick_basis": "CURRENT_PUBLIC_BROKER_RECORD_ONLY",
+  "historical_price_geometry_verified": false,
+  "level_universe_reviewed": false,
+  "owner_approval": null,
+  "provenance": "Proposal based on public tick record and OHLC grid compatibility; neither proves historical Point",
+  "clock": "CONDITIONAL_BAR_COORDINATES",
+  "session_binding": "NONE",
+  "scheduler_used": false,
+  "net_results": null,
+  "required_policy_decisions": [
+    "Allow explicitly hypothetical Point=0.01 and tick=0.01 for engineering experiments only",
+    "Allow separate provisional machine-checked levels with causal strengthening evidence; do not label as independent human review",
+    "Keep approved historical replay blocked until actual evidence and independent review exist"
+  ],
+  "excluded_from_provisional_pool": ["TREND_BREAK", "PARANORMAL_BAR"],
+  "note": "Even if approved later, shape passes alone do not meet strengthening, lifecycle or target-space checks"
+}
