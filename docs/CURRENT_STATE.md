@@ -1,3 +1,29 @@
+## Завершений умовний S1 — рішення власника 20.10.2026
+
+Власник погодив окремий інженерний режим Point=0.02/tick=0.02 (попередня пропозиція0.01 не застосовується). Виконано прямий S1 A/B на ACHC.us із11 provisional рівнями;0 заявок уA іB; повторний повний прогін ідентичний. Source hashes до/після збіглися, Landlock self-test PASS;366 локальних тестів PASS. Historical/independent-human verification не заявляється; цей дозвіл змінює вимоги лише окремого engineering mode. [Повний результат і межі](research/ACHC_S1_ENGINEERING_ACCEPTANCE_20261020.md).
+
+## Допуск — додаткова перевірка 20.10.2026
+
+Перевірено 21 кандидат у M5-діапазоні; незалежний допуск і historical Point ще не отримані. Посилено перевірку профілю (literal bool true, додатна скінченна геометрія); повний локальний набір 360 PASS. Підготовлено окрему сценарну пропозицію, НЕ затверджену й НЕ виконану. [Результат та мінімальне потрібне рішення](research/S1_ADMISSION_FOLLOWUP_20261020.md).
+
+## Актуальне виконання — 20.10.2026
+
+Тестовий шлях переведено на прямий `approved_replay` без імпорту scheduler, із code hashes та умовними M5-координатами, без реальних сесій. Повний локальний набір: 342 PASS. Для 80 рівнів виконано окрему перевірку форми: 63 SHAPE_PASS_REVIEW_PENDING, 13 QUALITATIVE_REVIEW_REQUIRED, 4 POLICY_UNAPPROVED. Це не незалежний допуск; admitted=0. Point/Digits та історична геометрія залишаються непідтвердженими. Деталі: [звіт](research/S1_TEST_PATH_REVIEW_20261020.md).
+
+Нижче збережено попередні часові зрізи; твердження про ще невиконану адаптацію scheduler є історичними.
+
+## Контрольна точка — 20.10.2026
+
+Draft [PR96](https://github.com/kolemasakar/K-Trader/pull/96) відкритий; CI run394 на `2d69ac1` SUCCESS. Реальний S1-прогін ще не завершений; допуск 0/80 за попереднім preparation report. Публічну специфікацію ACHC.us отримано 13.10: tick=0,01 USD, tick value=0,01 USD, contract=1. Point/Digits та історична застосовність не підтверджені; незалежний review рівнів не виконано. Поточний tick більше не є відсутнім параметром; історичний tick лишається непідтвердженим.
+
+Чинна [контрольна точка переходу](research/PROJECT_CHECKPOINT_20261020_PRE_TRANSITION.md) містить рішення, перевірки, доступ і борги. Генератор буде надано окремо; подальші прогони в межах фіксації не запускаються. Нижче — попередні записи стану.
+
+## Поточний пріоритет — 11.10.2026
+
+Підготувати перевірений S1-прогін, завершити допуск D1/W1 і приймання S1–S5. Статус: підготовка ACHC.us виконана; реальний допуск заблоковано відсутніми independent labels/Point/tick. Новий код має 333 загальні локальні PASS, завершений market backtest не підтверджено. Умовний clock дозволений; legacy strategy і benchmark виключені.
+
+Чинний [протокол](research/APPROVED_BACKTEST_PROTOCOL_20261011.md) визначає порядок: допуск → реальний S1 → приймання → S2–S5 → інші класи/контрольна вибірка. Нижче збережено історичні milestones; вони не замінюють нові gates.
+
 # K-Trader Current State
 
 > **Mandatory host restriction (2026-09-25):** HP-OMEN is **prohibited for all K-Trader use** (including indirect K_AI/MT4-backed data, diagnostics, CI, scripts, research and backups) until a separate explicit user instruction. Work only on verified independent K-Trader server/repository resources. If a step depends on HP-OMEN, mark it BLOCKED rather than substituting it. See [`docs/operations/K_TRADER_HP_OMEN_EXCLUSION_2026-09-25.md`](operations/K_TRADER_HP_OMEN_EXCLUSION_2026-09-25.md). This operational update does not change the historical Phase 11G evidence snapshot recorded below.

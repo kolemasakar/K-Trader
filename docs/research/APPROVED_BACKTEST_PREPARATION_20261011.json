@@ -1,0 +1,103 @@
+{
+  "admission_blockers": {
+    "HISTORICAL_TICK_UNVERIFIED": 80,
+    "INDEPENDENT_REVIEW_MISSING": 80
+  },
+  "admitted_levels": 0,
+  "atr5_v2": {
+    "accepted": [
+      {
+        "range": 1.1199999999999974,
+        "reference": 1.0160000000000005,
+        "timestamp": "2026-10-05T00:00:00"
+      },
+      {
+        "range": 1.5300000000000011,
+        "reference": 1.0160000000000005,
+        "timestamp": "2026-10-02T00:00:00"
+      },
+      {
+        "range": 0.870000000000001,
+        "reference": 1.0160000000000005,
+        "timestamp": "2026-10-01T00:00:00"
+      },
+      {
+        "range": 0.8399999999999999,
+        "reference": 1.0160000000000005,
+        "timestamp": "2026-09-30T00:00:00"
+      },
+      {
+        "range": 0.7200000000000024,
+        "reference": 1.0160000000000005,
+        "timestamp": "2026-09-29T00:00:00"
+      }
+    ],
+    "atr5": 1.0160000000000005,
+    "inspected": 5,
+    "reference_policy": "iterative-five-selected-recheck-v2",
+    "rejected": []
+  },
+  "candidate_counts": {
+    "D1": 68,
+    "W1": 12
+  },
+  "clock": "ALGORITHMIC_WALL_CLOCK",
+  "generated_at_utc": "2026-10-11T02:21:38.355617+00:00",
+  "legacy_benchmarks_used": false,
+  "legacy_strategy_used": false,
+  "market_trades": null,
+  "net_results": null,
+  "prefix_parity": [
+    {
+      "evidence_id": "18dcebecceb7c0c5a149494c4e2eca68021a170490b71514fc61184f323c14d5",
+      "pass": true,
+      "timeframe": "D1"
+    },
+    {
+      "evidence_id": "fda3aa8ef933ad9d344eb1cb4c55ed1cfccabcbe432c6c2fbbb37d8acdd2e893",
+      "pass": true,
+      "timeframe": "D1"
+    },
+    {
+      "evidence_id": "507eabecf64c35352f1450363758af62b40bd3ec8ce92e2d0936a48e9890d1e8",
+      "pass": true,
+      "timeframe": "D1"
+    },
+    {
+      "evidence_id": "23514f43ff05ae294bfddaf11c5059d0835993e82dd1de2bf62732684d1470d8",
+      "pass": true,
+      "timeframe": "W1"
+    },
+    {
+      "evidence_id": "7ecb5ee8f9621fa7c07d92eacd18b312472d02c98ecda7f26053c4eb63b10259",
+      "pass": true,
+      "timeframe": "W1"
+    },
+    {
+      "evidence_id": "6f7a9c44067c24729757159be52b7285231e2dabde8716d45c45edb495d9a245",
+      "pass": true,
+      "timeframe": "W1"
+    }
+  ],
+  "remaining": [
+    "INDEPENDENT_REAL_LEVEL_LABELS",
+    "VERIFIED_SYMBOL_POINT_TICK",
+    "BROKER_CONTRACT_COST_PROFILE",
+    "INTEGRATED_MODEL_LIFECYCLE_ACCEPTANCE"
+  ],
+  "run_kind": "PREPARATION_NOT_STRATEGY_BACKTEST",
+  "schema": "ktrader.approved_backtest_preparation.v1",
+  "series_counts": {
+    "D1": 2175,
+    "H1": 2061,
+    "M5": 2198
+  },
+  "session_accuracy": "NOT_VERIFIED_ALLOWED_FOR_ALGORITHMIC_WORK",
+  "source_content_sha256": {
+    "D1": "260e40db4e3a9c8fea80741915484d57f5d7f31ee2a0bae63a80857112d1b207",
+    "H1": "78ebcd0cdc3db18489465e8f4f8392eb94f037c87358d009f1cc64661aee0aa3",
+    "M5": "31b4bda61ef16be9d91bb2f221287e33260c5cce4940148f1708c56e64c8f5bf"
+  },
+  "status": "PREPARED_WITH_ADMISSION_BLOCKERS",
+  "symbol": "ACHC.us"
+}

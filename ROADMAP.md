@@ -1,3 +1,41 @@
+## Завершений умовний S1 — рішення власника 20.10.2026
+
+Власник погодив окремий інженерний режим Point=0.02/tick=0.02 (попередня пропозиція0.01 не застосовується). Виконано прямий S1 A/B на ACHC.us із11 provisional рівнями;0 заявок уA іB; повторний повний прогін ідентичний. Source hashes до/після збіглися, Landlock self-test PASS;366 локальних тестів PASS. Historical/independent-human verification не заявляється; цей дозвіл змінює вимоги лише окремого engineering mode. [Повний результат і межі](docs/research/ACHC_S1_ENGINEERING_ACCEPTANCE_20261020.md).
+
+## Допуск — додаткова перевірка 20.10.2026
+
+Перевірено 21 кандидат у M5-діапазоні; незалежний допуск і historical Point ще не отримані. Посилено перевірку профілю (literal bool true, додатна скінченна геометрія); повний локальний набір 360 PASS. Підготовлено окрему сценарну пропозицію, НЕ затверджену й НЕ виконану. [Результат та мінімальне потрібне рішення](docs/research/S1_ADMISSION_FOLLOWUP_20261020.md).
+
+## Актуальне виконання — 20.10.2026
+
+Тестовий шлях переведено на прямий `approved_replay` без імпорту scheduler, із code hashes та умовними M5-координатами, без реальних сесій. Повний локальний набір: 342 PASS. Для 80 рівнів виконано окрему перевірку форми: 63 SHAPE_PASS_REVIEW_PENDING, 13 QUALITATIVE_REVIEW_REQUIRED, 4 POLICY_UNAPPROVED. Це не незалежний допуск; admitted=0. Point/Digits та історична геометрія залишаються непідтвердженими. Деталі: [звіт](docs/research/S1_TEST_PATH_REVIEW_20261020.md).
+
+Нижче збережено попередні часові зрізи; твердження про ще невиконану адаптацію scheduler є історичними.
+
+## Рішення власника — 20.10.2026, уточнення тестування
+
+- На етапах тестування scheduler не використовується. Поточний runner імпортує approved_scheduler.run_model; адаптація тестового шляху до цього рішення ще не виконана. Реалізацію не вважати вже приведеною у відповідність.
+- Тестування виконується в умовних часових координатах без прив'язки до реальних торгових сесій. Зберігаються порядок барів, тривалість таймфреймів і причинна доступність D1/H1/M5/W1.
+- Версія коду потрібна для відтворюваності; часові прив'язки подій можуть бути індексом бара та часткою його тривалості, без вимоги UTC чи реальних сесій.
+- Наприкінці roadmap додано пошук та розробку нових перспективних алгоритмів.
+
+## Контрольна точка — 20.10.2026
+
+Draft [PR96](https://github.com/kolemasakar/K-Trader/pull/96) відкритий; CI run394 на `2d69ac1` SUCCESS. Реальний S1-прогін ще не завершений; допуск 0/80 за попереднім preparation report. Публічну специфікацію ACHC.us отримано 13.10: tick=0,01 USD, tick value=0,01 USD, contract=1. Point/Digits та історична застосовність не підтверджені; незалежний review рівнів не виконано. Поточний tick більше не є відсутнім параметром; історичний tick лишається непідтвердженим.
+
+Чинна [контрольна точка переходу](docs/research/PROJECT_CHECKPOINT_20261020_PRE_TRANSITION.md) містить рішення, перевірки, доступ і борги. Генератор буде надано окремо; подальші прогони в межах фіксації не запускаються. Нижче — попередні записи стану.
+
+# Чинний дослідницький рубіж — 11.10.2026
+
+Мета: завершений перевірений S1-прогін на ACHC.us, потім S2–S5 за погодженими специфікаціями. Реальна підготовка виконана: 68 D1/12 W1 кандидатів; ATR5 v2≈1,016; 6/6 вибіркових prefix checks. Допуск 0/80 через відсутні independent labels і historical Point/tick. Новий контур — 333 загальні локальні PASS; повний market replay не підтверджено. Умовний wall clock дозволений; legacy strategy/benchmark виключені.
+
+1) Завершити реальний допуск рівнів і verified symbol profile.
+2) Прийняти S1 lifecycle A/B і повторний deterministic replay.
+3) Послідовно S2-А/Б → S3 → S4 → S5-А/Б → канал.
+4) Порівняти класи активів і провести незалежний контроль після заморожування рішень.
+
+Чинний [протокол](docs/research/APPROVED_BACKTEST_PROTOCOL_20261011.md). Нижче — історичний roadmap; старі правила не керують новими тестами.
+
 # K-Trader Roadmap v1.18
 
 Status: APPROVED baseline; Phase 9 production and Phase 10 Custom GPT product integration are complete; repository-side implementation is verified through Phase 11G, two canonical production chains are catalogued, FAST M5/60m is production-validated, corrected historical Windows #1-#4 are closed, INTRADAY/M15 universal TTL remains unresolved after broader time-split validation, and MEDIUM/H1 8-12h is time-split validated as a research-only lifecycle design band.
@@ -411,3 +449,13 @@ Status: FUTURE / NOT ACTIVE.
 - PostgreSQL/TimescaleDB/Redis/Kafka/Kubernetes unless measured load justifies them;
 - statistical win probability until calibrated from confirmed outcomes with an approved out-of-sample methodology;
 - full order-book storage.
+
+## Завершальний дослідницький напрям — пошук та розробка нових перспективних алгоритмів
+
+Статус: ДОДАНО ВЛАСНИКОМ 20.10.2026 / ПОДАЛЬШИЙ ЕТАП.
+
+Після поточного циклу тестування та незалежного контролю:
+1) Шукати перспективні алгоритми й формулювати перевірювані гіпотези.
+2) Розробляти окремі версійовані прототипи.
+3) Порівнювати їх із перевіреними базовими моделями на спільному протоколі та незалежних вибірках.
+4) Відбирати алгоритми за відтворюваними результатами та стійкістю.

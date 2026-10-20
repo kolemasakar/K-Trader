@@ -1,0 +1,1293 @@
+{
+  "assumed_order_tick": "0.02",
+  "assumed_point": "0.02",
+  "blocked_levels": [
+    {
+      "id": "18dcebecceb7c0c5a149494c4e2eca68021a170490b71514fc61184f323c14d5",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "fda3aa8ef933ad9d344eb1cb4c55ed1cfccabcbe432c6c2fbbb37d8acdd2e893",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "507eabecf64c35352f1450363758af62b40bd3ec8ce92e2d0936a48e9890d1e8",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "b58cf5e9e1c89a9283646c6e2e6858e89d773c3c6c40fd91d40b0f29e5818e10",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "24416b65846ed0a2a1354be0c55e308df5156372ba86b233b8ddc280ba9e9019",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "a42e97a443f48a3557bea4199bd52c7d0095f08a7dbead0085afe2c8bee681b1",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "7085fd0c4390b1e68f16fa04d1506bc2a680b3709430918b606b6f533ccad6c4",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "fdcd56a225a4a738ca90332bb60d01d39f1cfedec0ecd589164d4b1859ea5d64",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "eacd88c5a36460118345591e5bea9900a10f24ac11bb00de07b3a99de5be2cc2",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "b8977e95847c27418e26c51d678b5040288c931a28fccb121219489bcea246fc",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "a488f3ede5b689843ba25ce71636a6fd723a6147ddd565e2e292aeb1fa875fee",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "f66633fd32d60db1e2aa892e5c8a69ac33231b128c4648160dacc771b7941b24",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "a0c83749bf8928e116a16df68fcc1e9648a5e09800264c7b7d44b5ca9ba96561",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "3b01fb53655ba29aafaf785ff07672f84093a2eba73663a3aec067f9bf75deb4",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "52ee66a4081229ac35de216f35a3b7872c067a67dd972f0dc6ca83fb67822a55",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "e4fe5e901313ca10c98f46b4a48a0381a7041c7f0c4161fcef532f5bae615b04",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "2bde492d46a3a43090858897e5e43b64353531411c8eac177364d26f10d204f5",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "1f1aeab554191277efefbf93ce52ed47d99ecf8b38df596717a48a7821860cda",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "0fe3eb2848cba1aa84e5672e4bb73bbdbae7fa8ee8af30069fffe07abaf66a52",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "e64ca60e30e4b4ba33012c5875ac331c4e5295a67cfca692352de14065045325",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "515addafaed91b6ba83864f8847803eade091f8a22e208f7a420de08788a7aa7",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "647d1f841896dfe8ee94b6b7f332fc9ecbbcb160dae7332f8eb8d2535d0690b0",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "6e09938b912d489842fba07720f5f09a1ea621e6a0bfb6546763e52ba85eebb1",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "8c5b10e6b3f580e1592fd07bbe366d95d6ea84c5f290973263004836f65751b9",
+      "reason": "POLICY_UNAPPROVED"
+    },
+    {
+      "id": "45693e5795b61ceea949c11c32a337fd3d0886f62f1df1b3efca27f82430e311",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "4b1e0eaf95fb420387fb5571c7e1e5c0298b4bc6b631fc2a3965fbd7d8a1fb58",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "db66503e9804449d1d8daf36c66503132ec46a1a4c54568800380624acf49e6c",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "42ab3f6eab1b79c70831bf0aac4e6abe0668700775c9b8368f73b40ba53be3ac",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "c74662d36358d324878ff98ad83581872532f551b15690929d1eb701dd775777",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "407d963abc6254b9b2fd1861272aa6a71f560236701a634d61d1c6450ea1688e",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "92404d8f36974265051441aeea8529bf662f5e099b37c392204dbc07715221fa",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "0b23903b2dfc036765247b23ec2b91d17e58a52d8357a675288a01ef392f2289",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "62ea7c1ab2c6473f81a0720ac385833c91d1d7cf8940ca6699e4a9d8d0001ff3",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "9be60e8dd604077f99bf6844fc8a5d662e624f6a4f45848ef6cf8416c7afdabb",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "8610e5f5e8fe16f45229e99134eca0f27863ce1173dc3938fa16ba694cdd494d",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "5e9bdbebc3854331d5494e2a6077b695cfca6ac69442bb9106404c31d0ca65c1",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "f4be2393c4b7805f2638dba0c6cb8722d8be29e2bede90a39343fbbf4d9af7fc",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "89fd2314cfac808bbd99857487e7bcb85c489f0de9b3e334bb57c44eea827573",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "bcf3d6f1d1c4942982124576542817179105b1b4a1516ed3a46a01a5172e7181",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "48f32c3edca4279fff3e920d2e01e6311b781217971b296e9a60a8e72a73dee1",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "7b4e7b4c21316a77a2c57d89283d4878baed558357a3404069044fda575c8503",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "73bbe7130c195884b71f46d39b752a521eb62528a046c602c33c4c446abeeab0",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "1f1805564c0710f5384eedd693e2c61f244bf1dab7620bb2223891a70a636056",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "5c7d7c8c58e8ae6173dc21d44af8db5492dd3d92a87d645f6594f9e91267718b",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "827cdd42fe446473f6227c6e0982b190d590a966d62f998342a874889badf86f",
+      "reason": "POLICY_UNAPPROVED"
+    },
+    {
+      "id": "ff21aba1ba9ce46d67734ae00bb10dcb0d91172863c02ec5b61b05de2124acc8",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "e98bc918a3f2961f514bad66fe5795e5fc4ebe0e02f6c50c77c60926a18c8598",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "d936b3f0f94933f3b374b6e16c46db41ae490c8dcb7ff75d883a43f59d799777",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "bc1d2361e6e18a83a366e6263a3b0c032ce39179b0f6cc21e1033cb0c4fbe8aa",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "160e572b8c6fe26d6ab4a73e502bd6f062921929646e22e09b8f62d40e49b927",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "038336d4f3d6b8d0911aff1cb3789c20287a62da6e20f9c2489dd350e7e7575b",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "9060a5a86879e7d0599ea83ad6cd225b933c7e2a245e402a6c95343415a9c0c8",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "d54a8b8135746aa357dc6f7b7d4844dc85155dbbaa1ad9c917200d31d940bf1f",
+      "reason": "POLICY_UNAPPROVED"
+    },
+    {
+      "id": "449b42f9bded9862101ab0dabf26ce8e00556bcfd56c400e4ebec2579764e019",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "41c789f4bb350784054f156a3e726fcf48be2780f170327c3b4209c0fda7f27f",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "6aa68f39090ae30b32edcb64a1791012a42d797ec19e64ca25bccabd4650ea64",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "8af6ba7df22533ef348dd10866a0b32e1d0b18e6689b21c4fbf59d1dc65dc23d",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "23514f43ff05ae294bfddaf11c5059d0835993e82dd1de2bf62732684d1470d8",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "7ecb5ee8f9621fa7c07d92eacd18b312472d02c98ecda7f26053c4eb63b10259",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "6f7a9c44067c24729757159be52b7285231e2dabde8716d45c45edb495d9a245",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "fe73b89b42dceba0c80f31f6c1d881c6fd6d916b69b4c467c64ea55080a045bc",
+      "reason": "POLICY_UNAPPROVED"
+    },
+    {
+      "id": "891ff0cdb2790f87a6c80f09d36452f305caca2bbe1b77646afd6cc513a6d85f",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "7e09587bd990add7f328b2e22fd0070d3a3095580bf277d3ee4d9566f09fe6e2",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "ed87184897726872bd754fd0aa8774ebef4cfccc0dd291427ee428eb38f35fc0",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "77bcfd09aeaa9ed96ccfcc63d7a2db5f0fdeb47378f5205966a522acac0c49d0",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "209bc576ac64c312317a3773e9d9bccf88af8f67ac263bf913ef47db6d1c2bf8",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "a7cdd084e6af77beb843cec0dd4daab455e5278b7e713f3b8a8638e65d53167c",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    },
+    {
+      "id": "0cd8fcb964cc5febd7f4d111e39a20a5f2fd73dbd70d12e4bd4e0cbca5ca35d6",
+      "reason": "QUALITATIVE_REVIEW_REQUIRED"
+    },
+    {
+      "id": "fc3d195cd883d484401f907f8c84b5bbcc5767a2753816b0b0c6694419270ea2",
+      "reason": "NO_SUBSEQUENT_EXACT_TOUCH"
+    }
+  ],
+  "clock": "CONDITIONAL_BAR_COORDINATES",
+  "code_manifest": {
+    "files": {
+      "scripts/research/gerchik_filtered_atr5_v1.py": "777bf4853b4e758d06eede71217bdf9fa8d3a6b70927f29591332d50631c311e",
+      "scripts/run_approved_backtest.py": "bb2dcd349663497ec14b3405d48a1cc51cfdc5c56929cc3be0caa31330d28cac",
+      "scripts/run_readonly_research.py": "c9cb1b14c37aadd7a5ef810dfb6c975b5315831f9c21b0862771761592739fec",
+      "scripts/run_s1_engineering.py": "35843ea6b3f1de770132410ef588d6bacc7d85ecfdf73226782e569c97f30d8d",
+      "src/ktrader/__init__.py": "8f3d198cd3a3e2053defdfd2ed745667ee4b3f314dd36bb19c51ab01462c710b",
+      "src/ktrader/approved_execution.py": "cba2579f6b8629d8e40b740d4f8a5c299793529a8f7c1127a163fe9fa9e1b3e4",
+      "src/ktrader/approved_models.py": "6ee7cc31def1bd02547cf3701c603aed33d1e3aa61355b549965d8351084b90f",
+      "src/ktrader/approved_replay.py": "896d41b8b38160959b72b55bb0c1c8bb8b7a3de327a4572c8c27190d774575c7",
+      "src/ktrader/engineering_s1.py": "facb814c817356c458ce40d4cde858d92ec64bc768a2b622cb960ec1ef1288b1",
+      "src/ktrader/level_admission.py": "f62c0323a824fdaaad52456c2af58d29940843312ba5de12ef2c2ef49b819e48",
+      "src/ktrader/level_semantic_audit.py": "8ad5e48d91a21fc47561552d654354b635bd63f3a9a8f8312827738b1588491c",
+      "src/ktrader/mt4_research.py": "dbd2cc36007acb1af03106271e180b7c2a7031d950c00848c66ccd96cb5a92bf",
+      "src/ktrader/price_profile.py": "468660b5c3a40f6748d03ace88c32d49aa8a586f2704de02856ec9a06a495619",
+      "src/ktrader/research_risk.py": "98d88c4a7ea6e1c2542f3c59dac780fceb1459cda4fa5d2472e89d55abe571c8",
+      "src/ktrader/s1_atr5.py": "c8f7440c23231ef9ee8927d8e7d0b9d8ffee179ebf52773757c12de484de8853",
+      "src/ktrader/s1_equity_level_rows.py": "c2842c367e6675e0526bf5aed70691f59ccd768506d352beea19fb04c8dd6dbe"
+    },
+    "sha256": "13e5afb489266198614d5a18d27124d2f8d8162043dc6d7a05a483f9245a4fea"
+  },
+  "deterministic_sha256": "b5eaade05640d318b82623cc7f64ce3aac23d6c361daed3d9ea98176918fe656",
+  "diagnostics": {
+    "099487bca8c4c338b7814e15240d027edf71717d156a3270c9c291264fe693e5:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1698,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1707,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1707,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1707,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1880
+    },
+    "099487bca8c4c338b7814e15240d027edf71717d156a3270c9c291264fe693e5:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1698,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1707,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1707,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1707,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1880
+    },
+    "6db922bd4705f7bac95f0fd11f776dbbd770056bbb3c950a2a627e7d0e3c2151:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1652,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "6db922bd4705f7bac95f0fd11f776dbbd770056bbb3c950a2a627e7d0e3c2151:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1652,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "89c3031b3932b60b26126c513ea54f2324384d491d579189203cfe8b63326862:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1689,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "89c3031b3932b60b26126c513ea54f2324384d491d579189203cfe8b63326862:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1689,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "9712b864391ba5d7589b8e492aefd89c94246d77a3cf85b64f7dda30bfdc767d:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 2145,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 2157,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 2153,
+      "ACTIVATION_REJECT:LARGE_BAR": 135,
+      "ACTIVATION_REJECT:LEVEL_NOT_ADMITTED_OR_STRENGTH_UNCONFIRMED": 2012,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 43,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 81
+    },
+    "9712b864391ba5d7589b8e492aefd89c94246d77a3cf85b64f7dda30bfdc767d:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 2145,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 2157,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 2153,
+      "ACTIVATION_REJECT:LARGE_BAR": 135,
+      "ACTIVATION_REJECT:LEVEL_NOT_ADMITTED_OR_STRENGTH_UNCONFIRMED": 2012,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 43,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 90
+    },
+    "a3300f24039b30bd69d3c5accee643154c1b6e2bb206c9b771fd9b1e40540480:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1689,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "a3300f24039b30bd69d3c5accee643154c1b6e2bb206c9b771fd9b1e40540480:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1689,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "ae46b8973a48a0252e738c1cbddf7a0ff2871fb2d0a264324a167466223161d8:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1689,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "ae46b8973a48a0252e738c1cbddf7a0ff2871fb2d0a264324a167466223161d8:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1689,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "b50041fdec072bfd444b6a16db86bc41c89b92fcfd737a9c24cb07c253c5f7de:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 2161,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 2175,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 2175,
+      "ACTIVATION_REJECT:LARGE_BAR": 137,
+      "ACTIVATION_REJECT:LEVEL_NOT_ADMITTED_OR_STRENGTH_UNCONFIRMED": 2175,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 20
+    },
+    "b50041fdec072bfd444b6a16db86bc41c89b92fcfd737a9c24cb07c253c5f7de:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 2161,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 2175,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 2175,
+      "ACTIVATION_REJECT:LARGE_BAR": 137,
+      "ACTIVATION_REJECT:LEVEL_NOT_ADMITTED_OR_STRENGTH_UNCONFIRMED": 2175,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 20
+    },
+    "bd063c5ec9f29eeba2e5bb3151a921b4f587ade7b537af506e11d8698e70377d:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1689,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "bd063c5ec9f29eeba2e5bb3151a921b4f587ade7b537af506e11d8698e70377d:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1689,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "cb60a06cd57aeb466604a26231641b213662956d1300fc9888ca5fee4084c67b:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 2044,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 2045,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 2029,
+      "ACTIVATION_REJECT:LARGE_BAR": 132,
+      "ACTIVATION_REJECT:LEVEL_NOT_ADMITTED_OR_STRENGTH_UNCONFIRMED": 1572,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 88,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 693
+    },
+    "cb60a06cd57aeb466604a26231641b213662956d1300fc9888ca5fee4084c67b:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 2044,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 2045,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 2029,
+      "ACTIVATION_REJECT:LARGE_BAR": 132,
+      "ACTIVATION_REJECT:LEVEL_NOT_ADMITTED_OR_STRENGTH_UNCONFIRMED": 1572,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 88,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 660
+    },
+    "e67056904d5bcaa776b0f3c038628a13cf7ff4fffd9ddcee6e8b38b3aaa176ae:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1650,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "e67056904d5bcaa776b0f3c038628a13cf7ff4fffd9ddcee6e8b38b3aaa176ae:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 1674,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 1689,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 1689,
+      "ACTIVATION_REJECT:LARGE_BAR": 103,
+      "ACTIVATION_REJECT:MOVE_RESERVE": 1650,
+      "BARS_VISITED": 2177,
+      "COMPRESSION_PREFIX_BLOCKED": 1952
+    },
+    "eeade6ea82ad7372087991a814d4ccc3517e903d0ed51a12e728f14bda391289:A": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 2163,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 2177,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 2177,
+      "ACTIVATION_REJECT:LARGE_BAR": 137,
+      "ACTIVATION_REJECT:LEVEL_NOT_ADMITTED_OR_STRENGTH_UNCONFIRMED": 2177,
+      "BARS_VISITED": 2177
+    },
+    "eeade6ea82ad7372087991a814d4ccc3517e903d0ed51a12e728f14bda391289:B": {
+      "ACTIVATION_REJECT:APPROACH_MISALIGNMENT": 2163,
+      "ACTIVATION_REJECT:BPU1_TOUCH": 2177,
+      "ACTIVATION_REJECT:BPU2_TOUCH_OR_PENETRATION": 2177,
+      "ACTIVATION_REJECT:LARGE_BAR": 137,
+      "ACTIVATION_REJECT:LEVEL_NOT_ADMITTED_OR_STRENGTH_UNCONFIRMED": 2177,
+      "BARS_VISITED": 2177
+    }
+  },
+  "historical_price_geometry_verified": false,
+  "independent_human_review": false,
+  "legacy_strategy_used": false,
+  "level_grid_policy": "RAW_SOURCE_LEVELS_PRESERVED; ASSUMED_GRID_APPLIES_TO_ORDERS_ONLY",
+  "model": "S1",
+  "monetary_results": null,
+  "net_results": null,
+  "orders": [],
+  "panels_sha256": "e63270def2d97c1d9dff094a3a2fbf5de9445396d54079e9f38b194351369a98",
+  "pool_counts": {
+    "accepted": 11,
+    "blocked": 69
+  },
+  "pool_policy": "SHAPE_PLUS_LATER_EXACT_TOUCH_AND_CURRENT_SOURCE_TF_DEFENDED_CLOSE",
+  "profile_sha256": "4adb5160ad83ae2998574e5fe43db32e954500425d2df7c7343711e9d47c1f27",
+  "provisional_levels": [
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1740528000000,
+      "candidate": {
+        "additional_patterns": [],
+        "competing_primary_types": [],
+        "confirmation_index": 91,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1529366400000,
+        "price": "42.37",
+        "primary_type": "CONSOLIDATION",
+        "side": "RESISTANCE",
+        "source_field": "high",
+        "source_index": 74,
+        "source_open_ms": 1527033600000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "CONSOLIDATION",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91
+        ]
+      },
+      "historically_verified": false,
+      "id": "89c3031b3932b60b26126c513ea54f2324384d491d579189203cfe8b63326862",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1740528000000,
+          "index": 1770
+        }
+      ]
+    },
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1599177600000,
+      "candidate": {
+        "additional_patterns": [],
+        "competing_primary_types": [],
+        "confirmation_index": 294,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1554854400000,
+        "price": "29.89",
+        "primary_type": "MIRROR",
+        "side": "SUPPORT",
+        "source_field": "high",
+        "source_index": 288,
+        "source_open_ms": 1554076800000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "MIRROR",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          288,
+          290,
+          291,
+          294
+        ]
+      },
+      "historically_verified": false,
+      "id": "9712b864391ba5d7589b8e492aefd89c94246d77a3cf85b64f7dda30bfdc767d",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1599177600000,
+          "index": 649
+        }
+      ]
+    },
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1568764800000,
+      "candidate": {
+        "additional_patterns": [],
+        "competing_primary_types": [],
+        "confirmation_index": 308,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1556668800000,
+        "price": "32.55",
+        "primary_type": "CONSOLIDATION",
+        "side": "RESISTANCE",
+        "source_field": "high",
+        "source_index": 210,
+        "source_open_ms": 1544054400000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "CONSOLIDATION",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          210,
+          211,
+          212,
+          213,
+          214,
+          215,
+          216,
+          217,
+          218,
+          219,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226,
+          227,
+          228,
+          229,
+          230,
+          231,
+          232,
+          233,
+          234,
+          235,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          243,
+          244,
+          245,
+          246,
+          247,
+          248,
+          249,
+          250,
+          251,
+          252,
+          253,
+          254,
+          255,
+          256,
+          257,
+          258,
+          259,
+          260,
+          261,
+          262,
+          263,
+          264,
+          265,
+          266,
+          267,
+          268,
+          269,
+          270,
+          271,
+          272,
+          273,
+          274,
+          275,
+          276,
+          277,
+          278,
+          279,
+          280,
+          281,
+          282,
+          283,
+          284,
+          285,
+          286,
+          287,
+          288,
+          289,
+          290,
+          291,
+          292,
+          293,
+          294,
+          295,
+          296,
+          297,
+          298,
+          299,
+          300,
+          301,
+          302,
+          303,
+          304,
+          305,
+          306,
+          307,
+          308
+        ]
+      },
+      "historically_verified": false,
+      "id": "a3300f24039b30bd69d3c5accee643154c1b6e2bb206c9b771fd9b1e40540480",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1568764800000,
+          "index": 405
+        }
+      ]
+    },
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1559952000000,
+      "candidate": {
+        "additional_patterns": [
+          {
+            "known_at_ms": 1559952000000,
+            "source_open_ms": 1556668800000,
+            "type": "CONSOLIDATION",
+            "witness_indices": [
+              309,
+              310,
+              311,
+              312,
+              313,
+              314,
+              315,
+              316,
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335
+            ]
+          }
+        ],
+        "competing_primary_types": [],
+        "confirmation_index": 309,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1556755200000,
+        "price": "34.07",
+        "primary_type": "CONSOLIDATION",
+        "side": "RESISTANCE",
+        "source_field": "high",
+        "source_index": 209,
+        "source_open_ms": 1543881600000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "CONSOLIDATION",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          209,
+          210,
+          211,
+          212,
+          213,
+          214,
+          215,
+          216,
+          217,
+          218,
+          219,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226,
+          227,
+          228,
+          229,
+          230,
+          231,
+          232,
+          233,
+          234,
+          235,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          243,
+          244,
+          245,
+          246,
+          247,
+          248,
+          249,
+          250,
+          251,
+          252,
+          253,
+          254,
+          255,
+          256,
+          257,
+          258,
+          259,
+          260,
+          261,
+          262,
+          263,
+          264,
+          265,
+          266,
+          267,
+          268,
+          269,
+          270,
+          271,
+          272,
+          273,
+          274,
+          275,
+          276,
+          277,
+          278,
+          279,
+          280,
+          281,
+          282,
+          283,
+          284,
+          285,
+          286,
+          287,
+          288,
+          289,
+          290,
+          291,
+          292,
+          293,
+          294,
+          295,
+          296,
+          297,
+          298,
+          299,
+          300,
+          301,
+          302,
+          303,
+          304,
+          305,
+          306,
+          307,
+          308,
+          309
+        ]
+      },
+      "historically_verified": false,
+      "id": "bd063c5ec9f29eeba2e5bb3151a921b4f587ade7b537af506e11d8698e70377d",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1559952000000,
+          "index": 335
+        }
+      ]
+    },
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1563580800000,
+      "candidate": {
+        "additional_patterns": [],
+        "competing_primary_types": [],
+        "confirmation_index": 328,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1559174400000,
+        "price": "31.57",
+        "primary_type": "CONSOLIDATION",
+        "side": "SUPPORT",
+        "source_field": "low",
+        "source_index": 317,
+        "source_open_ms": 1557705600000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "CONSOLIDATION",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          317,
+          318,
+          319,
+          320,
+          321,
+          322,
+          323,
+          324,
+          325,
+          326,
+          327,
+          328
+        ]
+      },
+      "historically_verified": false,
+      "id": "eeade6ea82ad7372087991a814d4ccc3517e903d0ed51a12e728f14bda391289",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1563580800000,
+          "index": 364
+        },
+        {
+          "available_at": 1568764800000,
+          "index": 405
+        },
+        {
+          "available_at": 1569456000000,
+          "index": 411
+        }
+      ]
+    },
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1581120000000,
+      "candidate": {
+        "additional_patterns": [],
+        "competing_primary_types": [],
+        "confirmation_index": 361,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1563321600000,
+        "price": "33.5",
+        "primary_type": "MIRROR",
+        "side": "RESISTANCE",
+        "source_field": "low",
+        "source_index": 342,
+        "source_open_ms": 1560816000000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "MIRROR",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          342,
+          356,
+          357,
+          358,
+          360,
+          361
+        ]
+      },
+      "historically_verified": false,
+      "id": "ae46b8973a48a0252e738c1cbddf7a0ff2871fb2d0a264324a167466223161d8",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1581120000000,
+          "index": 504
+        }
+      ]
+    },
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1582761600000,
+      "candidate": {
+        "additional_patterns": [],
+        "competing_primary_types": [],
+        "confirmation_index": 431,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1571875200000,
+        "price": "31.26",
+        "primary_type": "MIRROR",
+        "side": "SUPPORT",
+        "source_field": "high",
+        "source_index": 413,
+        "source_open_ms": 1569542400000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "MIRROR",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          413,
+          415,
+          429,
+          430,
+          431
+        ]
+      },
+      "historically_verified": false,
+      "id": "b50041fdec072bfd444b6a16db86bc41c89b92fcfd737a9c24cb07c253c5f7de",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1582761600000,
+          "index": 516
+        }
+      ]
+    },
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1598918400000,
+      "candidate": {
+        "additional_patterns": [],
+        "competing_primary_types": [],
+        "confirmation_index": 521,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1583366400000,
+        "price": "31.41",
+        "primary_type": "MIRROR",
+        "side": "RESISTANCE",
+        "source_field": "low",
+        "source_index": 459,
+        "source_open_ms": 1575331200000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "MIRROR",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          459,
+          466,
+          516,
+          518,
+          521
+        ]
+      },
+      "historically_verified": false,
+      "id": "e67056904d5bcaa776b0f3c038628a13cf7ff4fffd9ddcee6e8b38b3aaa176ae",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1598918400000,
+          "index": 646
+        }
+      ]
+    },
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1599177600000,
+      "candidate": {
+        "additional_patterns": [
+          {
+            "known_at_ms": 1596672000000,
+            "source_open_ms": 1583366400000,
+            "type": "TREND_BREAK",
+            "witness_indices": [
+              520,
+              521,
+              522,
+              523,
+              524,
+              587,
+              628
+            ]
+          }
+        ],
+        "competing_primary_types": [],
+        "confirmation_index": 522,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1583452800000,
+        "price": "31.42",
+        "primary_type": "MIRROR",
+        "side": "RESISTANCE",
+        "source_field": "low",
+        "source_index": 449,
+        "source_open_ms": 1574035200000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "MIRROR",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          449,
+          451,
+          452,
+          466,
+          516,
+          518,
+          522
+        ]
+      },
+      "historically_verified": false,
+      "id": "6db922bd4705f7bac95f0fd11f776dbbd770056bbb3c950a2a627e7d0e3c2151",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1599177600000,
+          "index": 649
+        }
+      ]
+    },
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1760400000000,
+      "candidate": {
+        "additional_patterns": [],
+        "competing_primary_types": [],
+        "confirmation_index": 1928,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1760140800000,
+        "price": "24.15",
+        "primary_type": "CONSOLIDATION",
+        "side": "SUPPORT",
+        "source_field": "low",
+        "source_index": 1921,
+        "source_open_ms": 1759276800000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "CONSOLIDATION",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          1921,
+          1922,
+          1923,
+          1924,
+          1925,
+          1926,
+          1927,
+          1928
+        ]
+      },
+      "historically_verified": false,
+      "id": "099487bca8c4c338b7814e15240d027edf71717d156a3270c9c291264fe693e5",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1760400000000,
+          "index": 1929
+        },
+        {
+          "available_at": 1779235200000,
+          "index": 2079
+        },
+        {
+          "available_at": 1780963200000,
+          "index": 2092
+        }
+      ]
+    },
+    {
+      "admission_basis": "PROVISIONAL_MACHINE_SHAPE_AND_TOUCH",
+      "available_at": 1782777600000,
+      "candidate": {
+        "additional_patterns": [
+          {
+            "known_at_ms": 1782777600000,
+            "source_open_ms": 1778630400000,
+            "type": "CONSOLIDATION",
+            "witness_indices": [
+              2075,
+              2076,
+              2077,
+              2078,
+              2079,
+              2080,
+              2081,
+              2082,
+              2083,
+              2084,
+              2085,
+              2086,
+              2087,
+              2088,
+              2089,
+              2090,
+              2091,
+              2092,
+              2093,
+              2094,
+              2095,
+              2096,
+              2097,
+              2098,
+              2099,
+              2100,
+              2101,
+              2102,
+              2103,
+              2104,
+              2105,
+              2106
+            ]
+          }
+        ],
+        "competing_primary_types": [],
+        "confirmation_index": 2075,
+        "historical_tick": "PENDING",
+        "independent_review": "PENDING",
+        "known_at_ms": 1778716800000,
+        "price": "27.71",
+        "primary_type": "CONSOLIDATION",
+        "side": "RESISTANCE",
+        "source_field": "high",
+        "source_index": 2069,
+        "source_open_ms": 1777939200000,
+        "status": "RESEARCH_CANDIDATE",
+        "timeframe": "D1",
+        "type": "CONSOLIDATION",
+        "verification": "AUTOMATED_ARCHETYPE_ONLY",
+        "witness_indices": [
+          2069,
+          2070,
+          2071,
+          2072,
+          2073,
+          2074,
+          2075
+        ]
+      },
+      "historically_verified": false,
+      "id": "cb60a06cd57aeb466604a26231641b213662956d1300fc9888ca5fee4084c67b",
+      "independent_human_review": false,
+      "proofs": [
+        {
+          "available_at": 1782777600000,
+          "index": 2106
+        }
+      ]
+    }
+  ],
+  "raw_source_prices_unchanged": true,
+  "rerun_identical": true,
+  "scheduler_used": false,
+  "schema": "ktrader.s1_engineering.v1",
+  "series_counts": {
+    "D1": 2175,
+    "H1": 2061,
+    "M5": 2198
+  },
+  "session_binding": "NONE",
+  "source_content_sha256": {
+    "D1": "260e40db4e3a9c8fea80741915484d57f5d7f31ee2a0bae63a80857112d1b207",
+    "H1": "78ebcd0cdc3db18489465e8f4f8392eb94f037c87358d009f1cc64661aee0aa3",
+    "M5": "31b4bda61ef16be9d91bb2f221287e33260c5cce4940148f1708c56e64c8f5bf"
+  },
+  "state_context_counts": {
+    "DEFENDED_SOURCE_CLOSE": 15924,
+    "SOURCE_SIDE_NOT_DEFENDED": 8023
+  },
+  "status": "COMPLETED_ENGINEERING_EXPERIMENT",
+  "summary": {
+    "A": {},
+    "B": {}
+  },
+  "symbol": "ACHC.us",
+  "target_space": "NEAREST_CURRENT_PROVISIONAL_LEVEL; NOT VERIFIED_COMPLETE_UNIVERSE",
+  "validation_scope": "ENGINEERING_NOT_HOLDOUT_OR_BROKER_EXECUTION",
+  "verified_market_acceptance": false
+}

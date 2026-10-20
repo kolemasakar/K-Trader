@@ -1,0 +1,14 @@
+{
+  "mode": "OWNER_AUTHORIZED_ENGINEERING",
+  "owner_approval_id": "OWNER_20261020_POINT002_TICK002",
+  "owner_instruction": "умовний інженерний тест: Point=0,02, tick=0,02; погоджую 1",
+  "broker_symbol": "ACHC.us",
+  "asset_class": "us_equity",
+  "point": "0.02",
+  "tick_size": "0.02",
+  "historical_price_geometry_verified": false,
+  "level_universe_reviewed": false,
+  "session_binding": "NONE",
+  "source_level_price_policy": "PRESERVE_EXACT_SOURCE_PRICE",
+  "provenance": "Owner-authorized hypothetical geometry, not terminal specification"
+}

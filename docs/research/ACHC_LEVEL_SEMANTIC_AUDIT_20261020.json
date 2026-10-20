@@ -1,0 +1,1215 @@
+{
+  "admitted_levels": 0,
+  "as_of_ms": 1791331200000,
+  "auditor_code_sha256": "8ad5e48d91a21fc47561552d654354b635bd63f3a9a8f8312827738b1588491c",
+  "counts": {
+    "POLICY_UNAPPROVED": 4,
+    "QUALITATIVE_REVIEW_REQUIRED": 13,
+    "SHAPE_PASS_REVIEW_PENDING": 63
+  },
+  "panels_sha256": "e63270def2d97c1d9dff094a3a2fbf5de9445396d54079e9f38b194351369a98",
+  "results": [
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "18dcebecceb7c0c5a149494c4e2eca68021a170490b71514fc61184f323c14d5",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "fda3aa8ef933ad9d344eb1cb4c55ed1cfccabcbe432c6c2fbbb37d8acdd2e893",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "507eabecf64c35352f1450363758af62b40bd3ec8ce92e2d0936a48e9890d1e8",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "b58cf5e9e1c89a9283646c6e2e6858e89d773c3c6c40fd91d40b0f29e5818e10",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "89c3031b3932b60b26126c513ea54f2324384d491d579189203cfe8b63326862",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        1770
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "24416b65846ed0a2a1354be0c55e308df5156372ba86b233b8ddc280ba9e9019",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "a42e97a443f48a3557bea4199bd52c7d0095f08a7dbead0085afe2c8bee681b1",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "7085fd0c4390b1e68f16fa04d1506bc2a680b3709430918b606b6f533ccad6c4",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "9712b864391ba5d7589b8e492aefd89c94246d77a3cf85b64f7dda30bfdc767d",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        649
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "a3300f24039b30bd69d3c5accee643154c1b6e2bb206c9b771fd9b1e40540480",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        405
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "bd063c5ec9f29eeba2e5bb3151a921b4f587ade7b537af506e11d8698e70377d",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        335
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "eeade6ea82ad7372087991a814d4ccc3517e903d0ed51a12e728f14bda391289",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        364,
+        405,
+        411
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "fdcd56a225a4a738ca90332bb60d01d39f1cfedec0ecd589164d4b1859ea5d64",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "eacd88c5a36460118345591e5bea9900a10f24ac11bb00de07b3a99de5be2cc2",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "ae46b8973a48a0252e738c1cbddf7a0ff2871fb2d0a264324a167466223161d8",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        504
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "b8977e95847c27418e26c51d678b5040288c931a28fccb121219489bcea246fc",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "a488f3ede5b689843ba25ce71636a6fd723a6147ddd565e2e292aeb1fa875fee",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "b50041fdec072bfd444b6a16db86bc41c89b92fcfd737a9c24cb07c253c5f7de",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        516
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "f66633fd32d60db1e2aa892e5c8a69ac33231b128c4648160dacc771b7941b24",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "a0c83749bf8928e116a16df68fcc1e9648a5e09800264c7b7d44b5ca9ba96561",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "3b01fb53655ba29aafaf785ff07672f84093a2eba73663a3aec067f9bf75deb4",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "e67056904d5bcaa776b0f3c038628a13cf7ff4fffd9ddcee6e8b38b3aaa176ae",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        646
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "6db922bd4705f7bac95f0fd11f776dbbd770056bbb3c950a2a627e7d0e3c2151",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        649
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "52ee66a4081229ac35de216f35a3b7872c067a67dd972f0dc6ca83fb67822a55",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "e4fe5e901313ca10c98f46b4a48a0381a7041c7f0c4161fcef532f5bae615b04",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "2bde492d46a3a43090858897e5e43b64353531411c8eac177364d26f10d204f5",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "1f1aeab554191277efefbf93ce52ed47d99ecf8b38df596717a48a7821860cda",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "0fe3eb2848cba1aa84e5672e4bb73bbdbae7fa8ee8af30069fffe07abaf66a52",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "e64ca60e30e4b4ba33012c5875ac331c4e5295a67cfca692352de14065045325",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "515addafaed91b6ba83864f8847803eade091f8a22e208f7a420de08788a7aa7",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "647d1f841896dfe8ee94b6b7f332fc9ecbbcb160dae7332f8eb8d2535d0690b0",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "6e09938b912d489842fba07720f5f09a1ea621e6a0bfb6546763e52ba85eebb1",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "8c5b10e6b3f580e1592fd07bbe366d95d6ea84c5f290973263004836f65751b9",
+      "independent_review_created": false,
+      "notes": [
+        "20-bar non-ATR anomaly reference is an unapproved research hypothesis"
+      ],
+      "primary_type": "PARANORMAL_BAR",
+      "status": "POLICY_UNAPPROVED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "45693e5795b61ceea949c11c32a337fd3d0886f62f1df1b3efca27f82430e311",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "4b1e0eaf95fb420387fb5571c7e1e5c0298b4bc6b631fc2a3965fbd7d8a1fb58",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "db66503e9804449d1d8daf36c66503132ec46a1a4c54568800380624acf49e6c",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "three_or_more_consecutive_exact_extrema": true
+      },
+      "evidence_id": "42ab3f6eab1b79c70831bf0aac4e6abe0668700775c9b8368f73b40ba53be3ac",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "LIMIT",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "c74662d36358d324878ff98ad83581872532f551b15690929d1eb701dd775777",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "407d963abc6254b9b2fd1861272aa6a71f560236701a634d61d1c6450ea1688e",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "92404d8f36974265051441aeea8529bf662f5e099b37c392204dbc07715221fa",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "0b23903b2dfc036765247b23ec2b91d17e58a52d8357a675288a01ef392f2289",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "62ea7c1ab2c6473f81a0720ac385833c91d1d7cf8940ca6699e4a9d8d0001ff3",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "9be60e8dd604077f99bf6844fc8a5d662e624f6a4f45848ef6cf8416c7afdabb",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "8610e5f5e8fe16f45229e99134eca0f27863ce1173dc3938fa16ba694cdd494d",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "5e9bdbebc3854331d5494e2a6077b695cfca6ac69442bb9106404c31d0ca65c1",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "f4be2393c4b7805f2638dba0c6cb8722d8be29e2bede90a39343fbbf4d9af7fc",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "89fd2314cfac808bbd99857487e7bcb85c489f0de9b3e334bb57c44eea827573",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "bcf3d6f1d1c4942982124576542817179105b1b4a1516ed3a46a01a5172e7181",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "48f32c3edca4279fff3e920d2e01e6311b781217971b296e9a60a8e72a73dee1",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "7b4e7b4c21316a77a2c57d89283d4878baed558357a3404069044fda575c8503",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "73bbe7130c195884b71f46d39b752a521eb62528a046c602c33c4c446abeeab0",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "1f1805564c0710f5384eedd693e2c61f244bf1dab7620bb2223891a70a636056",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "5c7d7c8c58e8ae6173dc21d44af8db5492dd3d92a87d645f6594f9e91267718b",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "827cdd42fe446473f6227c6e0982b190d590a966d62f998342a874889badf86f",
+      "independent_review_created": false,
+      "notes": [
+        "20-bar non-ATR anomaly reference is an unapproved research hypothesis"
+      ],
+      "primary_type": "PARANORMAL_BAR",
+      "status": "POLICY_UNAPPROVED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "ff21aba1ba9ce46d67734ae00bb10dcb0d91172863c02ec5b61b05de2124acc8",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "e98bc918a3f2961f514bad66fe5795e5fc4ebe0e02f6c50c77c60926a18c8598",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "099487bca8c4c338b7814e15240d027edf71717d156a3270c9c291264fe693e5",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        1929,
+        2079,
+        2092
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "d936b3f0f94933f3b374b6e16c46db41ae490c8dcb7ff75d883a43f59d799777",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "bc1d2361e6e18a83a366e6263a3b0c032ce39179b0f6cc21e1033cb0c4fbe8aa",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "160e572b8c6fe26d6ab4a73e502bd6f062921929646e22e09b8f62d40e49b927",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "038336d4f3d6b8d0911aff1cb3789c20287a62da6e20f9c2489dd350e7e7575b",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "9060a5a86879e7d0599ea83ad6cd225b933c7e2a245e402a6c95343415a9c0c8",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "d54a8b8135746aa357dc6f7b7d4844dc85155dbbaa1ad9c917200d31d940bf1f",
+      "independent_review_created": false,
+      "notes": [
+        "20-bar non-ATR anomaly reference is an unapproved research hypothesis"
+      ],
+      "primary_type": "PARANORMAL_BAR",
+      "status": "POLICY_UNAPPROVED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "449b42f9bded9862101ab0dabf26ce8e00556bcfd56c400e4ebec2579764e019",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "41c789f4bb350784054f156a3e726fcf48be2780f170327c3b4209c0fda7f27f",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "cb60a06cd57aeb466604a26231641b213662956d1300fc9888ca5fee4084c67b",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [
+        2106
+      ],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "6aa68f39090ae30b32edcb64a1791012a42d797ec19e64ca25bccabd4650ea64",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "8af6ba7df22533ef348dd10866a0b32e1d0b18e6689b21c4fbf59d1dc65dc23d",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "D1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "23514f43ff05ae294bfddaf11c5059d0835993e82dd1de2bf62732684d1470d8",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "7ecb5ee8f9621fa7c07d92eacd18b312472d02c98ecda7f26053c4eb63b10259",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "6f7a9c44067c24729757159be52b7285231e2dabde8716d45c45edb495d9a245",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "fe73b89b42dceba0c80f31f6c1d881c6fd6d916b69b4c467c64ea55080a045bc",
+      "independent_review_created": false,
+      "notes": [
+        "20-bar non-ATR anomaly reference is an unapproved research hypothesis"
+      ],
+      "primary_type": "PARANORMAL_BAR",
+      "status": "POLICY_UNAPPROVED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "891ff0cdb2790f87a6c80f09d36452f305caca2bbe1b77646afd6cc513a6d85f",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "7e09587bd990add7f328b2e22fd0070d3a3095580bf277d3ee4d9566f09fe6e2",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "ed87184897726872bd754fd0aa8774ebef4cfccc0dd291427ee428eb38f35fc0",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "77bcfd09aeaa9ed96ccfcc63d7a2db5f0fdeb47378f5205966a522acac0c49d0",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "209bc576ac64c312317a3773e9d9bccf88af8f67ac263bf913ef47db6d1c2bf8",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "closed_role_change": true,
+        "no_failed_role_change_bridged": true,
+        "old_side_two_defenses_research_policy": true,
+        "opposite_exact_retest": true
+      },
+      "evidence_id": "a7cdd084e6af77beb843cec0dd4daab455e5278b7e713f3b8a8638e65d53167c",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "MIRROR",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {},
+      "evidence_id": "0cd8fcb964cc5febd7f4d111e39a20a5f2fd73dbd70d12e4bd4e0cbca5ca35d6",
+      "independent_review_created": false,
+      "notes": [
+        "Meaningful reversal/new extreme needs independent contextual review"
+      ],
+      "primary_type": "TREND_BREAK",
+      "status": "QUALITATIVE_REVIEW_REQUIRED",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    },
+    {
+      "admitted": false,
+      "checks": {
+        "origin_and_confirmation_exact": true,
+        "three_or_more_strictly_one_sided_between": true
+      },
+      "evidence_id": "fc3d195cd883d484401f907f8c84b5bbcc5767a2753816b0b0c6694419270ea2",
+      "independent_review_created": false,
+      "notes": [],
+      "primary_type": "CONSOLIDATION",
+      "status": "SHAPE_PASS_REVIEW_PENDING",
+      "subsequent_exact_touch_indices": [],
+      "timeframe": "W1"
+    }
+  ],
+  "scheduler_used": false,
+  "schema": "ktrader.level_semantic_audit.v1",
+  "scope": "RULE_SHAPE_DIAGNOSTIC_NOT_INDEPENDENT_LABEL"
+}
+
