@@ -41,7 +41,7 @@ W1 відомий лише після першого завершеного D1 �
 - Landlock self-test: source_read=true / source_write_denied=true / exit0.
 - Реальна підготовка ACHC.us: D1=2175/H1=2061/M5=2198; D1 candidates=68/W1=12; ATR5 v2≈1,016.
 - Вибіркові real-prefix checks: 6/6 PASS. Не називати це повним незалежним аудитом усіх архетипів.
-- 55 цільових перевірок PASS (approved_models, MT4, S1 replay): нові моделі/сценарії та відповідні MT4/S1 регресії. Повний локальний набір: 333 PASS. Ізольований ARM64 synthetic S1 A/B smoke та повторення: PASS. CI окремо після публікації; не видавати synthetic tests за real strategy backtest.
+- 55 цільових перевірок PASS (approved_models, MT4, S1 replay): нові моделі/сценарії та відповідні MT4/S1 регресії. Повний локальний набір: 333 PASS. Ізольований ARM64 synthetic S1 A/B smoke та повторення: PASS. CI run394 на remote `2d69ac1554b95d246a96d0057561c9e04a968c61` SUCCESS; не видавати synthetic tests за real strategy backtest.
 - Реальний допуск: 0/80; усі 80 мають HISTORICAL_TICK_UNVERIFIED та INDEPENDENT_REVIEW_MISSING.
 - Даних Point/tick/contract/cost/review у перевіреному KAI-корпусі не знайдено. Підготовка виконана, повний market S1 replay заблокований; trades=null, не 0 market trades.
 
@@ -52,5 +52,10 @@ W1 відомий лише після першого завершеного D1 �
 
 ## Фінальна локальна ревізія
 - Подія досягнення наступного сильного рівня S5-Б передається у lifecycle до повернення; сценарії A/B мають регресійні перевірки.
-- Первісну публікацію відхилила автоматична перевірка дозволів; власник згодом явно дозволив публікацію. Гілку `research/approved-strategies-readiness-20261011` опубліковано через GitHub-конектор; draft [PR96](https://github.com/kolemasakar/K-Trader/pull/96), CI запущено, результат ще не заявлено.
+- Первісну публікацію відхилила автоматична перевірка дозволів; власник згодом явно дозволив публікацію. Гілку `research/approved-strategies-readiness-20261011` опубліковано через GitHub-конектор; draft [PR96](https://github.com/kolemasakar/K-Trader/pull/96), CI run394 завершено SUCCESS (Python3.12/3.14, Docker amd64/arm64, canonical merge gate).
 - Опубліковане дерево коду `fc5c0f317b12efa116663a179c6619d6082206fc` точно відповідає локально перевіреній ревізії `b5bc7eb5a9101749ab8f25eb509cc3b528212e58`. Початковий remote commit: `01b596504a8df2fca945add1ed53707d478e827c`; наступне оновлення стосується тільки цього протоколу.
+
+## Доповнення станом на 20.10.2026
+- Поточний публічний tick ACHC.us знайдено 13.10 на офіційному API Gerchik & Co: 0,01 USD; tick value 0,01 USD; contract size 1. [Snapshot](ACHC_US_GERCHIK_PUBLIC_SPEC_20261013.json). Point/Digits відсутні; історична застосовність і конкретний terminal server не підтверджені. Не підміняти Point тиковим кроком і не ставити historical verification=true.
+- Незалежний допуск рівнів та реальний market S1 acceptance не завершені. Відсутність метаданих у KAI-корпусі не означає відсутності знайденої поточної вебспецифікації.
+- Зафіксовано [контрольну точку перед переходом](PROJECT_CHECKPOINT_20261020_PRE_TRANSITION.md); вона уточнює поточний стан без зміни погоджених правил моделей. Генератор очікується окремо.

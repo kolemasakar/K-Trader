@@ -1,0 +1,95 @@
+{
+  "schema": "ktrader.public_broker_spec_snapshot.v1",
+  "retrieved_at_utc": "2026-10-13T11:38:34.178221+00:00",
+  "broker": "Gerchik & Co",
+  "source_page": "https://gerchik.co/en/for-trader/trading-terms/list-of-assets",
+  "source_api": "https://po-api.gerchik.co/api/get-symbols-info-by-groups",
+  "request_method": "POST",
+  "request_body": {
+    "data": [
+      "US Stocks\\*"
+    ]
+  },
+  "source_response_sha256": "801400c5cd67d1e757cc02a84d542436551f4eaaae4a639815b0b679cb8a8e18",
+  "record": {
+    "symbol_name": "ACHC.us",
+    "symbol_group": "US Stocks\\ACHC.us",
+    "min_volume_lots": "1.00",
+    "max_volume_lots": "10000.00",
+    "volume_step_lots": "1.00",
+    "trading_sessions": [
+      {
+        "Day": 1,
+        "trading_sessions": [
+          {
+            "Open": 990,
+            "Close": 1380
+          }
+        ]
+      },
+      {
+        "Day": 2,
+        "trading_sessions": [
+          {
+            "Open": 990,
+            "Close": 1380
+          }
+        ]
+      },
+      {
+        "Day": 3,
+        "trading_sessions": [
+          {
+            "Open": 990,
+            "Close": 1380
+          }
+        ]
+      },
+      {
+        "Day": 4,
+        "trading_sessions": [
+          {
+            "Open": 990,
+            "Close": 1380
+          }
+        ]
+      },
+      {
+        "Day": 5,
+        "trading_sessions": [
+          {
+            "Open": 990,
+            "Close": 1380
+          }
+        ]
+      }
+    ],
+    "tick_size": 0.01,
+    "tick_value": 0.01,
+    "contract_size": 1,
+    "margin_initial_buy": 20,
+    "swap_long": -8.25,
+    "swap_short": 0.5,
+    "swap_mode": 5,
+    "currency_profit": "USD",
+    "currency_base": "USD",
+    "currency_margin": "USD",
+    "description": "Acadia Healthcare Company, Inc.",
+    "margin_mode": 1
+  },
+  "point": null,
+  "digits": null,
+  "historical_price_geometry_verified": false,
+  "platform_server_verified": false,
+  "historical_validity": "NOT_VERIFIED",
+  "session_timezone": "NOT_VERIFIED",
+  "cost_profile_verified": false,
+  "level_universe_reviewed": false,
+  "scope": "CURRENT_PUBLIC_WEBSITE_SPECIFICATION; not a direct MT4/MT5 terminal export",
+  "notes": [
+    "Public table JavaScript contractsPage obtains groups via /api/v1/symbols-group and reads this API.",
+    "Point/Digits are absent. Tick size must not be substituted for Point.",
+    "Current specification does not establish unchanged settings across the KAI historical period.",
+    "No admission flags are promoted to true by this snapshot."
+  ]
+}
