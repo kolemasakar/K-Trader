@@ -1,3 +1,12 @@
+## Authoritative owner decision - 2026-11-14: shared D1/W1 and research-only scope
+
+- The existing S1-approved automatic strong D1/W1 selector is the ONLY level source for S1, S2A, S2B, S3, S4, S5A and S5B. Do not redesign, duplicate or reapprove the level algorithm.
+- Canonical source: `src/ktrader/automatic_levels.py`, recovered byte-for-byte from Oracle S1 snapshot; `s1_level_book` and `s1_level_active` are the common entrypoints. Each strategy retains its own unchanged trading-model rules.
+- K-Trader NEVER sends broker orders, opens positions or manages trading accounts. It is an OHLC research/backtesting platform. A simulation price quantum is not broker authorization or proof of historical tick.
+- Owner explicitly WAIVES S1 strategy-result parity/regression as a requirement for this level-only integration: S1 strategy logic is out of scope and must remain untouched. This waiver does not establish test PASS; functional integration, syntax and S2A/S2B tests remain independently reportable.
+- Historical 2026-10-11/20 manual independent level-review and broker-Point gates are SUPERSEDED for OHLC research; retain old reports as historical evidence only.
+- GitHub implementation: draft PR #97, `research/unified-d1w1-ohlc-20261114`. Recovered source and runner wiring committed. End-to-end backtests and CI are not yet confirmed. Next: finish shared integration verification, S2A/S2B historical runs, then owner final S2 approval. S3 follows only after approved S2 evidence.
+
 ## Завершений умовний S1 — рішення власника 20.10.2026
 
 Власник погодив окремий інженерний режим Point=0.02/tick=0.02 (попередня пропозиція0.01 не застосовується). Виконано прямий S1 A/B на ACHC.us із11 provisional рівнями;0 заявок уA іB; повторний повний прогін ідентичний. Source hashes до/після збіглися, Landlock self-test PASS;366 локальних тестів PASS. Historical/independent-human verification не заявляється; цей дозвіл змінює вимоги лише окремого engineering mode. [Повний результат і межі](research/ACHC_S1_ENGINEERING_ACCEPTANCE_20261020.md).
