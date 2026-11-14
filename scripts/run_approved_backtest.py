@@ -14,7 +14,7 @@ from pathlib import Path
 from ktrader.mt4_research import MT4ResearchCorpus
 from ktrader.approved_models import Bar,Context,dec,luft,trend
 from ktrader.approved_replay import run_model
-from ktrader.level_admission import admit
+from ktrader.automatic_levels import s1_level_book,s1_level_active
 from ktrader.price_profile import profile_blockers
 from ktrader.s1_atr5 import filtered_atr5
 
@@ -47,8 +47,12 @@ def logical_coordinates(record, offset):
 def main(argv=None):
     parser=argparse.ArgumentParser()
     parser.add_argument('--root',required=True)
-    parser.add_argument('--evidence',required=True,help='review panels with actual completed independent reviews')
-    parser.add_argument('--profile',required=True)
+    parser.add_argument('--evidence',help='legacy argument, ignored: levels come from approved S1 selector')
+    parser.add_argument('--profile',help='optional OHLC simulation geometry, not broker authorization')
+    parser.add_argument('--price-quantum',required=True,help='positive simulation price increment, not historical broker tick')
+    parser.add_argument('--asset-class',default='us_equity')
+    parser.add_argument('--round-grid',help='approved market round-price grid JSON')
+    parser.add_argument('--verified-gap-pairs',help='verified gap evidence JSON')
     parser.add_argument('--output',required=True)
     parser.add_argument('--symbol',default='ACHC.us')
     parser.add_argument('--model',choices=['S1','S2A','S2B','S3','S4','S5A','S5B'],default='S1')
@@ -57,44 +61,38 @@ def main(argv=None):
     source=Path(args.root).resolve(strict=True);output=Path(args.output).resolve(strict=True)
     if source==output or source in output.parents or output in source.parents:
         raise ValueError('source/results overlap')
-    profile=json.loads(Path(args.profile).read_text())
-    panels=json.loads(Path(args.evidence).read_text())
-    missing=profile_blockers(profile,args.symbol)
-    if missing:
-        print(json.dumps({'status':'BLOCKED_PROFILE','missing':missing,'market_trades':None}));return 2
-    if profile.get('broker_symbol')!=args.symbol:
-        raise ValueError('symbol profile mismatch')
+    profile=json.loads(Path(args.profile).read_text()) if args.profile else {}
+    quantum=Decimal(args.price_quantum)
+    if not quantum.is_finite() or quantum<=0:
+        raise ValueError('positive finite simulation price quantum required')
+    profile.setdefault('asset_class',args.asset_class)
+    profile.setdefault('point',str(quantum))
+    profile.setdefault('tick_size',str(quantum))
+    round_grid=json.loads(Path(args.round_grid).read_text()) if args.round_grid else None
+    verified_gaps=json.loads(Path(args.verified_gap_pairs).read_text()) if args.verified_gap_pairs else None
     corpus=MT4ResearchCorpus(source,wall_clock_mode=True)
     candles={tf:list(corpus.iter_closed(args.symbol,tf,as_of=args.as_of)) for tf in ('D1','H1','M5')}
     hashes={tf:corpus.series[(args.symbol,tf)]['normalized_sha256'] for tf in candles}
     from ktrader.s1_equity_level_rows import completed_daily,completed_weekly
     rows={'D1':completed_daily(candles['D1']),'W1':completed_weekly(candles['D1'])}
     cutoff=epoch(args.as_of)
-    accepted=[];blocked=[]
-    for panel in panels:
-        candidate=panel['candidate']
-        review=panel.get('review')
-        # Panels prepared by the audit have an incomplete template, not approval.
-        if review and not review.get('evidence_id'):
-            review={**review,'evidence_id':panel['evidence_id'],'source_sha256':panel['source_sha256']}
-        decision=admit(candidate,review,rows[candidate['timeframe']],as_of_ms=cutoff,
-                       tick=profile['tick_size'],source_hash=hashes['D1'])
-        if decision.admitted:
-            accepted.append((candidate,review,decision))
-        else:
-            blocked.append({'id':decision.evidence_id,'reasons':decision.reasons})
+    levels,rows,availability=s1_level_book(candles['D1'],cutoff,
+        asset_class=profile['asset_class'],symbol=args.symbol,
+        round_grid=round_grid,verified_gap_pairs=verified_gaps)
+    accepted=[(x['candidate'],x,x) for x in levels if x['strong']]
+    blocked=[{'id':x['evidence_id'],'reasons':['NOT_STRONG']} for x in levels if not x['strong']]
     if not accepted:
-        result={'status':'BLOCKED_LEVEL_ADMISSION','market_trades':None,'blocked':blocked}
-        (output/'backtest_gate.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
-        print(json.dumps(result));return 2
+        result={'status':'NO_STRONG_LEVELS','market_trades':[],'blocked':blocked}
+        (output/'backtest_gate.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\\n')
+        print(json.dumps(result));return 0
     unique={}
-    for c,r,a in sorted(accepted,key=lambda x:x[2].available_at_ms):
+    for c,r,a in sorted(accepted,key=lambda x:x[2]['available_at_ms']):
         unique.setdefault((c['price'],c['side']),(c,r,a))
     accepted=list(unique.values())
     times={tf:[epoch(b['close_time']) for b in values] for tf,values in candles.items()}
     records=[]
     for candidate,review,admission in accepted:
-        first_index=next((i for i,b in enumerate(candles['M5']) if epoch(b['open_time'])>=admission.available_at_ms and i>=21),None)
+        first_index=next((i for i,b in enumerate(candles['M5']) if epoch(b['open_time'])>=admission['available_at_ms'] and i>=21),None)
         if first_index is None:
             continue
         level=dec(candidate['price'])
@@ -118,18 +116,17 @@ def main(argv=None):
                 approach_daily=trend([Bar.from_row(b) for b in candles['D1'][:bisect_right(times['D1'],approach_time)]])
             except ValueError:
                 return None
-            decision=admit(candidate,review,rows[candidate['timeframe']],as_of_ms=now,
-                           tick=profile['tick_size'],source_hash=hashes['D1'])
+            level_active=s1_level_active(admission,rows,availability,now)
             approach_m5=history[:-1] if args.model=='S1' else history
             approach=(approach_daily,trend([Bar.from_row(b) for b in candles['H1'][:hourly_n]]),trend(approach_m5))
             # Target space requires an independently reviewed universe. ATE is
             # never inferred from the maximum of a partial available sample.
-            other=[dec(c['price']) for c,r,a in accepted if a.available_at_ms<=now and side*(dec(c['price'])-level)>0]
+            other=[dec(c['price']) for c,r,a in accepted if a['available_at_ms']<=now and side*(dec(c['price'])-level)>0]
             breakout_other=[dec(c['price']) for c,r,a in accepted if a.available_at_ms<=now and side*(dec(c['price'])-level)<0]
             space=bool(other) or profile.get('all_time_coverage_verified') is True
             return Context(level,side,luft(level,profile['asset_class'],profile['point']),
                            dec(profile['tick_size']),dec(profile['point']),atr,profile['asset_class'],
-                           decision.admitted,decision.admitted,approach,daily_direction,space,
+                           level_active,level_active,approach,daily_direction,space,
                            forex_stop_points=profile.get('forex_stop_points'),
                            opposing_level=min(other,key=lambda p:abs(p-level)) if other else None,
                            breakout_next_level=min(breakout_other,key=lambda p:abs(p-level)) if breakout_other else None)
@@ -137,17 +134,17 @@ def main(argv=None):
             replay=run_model([Bar.from_row(b) for b in candles['M5'][first_index:]],args.model,
                              context_at,scenario,seed_history=[Bar.from_row(b) for b in candles['M5'][:first_index]])
             for result in replay:
-                records.append({'level_id':admission.evidence_id,'scenario':scenario,**logical_coordinates(result,first_index)})
+                records.append({'level_id':admission['evidence_id'],'scenario':scenario,**logical_coordinates(result,first_index)})
     report={'status':'ALGORITHMIC_SCENARIO_RUN','schema':'ktrader.approved_models.replay.v1',
             'symbol':args.symbol,'model':args.model,'clock':'ALGORITHMIC_WALL_CLOCK',
             'execution_driver':'SEQUENTIAL_HISTORICAL_REPLAY','scheduler_used':False,
             'session_binding':'NONE','code_manifest':code_manifest(),
             'session_accuracy':'NOT_VERIFIED','source_content_sha256':hashes,
-            'profile_sha256':hashlib.sha256(Path(args.profile).read_bytes()).hexdigest(),
-            'evidence_sha256':hashlib.sha256(Path(args.evidence).read_bytes()).hexdigest(),
+            'profile_sha256':hashlib.sha256(Path(args.profile).read_bytes()).hexdigest() if args.profile else None,
+            'evidence_sha256':None,
             'admitted_levels':len(accepted),'orders':records,'net_results':None,
             'legacy_strategy_used':False,'legacy_benchmarks_used':False,
-            'validation_scope':'ENGINEERING_REPLAY_NOT_INDEPENDENT_HOLDOUT'}
+            'validation_scope':'OHLC_RESEARCH_ONLY_NO_BROKER_EXECUTION','level_engine':'ktrader.automatic_levels.s1_level_book'}
     (output/'backtest.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
     print(json.dumps({'status':report['status'],'orders':len(records),'admitted_levels':len(accepted)}))
     return 0
