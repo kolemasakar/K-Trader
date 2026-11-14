@@ -14,7 +14,7 @@ from pathlib import Path
 from ktrader.mt4_research import MT4ResearchCorpus
 from ktrader.approved_models import Bar,Context,dec,luft,trend
 from ktrader.approved_replay import run_model
-from ktrader.research_level_engine import research_admit
+from ktrader.level_admission import admit
 from ktrader.price_profile import profile_blockers
 from ktrader.s1_atr5 import filtered_atr5
 
@@ -47,10 +47,8 @@ def logical_coordinates(record, offset):
 def main(argv=None):
     parser=argparse.ArgumentParser()
     parser.add_argument('--root',required=True)
-    parser.add_argument('--evidence',required=True,help='automated strength evidence panels, not human labels')
-    parser.add_argument('--profile',help='optional OHLC research geometry JSON')
-    parser.add_argument('--price-quantum',required=True,help='explicit OHLC simulation quantum, not a broker tick')
-    parser.add_argument('--asset-class',default='us_equity')
+    parser.add_argument('--evidence',required=True,help='review panels with actual completed independent reviews')
+    parser.add_argument('--profile',required=True)
     parser.add_argument('--output',required=True)
     parser.add_argument('--symbol',default='ACHC.us')
     parser.add_argument('--model',choices=['S1','S2A','S2B','S3','S4','S5A','S5B'],default='S1')
@@ -59,14 +57,13 @@ def main(argv=None):
     source=Path(args.root).resolve(strict=True);output=Path(args.output).resolve(strict=True)
     if source==output or source in output.parents or output in source.parents:
         raise ValueError('source/results overlap')
-    profile=json.loads(Path(args.profile).read_text()) if args.profile else {}
-    quantum=Decimal(args.price_quantum)
-    if not quantum.is_finite() or quantum<=0:
-        raise ValueError('positive OHLC simulation quantum required')
-    profile.setdefault('asset_class',args.asset_class)
-    profile.setdefault('point',str(quantum))
-    profile.setdefault('tick_size',str(quantum))
+    profile=json.loads(Path(args.profile).read_text())
     panels=json.loads(Path(args.evidence).read_text())
+    missing=profile_blockers(profile,args.symbol)
+    if missing:
+        print(json.dumps({'status':'BLOCKED_PROFILE','missing':missing,'market_trades':None}));return 2
+    if profile.get('broker_symbol')!=args.symbol:
+        raise ValueError('symbol profile mismatch')
     corpus=MT4ResearchCorpus(source,wall_clock_mode=True)
     candles={tf:list(corpus.iter_closed(args.symbol,tf,as_of=args.as_of)) for tf in ('D1','H1','M5')}
     hashes={tf:corpus.series[(args.symbol,tf)]['normalized_sha256'] for tf in candles}
@@ -80,10 +77,10 @@ def main(argv=None):
         # Panels prepared by the audit have an incomplete template, not approval.
         if review and not review.get('evidence_id'):
             review={**review,'evidence_id':panel['evidence_id'],'source_sha256':panel['source_sha256']}
-        decision=research_admit(candidate,rows[candidate['timeframe']],as_of_ms=cutoff,
-                       source_hash=hashes['D1'],verified_strength=panel.get('automated_strength_verified') is True)
+        decision=admit(candidate,review,rows[candidate['timeframe']],as_of_ms=cutoff,
+                       tick=profile['tick_size'],source_hash=hashes['D1'])
         if decision.admitted:
-            accepted.append(({**candidate,'automated_strength_verified':True},review,decision))
+            accepted.append((candidate,review,decision))
         else:
             blocked.append({'id':decision.evidence_id,'reasons':decision.reasons})
     if not accepted:
@@ -121,8 +118,8 @@ def main(argv=None):
                 approach_daily=trend([Bar.from_row(b) for b in candles['D1'][:bisect_right(times['D1'],approach_time)]])
             except ValueError:
                 return None
-            decision=research_admit(candidate,rows[candidate['timeframe']],as_of_ms=now,
-                           source_hash=hashes['D1'],verified_strength=candidate.get('automated_strength_verified') is True)
+            decision=admit(candidate,review,rows[candidate['timeframe']],as_of_ms=now,
+                           tick=profile['tick_size'],source_hash=hashes['D1'])
             approach_m5=history[:-1] if args.model=='S1' else history
             approach=(approach_daily,trend([Bar.from_row(b) for b in candles['H1'][:hourly_n]]),trend(approach_m5))
             # Target space requires an independently reviewed universe. ATE is
@@ -145,12 +142,12 @@ def main(argv=None):
             'symbol':args.symbol,'model':args.model,'clock':'ALGORITHMIC_WALL_CLOCK',
             'execution_driver':'SEQUENTIAL_HISTORICAL_REPLAY','scheduler_used':False,
             'session_binding':'NONE','code_manifest':code_manifest(),
-            'session_accuracy':'NOT_VERIFIED','execution_mode':'OHLC_RESEARCH_ONLY_NO_BROKER','source_content_sha256':hashes,
-            'profile_sha256':hashlib.sha256(Path(args.profile).read_bytes()).hexdigest() if args.profile else None,
+            'session_accuracy':'NOT_VERIFIED','source_content_sha256':hashes,
+            'profile_sha256':hashlib.sha256(Path(args.profile).read_bytes()).hexdigest(),
             'evidence_sha256':hashlib.sha256(Path(args.evidence).read_bytes()).hexdigest(),
             'admitted_levels':len(accepted),'orders':records,'net_results':None,
             'legacy_strategy_used':False,'legacy_benchmarks_used':False,
-            'validation_scope':'OHLC_RESEARCH_ONLY_NO_BROKER_EXECUTION'}
+            'validation_scope':'ENGINEERING_REPLAY_NOT_INDEPENDENT_HOLDOUT'}
     (output/'backtest.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
     print(json.dumps({'status':report['status'],'orders':len(records),'admitted_levels':len(accepted)}))
     return 0
