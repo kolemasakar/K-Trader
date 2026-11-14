@@ -75,7 +75,7 @@ def main(argv=None):
     rows={'D1':completed_daily(candles['D1']),'W1':completed_weekly(candles['D1'])}
     cutoff=epoch(args.as_of)
     levels,rows,availability=s1_level_book(candles['D1'],cutoff,
-        asset_class=profile['asset_class'],symbol=args.symbol,
+        asset_class='metals' if profile['asset_class'] in ('gold','silver') else profile['asset_class'],symbol=args.symbol,
         round_grid=round_grid,verified_gap_pairs=verified_gaps)
     accepted=[(x['candidate'],x,x) for x in levels if x['strong']]
     blocked=[{'id':x['evidence_id'],'reasons':['NOT_STRONG']} for x in levels if not x['strong']]
