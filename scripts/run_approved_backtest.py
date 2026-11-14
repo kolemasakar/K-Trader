@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Run one approved model on verified MT4 series and external reviewed evidence.
+"""Run one approved model on read-only OHLC series using the approved S1 level selector.
 
-No legacy strategy or benchmark inputs. Profiles and reviewed labels are required;
-unknown monetary terms stay unknown while price-only scenario runs are explicit.
+No broker execution, manual level labels or mandatory broker specification.
 """
 import argparse
 from bisect import bisect_right
@@ -15,7 +14,6 @@ from ktrader.mt4_research import MT4ResearchCorpus
 from ktrader.approved_models import Bar,Context,dec,luft,trend
 from ktrader.approved_replay import run_model
 from ktrader.automatic_levels import s1_level_book,s1_level_active
-from ktrader.price_profile import profile_blockers
 from ktrader.s1_atr5 import filtered_atr5
 
 
@@ -83,7 +81,7 @@ def main(argv=None):
     blocked=[{'id':x['evidence_id'],'reasons':['NOT_STRONG']} for x in levels if not x['strong']]
     if not accepted:
         result={'status':'NO_STRONG_LEVELS','market_trades':[],'blocked':blocked}
-        (output/'backtest_gate.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\\n')
+        (output/'backtest_gate.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
         print(json.dumps(result));return 0
     unique={}
     for c,r,a in sorted(accepted,key=lambda x:x[2]['available_at_ms']):
@@ -122,7 +120,7 @@ def main(argv=None):
             # Target space requires an independently reviewed universe. ATE is
             # never inferred from the maximum of a partial available sample.
             other=[dec(c['price']) for c,r,a in accepted if a['available_at_ms']<=now and side*(dec(c['price'])-level)>0]
-            breakout_other=[dec(c['price']) for c,r,a in accepted if a.available_at_ms<=now and side*(dec(c['price'])-level)<0]
+            breakout_other=[dec(c['price']) for c,r,a in accepted if a['available_at_ms']<=now and side*(dec(c['price'])-level)<0]
             space=bool(other) or profile.get('all_time_coverage_verified') is True
             return Context(level,side,luft(level,profile['asset_class'],profile['point']),
                            dec(profile['tick_size']),dec(profile['point']),atr,profile['asset_class'],
