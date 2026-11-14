@@ -12,4 +12,4 @@ The S1 function s1_level_book is the sole D1/W1 source in scripts/run_approved_b
 
 Broker execution is prohibited in K-Trader. Explicit --price-quantum is a simulation assumption, not evidence of broker tick/Point. OHLC price/R results cannot be presented as actual fills or net P&L.
 
-Verification status: source recovered and published; regression parity, full S1 and S2A/S2B real-bar replays and GitHub CI are NOT YET VERIFIED. Do not merge the draft PR until tests pass. The original S1 snapshot's outputs must be compared before declaring parity.
+Verification status: source recovered and published. The owner explicitly ruled that S1 strategy-result parity testing is NOT REQUIRED for this level-only integration; S1 strategy rules are unchanged by design. This is a waiver, not a test PASS. Shared wiring AST parse and Oracle S1 module import passed. End-to-end S2A/S2B real-bar runs and GitHub CI are NOT YET VERIFIED. Keep the draft PR unmerged until applicable integration tests and S2 evidence are complete.
