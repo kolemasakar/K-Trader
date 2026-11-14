@@ -63,15 +63,17 @@ def _claim(rows, tf, price, side, kind, origin, confirmation, witnesses):
                 confirmation_index=confirmation, witness_indices=sorted(set(witnesses)))
 
 
-def detect_all(rows, timeframe, policy):
+def detect_all(rows, timeframe, policy, *, bar_series=False, atr_large_indices=None, verified_gap_pairs=()):
     """Return earliest primary identities plus later pattern evidence.
 
     Simultaneously qualifying different types remain AMBIGUOUS. No base-weight
     ranking selects a primary. Every claim stores a complete causal witness.
     """
     policy.validate()
-    if timeframe not in ('D1', 'W1'):
+    if not bar_series and timeframe not in ('D1', 'W1'):
         raise ValueError('D1/W1 only')
+    if bar_series and policy.calendar != 'US_EQUITY_SESSION_WALL_CLOCK':
+        raise ValueError('generic series requires ordered non-overlapping bar policy')
     strict = strict_formations(rows, timeframe, session_calendar=(policy.calendar == 'US_EQUITY_SESSION_WALL_CLOCK'))  # validates OHLC and order
     step = 86400000 if timeframe == 'D1' else 604800000
     if policy.calendar == 'UTC_CONTINUOUS_24_7':
@@ -168,10 +170,12 @@ def detect_all(rows, timeframe, policy):
     # Non-ATR arithmetic reference excludes the formation bar and uses only past bars.
     n = policy.paranormal_reference_bars
     multiple = Decimal(policy.paranormal_multiple)
-    for i in range(n, len(rows)):
-        mean = sum((b[1]-b[2] for b in prices[i-n:i]), Decimal(0))/n
-        if mean <= 0 or prices[i][1]-prices[i][2] < multiple*mean:
-            continue
+    origins = range(n,len(rows)) if atr_large_indices is None else sorted(atr_large_indices)
+    for i in origins:
+        if atr_large_indices is None:
+            mean = sum((b[1]-b[2] for b in prices[i-n:i]), Decimal(0))/n
+            if mean <= 0 or prices[i][1]-prices[i][2] < multiple*mean:
+                continue
         for field, side in ((1, 'RESISTANCE'), (2, 'SUPPORT')):
             p = prices[i][field]
             contacts = {}
@@ -183,12 +187,12 @@ def detect_all(rows, timeframe, policy):
                     contacts[kind] = j
                 if {'TOUCH', 'FALSE_BREAKOUT'} <= contacts.keys():
                     claims.append(_claim(rows, timeframe, p, side, 'PARANORMAL_BAR', i, j,
-                                         list(range(i-n, i+1))+list(contacts.values())))
+                                         (list(range(i-n,i+1)) if atr_large_indices is None else [i])+list(contacts.values())))
                     break
     # True traded-price gap: disjoint adjacent ranges in a contiguous 24/7 series.
     # Missing bars were rejected above. Both boundaries need their own later defense.
     for i in range(1, len(rows)):
-        if policy.calendar != "UTC_CONTINUOUS_24_7":
+        if policy.calendar != "UTC_CONTINUOUS_24_7" and (rows[i-1][0],rows[i][0]) not in verified_gap_pairs:
             continue  # session gaps need separately reviewed exchange calendar
         a, b = prices[i-1], prices[i]
         boundaries = []
