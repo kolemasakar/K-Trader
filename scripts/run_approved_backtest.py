@@ -14,7 +14,7 @@ from pathlib import Path
 from ktrader.mt4_research import MT4ResearchCorpus
 from ktrader.approved_models import Bar,Context,dec,luft,trend
 from ktrader.approved_replay import run_model
-from ktrader.level_admission import admit
+from ktrader.research_level_engine import research_admit
 from ktrader.price_profile import profile_blockers
 from ktrader.s1_atr5 import filtered_atr5
 
@@ -47,7 +47,7 @@ def logical_coordinates(record, offset):
 def main(argv=None):
     parser=argparse.ArgumentParser()
     parser.add_argument('--root',required=True)
-    parser.add_argument('--evidence',required=True,help='review panels with actual completed independent reviews')
+    parser.add_argument('--evidence',required=True,help='automated strength evidence panels, not human labels')
     parser.add_argument('--profile',required=True)
     parser.add_argument('--output',required=True)
     parser.add_argument('--symbol',default='ACHC.us')
@@ -77,10 +77,10 @@ def main(argv=None):
         # Panels prepared by the audit have an incomplete template, not approval.
         if review and not review.get('evidence_id'):
             review={**review,'evidence_id':panel['evidence_id'],'source_sha256':panel['source_sha256']}
-        decision=admit(candidate,review,rows[candidate['timeframe']],as_of_ms=cutoff,
-                       tick=profile['tick_size'],source_hash=hashes['D1'])
+        decision=research_admit(candidate,rows[candidate['timeframe']],as_of_ms=cutoff,
+                       source_hash=hashes['D1'],verified_strength=panel.get('automated_strength_verified') is True)
         if decision.admitted:
-            accepted.append((candidate,review,decision))
+            accepted.append(({**candidate,'automated_strength_verified':True},review,decision))
         else:
             blocked.append({'id':decision.evidence_id,'reasons':decision.reasons})
     if not accepted:
@@ -118,8 +118,8 @@ def main(argv=None):
                 approach_daily=trend([Bar.from_row(b) for b in candles['D1'][:bisect_right(times['D1'],approach_time)]])
             except ValueError:
                 return None
-            decision=admit(candidate,review,rows[candidate['timeframe']],as_of_ms=now,
-                           tick=profile['tick_size'],source_hash=hashes['D1'])
+            decision=research_admit(candidate,rows[candidate['timeframe']],as_of_ms=now,
+                           source_hash=hashes['D1'],verified_strength=candidate.get('automated_strength_verified') is True)
             approach_m5=history[:-1] if args.model=='S1' else history
             approach=(approach_daily,trend([Bar.from_row(b) for b in candles['H1'][:hourly_n]]),trend(approach_m5))
             # Target space requires an independently reviewed universe. ATE is
@@ -147,7 +147,7 @@ def main(argv=None):
             'evidence_sha256':hashlib.sha256(Path(args.evidence).read_bytes()).hexdigest(),
             'admitted_levels':len(accepted),'orders':records,'net_results':None,
             'legacy_strategy_used':False,'legacy_benchmarks_used':False,
-            'validation_scope':'ENGINEERING_REPLAY_NOT_INDEPENDENT_HOLDOUT'}
+            'validation_scope':'OHLC_RESEARCH_ONLY_NO_BROKER_EXECUTION'}
     (output/'backtest.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
     print(json.dumps({'status':report['status'],'orders':len(records),'admitted_levels':len(accepted)}))
     return 0
